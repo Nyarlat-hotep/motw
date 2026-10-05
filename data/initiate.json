@@ -1,0 +1,488 @@
+{
+  "id": "initiate",
+  "name": "The Initiate",
+  "tagline": "You belong to an ancient secret order of monster slayers. You have training, tradition and backup, but also the Sect's politics and orders to deal with.",
+  "difficulty": 2,
+  "ratings": [
+    {
+      "charm": -1,
+      "cool": 1,
+      "sharp": 0,
+      "tough": 1,
+      "weird": 2
+    },
+    {
+      "charm": 0,
+      "cool": 1,
+      "sharp": 1,
+      "tough": -1,
+      "weird": 2
+    },
+    {
+      "charm": -1,
+      "cool": 0,
+      "sharp": -1,
+      "tough": 2,
+      "weird": 2
+    },
+    {
+      "charm": 1,
+      "cool": -1,
+      "sharp": 1,
+      "tough": 0,
+      "weird": 2
+    },
+    {
+      "charm": 0,
+      "cool": 0,
+      "sharp": 0,
+      "tough": 1,
+      "weird": 2
+    }
+  ],
+  "look": [
+    {
+      "title": "Body",
+      "options": [
+        "hardened body",
+        "tattooed body",
+        "agile body",
+        "strong body",
+        "thin body",
+        "angular body",
+        "hunched body"
+      ],
+      "writeIn": true
+    },
+    {
+      "title": "Clothes",
+      "options": [
+        "archaic clothes",
+        "unfashionable clothes",
+        "ceremonial clothes",
+        "mismatched clothes",
+        "formal clothes"
+      ],
+      "writeIn": true
+    }
+  ],
+  "luckSpecial": "Whenever you burn a Luck point, your Sect suffers a setback, like a reckless project or an operation that goes badly wrong.",
+  "moves": {
+    "intro": "Besides the basic moves, you have four Initiate moves. The first (about your Sect) comes free, and you choose three more from the list.",
+    "pick": 3,
+    "auto": [
+      {
+        "id": "initiate-sect",
+        "name": "Sect Contact",
+        "kind": "roll",
+        "stat": "charm",
+        "trig": "Each time a mystery begins and you are on good terms with your Sect",
+        "full": "The Sect offers helpful information or support in the field.",
+        "part": "They give you a mission linked to the mystery. If you complete it, you also get some info or help.",
+        "miss": "The Sect asks you to do something wrong.",
+        "note": "Failing a mission or defying an order leaves you in the Sect's bad books until you make amends. The sheet does not name this move, so the name is just a label."
+      }
+    ],
+    "choices": [
+      {
+        "id": "initiate-ancient-fighting-arts",
+        "name": "Ancient Fighting Arts",
+        "kind": "passive",
+        "summary": "With an old-style hand weapon you do +1 harm, and you also get +1 on protect someone rolls."
+      },
+      {
+        "id": "initiate-mystic",
+        "name": "Mystic",
+        "kind": "passive",
+        "summary": "Each successful use of magic gives you +1 forward."
+      },
+      {
+        "id": "initiate-fortunes",
+        "name": "Fortunes",
+        "kind": "roll",
+        "stat": "weird",
+        "trig": "Once per mystery, when you consult the Sect's prophecies or fortune-telling about what is coming",
+        "full": "Hold 3.",
+        "part": "Hold 1.",
+        "miss": "The information is wrong, and the Keeper decides how it hurts you.",
+        "note": "Each hold point can be spent on one of these: have a useful item to hand; arrive just in time wherever you are needed; give yourself or another hunter +1 forward; or warn someone in hindsight about an attack so it never takes place."
+      },
+      {
+        "id": "initiate-sacred-oath",
+        "name": "Sacred Oath",
+        "kind": "passive",
+        "summary": "You may vow to pursue one goal and give up something while you do (for example talking, all food except bread and water, drink, lying or sex). The Keeper has to agree, and the sacrifice should be as big and hard as the goal. While you keep the vow and work toward the goal, you get +1 to rolls that directly serve it, and you mark experience when each session ends. Breaking the vow means -1 ongoing until you make amends."
+      },
+      {
+        "id": "initiate-mentor",
+        "name": "Mentor",
+        "kind": "roll",
+        "stat": "sharp",
+        "trig": "When you contact your mentor in the Sect for information (name them when you take this move)",
+        "full": "Your question gets a straight answer.",
+        "part": "Choose one: they are busy and cannot help, or they answer but you owe them a favour.",
+        "miss": "Your question causes trouble.",
+        "note": ""
+      },
+      {
+        "id": "initiate-apprentice",
+        "name": "Apprentice",
+        "kind": "passive",
+        "summary": "You have a student (name them) and it is your task to pass on the Sect's ways. The student is an ally of the subordinate type, motivated to do exactly as you instruct."
+      },
+      {
+        "id": "initiate-helping-hand",
+        "name": "Helping Hand",
+        "kind": "passive",
+        "summary": "When you help out another hunter and it works, they get +2 rather than the normal +1."
+      },
+      {
+        "id": "initiate-old-black-magic",
+        "name": "That Old Black Magic",
+        "kind": "passive",
+        "summary": "Casting a spell lets you use its effect to put one of the investigation questions to the Keeper (the ones from investigate a mystery)."
+      }
+    ]
+  },
+  "gear": [
+    {
+      "id": "old-weapons",
+      "title": "Old-fashioned weapons",
+      "intro": "Pick two or three, depending on your Sect's traditions.",
+      "pick": [
+        2,
+        3
+      ],
+      "auto": false,
+      "kind": "weapon",
+      "note": "Fighting arts or Obsolete gear in your Sect means three old-fashioned weapons. Modernised or Nifty gadgets means you may take two modern ones. Any other Sect gives you a split: one modern weapon plus two old-fashioned ones.",
+      "items": [
+        {
+          "name": "Sword",
+          "harm": 2,
+          "tags": "hand messy"
+        },
+        {
+          "name": "Axe",
+          "harm": 2,
+          "tags": "hand messy"
+        },
+        {
+          "name": "Big sword",
+          "harm": 3,
+          "tags": "hand messy heavy"
+        },
+        {
+          "name": "Big axe",
+          "harm": 3,
+          "tags": "hand messy slow heavy"
+        },
+        {
+          "name": "Silver knife",
+          "harm": 1,
+          "tags": "hand silver"
+        },
+        {
+          "name": "Fighting sticks",
+          "harm": 1,
+          "tags": "hand quick"
+        },
+        {
+          "name": "Spear",
+          "harm": 2,
+          "tags": "hand/close"
+        },
+        {
+          "name": "Mace",
+          "harm": 2,
+          "tags": "hand messy"
+        },
+        {
+          "name": "Crossbow",
+          "harm": 2,
+          "tags": "close slow"
+        }
+      ]
+    },
+    {
+      "id": "modern-weapons",
+      "title": "Modern weapons",
+      "intro": "Pick up to two, depending on your Sect's traditions.",
+      "pick": [
+        0,
+        2
+      ],
+      "auto": false,
+      "kind": "weapon",
+      "note": "Take two if the Sect is Modernised or has Nifty gadgets, otherwise one (paired with two old-fashioned weapons). With Fighting arts or Obsolete gear you get three old-fashioned ones and the sheet gives no modern weapon.",
+      "items": [
+        {
+          "name": ".38 revolver",
+          "harm": 2,
+          "tags": "close reload loud"
+        },
+        {
+          "name": "9mm",
+          "harm": 2,
+          "tags": "close loud"
+        },
+        {
+          "name": "Sniper rifle",
+          "harm": 3,
+          "tags": "far"
+        },
+        {
+          "name": "Magnum",
+          "harm": 3,
+          "tags": "close reload loud"
+        },
+        {
+          "name": "Shotgun",
+          "harm": 3,
+          "tags": "close messy"
+        }
+      ]
+    },
+    {
+      "id": "armor",
+      "title": "Armour",
+      "intro": "You always get old-fashioned armour.",
+      "pick": 0,
+      "auto": true,
+      "kind": "armor",
+      "items": [
+        {
+          "name": "Old-fashioned armour",
+          "armor": 1,
+          "tags": "heavy"
+        }
+      ]
+    }
+  ],
+  "extras": [
+    {
+      "id": "sect-description",
+      "title": "Your Sect",
+      "intro": "Your order is an old secret society that hunts monsters. Think about where it began, how long it has existed, whether it is religious, why it hides, and how it finds new members.",
+      "pick": 0,
+      "text": true,
+      "placeholder": "Describe your Sect: origins, age, religion, secrecy, recruitment..."
+    },
+    {
+      "id": "good-traditions",
+      "title": "Sect traditions: good",
+      "intro": "Choose two. The Keeper uses them to decide how the Sect behaves.",
+      "pick": 2,
+      "options": [
+        {
+          "id": "knowledgable",
+          "label": "Knowledgable"
+        },
+        {
+          "id": "ancient-lore",
+          "label": "Ancient lore"
+        },
+        {
+          "id": "magical-lore",
+          "label": "Magical lore"
+        },
+        {
+          "id": "fighting-arts",
+          "label": "Fighting arts",
+          "detail": "Means you pick three old-fashioned weapons."
+        },
+        {
+          "id": "modernised",
+          "label": "Modernised",
+          "detail": "Lets you pick two modern weapons."
+        },
+        {
+          "id": "chapters-everywhere",
+          "label": "Chapters everywhere"
+        },
+        {
+          "id": "secular-power",
+          "label": "Secular power"
+        },
+        {
+          "id": "flexible-tactics",
+          "label": "Flexible tactics"
+        },
+        {
+          "id": "open-hierarchy",
+          "label": "Open hierarchy"
+        },
+        {
+          "id": "integrated",
+          "label": "Integrated in society"
+        },
+        {
+          "id": "rich",
+          "label": "Rich"
+        },
+        {
+          "id": "nifty-gadgets",
+          "label": "Nifty gadgets",
+          "detail": "Lets you pick two modern weapons."
+        },
+        {
+          "id": "magical-items",
+          "label": "Magical items"
+        }
+      ]
+    },
+    {
+      "id": "bad-traditions",
+      "title": "Sect traditions: bad",
+      "intro": "Pick one.",
+      "pick": 1,
+      "options": [
+        {
+          "id": "dubious-motives",
+          "label": "Dubious motives"
+        },
+        {
+          "id": "tradition-bound",
+          "label": "Tradition-bound"
+        },
+        {
+          "id": "short-sighted",
+          "label": "Short-sighted"
+        },
+        {
+          "id": "paranoid",
+          "label": "Paranoid and secretive"
+        },
+        {
+          "id": "closed-hierarchy",
+          "label": "Closed hierarchy"
+        },
+        {
+          "id": "factionalised",
+          "label": "Factionalised"
+        },
+        {
+          "id": "strict-laws",
+          "label": "Strict laws"
+        },
+        {
+          "id": "mystical-oaths",
+          "label": "Mystical oaths"
+        },
+        {
+          "id": "total-obedience",
+          "label": "Total obedience"
+        },
+        {
+          "id": "tyrannical-leaders",
+          "label": "Tyrannical leaders"
+        },
+        {
+          "id": "obsolete-gear",
+          "label": "Obsolete gear",
+          "detail": "Means you pick three old-fashioned weapons."
+        },
+        {
+          "id": "poor",
+          "label": "Poor"
+        }
+      ]
+    }
+  ],
+  "history": [
+    "They belong to your Sect as a lay member.",
+    "You battled side by side when the monster hordes looked unbeatable. Ask them how that went.",
+    "You are friends, but they knew you first under a false identity and found out about the Sect later. Ask what they think of that.",
+    "They are family, or your partner or spouse. Work out the exact relationship between you.",
+    "You are fellow ancient weapons or martial arts club members.",
+    "The prophecies mention them, but not what part they will play.",
+    "They left the Sect but you stayed friends. Ask whether they quit or were expelled, and why.",
+    "You met while looking into occult oddities and have been fellow mystics since."
+  ],
+  "improvements": [
+    {
+      "text": "Get +1 Weird, max +3",
+      "kind": "stat",
+      "stat": "weird",
+      "max": 3
+    },
+    {
+      "text": "Get +1 Cool, max +2",
+      "kind": "stat",
+      "stat": "cool",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Sharp, max +2",
+      "kind": "stat",
+      "stat": "sharp",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Tough, max +2",
+      "kind": "stat",
+      "stat": "tough",
+      "max": 2
+    },
+    {
+      "text": "Take another Initiate move",
+      "kind": "move"
+    },
+    {
+      "text": "Take another Initiate move",
+      "kind": "move"
+    },
+    {
+      "text": "Get command of your chapter of the Sect",
+      "kind": "other"
+    },
+    {
+      "text": "Get a Sect team under your command",
+      "kind": "other"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    }
+  ],
+  "advanced": [
+    {
+      "text": "Get +1 to any rating, max +3",
+      "kind": "stat",
+      "stat": "any",
+      "max": 3
+    },
+    {
+      "text": "Change this hunter to a new type",
+      "kind": "other"
+    },
+    {
+      "text": "Create a second hunter to play as well as this one",
+      "kind": "other"
+    },
+    {
+      "text": "Mark two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Mark another two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Retire this hunter to safety",
+      "kind": "other"
+    },
+    {
+      "text": "Become the leader, or effective leader, of the whole Sect",
+      "kind": "other"
+    },
+    {
+      "text": "Get back one used Luck point",
+      "kind": "luck"
+    }
+  ]
+}

@@ -1,0 +1,381 @@
+{
+  "id": "crooked",
+  "name": "The Crooked",
+  "tagline": "A former criminal who knows every angle. You have contacts, tricks and enemies from the old life, and you now use all of it against monsters.",
+  "difficulty": 1,
+  "ratings": [
+    {
+      "charm": 1,
+      "cool": 1,
+      "sharp": 2,
+      "tough": 0,
+      "weird": -1
+    },
+    {
+      "charm": -1,
+      "cool": 1,
+      "sharp": 1,
+      "tough": 2,
+      "weird": 0
+    },
+    {
+      "charm": -1,
+      "cool": 2,
+      "sharp": 2,
+      "tough": 0,
+      "weird": -1
+    },
+    {
+      "charm": 2,
+      "cool": 1,
+      "sharp": 1,
+      "tough": 0,
+      "weird": -1
+    },
+    {
+      "charm": 2,
+      "cool": 0,
+      "sharp": 1,
+      "tough": -1,
+      "weird": 1
+    }
+  ],
+  "look": [
+    {
+      "title": "Eyes",
+      "options": [
+        "hard eyes",
+        "friendly eyes",
+        "watchful eyes",
+        "smiling eyes",
+        "calculating eyes"
+      ],
+      "writeIn": true
+    },
+    {
+      "title": "Clothes",
+      "options": [
+        "street wear",
+        "tailored suit",
+        "cheap suit",
+        "tracksuit",
+        "nondescript clothes"
+      ],
+      "writeIn": true
+    }
+  ],
+  "luckSpecial": "Spending a Luck point means a figure from your old life shows up again, before long.",
+  "moves": {
+    "intro": "Besides the basic moves, you take two Crooked moves, both chosen from the list. Your background (below) adds one more small trick.",
+    "pick": 2,
+    "auto": [],
+    "choices": [
+      {
+        "id": "crooked-artifact",
+        "name": "Artifact",
+        "kind": "passive",
+        "summary": "You keep a magic item you took for yourself. Choose one: a protective amulet (1-armour, magic, recharges); a lucky charm (counts once as a Luck point, then it is gone); a grimoire (reading up in it earns +1 forward on a use magic roll); a skeleton key (opens any lock sealed by magic); or an imp stone (a minor demon serves the holder, summoned through the use magic move)."
+      },
+      {
+        "id": "crooked-crew",
+        "name": "Crew",
+        "kind": "passive",
+        "summary": "Three or four trusted people work with you and will help on nearly any job. Treat them as a team (rulebook page 119)."
+      },
+      {
+        "id": "crooked-deal-with-the-devil",
+        "name": "Deal with the Devil",
+        "kind": "passive",
+        "summary": "Your soul belongs to the Devil. Choose one or two perks: wealth, fame, youth, sensual gratification, or skill (+1 to two ratings). The bill arrives when you die; if you took two perks, it arrives after six months instead, and if you took one, after a year."
+      },
+      {
+        "id": "crooked-friends-on-the-force",
+        "name": "Friends on the Force",
+        "kind": "passive",
+        "summary": "Some police officers will bend the rules for you if you make it worth their while. Act under pressure to contact them whenever you need the law pointed elsewhere. It will cost you something, though maybe not immediately."
+      },
+      {
+        "id": "crooked-made",
+        "name": "Made",
+        "kind": "passive",
+        "summary": "You belong to a gang. Name it and decide how what it does connects to your past. Members will back you up if you pay them. The bosses will sometimes give you tasks, with pay. Small mistakes get forgiven, but never cross another made member."
+      },
+      {
+        "id": "crooked-driver",
+        "name": "Driver",
+        "kind": "passive",
+        "summary": "While you are behind the wheel you have +1 ongoing. You can start any vehicle without keys; the older the vehicle, the less gear you need. You own two practical, easy-to-find vehicles, such as a sportscar and a van."
+      },
+      {
+        "id": "crooked-home-ground",
+        "name": "Home Ground",
+        "kind": "passive",
+        "summary": "Back in your old part of town, locals remember that your crew looked after them. There you can always find someone who will shelter you or do a small favour, with no questions."
+      },
+      {
+        "id": "crooked-notorious",
+        "name": "Notorious",
+        "kind": "passive",
+        "summary": "Your criminal past made you feared. If you tell someone who you are, that fearsome name is a good enough reason for them to comply when you use manipulate someone. Naming yourself may cause trouble down the line."
+      }
+    ]
+  },
+  "gear": [
+    {
+      "id": "weapons",
+      "title": "Effective weapons",
+      "intro": "Pick three.",
+      "pick": 3,
+      "auto": false,
+      "kind": "weapon",
+      "items": [
+        {
+          "name": ".22 revolver",
+          "harm": 1,
+          "tags": "close reload small"
+        },
+        {
+          "name": ".38 revolver",
+          "harm": 2,
+          "tags": "close reload loud"
+        },
+        {
+          "name": "9mm",
+          "harm": 2,
+          "tags": "close loud"
+        },
+        {
+          "name": "Shotgun",
+          "harm": 3,
+          "tags": "close messy"
+        },
+        {
+          "name": "Hunting rifle",
+          "harm": 2,
+          "tags": "far loud"
+        },
+        {
+          "name": "Big knife",
+          "harm": 1,
+          "tags": "hand"
+        },
+        {
+          "name": "Baseball bat",
+          "harm": 1,
+          "tags": "hand"
+        },
+        {
+          "name": "Submachinegun",
+          "harm": 2,
+          "tags": "close reload area"
+        },
+        {
+          "name": "Assault rifle",
+          "harm": 3,
+          "tags": "close/far area"
+        }
+      ]
+    }
+  ],
+  "extras": [
+    {
+      "id": "background",
+      "title": "Background",
+      "intro": "Before hunting monsters you made a living outside the law. Choose one past job; each comes with its own skill.",
+      "pick": 1,
+      "options": [
+        {
+          "id": "hoodlum",
+          "label": "Hoodlum",
+          "detail": "When you manipulate someone by threatening violence, you may roll +Tough rather than +Charm."
+        },
+        {
+          "id": "burglar",
+          "label": "Burglar",
+          "detail": "Roll +Sharp when you break into a secured place. On a 10+ choose three of these, on a 7-9 choose two: nobody sees you go in; nobody sees you leave; no mess is left behind; you locate the thing you came for."
+        },
+        {
+          "id": "grifter",
+          "label": "Grifter",
+          "detail": "Before you manipulate someone, you may put this question to the Keeper: what would persuade them to do as I ask? The answer must be truthful, though it can be partial."
+        },
+        {
+          "id": "fixer",
+          "label": "Fixer",
+          "detail": "Roll +Charm to buy, sell or hire something. 10+: you know exactly who would be interested. 7-9: only one person can do it, but there is a catch; choose one: you owe them, they once burned you, or you once burned them. Miss: the one person able to help is someone who despises you."
+        },
+        {
+          "id": "assassin",
+          "label": "Assassin",
+          "detail": "The first attack you make against a target that is not expecting it does +2 harm."
+        },
+        {
+          "id": "charlatan",
+          "label": "Charlatan",
+          "detail": "Roll +Cool to make people think you are working real magic. 10+: the crowd is fully taken in. 7-9: you made a few slips and somebody might spot it. You can also read fortunes to manipulate people, and then you get a free question on what they currently hope for, even when you miss."
+        },
+        {
+          "id": "pickpocket",
+          "label": "Pickpocket",
+          "detail": "Roll +Charm to lift something small. 10+: you take it and the target never notices. 7-9: choose one problem: you fail to take it, you take the wrong item, or the target recalls you afterwards."
+        }
+      ]
+    },
+    {
+      "id": "heat",
+      "title": "Heat",
+      "intro": "Your past has left you with enemies. Choose two or more, and decide who each person is.",
+      "pick": [
+        2,
+        5
+      ],
+      "options": [
+        {
+          "id": "detective",
+          "label": "A police detective",
+          "detail": "A police detective (give a name) is determined to see you locked up."
+        },
+        {
+          "id": "rival",
+          "label": "A rival from your background",
+          "detail": "A rival from your old life (give a name) takes every chance to ruin things for you."
+        },
+        {
+          "id": "criminal",
+          "label": "A well-connected criminal",
+          "detail": "A criminal with strong connections (give a name) is angry at you and wants you ruined by any means."
+        },
+        {
+          "id": "powers",
+          "label": "Someone with special powers",
+          "detail": "Someone with special powers (name them), either a person or a monster, whom you took advantage of."
+        },
+        {
+          "id": "partner",
+          "label": "An old partner you betrayed",
+          "detail": "A former partner (give a name) whom you double-crossed during a job."
+        }
+      ]
+    },
+    {
+      "id": "underworld",
+      "title": "Underworld",
+      "intro": "Pick how you discovered the real underworld. Keep it in mind when choosing your moves so everything fits together.",
+      "pick": 1,
+      "options": [
+        {
+          "id": "target",
+          "label": "The target of a job was a dangerous creature",
+          "detail": "Choose one creature type: vampire, werewolf, troll or reptiloid."
+        },
+        {
+          "id": "partner",
+          "label": "You worked with someone who was more than they seemed",
+          "detail": "Choose what they were: a sorcerer, a demon, a faerie or a psychic."
+        },
+        {
+          "id": "hired",
+          "label": "You were hired by something weird",
+          "detail": "Choose what hired you: an immortal, a god, an outsider or a witch."
+        },
+        {
+          "id": "went-south",
+          "label": "Things went south on a job",
+          "detail": "Other mishaps are possible too, but choose one of these as the cause: a salamander, a dream-eater, a hunger of ghouls, or a horde of goblins."
+        }
+      ]
+    }
+  ],
+  "history": [
+    "They know what you did as a criminal. Tell them which of your crimes they witnessed.",
+    "They were present the day you quit crime to chase monsters. Decide together how it went.",
+    "They are your kid brother or sister, or your child (possibly adopted), and you watch over them.",
+    "They are a cousin or other more distant relative.",
+    "They rescued you when a monster had you cornered, so you owe them a favour.",
+    "You and they pulled a job that was partly or fully illegal. Decide together what the job was.",
+    "They are your conscience: after you discuss a decision with them, you tend to do the decent thing.",
+    "You are strongly drawn to them, and hope one day to be good enough for them."
+  ],
+  "improvements": [
+    {
+      "text": "Get +1 Sharp, max +3",
+      "kind": "stat",
+      "stat": "sharp",
+      "max": 3
+    },
+    {
+      "text": "Get +1 Tough, max +2",
+      "kind": "stat",
+      "stat": "tough",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Cool, max +2",
+      "kind": "stat",
+      "stat": "cool",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Charm, max +2",
+      "kind": "stat",
+      "stat": "charm",
+      "max": 2
+    },
+    {
+      "text": "Take another Crooked move",
+      "kind": "move"
+    },
+    {
+      "text": "Take another Crooked move",
+      "kind": "move"
+    },
+    {
+      "text": "Gain an ally: one of your old crew",
+      "kind": "other"
+    },
+    {
+      "text": "Recover a stash of money from the old days, enough to live without care for a year or two",
+      "kind": "other"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    }
+  ],
+  "advanced": [
+    {
+      "text": "Get +1 to any rating, max +3",
+      "kind": "stat",
+      "stat": "any",
+      "max": 3
+    },
+    {
+      "text": "Change this hunter to a new type",
+      "kind": "other"
+    },
+    {
+      "text": "Create a second hunter to play as well as this one",
+      "kind": "other"
+    },
+    {
+      "text": "Mark two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Mark another two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Retire this hunter to safety",
+      "kind": "other"
+    },
+    {
+      "text": "Erase one used Luck mark from your playbook",
+      "kind": "luck"
+    }
+  ]
+}

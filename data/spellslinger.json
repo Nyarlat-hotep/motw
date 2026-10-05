@@ -1,0 +1,365 @@
+{
+  "id": "spellslinger",
+  "name": "The Spell-Slinger",
+  "tagline": "You fight fire with fire magic: a custom-built set of attack spells, a toolkit of rituals, and a wizard council that keeps nosing into your business.",
+  "difficulty": 2,
+  "ratings": [
+    {
+      "charm": -1,
+      "cool": 1,
+      "sharp": 1,
+      "tough": 0,
+      "weird": 2
+    },
+    {
+      "charm": 0,
+      "cool": -1,
+      "sharp": 1,
+      "tough": 1,
+      "weird": 2
+    },
+    {
+      "charm": -1,
+      "cool": 0,
+      "sharp": 2,
+      "tough": -1,
+      "weird": 2
+    },
+    {
+      "charm": 1,
+      "cool": 0,
+      "sharp": 1,
+      "tough": -1,
+      "weird": 2
+    },
+    {
+      "charm": 0,
+      "cool": 0,
+      "sharp": 1,
+      "tough": 0,
+      "weird": 2
+    }
+  ],
+  "look": [
+    {
+      "title": "Clothes",
+      "options": [
+        "rumpled clothes",
+        "stylish clothes",
+        "goth clothes",
+        "old fashioned clothes"
+      ],
+      "writeIn": true
+    },
+    {
+      "title": "Eyes",
+      "options": [
+        "shadowed eyes",
+        "fierce eyes",
+        "weary eyes",
+        "sparkling eyes"
+      ],
+      "writeIn": true
+    }
+  ],
+  "luckSpecial": "Each time you spend a Luck point, the official council of wizards starts poking its nose into your business. (Spending Luck can also avoid all harm from one injury.)",
+  "moves": {
+    "intro": "Take every basic move plus four Spell-Slinger moves. Tools and Techniques is free; pick three others from the list. Your attack spells are covered separately under Combat Magic.",
+    "pick": 3,
+    "auto": [
+      {
+        "id": "spellslinger-tools-and-techniques",
+        "name": "Tools and Techniques",
+        "kind": "passive",
+        "summary": "Your combat magic depends on four things: consumables, foci, gestures and incantations. Cross one off; you rely on the other three. Consumables are powders, oils and similar supplies, some used up with each cast; lacking them, casting costs you 1-harm ignore-armour. Foci are wands, staves and similar props; lacking them, your combat magic deals one point less harm. Gestures are hand movements; while restrained, you take -1 ongoing to combat magic. Incantations are words in an arcane language; if you cast combat magic silently, you have to act under pressure to keep your mind from scrambling."
+      }
+    ],
+    "choices": [
+      {
+        "id": "spellslinger-advanced-arcane-training",
+        "name": "Advanced Arcane Training",
+        "kind": "passive",
+        "summary": "With two of your remaining three tools and techniques in hand, you can do without the third."
+      },
+      {
+        "id": "spellslinger-arcane-reputation",
+        "name": "Arcane Reputation",
+        "kind": "passive",
+        "summary": "Choose three major groups or organizations from the supernatural scene (friendlier monsters can count). They know your reputation and respect your power. Humans among them give you a bonus of +1 forward when manipulated by you; monsters among them can be manipulated like humans, but with no bonus."
+      },
+      {
+        "id": "spellslinger-couldve-been-worse",
+        "name": "Could've Been Worse",
+        "kind": "passive",
+        "summary": "If your use magic roll is a miss, you can pick one of these instead of the magic getting out of control. Fizzle: the spell's prep and materials are wasted, and redoing it takes twice the prep time. This Is Gonna Suck: the spell works, but every listed glitch happens except one, which you choose to dodge."
+      },
+      {
+        "id": "spellslinger-enchanted-clothing",
+        "name": "Enchanted Clothing",
+        "kind": "passive",
+        "summary": "Choose a piece of ordinary clothing. It is enchanted but looks the same. Harm from anything reaching you through that garment is reduced by 1."
+      },
+      {
+        "id": "spellslinger-forensic-divination",
+        "name": "Forensic Divination",
+        "kind": "passive",
+        "summary": "After a successful investigate a mystery roll, you get a bonus question: \"What magic was done here?\""
+      },
+      {
+        "id": "spellslinger-go-big-or-go-home",
+        "name": "Go Big or Go Home",
+        "kind": "passive",
+        "summary": "Use magic rolls you make to meet the requirements of Big Magic get +1 ongoing."
+      },
+      {
+        "id": "spellslinger-not-my-fault",
+        "name": "Not My Fault",
+        "kind": "passive",
+        "summary": "Dealing with the fallout from your own spells gives you +1 to act under pressure."
+      },
+      {
+        "id": "spellslinger-practitioner",
+        "name": "Practitioner",
+        "kind": "passive",
+        "summary": "Pick two of the effects open to you under use magic. Each time you choose one of those two, add +1 to the use magic roll."
+      },
+      {
+        "id": "spellslinger-shield-spell",
+        "name": "Shield Spell",
+        "kind": "passive",
+        "summary": "Protecting someone gives you 2-armour against harm passed on to you. It does not stack with other armour you may have."
+      },
+      {
+        "id": "spellslinger-third-eye",
+        "name": "Third Eye",
+        "kind": "passive",
+        "summary": "Your third eye can open briefly while you read a bad situation, giving extra information: any roll of 7 or more earns +1 hold, and you can see invisible things. After a miss you can still take 1 hold, but you are exposed to supernatural danger, since raw hidden reality is hard on the mind."
+      }
+    ]
+  },
+  "gear": [
+    {
+      "id": "backup-weapon",
+      "title": "Backup weapon",
+      "intro": "You do not need much beyond the foci or consumables that power your magic, but it is good to carry a backup. Pick one.",
+      "pick": 1,
+      "auto": false,
+      "kind": "weapon",
+      "items": [
+        {
+          "name": "Old revolver",
+          "harm": 2,
+          "tags": "close reload loud"
+        },
+        {
+          "name": "Ritual knife",
+          "harm": 1,
+          "tags": "hand"
+        },
+        {
+          "name": "Heirloom sword",
+          "harm": 2,
+          "tags": "hand messy"
+        }
+      ]
+    }
+  ],
+  "extras": [
+    {
+      "id": "tools-crossed-off",
+      "title": "Tools and Techniques: cross one off",
+      "intro": "Cross off one of these four; you will need the other three. (You can cross off another one later as an advanced improvement.)",
+      "pick": 1,
+      "options": [
+        {
+          "id": "consumables",
+          "label": "Consumables",
+          "detail": "Without supplies on hand when you cast, you take 1-harm ignore-armour."
+        },
+        {
+          "id": "foci",
+          "label": "Foci",
+          "detail": "Missing your props means your combat magic deals 1 less harm."
+        },
+        {
+          "id": "gestures",
+          "label": "Gestures",
+          "detail": "While you are restrained, combat magic takes -1 ongoing."
+        },
+        {
+          "id": "incantations",
+          "label": "Incantations",
+          "detail": "Casting in silence means you must act under pressure or your thoughts get scrambled."
+        }
+      ]
+    },
+    {
+      "id": "combat-bases",
+      "title": "Combat magic: bases",
+      "intro": "These are your attack spells. Casting them to kick some ass uses +Weird in place of +Tough, though the Keeper may call for act under pressure to cast cleanly. You get three combat magic picks in all, at least one of them a base. A spell is one base plus any effects you own.",
+      "pick": [
+        1,
+        3
+      ],
+      "options": [
+        {
+          "id": "blast",
+          "label": "Blast",
+          "detail": "Harm 2; tags: magic, close, obvious, loud."
+        },
+        {
+          "id": "ball",
+          "label": "Ball",
+          "detail": "Harm 1; tags: magic, area, close, obvious, loud."
+        },
+        {
+          "id": "missile",
+          "label": "Missile",
+          "detail": "Harm 1; tags: magic, far, obvious, loud."
+        },
+        {
+          "id": "wall",
+          "label": "Wall",
+          "detail": "Harm 1; 1-armour; tags: magic, barrier, close, obvious, loud."
+        }
+      ]
+    },
+    {
+      "id": "combat-effects",
+      "title": "Combat magic: effects",
+      "intro": "Any picks left over from your three combat magic choices (after at least one base) go on effects. You can add any effect to any of your bases.",
+      "pick": [
+        0,
+        2
+      ],
+      "options": [
+        {
+          "id": "fire",
+          "label": "Fire",
+          "detail": "Gives a base +2 harm and the fire tag. A 10+ on the combat magic roll keeps the fire from spreading."
+        },
+        {
+          "id": "force-wind",
+          "label": "Force or Wind",
+          "detail": "Gives a base +1 harm and the forceful tag, or a wall +1 armour."
+        },
+        {
+          "id": "lightning-entropy",
+          "label": "Lightning or Entropy",
+          "detail": "Gives a base +1 harm and the messy tag."
+        },
+        {
+          "id": "frost-ice",
+          "label": "Frost or Ice",
+          "detail": "On a wall: adds \"-1 harm +2 armour\". On other bases: adds \"+1 harm restraining\"."
+        },
+        {
+          "id": "earth",
+          "label": "Earth",
+          "detail": "Gives a base the forceful and restraining tags."
+        },
+        {
+          "id": "necromantic",
+          "label": "Necromantic",
+          "detail": "Gives a base the life-drain tag."
+        }
+      ]
+    }
+  ],
+  "history": [
+    "They keep you grounded whenever your power gets to you. Ask about the most recent time that happened.",
+    "You are related by blood but lost touch for years. Ask how they found their way back to you.",
+    "They mentored you in a past life. Ask what they taught you.",
+    "You used magic to save them, which is how they first learned monsters exist. Ask them which creature was hunting them.",
+    "Your old rivalry became a close friendship. Tell them what the fight was about.",
+    "You believed they had died, yet here they are. Ask what supposedly killed them.",
+    "You keep drifting together and apart as a couple. Ask what separates you, and tell them what holds you together.",
+    "They are a fellow fighter who has stood beside you against the worst threats."
+  ],
+  "improvements": [
+    {
+      "text": "Get +1 Weird, max +3",
+      "kind": "stat",
+      "stat": "weird",
+      "max": 3
+    },
+    {
+      "text": "Get +1 Cool, max +2",
+      "kind": "stat",
+      "stat": "cool",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Sharp, max +2",
+      "kind": "stat",
+      "stat": "sharp",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Tough, max +2",
+      "kind": "stat",
+      "stat": "tough",
+      "max": 2
+    },
+    {
+      "text": "Take another Spell-Slinger move",
+      "kind": "move"
+    },
+    {
+      "text": "Take another Spell-Slinger move",
+      "kind": "move"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    },
+    {
+      "text": "Take another Combat Magic pick",
+      "kind": "other"
+    }
+  ],
+  "advanced": [
+    {
+      "text": "Get +1 to any rating, max +3",
+      "kind": "stat",
+      "stat": "any",
+      "max": 3
+    },
+    {
+      "text": "Change this hunter to a new type",
+      "kind": "other"
+    },
+    {
+      "text": "Create a second hunter to play as well as this one",
+      "kind": "other"
+    },
+    {
+      "text": "Mark two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Mark another two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Retire this hunter to safety",
+      "kind": "other"
+    },
+    {
+      "text": "Erase one used Luck mark from your playbook",
+      "kind": "luck"
+    },
+    {
+      "text": "Take another Combat Magic pick",
+      "kind": "other"
+    },
+    {
+      "text": "Cross off another option from your Tools and Techniques",
+      "kind": "other"
+    }
+  ]
+}

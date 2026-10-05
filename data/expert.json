@@ -1,0 +1,349 @@
+{
+  "id": "expert",
+  "name": "The Expert",
+  "tagline": "A scholar of the unnatural who is rarely the strongest in the room but usually the best prepared, with a haven full of tools and knowledge.",
+  "difficulty": 1,
+  "ratings": [
+    {
+      "charm": -1,
+      "cool": 1,
+      "sharp": 2,
+      "tough": 1,
+      "weird": 0
+    },
+    {
+      "charm": 0,
+      "cool": 1,
+      "sharp": 2,
+      "tough": -1,
+      "weird": 1
+    },
+    {
+      "charm": 1,
+      "cool": -1,
+      "sharp": 2,
+      "tough": 1,
+      "weird": 0
+    },
+    {
+      "charm": -1,
+      "cool": 1,
+      "sharp": 2,
+      "tough": 0,
+      "weird": 1
+    },
+    {
+      "charm": -1,
+      "cool": 0,
+      "sharp": 2,
+      "tough": -1,
+      "weird": 2
+    }
+  ],
+  "look": [
+    {
+      "title": "Face",
+      "options": [
+        "thoughtful face",
+        "lined face",
+        "scarred face",
+        "contemplative face",
+        "stern face",
+        "avuncular face",
+        "experienced face",
+        "ancient face"
+      ],
+      "writeIn": true
+    },
+    {
+      "title": "Clothes",
+      "options": [
+        "old fashioned clothes",
+        "casual clothes",
+        "utility clothes",
+        "tailored clothes",
+        "outdoor clothes"
+      ],
+      "writeIn": true
+    }
+  ],
+  "luckSpecial": "When you use up a Luck point, you learn that a current event ties back to something you took part in long ago.",
+  "moves": {
+    "intro": "Beyond the basic moves you take two Expert moves, both chosen from the seven below. None are free.",
+    "pick": 2,
+    "auto": [],
+    "choices": [
+      {
+        "id": "expert-read-about-this",
+        "name": "I've Read About This Sort Of Thing",
+        "kind": "passive",
+        "summary": "When you act under pressure, roll +Sharp instead of +Cool."
+      },
+      {
+        "id": "expert-often-right",
+        "name": "Often Right",
+        "kind": "passive",
+        "summary": "If a fellow hunter asks you how to handle a problem, tell them what you honestly think. Should they act on it, they get +1 ongoing for as long as they follow the advice, and you mark experience."
+      },
+      {
+        "id": "expert-preparedness",
+        "name": "Preparedness",
+        "kind": "roll",
+        "stat": "sharp",
+        "trig": "When you need something unusual or rare",
+        "full": "You have it with you right now.",
+        "part": "You own it, but it is elsewhere and getting it takes a while.",
+        "miss": "You know its location, but that place is dangerous.",
+        "note": ""
+      },
+      {
+        "id": "expert-not-as-bad",
+        "name": "It Wasn't As Bad As It Looked",
+        "kind": "roll",
+        "stat": "cool",
+        "trig": "Once per mystery, when you try to keep going despite your injuries",
+        "full": "Heal 2 harm and your wounds are stable.",
+        "part": "Choose one: stabilize your wounds, or heal 1 harm.",
+        "miss": "The injuries are worse than you thought. The Keeper may hit you with a harm move, or make your wounds unstable.",
+        "note": "You can only try this once per mystery."
+      },
+      {
+        "id": "expert-precise-strike",
+        "name": "Precise Strike",
+        "kind": "roll",
+        "stat": "tough",
+        "trig": "When you inflict harm on a monster and aim for a weak spot",
+        "full": "You inflict +2 harm.",
+        "part": "You inflict +1 harm.",
+        "miss": "The monster gets an opening against you.",
+        "note": ""
+      },
+      {
+        "id": "expert-plan",
+        "name": "The Woman (or Man) With The Plan",
+        "kind": "roll",
+        "stat": "sharp",
+        "trig": "At the beginning of each mystery",
+        "full": "Hold 2.",
+        "part": "Hold 1.",
+        "miss": "The Keeper gets 1 hold to use on you, putting you in the worst spot with no preparation.",
+        "note": "Each point of hold lets you turn up in the right place, fully ready."
+      },
+      {
+        "id": "expert-dark-past",
+        "name": "Dark Past",
+        "kind": "roll",
+        "stat": "weird",
+        "trig": "When you trawl through your memories for something relevant to the case at hand",
+        "full": "Ask the Keeper two of the questions below.",
+        "part": "Choose one of the questions listed.",
+        "miss": "You still get one question, but your answer reveals you had a hand in causing the current trouble.",
+        "note": "You may ask about: lessons from past dealings with this creature or its kind; any dark magic you know that could help; anyone you know of who might be responsible; and any contact who could assist the group right now."
+      }
+    ]
+  },
+  "gear": [
+    {
+      "id": "weapons",
+      "title": "Monster-slaying weapons",
+      "intro": "Pick three.",
+      "pick": 3,
+      "auto": false,
+      "kind": "weapon",
+      "items": [
+        {
+          "name": "Mallet & wooden stakes",
+          "harm": 3,
+          "tags": "intimate slow wooden"
+        },
+        {
+          "name": "Silver sword",
+          "harm": 2,
+          "tags": "hand messy silver"
+        },
+        {
+          "name": "Cold iron sword",
+          "harm": 2,
+          "tags": "hand messy iron"
+        },
+        {
+          "name": "Blessed knife",
+          "harm": 2,
+          "tags": "hand holy"
+        },
+        {
+          "name": "Magical dagger",
+          "harm": 2,
+          "tags": "hand magic"
+        },
+        {
+          "name": "Juju bag",
+          "harm": 1,
+          "tags": "far magic"
+        },
+        {
+          "name": "Flamethrower",
+          "harm": 3,
+          "tags": "close fire heavy volatile"
+        },
+        {
+          "name": "Magnum",
+          "harm": 3,
+          "tags": "close reload loud"
+        },
+        {
+          "name": "Shotgun",
+          "harm": 3,
+          "tags": "close messy loud"
+        }
+      ]
+    }
+  ],
+  "extras": [
+    {
+      "id": "haven",
+      "title": "Haven",
+      "intro": "Your haven is a safe base where you can work. Choose three features for it.",
+      "pick": 3,
+      "options": [
+        {
+          "id": "lore-library",
+          "label": "Lore Library",
+          "detail": "Time in your book collection earns +1 forward on investigating the mystery, when history or reference works can help."
+        },
+        {
+          "id": "mystical-library",
+          "label": "Mystical Library",
+          "detail": "When you prep with your haven's occult books and grimoires, you get +1 forward to use magic."
+        },
+        {
+          "id": "protection-spells",
+          "label": "Protection Spells",
+          "detail": "Monsters cannot enter your haven. They might find some special way around the wards, but not easily."
+        },
+        {
+          "id": "armory",
+          "label": "Armory",
+          "detail": "Your haven stores rare, magical monster-fighting gear. When you want a particular special weapon, roll +Weird. 10+: it is there, with extras if quantity matters. 7-9: it is there, but only the bare minimum. Miss: what you get is the wrong tool."
+        },
+        {
+          "id": "infirmary",
+          "label": "Infirmary",
+          "detail": "You are able to treat patients and have beds for one or two. The Keeper says how long each patient needs, and whether you need more supplies or assistance."
+        },
+        {
+          "id": "workshop",
+          "label": "Workshop",
+          "detail": "A work area where you build or fix guns, vehicles and other devices. Agree with the Keeper on time needed for each job, and on any extra supplies or help required."
+        },
+        {
+          "id": "oubliette",
+          "label": "Oubliette",
+          "detail": "A cell sealed off from all monsters, spirits and magic you are aware of. What you put in can't be located, can't use magic and can't escape."
+        },
+        {
+          "id": "panic-room",
+          "label": "Panic Room",
+          "detail": "A fortified refuge with basic supplies and both mundane and magical protection. You can lie low there for several days, safe from nearly everything."
+        },
+        {
+          "id": "magical-laboratory",
+          "label": "Magical Laboratory",
+          "detail": "A magical workroom stocked with odd ingredients and equipment for spellcasting, covering use magic, big magic and other magic moves."
+        }
+      ]
+    }
+  ],
+  "history": [
+    "They are your pupil, apprentice, ward or child. Settle which one between you.",
+    "They sought your counsel and it saved them from a bad spot. Ask what the spot was.",
+    "They have learned some of your secrets and promised silence. Tell them which ones.",
+    "They are a faraway relative. Say exactly how.",
+    "You each belonged to the same occult circle, which is now dissolved. Ask why they quit, then explain your own reason.",
+    "They helped you get hold of a one-of-a-kind item, which now lives in your haven. Say what it is.",
+    "You share a teacher. Ask how things ended for them, and then for you.",
+    "You pulled them out of a dangerous situation. Tell them how it went."
+  ],
+  "improvements": [
+    {
+      "text": "Get +1 Sharp, max +3",
+      "kind": "stat",
+      "stat": "sharp",
+      "max": 3
+    },
+    {
+      "text": "Get +1 Charm, max +2",
+      "kind": "stat",
+      "stat": "charm",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Cool, max +2",
+      "kind": "stat",
+      "stat": "cool",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Weird, max +2",
+      "kind": "stat",
+      "stat": "weird",
+      "max": 2
+    },
+    {
+      "text": "Take another Expert move",
+      "kind": "move"
+    },
+    {
+      "text": "Take another Expert move",
+      "kind": "move"
+    },
+    {
+      "text": "Add an option to your haven",
+      "kind": "other"
+    },
+    {
+      "text": "Add an option to your haven",
+      "kind": "other"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    }
+  ],
+  "advanced": [
+    {
+      "text": "Get +1 to any rating, max +3",
+      "kind": "stat",
+      "stat": "any",
+      "max": 3
+    },
+    {
+      "text": "Get back one used Luck point",
+      "kind": "luck"
+    },
+    {
+      "text": "Change this hunter to a new type",
+      "kind": "other"
+    },
+    {
+      "text": "Create a second hunter to play as well as this one",
+      "kind": "other"
+    },
+    {
+      "text": "Mark two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Mark another two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Retire this hunter to safety",
+      "kind": "other"
+    }
+  ]
+}

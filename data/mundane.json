@@ -1,0 +1,320 @@
+{
+  "id": "mundane",
+  "name": "The Mundane",
+  "tagline": "A regular person with no powers who somehow ended up on a monster-hunting team. Lots of heart, lots of luck, and a knack for being in the right (or wrong) place.",
+  "difficulty": 0,
+  "ratings": [
+    {
+      "charm": 2,
+      "cool": 1,
+      "sharp": 0,
+      "tough": 1,
+      "weird": -1
+    },
+    {
+      "charm": 2,
+      "cool": -1,
+      "sharp": 1,
+      "tough": 1,
+      "weird": 0
+    },
+    {
+      "charm": 2,
+      "cool": 0,
+      "sharp": -1,
+      "tough": 1,
+      "weird": 1
+    },
+    {
+      "charm": 2,
+      "cool": 0,
+      "sharp": 1,
+      "tough": 1,
+      "weird": -1
+    },
+    {
+      "charm": 2,
+      "cool": 1,
+      "sharp": 1,
+      "tough": 0,
+      "weird": -1
+    }
+  ],
+  "look": [
+    {
+      "title": "Age",
+      "options": [
+        "kid",
+        "teen",
+        "adult",
+        "old"
+      ],
+      "writeIn": true
+    },
+    {
+      "title": "Face",
+      "options": [
+        "friendly face",
+        "alluring face",
+        "laughing face",
+        "trustworthy face",
+        "average face",
+        "serious face",
+        "sensual face"
+      ],
+      "writeIn": true
+    },
+    {
+      "title": "Clothes",
+      "options": [
+        "normal clothes",
+        "casual clothes",
+        "goth clothes",
+        "sporty clothes",
+        "work clothes",
+        "street clothes",
+        "nerdy clothes"
+      ],
+      "writeIn": true
+    }
+  ],
+  "luckSpecial": "Each time you spend a Luck point, you stumble onto something weird, and it might even turn out to be useful.",
+  "moves": {
+    "intro": "Take every basic move, then choose any three of the Mundane moves below. None come free.",
+    "pick": 3,
+    "auto": [],
+    "choices": [
+      {
+        "id": "mundane-always-the-victim",
+        "name": "Always The Victim",
+        "kind": "passive",
+        "summary": "If another hunter shields you with protect someone, they earn experience. You earn experience each time a monster grabs you."
+      },
+      {
+        "id": "mundane-oops",
+        "name": "Oops!",
+        "kind": "passive",
+        "summary": "Tell the Keeper when you would like to blunder into a discovery. You turn up something significant and helpful, though it may have nothing to do with what you are facing right now."
+      },
+      {
+        "id": "mundane-lets-get-out-of-here",
+        "name": "Let's Get Out Of Here!",
+        "kind": "passive",
+        "summary": "When you protect someone by giving orders or guiding them to safety, use +Charm in place of +Tough."
+      },
+      {
+        "id": "mundane-panic-button",
+        "name": "Panic Button",
+        "kind": "roll",
+        "stat": "sharp",
+        "trig": "When you need to escape, name the route you will try and roll",
+        "full": "You get out of danger with no trouble.",
+        "part": "You can go or stay. Going costs you: something gets left behind, or something tags along.",
+        "miss": "You are caught halfway out.",
+        "note": ""
+      },
+      {
+        "id": "mundane-power-of-heart",
+        "name": "The Power of Heart",
+        "kind": "passive",
+        "summary": "When you help someone fight a monster, skip the +Cool roll; your help counts as a 10 automatically."
+      },
+      {
+        "id": "mundane-trust-me",
+        "name": "Trust Me",
+        "kind": "roll",
+        "stat": "charm",
+        "trig": "When you tell an ordinary person the truth to keep them safe",
+        "full": "They follow your instructions without argument.",
+        "part": "They comply, but the Keeper picks one complication: a tough question first, some dithering and delay, or their own \"better\" plan.",
+        "miss": "They think you are crazy and maybe dangerous too.",
+        "note": ""
+      },
+      {
+        "id": "mundane-what-could-go-wrong",
+        "name": "What Could Go Wrong?",
+        "kind": "passive",
+        "summary": "When you rush into immediate danger with no safety net, take 2 hold. Spend each hold on one of: +1 harm dealt, 1 less harm taken by someone, or +2 forward when acting under pressure."
+      },
+      {
+        "id": "mundane-dont-worry-ill-check-it-out",
+        "name": "Don't Worry, I'll Check It Out",
+        "kind": "passive",
+        "summary": "Mark experience when you head off alone to look into a frightening place or thing."
+      }
+    ]
+  },
+  "gear": [
+    {
+      "id": "weapons",
+      "title": "Mundane weapons",
+      "intro": "Pick two.",
+      "pick": 2,
+      "auto": false,
+      "kind": "weapon",
+      "items": [
+        {
+          "name": "Golf club, baseball bat, cricket bat, or hockey stick",
+          "harm": 2,
+          "tags": "hand innocuous messy"
+        },
+        {
+          "name": "Pocket knife or multitool",
+          "harm": 1,
+          "tags": "hand useful small"
+        },
+        {
+          "name": "Small handgun",
+          "harm": 2,
+          "tags": "close loud reload"
+        },
+        {
+          "name": "Hunting rifle",
+          "harm": 3,
+          "tags": "far loud reload"
+        },
+        {
+          "name": "Sledge-hammer or fire axe",
+          "harm": 3,
+          "tags": "hand messy"
+        },
+        {
+          "name": "Nunchuks",
+          "harm": 2,
+          "tags": "hand area"
+        }
+      ]
+    },
+    {
+      "id": "transport",
+      "title": "Means of transport",
+      "intro": "Pick one.",
+      "pick": 1,
+      "auto": false,
+      "kind": "item",
+      "items": [
+        {
+          "name": "Skateboard",
+          "tags": ""
+        },
+        {
+          "name": "Bicycle",
+          "tags": ""
+        },
+        {
+          "name": "Fairly new car in decent condition",
+          "tags": ""
+        },
+        {
+          "name": "Classic car in terrible condition",
+          "tags": ""
+        },
+        {
+          "name": "Motorcycle",
+          "tags": ""
+        },
+        {
+          "name": "Van",
+          "tags": ""
+        }
+      ]
+    }
+  ],
+  "extras": [],
+  "history": [
+    "You are family. Tell them precisely how.",
+    "You started out as rivals, but now each respects what the other can do.",
+    "You are dating, or you are sweet on them. Ask which one they would like.",
+    "You look up to them as the monster hunter you want to become. Tell them why you idolize them.",
+    "You are good friends. Say whether it goes back years or started lately.",
+    "You are a little wary of them, perhaps because of their supernatural abilities.",
+    "They were the one who showed you monsters are real. Tell them what you think about that.",
+    "A lucky string of coincidences let you rescue them from a monster. Tell them what happened."
+  ],
+  "improvements": [
+    {
+      "text": "Get +1 Charm, max +3",
+      "kind": "stat",
+      "stat": "charm",
+      "max": 3
+    },
+    {
+      "text": "Get +1 Cool, max +2",
+      "kind": "stat",
+      "stat": "cool",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Sharp, max +2",
+      "kind": "stat",
+      "stat": "sharp",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Tough, max +2",
+      "kind": "stat",
+      "stat": "tough",
+      "max": 2
+    },
+    {
+      "text": "Take another Mundane move",
+      "kind": "move"
+    },
+    {
+      "text": "Take another Mundane move",
+      "kind": "move"
+    },
+    {
+      "text": "Get back one used Luck point",
+      "kind": "luck"
+    },
+    {
+      "text": "Get back one used Luck point",
+      "kind": "luck"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    }
+  ],
+  "advanced": [
+    {
+      "text": "Get +1 to any rating, max +3",
+      "kind": "stat",
+      "stat": "any",
+      "max": 3
+    },
+    {
+      "text": "Change this hunter to a new type",
+      "kind": "other"
+    },
+    {
+      "text": "Create a second hunter to play as well as this one",
+      "kind": "other"
+    },
+    {
+      "text": "Mark two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Mark another two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Retire this hunter to safety",
+      "kind": "other"
+    },
+    {
+      "text": "Get back one used Luck point",
+      "kind": "luck"
+    },
+    {
+      "text": "Get back one used Luck point",
+      "kind": "luck"
+    }
+  ]
+}

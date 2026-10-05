@@ -1,0 +1,333 @@
+{
+  "id": "divine",
+  "name": "The Divine",
+  "tagline": "A heavenly agent sent to Earth on a mission. You hit hard, shrug off harm, and juggle orders from above with confusing mortal life.",
+  "difficulty": 1,
+  "ratings": [
+    {
+      "charm": 1,
+      "cool": 1,
+      "sharp": -1,
+      "tough": 2,
+      "weird": 0
+    },
+    {
+      "charm": -1,
+      "cool": 2,
+      "sharp": -1,
+      "tough": 2,
+      "weird": 0
+    },
+    {
+      "charm": -1,
+      "cool": 0,
+      "sharp": 1,
+      "tough": 2,
+      "weird": 1
+    },
+    {
+      "charm": 1,
+      "cool": 1,
+      "sharp": 0,
+      "tough": 2,
+      "weird": -1
+    },
+    {
+      "charm": -1,
+      "cool": 1,
+      "sharp": 0,
+      "tough": 2,
+      "weird": 1
+    }
+  ],
+  "look": [
+    {
+      "title": "Nature",
+      "options": [
+        "human",
+        "marked by divinity",
+        "inhuman"
+      ],
+      "writeIn": true
+    },
+    {
+      "title": "Eyes",
+      "options": [
+        "blazing eyes",
+        "terrifying eyes",
+        "placid eyes",
+        "sparkling eyes",
+        "perceptive eyes",
+        "starry eyes",
+        "glowing eyes"
+      ],
+      "writeIn": true
+    },
+    {
+      "title": "Clothes",
+      "options": [
+        "dirty clothes",
+        "perfect suit",
+        "rumpled suit",
+        "casual clothes",
+        "practical clothes"
+      ],
+      "writeIn": true
+    }
+  ],
+  "luckSpecial": "Each time you spend a Luck point, you receive word that your Mission needs something difficult done. By you. Urgently.",
+  "moves": {
+    "intro": "Beyond the basic moves you take three Divine moves, all chosen from the seven listed. None come for free.",
+    "pick": 3,
+    "auto": [],
+    "choices": [
+      {
+        "id": "divine-boss-from-beyond",
+        "name": "Boss from Beyond",
+        "kind": "roll",
+        "stat": "weird",
+        "trig": "At the beginning of each mystery",
+        "full": "Your Superiors give you a simple task. You may also put one investigate a mystery question to the Keeper straight away.",
+        "part": "Your Superiors give you a hard or tangled task. You may also put one investigate a mystery question to the Keeper straight away.",
+        "miss": "They order something awful. Until you make up for failing them, you lose access to this move if you refuse.",
+        "note": "Roll 10+ or 7-9 and you can also pose one of the investigate a mystery questions at once."
+      },
+      {
+        "id": "divine-angel-wings",
+        "name": "Angel Wings",
+        "kind": "roll",
+        "stat": "weird",
+        "trig": "When you take one or two other people along on an Angel Wings jump",
+        "full": "You all arrive where you wanted to go.",
+        "part": "The jump goes slightly wrong: the group gets split up, or all of you land in the wrong spot.",
+        "miss": "",
+        "note": "Travelling alone needs no roll: you instantly appear at any place you have been before, or beside someone you know well. You only roll when taking one or two passengers."
+      },
+      {
+        "id": "divine-what-i-need",
+        "name": "What I Need, When I Need It",
+        "kind": "passive",
+        "summary": "Any small item you own can be put away in a hidden magical pocket that no one else can reach. Take it out whenever you want and it lands in your hand."
+      },
+      {
+        "id": "divine-smite",
+        "name": "Smite",
+        "kind": "passive",
+        "summary": "Against monsters, both your body and your divine weapon act as a weakness for them. Bare-handed, you hit for 2-harm intimate hand messy."
+      },
+      {
+        "id": "divine-soothe",
+        "name": "Soothe",
+        "kind": "passive",
+        "summary": "Murmur calmly to a person for a few seconds and their fear, anger or any other upset melts away. It still works if the cause of the upset is nearby, provided your voice can be heard."
+      },
+      {
+        "id": "divine-lay-on-hands",
+        "name": "Lay On Hands",
+        "kind": "roll",
+        "stat": "cool",
+        "trig": "When you place your hands on a wounded or sick person to heal them",
+        "full": "Heal 2 harm or cure one illness, and the patient is stable.",
+        "part": "The healing works as on a 10+, but the harm or illness passes to you.",
+        "miss": "Your divine glow hurts them further.",
+        "note": ""
+      },
+      {
+        "id": "divine-cast-out-evil",
+        "name": "Cast Out Evil",
+        "kind": "roll",
+        "stat": "tough",
+        "trig": "When you try to banish an unnatural creature from your presence",
+        "full": "It is banished.",
+        "part": "The banishing takes a little while: the creature has time to take one or two actions first.",
+        "miss": "Something holds the creature in place, which is bad news.",
+        "note": "The banished creature takes no damage and you cannot choose where it ends up. You may also use this on unnatural hunters such as the Monstrous."
+      }
+    ]
+  },
+  "gear": [
+    {
+      "id": "weapon",
+      "title": "Divine weapon",
+      "intro": "Pick one.",
+      "pick": 1,
+      "auto": false,
+      "kind": "weapon",
+      "items": [
+        {
+          "name": "Flaming sword",
+          "harm": 3,
+          "tags": "hand fire holy"
+        },
+        {
+          "name": "Thunder hammer",
+          "harm": 3,
+          "tags": "hand stun holy"
+        },
+        {
+          "name": "Razor whip",
+          "harm": 3,
+          "tags": "hand area messy holy"
+        },
+        {
+          "name": "Five demon bag",
+          "harm": 3,
+          "tags": "close magic holy"
+        },
+        {
+          "name": "Silver trident",
+          "harm": 3,
+          "tags": "hand silver holy"
+        }
+      ]
+    },
+    {
+      "id": "armor",
+      "title": "Divine armour",
+      "intro": "You also get divine armour. Give it a look that suits your divine origin.",
+      "pick": 0,
+      "auto": true,
+      "kind": "armor",
+      "items": [
+        {
+          "name": "Divine armour",
+          "armor": 1,
+          "tags": "holy"
+        }
+      ]
+    }
+  ],
+  "extras": [
+    {
+      "id": "mission",
+      "title": "Mission",
+      "intro": "Your presence on Earth has a purpose. Choose one.",
+      "pick": 1,
+      "options": [
+        {
+          "id": "adversary",
+          "label": "Fight an Adversary",
+          "detail": "Your task is to thwart the plots of an Adversary."
+        },
+        {
+          "id": "prevent-end",
+          "label": "Prevent the End of Days",
+          "detail": "The world is near its End of Days. You steer these hunters so that it never happens."
+        },
+        {
+          "id": "ensure-end",
+          "label": "Ensure the End of Days",
+          "detail": "The world is near its End of Days. You steer these hunters so that it does happen."
+        },
+        {
+          "id": "exiled",
+          "label": "Exiled",
+          "detail": "You are an exile working for Good in secret, hiding from your kin, who are obliged to put you to death for what you did."
+        },
+        {
+          "id": "protect-hunter",
+          "label": "Prepare and protect another hunter",
+          "detail": "Another hunter is meant to play a key part in what is coming. Train them for it and shield them whatever it takes."
+        }
+      ]
+    }
+  ],
+  "history": [
+    "If your mission is to protect another hunter, say to them: you have a key part to play in what comes, and you are here to lead and shield them.",
+    "They should not be mixed up in this, as no prophecy names them. That catches your notice, though you cannot tell why yet.",
+    "Deep down they are decent and just, and it is your job to keep them that way.",
+    "By rights they are a vile creature to be destroyed, yet you cannot do it. Figure out together what stops you.",
+    "Their prayer, whether casual or even unknowing, is what called you here.",
+    "You feel a strong physical pull towards them, and these human feelings confuse you.",
+    "They rescued you, and you recognise that you are in their debt.",
+    "They are your guide to everyday human life: food, sex, drugs, TV and the like."
+  ],
+  "improvements": [
+    {
+      "text": "Get +1 Tough, max +3",
+      "kind": "stat",
+      "stat": "tough",
+      "max": 3
+    },
+    {
+      "text": "Get +1 Cool, max +2",
+      "kind": "stat",
+      "stat": "cool",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Charm, max +2",
+      "kind": "stat",
+      "stat": "charm",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Sharp, max +2",
+      "kind": "stat",
+      "stat": "sharp",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Weird, max +2",
+      "kind": "stat",
+      "stat": "weird",
+      "max": 2
+    },
+    {
+      "text": "Take another Divine move",
+      "kind": "move"
+    },
+    {
+      "text": "Take another Divine move",
+      "kind": "move"
+    },
+    {
+      "text": "Gain a lesser divine being as an ally, sent from above to help with your mission",
+      "kind": "other"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    }
+  ],
+  "advanced": [
+    {
+      "text": "Get +1 to any rating, max +3",
+      "kind": "stat",
+      "stat": "any",
+      "max": 3
+    },
+    {
+      "text": "Change this hunter to a new type",
+      "kind": "other"
+    },
+    {
+      "text": "Create a second hunter to play as well as this one",
+      "kind": "other"
+    },
+    {
+      "text": "Mark two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Mark another two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Retire this hunter to safety",
+      "kind": "other"
+    },
+    {
+      "text": "Erase one used Luck mark from your playbook",
+      "kind": "luck"
+    },
+    {
+      "text": "Change your mission: pick a different one from the normal options, or (if the Keeper agrees) make up a new one",
+      "kind": "other"
+    }
+  ]
+}

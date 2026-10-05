@@ -1,0 +1,481 @@
+{
+  "id": "professional",
+  "name": "The Professional",
+  "tagline": "Hunting monsters is your day job, with an Agency behind you. You get real gear and backup, plus the paperwork and politics that come with it.",
+  "difficulty": 1,
+  "ratings": [
+    {
+      "charm": 0,
+      "cool": 2,
+      "sharp": -1,
+      "tough": 2,
+      "weird": -1
+    },
+    {
+      "charm": -1,
+      "cool": 2,
+      "sharp": 1,
+      "tough": 1,
+      "weird": 0
+    },
+    {
+      "charm": 1,
+      "cool": 2,
+      "sharp": 1,
+      "tough": -1,
+      "weird": 0
+    },
+    {
+      "charm": -1,
+      "cool": 2,
+      "sharp": 1,
+      "tough": 0,
+      "weird": 1
+    },
+    {
+      "charm": 0,
+      "cool": 2,
+      "sharp": 2,
+      "tough": -1,
+      "weird": -1
+    }
+  ],
+  "look": [
+    {
+      "title": "Face",
+      "options": [
+        "chiseled face",
+        "scarred face",
+        "unshaven face",
+        "soft face",
+        "young face",
+        "old face",
+        "determined face"
+      ],
+      "writeIn": true
+    },
+    {
+      "title": "Outfit",
+      "options": [
+        "tailored suit",
+        "shabby suit",
+        "perfect suit",
+        "utility coveralls",
+        "battledress",
+        "paramilitary uniform",
+        "lab coat"
+      ],
+      "writeIn": true
+    }
+  ],
+  "luckSpecial": "Spending Luck means the Agency's next assignment for you is buried in bureaucracy.",
+  "moves": {
+    "intro": "Take every basic move and four Professional moves. Deal With the Agency comes free; choose three others from the list.",
+    "pick": 3,
+    "auto": [
+      {
+        "id": "professional-deal-with-the-agency",
+        "name": "Deal With the Agency",
+        "kind": "roll",
+        "stat": "sharp",
+        "trig": "When you ask the Agency for help or equipment, or try to cover for a failure",
+        "full": "Approved: you get the gear or people you asked for, or your mistake slips by unnoticed.",
+        "part": "Mixed result. You may take a scolding and face fallout, but you still receive what the job needs.",
+        "miss": "You blew it. Expect a suspension, an investigation or just a bad reputation, with no assistance until you straighten things out.",
+        "note": ""
+      }
+    ],
+    "choices": [
+      {
+        "id": "professional-bottle-it-up",
+        "name": "Bottle It Up",
+        "kind": "passive",
+        "summary": "You can add up to +3 to an act under pressure roll. For each +1 you add, the Keeper banks 1 hold, which can later be cashed in one for one to hit you with -1 on any move other than act under pressure."
+      },
+      {
+        "id": "professional-unfazeable",
+        "name": "Unfazeable",
+        "kind": "passive",
+        "summary": "Take +1 Cool (max +3)."
+      },
+      {
+        "id": "professional-battlefield-awareness",
+        "name": "Battlefield Awareness",
+        "kind": "passive",
+        "summary": "You stay aware of everything around you and of the threats to watch for. Gain +1 armour on top of your gear, up to a total of 2-armour."
+      },
+      {
+        "id": "professional-leave-no-one-behind",
+        "name": "Leave No One Behind",
+        "kind": "roll",
+        "stat": "sharp",
+        "trig": "In combat, when you help someone escape",
+        "full": "You get them out clean.",
+        "part": "Pick one: you get them out, or you take no harm.",
+        "miss": "They stay trapped and enemies turn on you.",
+        "note": ""
+      },
+      {
+        "id": "professional-tactical-genius",
+        "name": "Tactical Genius",
+        "kind": "passive",
+        "summary": "Reading a bad situation can use +Cool instead of +Sharp."
+      },
+      {
+        "id": "professional-medic",
+        "name": "Medic",
+        "kind": "roll",
+        "stat": "cool",
+        "trig": "When you give first aid with your complete kit and training",
+        "full": "The patient is stable and recovers 2 harm.",
+        "part": "Either recover 2 harm or get the injury stabilized, not both.",
+        "miss": "You cause 1 extra harm.",
+        "note": "This move replaces the regular first aid move."
+      },
+      {
+        "id": "professional-mobility",
+        "name": "Mobility",
+        "kind": "passive",
+        "summary": "You own a monster-hunting vehicle (truck, van or car). Give it two good traits and one bad one. Good traits: (1) roomy, (2) surveillance gear, (3) fast, (4) stealthy, (5) intimidating, (6) classic, (7) medical kit, (8) sleeping space, (9) toolkit, (10) concealed weapons, (11) anonymous, (12) armoured (+1 armour inside), (13) tough, (14) monster cage. Bad traits: (a) loud, (b) obvious, (c) temperamental, (d) beaten-up, (e) gas-guzzler, (f) uncomfortable, (g) slow, (h) old."
+      }
+    ]
+  },
+  "gear": [
+    {
+      "id": "serious-weapons",
+      "title": "Serious weapons",
+      "intro": "Pick one.",
+      "pick": 1,
+      "auto": false,
+      "kind": "weapon",
+      "items": [
+        {
+          "name": "Assault rifle",
+          "harm": 3,
+          "tags": "far area loud reload"
+        },
+        {
+          "name": "Grenade launcher",
+          "harm": 4,
+          "tags": "far area messy loud reload"
+        },
+        {
+          "name": "Sniper rifle",
+          "harm": 4,
+          "tags": "far"
+        },
+        {
+          "name": "Grenades",
+          "harm": 4,
+          "tags": "close area messy loud"
+        },
+        {
+          "name": "Submachine gun",
+          "harm": 3,
+          "tags": "close area loud reload"
+        }
+      ]
+    },
+    {
+      "id": "normal-weapons",
+      "title": "Normal weapons",
+      "intro": "Pick two.",
+      "pick": 2,
+      "auto": false,
+      "kind": "weapon",
+      "items": [
+        {
+          "name": ".38 revolver",
+          "harm": 2,
+          "tags": "close reload loud"
+        },
+        {
+          "name": "9mm",
+          "harm": 2,
+          "tags": "close loud"
+        },
+        {
+          "name": "Hunting rifle",
+          "harm": 2,
+          "tags": "far loud"
+        },
+        {
+          "name": "Shotgun",
+          "harm": 3,
+          "tags": "close messy"
+        },
+        {
+          "name": "Big knife",
+          "harm": 1,
+          "tags": "hand"
+        }
+      ]
+    },
+    {
+      "id": "armor",
+      "title": "Protection",
+      "intro": "Pick either a flak vest or combat armour.",
+      "pick": 1,
+      "auto": false,
+      "kind": "armor",
+      "items": [
+        {
+          "name": "Flak vest",
+          "armor": 1,
+          "tags": "hidden"
+        },
+        {
+          "name": "Combat armour",
+          "armor": 2,
+          "tags": "heavy"
+        }
+      ]
+    }
+  ],
+  "extras": [
+    {
+      "id": "agency-type",
+      "title": "Who the Agency is",
+      "intro": "Decide who you work for. Some ideas are below; make up something else if you prefer.",
+      "pick": 1,
+      "options": [
+        {
+          "id": "black-budget",
+          "label": "Black-budget government department"
+        },
+        {
+          "id": "military",
+          "label": "Secret military unit"
+        },
+        {
+          "id": "police",
+          "label": "Clandestine police team"
+        },
+        {
+          "id": "crusade",
+          "label": "A private individual's crusade"
+        },
+        {
+          "id": "corporation",
+          "label": "Corporation"
+        },
+        {
+          "id": "science",
+          "label": "Scientific team"
+        }
+      ]
+    },
+    {
+      "id": "agency-goal",
+      "title": "The Agency's goal",
+      "intro": "Decide what the Agency is trying to achieve. Make up your own if none of these fit.",
+      "pick": 1,
+      "options": [
+        {
+          "id": "destroy",
+          "label": "Destroy monsters"
+        },
+        {
+          "id": "study",
+          "label": "Study the supernatural"
+        },
+        {
+          "id": "protect",
+          "label": "Protect people"
+        },
+        {
+          "id": "power",
+          "label": "Gain power"
+        }
+      ]
+    },
+    {
+      "id": "agency-resources",
+      "title": "Agency resource tags",
+      "intro": "Your Agency gets two resource tags.",
+      "pick": 2,
+      "options": [
+        {
+          "id": "well-armed",
+          "label": "Well-armed"
+        },
+        {
+          "id": "well-financed",
+          "label": "Well-financed"
+        },
+        {
+          "id": "rigorous-training",
+          "label": "Rigorous training"
+        },
+        {
+          "id": "official-pull",
+          "label": "Official pull"
+        },
+        {
+          "id": "cover-identities",
+          "label": "Cover identities"
+        },
+        {
+          "id": "offices",
+          "label": "Offices all over"
+        },
+        {
+          "id": "good-intel",
+          "label": "Good intel"
+        },
+        {
+          "id": "recognised-authority",
+          "label": "Recognised authority"
+        },
+        {
+          "id": "weird-tech",
+          "label": "Weird tech gadgets"
+        },
+        {
+          "id": "support-teams",
+          "label": "Support teams"
+        }
+      ]
+    },
+    {
+      "id": "agency-red-tape",
+      "title": "Agency red tape tags",
+      "intro": "Pick two red tape tags for the Agency.",
+      "pick": 2,
+      "options": [
+        {
+          "id": "dubious-motives",
+          "label": "Dubious motives"
+        },
+        {
+          "id": "bureaucratic",
+          "label": "Bureaucratic"
+        },
+        {
+          "id": "secretive-hierarchy",
+          "label": "Secretive hierarchy"
+        },
+        {
+          "id": "cryptic-missions",
+          "label": "Cryptic missions"
+        },
+        {
+          "id": "hostile-superiors",
+          "label": "Hostile superiors"
+        },
+        {
+          "id": "rivalry",
+          "label": "Inter-departmental rivalry"
+        },
+        {
+          "id": "budget-cuts",
+          "label": "Budget cuts"
+        },
+        {
+          "id": "no-prisoners",
+          "label": "Take no prisoners policy"
+        },
+        {
+          "id": "live-capture",
+          "label": "Live capture policy"
+        }
+      ]
+    }
+  ],
+  "history": [
+    "There could be something romantic between you, but it has not gone anywhere yet.",
+    "The Agency has them under watch, and you have been observing them.",
+    "You are family. Say how closely.",
+    "A mission put you together, and you teamed up off the books with good results.",
+    "They have done work for the Agency in the past and have a good name there.",
+    "You were friends in training before the Agency took you on. It might have been the military, the police or something stranger; sort out the details together.",
+    "They rescued you, and maybe your team, from a mission that went disastrously wrong.",
+    "The Agency once sent you to handle them because they threatened its policies. Tell them how it ended."
+  ],
+  "improvements": [
+    {
+      "text": "Get +1 Cool, max +3",
+      "kind": "stat",
+      "stat": "cool",
+      "max": 3
+    },
+    {
+      "text": "Get +1 Charm, max +2",
+      "kind": "stat",
+      "stat": "charm",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Sharp, max +2",
+      "kind": "stat",
+      "stat": "sharp",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Tough, max +2",
+      "kind": "stat",
+      "stat": "tough",
+      "max": 2
+    },
+    {
+      "text": "Take another Professional move",
+      "kind": "move"
+    },
+    {
+      "text": "Take another Professional move",
+      "kind": "move"
+    },
+    {
+      "text": "Add a new resource tag for your Agency, or change a red tape tag",
+      "kind": "other"
+    },
+    {
+      "text": "Get command of an Agency team of monster hunters",
+      "kind": "other"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    }
+  ],
+  "advanced": [
+    {
+      "text": "Get +1 to any rating, max +3",
+      "kind": "stat",
+      "stat": "any",
+      "max": 3
+    },
+    {
+      "text": "Change this hunter to a new type",
+      "kind": "other"
+    },
+    {
+      "text": "Create a second hunter to play as well as this one",
+      "kind": "other"
+    },
+    {
+      "text": "Mark two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Mark another two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Retire this hunter to safety",
+      "kind": "other"
+    },
+    {
+      "text": "Get some or all of the other players' hunters hired by your Agency. They get the Deal With the Agency move, plus salary and benefits",
+      "kind": "other"
+    },
+    {
+      "text": "Get back one used Luck point",
+      "kind": "luck"
+    }
+  ]
+}

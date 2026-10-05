@@ -1,0 +1,447 @@
+{
+  "id": "monstrous",
+  "name": "The Monstrous",
+  "tagline": "Half human, half monster, and fighting the hunger every day. You are strong and strange, with a curse that always threatens to take over.",
+  "difficulty": 2,
+  "ratings": [
+    {
+      "charm": -1,
+      "cool": -1,
+      "sharp": 0,
+      "tough": 2,
+      "weird": 3
+    },
+    {
+      "charm": -1,
+      "cool": 1,
+      "sharp": 1,
+      "tough": 0,
+      "weird": 3
+    },
+    {
+      "charm": 2,
+      "cool": 0,
+      "sharp": -1,
+      "tough": -1,
+      "weird": 3
+    },
+    {
+      "charm": -2,
+      "cool": 2,
+      "sharp": 0,
+      "tough": 0,
+      "weird": 3
+    },
+    {
+      "charm": 0,
+      "cool": -1,
+      "sharp": 2,
+      "tough": -1,
+      "weird": 3
+    }
+  ],
+  "look": [
+    {
+      "title": "Nature",
+      "options": [
+        "almost human",
+        "half human",
+        "monstrous"
+      ],
+      "writeIn": true
+    },
+    {
+      "title": "Aura",
+      "options": [
+        "sinister aura",
+        "powerful aura",
+        "dark aura",
+        "unnerving aura",
+        "energetic aura",
+        "evil aura",
+        "bestial aura"
+      ],
+      "writeIn": true
+    },
+    {
+      "title": "Clothes",
+      "options": [
+        "archaic clothes",
+        "casual clothes",
+        "ragged clothes",
+        "tailored clothes",
+        "stylish clothes",
+        "street clothes",
+        "outdoor clothes"
+      ],
+      "writeIn": true
+    }
+  ],
+  "luckSpecial": "Whenever you burn a Luck point, the monster in you grows stronger: your Curse might worsen, or another drawback of your Breed might appear.",
+  "moves": {
+    "intro": "Besides the basic moves, you pick two Monstrous moves from the list. Nothing is free. Your breed (curse and natural attacks) is chosen in its own sections below.",
+    "pick": 2,
+    "auto": [],
+    "choices": [
+      {
+        "id": "monstrous-immortal",
+        "name": "Immortal",
+        "kind": "passive",
+        "summary": "You never age or get ill, and all harm you take is reduced by 1."
+      },
+      {
+        "id": "monstrous-unnatural-appeal",
+        "name": "Unnatural Appeal",
+        "kind": "passive",
+        "summary": "When you manipulate someone, roll +Weird instead of +Charm."
+      },
+      {
+        "id": "monstrous-unholy-strength",
+        "name": "Unholy Strength",
+        "kind": "passive",
+        "summary": "In place of +Tough, you roll +Weird for the kick some ass move."
+      },
+      {
+        "id": "monstrous-incorporeal",
+        "name": "Incorporeal",
+        "kind": "passive",
+        "summary": "You can pass through solid things freely, though not through living people."
+      },
+      {
+        "id": "monstrous-preternatural-speed",
+        "name": "Preternatural Speed",
+        "kind": "passive",
+        "summary": "You are far faster than ordinary people. Chasing, fleeing or running gives you +1 ongoing."
+      },
+      {
+        "id": "monstrous-claws-of-the-beast",
+        "name": "Claws of the Beast",
+        "kind": "passive",
+        "summary": "Every natural attack you have does +1 harm."
+      },
+      {
+        "id": "monstrous-mental-dominion",
+        "name": "Mental Dominion",
+        "kind": "roll",
+        "stat": "charm",
+        "trig": "When you stare into an ordinary person's eyes and force your will on them",
+        "full": "Hold 3.",
+        "part": "Hold 1.",
+        "miss": "",
+        "note": "Each hold point buys one order. Ordinary people obey whatever it is. Hunters may refuse; any hunter who obeys marks experience."
+      },
+      {
+        "id": "monstrous-unquenchable-vitality",
+        "name": "Unquenchable Vitality",
+        "kind": "roll",
+        "stat": "cool",
+        "trig": "When you have taken harm and want to heal yourself",
+        "full": "You heal 2 harm and your injuries stop getting worse (stabilised).",
+        "part": "You heal 1 harm and your injuries are stabilised.",
+        "miss": "Your injuries get worse.",
+        "note": ""
+      },
+      {
+        "id": "monstrous-dark-negotiator",
+        "name": "Dark Negotiator",
+        "kind": "passive",
+        "summary": "Manipulate someone works on monsters too, provided they are able to talk and reason."
+      },
+      {
+        "id": "monstrous-flight",
+        "name": "Flight",
+        "kind": "passive",
+        "summary": "You can fly."
+      },
+      {
+        "id": "monstrous-shapeshifter",
+        "name": "Shapeshifter",
+        "kind": "passive",
+        "summary": "You can take on another shape, usually an animal. Decide whether you have one other form or several, and describe them. Using an alternate form's keen senses (smell as a wolf, sight as an eagle) gives +1 to investigate a mystery."
+      },
+      {
+        "id": "monstrous-something-borrowed",
+        "name": "Something Borrowed",
+        "kind": "passive",
+        "summary": "Pick a move from any hunter playbook that nobody in the game is using."
+      }
+    ]
+  },
+  "gear": [
+    {
+      "id": "weapon",
+      "title": "Handy weapon",
+      "intro": "You may have one handy weapon if you like.",
+      "pick": 1,
+      "optional": true,
+      "auto": false,
+      "kind": "weapon",
+      "items": [
+        {
+          "name": ".38 revolver",
+          "harm": 2,
+          "tags": "close reload loud"
+        },
+        {
+          "name": "9mm",
+          "harm": 2,
+          "tags": "close loud"
+        },
+        {
+          "name": "Magnum",
+          "harm": 3,
+          "tags": "close reload loud"
+        },
+        {
+          "name": "Shotgun",
+          "harm": 3,
+          "tags": "close messy"
+        },
+        {
+          "name": "Big knife",
+          "harm": 1,
+          "tags": "hand"
+        },
+        {
+          "name": "Brass knuckles",
+          "harm": 1,
+          "tags": "hand quiet small"
+        },
+        {
+          "name": "Sword",
+          "harm": 2,
+          "tags": "hand messy"
+        },
+        {
+          "name": "Huge sword",
+          "harm": 3,
+          "tags": "hand heavy"
+        }
+      ]
+    }
+  ],
+  "extras": [
+    {
+      "id": "breed-origin",
+      "title": "Monster breed: your story",
+      "intro": "You are part human and part monster. Decide if you were born this way or were human and changed. Also decide if you have always tried to be good, or used to be evil and switched sides. Your breed is built from a curse, moves (above) and natural attacks.",
+      "pick": 0,
+      "text": true,
+      "placeholder": "How did you become what you are, and how did you end up on the side of good?"
+    },
+    {
+      "id": "curse",
+      "title": "Curse",
+      "intro": "Pick one.",
+      "pick": 1,
+      "options": [
+        {
+          "id": "feed",
+          "label": "Feed",
+          "detail": "You live on human victims, taking blood, brains or spiritual essence. When a perfect chance to feed appears, you must act under pressure or give in."
+        },
+        {
+          "id": "vulnerability",
+          "label": "Vulnerability",
+          "detail": "Pick a substance. It hurts you for +1 harm. Being tied up or surrounded by it forces you to act under pressure before using powers."
+        },
+        {
+          "id": "pure-drive",
+          "label": "Pure Drive",
+          "detail": "A single emotion drives you. Pick one: anger, cruelty, envy, fear, greed, hate, hunger, jealousy, joy, lust or pride. Given the chance to indulge it, you do so immediately unless you act under pressure to resist."
+        },
+        {
+          "id": "dark-master",
+          "label": "Dark Master",
+          "detail": "An evil overlord still thinks you are loyal. They keep sending orders and will not accept a refusal, or a failure."
+        }
+      ]
+    },
+    {
+      "id": "natural-attacks",
+      "title": "Natural attacks",
+      "intro": "Choose one Base plus one Extra for it, or choose two Bases. Either way you make two picks.",
+      "pick": 2,
+      "options": [
+        {
+          "id": "base-teeth",
+          "label": "Base: teeth",
+          "detail": "3-harm intimate."
+        },
+        {
+          "id": "base-claws",
+          "label": "Base: claws",
+          "detail": "2-harm hand."
+        },
+        {
+          "id": "base-magical-force",
+          "label": "Base: magical force",
+          "detail": "1-harm magical close."
+        },
+        {
+          "id": "base-life-drain",
+          "label": "Base: life-drain",
+          "detail": "1-harm intimate life-drain."
+        },
+        {
+          "id": "extra-harm",
+          "label": "Extra: +1 harm",
+          "detail": "Add +1 harm to one of your bases."
+        },
+        {
+          "id": "extra-ignore-armour",
+          "label": "Extra: ignore-armour",
+          "detail": "Add the ignore-armour tag to one of your bases."
+        },
+        {
+          "id": "extra-range",
+          "label": "Extra: extra range",
+          "detail": "Add one more range (intimate, hand, or close) to one of your bases."
+        }
+      ]
+    },
+    {
+      "id": "breed-suggestions",
+      "title": "Classic monster builds (suggestions only)",
+      "intro": "Ideas only, so build your own if you like. Each build below lists a curse, natural attacks and moves to take.",
+      "pick": 0,
+      "options": [
+        {
+          "id": "vampire",
+          "label": "Vampire",
+          "detail": "Attacks: life-drain or teeth as the base, boosted by +1 harm. Moves: either immortal or unquenchable vitality, along with mental dominion. Curse: feed, on blood or on life-force."
+        },
+        {
+          "id": "werewolf",
+          "label": "Werewolf",
+          "detail": "Attacks: both claws and teeth as bases. Moves: shapeshifter (wolf form, wolfman form, or both), plus a choice between unholy strength and claws of the beast. Curse: vulnerability, to silver."
+        },
+        {
+          "id": "ghost",
+          "label": "Ghost",
+          "detail": "Moves: incorporeal and immortal. Attacks: base magical force, extended with hand range. Curse: vulnerability (rock salt)."
+        },
+        {
+          "id": "faerie",
+          "label": "Faerie",
+          "detail": "Moves: flight and preternatural speed. Attacks: base magical force, with ignore-armour added. Curse: pure drive (joy)."
+        },
+        {
+          "id": "demon",
+          "label": "Demon",
+          "detail": "Moves: dark negotiator and unquenchable vitality. Attacks: base claws with +1 harm. Curse: pure drive (cruelty)."
+        },
+        {
+          "id": "orc",
+          "label": "Orc",
+          "detail": "Attacks: teeth as the base, with ignore-armour. Moves: dark negotiator and unholy strength. Curse: dark master, being the orc overlord."
+        },
+        {
+          "id": "zombie",
+          "label": "Zombie",
+          "detail": "Moves: immortal and unquenchable vitality. Attacks: base teeth with +1 harm. Curses: pure drive (hunger) and feed (flesh or brains)."
+        }
+      ]
+    }
+  ],
+  "history": [
+    "Once you lost control and nearly killed them. Ask how they brought you back.",
+    "They set out to kill you until you showed you are one of the good guys. Ask what changed their mind.",
+    "You are hopelessly infatuated with them. Ask whether they have noticed and feel the same.",
+    "You are close relations, or they are a distant descendant of yours. Tell them which.",
+    "You rescued them from one of your own kind, and kept that creature from being punished (it may be another good one, or it may have power over you).",
+    "They are linked to where your curse or origin came from. Say how.",
+    "You teamed up against bad odds and won.",
+    "They rescued you when a different hunter meant to kill you. Ask what went on."
+  ],
+  "improvements": [
+    {
+      "text": "Get +1 Charm, max +2",
+      "kind": "stat",
+      "stat": "charm",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Cool, max +2",
+      "kind": "stat",
+      "stat": "cool",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Sharp, max +2",
+      "kind": "stat",
+      "stat": "sharp",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Tough, max +2",
+      "kind": "stat",
+      "stat": "tough",
+      "max": 2
+    },
+    {
+      "text": "Take another Monstrous move",
+      "kind": "move"
+    },
+    {
+      "text": "Take another Monstrous move",
+      "kind": "move"
+    },
+    {
+      "text": "Gain a haven, like the Expert has, with two options",
+      "kind": "other"
+    },
+    {
+      "text": "Take a natural attacks pick",
+      "kind": "other"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    }
+  ],
+  "advanced": [
+    {
+      "text": "Get +1 to any rating, max +3",
+      "kind": "stat",
+      "stat": "any",
+      "max": 3
+    },
+    {
+      "text": "Change this hunter to a new type",
+      "kind": "other"
+    },
+    {
+      "text": "Create a second hunter to play as well as this one",
+      "kind": "other"
+    },
+    {
+      "text": "Mark two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Mark another two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Retire this hunter to safety",
+      "kind": "other"
+    },
+    {
+      "text": "Free yourself from the curse of your kind: your curse no longer applies, but you lose 1 Weird",
+      "kind": "other"
+    },
+    {
+      "text": "You turn evil (again): retire this character, they become one of the Keeper's threats",
+      "kind": "other"
+    },
+    {
+      "text": "Get back one used Luck point",
+      "kind": "luck"
+    }
+  ]
+}

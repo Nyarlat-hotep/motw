@@ -1,0 +1,376 @@
+{
+ "id": "spooky",
+ "name": "The Spooky",
+ "tagline": "You have strange powers with a dark source, and the bill for them is coming due. Powerful and flavourful, but your dark side will keep asking you to do nasty things.",
+ "difficulty": 2,
+ "ratings": [
+  {
+   "charm": 1,
+   "cool": 0,
+   "sharp": 1,
+   "tough": -1,
+   "weird": 2
+  },
+  {
+   "charm": -1,
+   "cool": 1,
+   "sharp": 0,
+   "tough": 1,
+   "weird": 2
+  },
+  {
+   "charm": 2,
+   "cool": 0,
+   "sharp": -1,
+   "tough": -1,
+   "weird": 2
+  },
+  {
+   "charm": 0,
+   "cool": -1,
+   "sharp": 1,
+   "tough": 1,
+   "weird": 2
+  },
+  {
+   "charm": -1,
+   "cool": -1,
+   "sharp": 2,
+   "tough": 0,
+   "weird": 2
+  }
+ ],
+ "look": [
+  {
+   "title": "Age",
+   "options": [
+    "kid",
+    "teen",
+    "adult",
+    "old"
+   ],
+   "writeIn": true
+  },
+  {
+   "title": "Eyes",
+   "options": [
+    "burning eyes",
+    "dark eyes",
+    "pained eyes",
+    "blank eyes",
+    "unblinking eyes",
+    "piercing eyes",
+    "shadowed eyes",
+    "creepy eyes"
+   ],
+   "writeIn": true
+  },
+  {
+   "title": "Clothes",
+   "options": [
+    "ratty clothes",
+    "casual clothes",
+    "goth clothes",
+    "neat clothes",
+    "nerdy clothes"
+   ],
+   "writeIn": true
+  }
+ ],
+ "luckSpecial": "Every Luck box you tick makes the demands from your dark side harsher.",
+ "moves": {
+  "intro": "Pick three Spooky moves from the list below; none come for free. You also have every basic move.",
+  "pick": 3,
+  "auto": [],
+  "choices": [
+   {
+    "id": "spooky-telepathy",
+    "name": "Telepathy",
+    "kind": "passive",
+    "summary": "Hear other people's thoughts and send your own back into their heads. You can investigate or size up a tense scene in silence, and even manipulate someone without a word. Rolls work as usual; the only difference is that targets are caught off guard by the strange link."
+   },
+   {
+    "id": "spooky-hex",
+    "name": "Hex",
+    "kind": "passive",
+    "summary": "Each time you work a spell through Use Magic, you may tack on one curse alongside the normal result: the target falls ill, the target is hurt right away (2-harm magic ignore-armour), or the target breaks something valuable or important."
+   },
+   {
+    "id": "spooky-the-sight",
+    "name": "The Sight",
+    "kind": "passive",
+    "summary": "Spirits and magical forces are visible to you. You can talk to those spirits, even bargain with them, and they point you to extra clues whenever you look into a mystery."
+   },
+   {
+    "id": "spooky-premonitions",
+    "name": "Premonitions",
+    "kind": "roll",
+    "stat": "weird",
+    "trig": "At the start of each mystery",
+    "full": "A clear vision shows you a coming disaster. Take +1 forward to head it off, and mark experience if you prevent it.",
+    "part": "You see only blurry fragments of a coming disaster. Mark experience if you prevent it.",
+    "miss": "You see something terrible happening to yourself. The Keeper gets 3 hold, and each one costs you -1 on one of your rolls.",
+    "note": ""
+   },
+   {
+    "id": "spooky-hunches",
+    "name": "Hunches",
+    "kind": "roll",
+    "stat": "sharp",
+    "trig": "When something bad is happening (or just about to happen) somewhere you are not",
+    "full": "You know exactly where to go and reach it in time.",
+    "part": "You are late: you can step in but cannot stop everything.",
+    "miss": "You get there at the worst moment and end up in danger yourself.",
+    "note": ""
+   },
+   {
+    "id": "spooky-tune-in",
+    "name": "Tune In",
+    "kind": "roll",
+    "stat": "weird",
+    "trig": "When you attune your mind to a monster or minion",
+    "full": "Hold 3.",
+    "part": "Hold 1.",
+    "miss": "The monster notices you.",
+    "note": "Each hold lets you put one question to the Keeper, and you get +1 ongoing while you act on the reply. Choose from: its current location; what it intends to do right now; its next target; which person it sees as the greatest danger; how to draw its attention."
+   },
+   {
+    "id": "spooky-big-whammy",
+    "name": "The Big Whammy",
+    "kind": "passive",
+    "summary": "Your powers can be used as a weapon: when you kick some ass, roll +Weird rather than +Tough. The blow does 2-harm, with the tags close, obvious and ignore-armour. A miss brings magical backlash on you."
+   },
+   {
+    "id": "spooky-jinx",
+    "name": "Jinx",
+    "kind": "roll",
+    "stat": "weird",
+    "trig": "When you jinx a target, nudging coincidences to happen the way you want",
+    "full": "Hold 2.",
+    "part": "Hold 1.",
+    "miss": "The Keeper gets 2 hold against you to use the same way.",
+    "note": "Spend hold on any of these: give a hunter -1 forward; give a hunter +1 forward by getting in their enemy's way; disrupt whatever a bystander, minion or monster is attempting; cause 1-harm to the target in an accident; leave something for the target to find; make the target lose something you are about to find."
+   }
+  ]
+ },
+ "gear": [
+  {
+   "id": "normal-weapons",
+   "title": "Normal weapons",
+   "intro": "Pick two normal weapons.",
+   "pick": 2,
+   "auto": false,
+   "kind": "weapon",
+   "items": [
+    {
+     "name": ".38 revolver",
+     "harm": 2,
+     "tags": "close reload loud"
+    },
+    {
+     "name": "9mm",
+     "harm": 2,
+     "tags": "close loud"
+    },
+    {
+     "name": "Hunting rifle",
+     "harm": 2,
+     "tags": "far loud"
+    },
+    {
+     "name": "Shotgun",
+     "harm": 3,
+     "tags": "close messy"
+    },
+    {
+     "name": "Big knife",
+     "harm": 1,
+     "tags": "hand"
+    }
+   ]
+  },
+  {
+   "id": "magic-items",
+   "title": "Magical items",
+   "intro": "You also carry whatever charms or magical items help you channel your powers.",
+   "pick": 0,
+   "auto": true,
+   "kind": "item",
+   "items": [
+    {
+     "name": "Magical items or amulets for invoking your powers"
+    }
+   ]
+  }
+ ],
+ "extras": [
+  {
+   "id": "dark-side",
+   "title": "Your dark side",
+   "intro": "Your powers come from a dark place, and it can push you toward bad choices, either as commands from the power's source or as impulses from within. Choose three tags. When the Keeper makes a tag-based demand and you comply, mark experience. If you refuse, your powers stop working until the mystery ends or you give in. The more Luck boxes you tick, the larger the demands become.",
+   "pick": 3,
+   "options": [
+    {
+     "id": "violence",
+     "label": "Violence"
+    },
+    {
+     "id": "depression",
+     "label": "Depression"
+    },
+    {
+     "id": "secrets",
+     "label": "Secrets"
+    },
+    {
+     "id": "lust",
+     "label": "Lust"
+    },
+    {
+     "id": "dark-bargain",
+     "label": "Dark bargain"
+    },
+    {
+     "id": "guilt",
+     "label": "Guilt"
+    },
+    {
+     "id": "soulless",
+     "label": "Soulless"
+    },
+    {
+     "id": "addiction",
+     "label": "Addiction"
+    },
+    {
+     "id": "mood-swings",
+     "label": "Mood swings"
+    },
+    {
+     "id": "rage",
+     "label": "Rage"
+    },
+    {
+     "id": "self-destruction",
+     "label": "Self-destruction"
+    },
+    {
+     "id": "greed-for-power",
+     "label": "Greed for power"
+    },
+    {
+     "id": "poor-impulse-control",
+     "label": "Poor impulse control"
+    },
+    {
+     "id": "hallucinations",
+     "label": "Hallucinations"
+    },
+    {
+     "id": "pain",
+     "label": "Pain"
+    },
+    {
+     "id": "paranoia",
+     "label": "Paranoia"
+    }
+   ]
+  }
+ ],
+ "history": [
+  "This hunter helped you learn to keep your powers under control, as far as anyone can.",
+  "You are related by blood. Work out the details together.",
+  "You are a couple, or married. Settle the exact relationship together.",
+  "You are long-time friends with complete trust.",
+  "You once used your powers on them. Decide whether your motive was selfish, and whether they ever learned of it.",
+  "You have known each other a while, but since your powers appeared you keep them at an emotional distance.",
+  "You are hoping they can help you get a grip on your powers.",
+  "They watched you use your powers out of selfishness or revenge. Ask who your victim was, then describe what you did."
+ ],
+ "improvements": [
+  {
+   "text": "Get +1 Weird, max +3",
+   "kind": "stat",
+   "stat": "weird",
+   "max": 3
+  },
+  {
+   "text": "Get +1 Charm, max +2",
+   "kind": "stat",
+   "stat": "charm",
+   "max": 2
+  },
+  {
+   "text": "Get +1 Cool, max +2",
+   "kind": "stat",
+   "stat": "cool",
+   "max": 2
+  },
+  {
+   "text": "Get +1 Sharp, max +2",
+   "kind": "stat",
+   "stat": "sharp",
+   "max": 2
+  },
+  {
+   "text": "Take another Spooky move",
+   "kind": "move"
+  },
+  {
+   "text": "Take another Spooky move",
+   "kind": "move"
+  },
+  {
+   "text": "Change some or all of your dark side tags",
+   "kind": "other"
+  },
+  {
+   "text": "Get a mystical library, like the Expert's haven option",
+   "kind": "other"
+  },
+  {
+   "text": "Take a move from another playbook",
+   "kind": "othermove"
+  },
+  {
+   "text": "Take a move from another playbook",
+   "kind": "othermove"
+  }
+ ],
+ "advanced": [
+  {
+   "text": "Get +1 to any rating, max +3",
+   "kind": "stat",
+   "stat": "any",
+   "max": 3
+  },
+  {
+   "text": "Change this hunter to a new type",
+   "kind": "other"
+  },
+  {
+   "text": "Create a second hunter to play as well as this one",
+   "kind": "other"
+  },
+  {
+   "text": "Mark two of the basic moves as advanced",
+   "kind": "other"
+  },
+  {
+   "text": "Mark another two of the basic moves as advanced",
+   "kind": "other"
+  },
+  {
+   "text": "Retire this hunter to safety",
+   "kind": "other"
+  },
+  {
+   "text": "You find a way to use your powers at a lower price: delete one dark side tag permanently",
+   "kind": "other"
+  },
+  {
+   "text": "Get back one used Luck point",
+   "kind": "luck"
+  }
+ ]
+}

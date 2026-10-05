@@ -1,0 +1,501 @@
+{
+ "id": "chosen",
+ "name": "The Chosen",
+ "tagline": "A prophecy says you will save the world, or doom it. Big destiny, big weapon, and a fate the Keeper will keep throwing at you.",
+ "difficulty": 1,
+ "ratings": [
+  {
+   "charm": 2,
+   "cool": -1,
+   "sharp": 1,
+   "tough": 2,
+   "weird": -1
+  },
+  {
+   "charm": -1,
+   "cool": 2,
+   "sharp": 1,
+   "tough": 2,
+   "weird": -1
+  },
+  {
+   "charm": 1,
+   "cool": 2,
+   "sharp": 1,
+   "tough": 1,
+   "weird": -1
+  },
+  {
+   "charm": -1,
+   "cool": 1,
+   "sharp": 2,
+   "tough": -1,
+   "weird": 2
+  },
+  {
+   "charm": 1,
+   "cool": 2,
+   "sharp": -1,
+   "tough": -1,
+   "weird": 2
+  }
+ ],
+ "look": [
+  {
+   "title": "Age",
+   "options": [
+    "kid",
+    "teen",
+    "young",
+    "burnt-out"
+   ],
+   "writeIn": true
+  },
+  {
+   "title": "Face",
+   "options": [
+    "fresh face",
+    "haggard face",
+    "young face",
+    "haunted face",
+    "hopeful face",
+    "controlled face"
+   ],
+   "writeIn": true
+  },
+  {
+   "title": "Clothes",
+   "options": [
+    "preppy clothes",
+    "casual wear",
+    "urban wear",
+    "normal clothes",
+    "neat clothes",
+    "street wear"
+   ],
+   "writeIn": true
+  }
+ ],
+ "luckSpecial": "Each time you spend a Luck point, the Keeper brings your fate into play and throws something from it at you.",
+ "moves": {
+  "intro": "On top of every basic move you get three Chosen moves. Two come automatically and you choose the third.",
+  "pick": 1,
+  "auto": [
+   {
+    "id": "chosen-destinys-plaything",
+    "name": "Destiny's Plaything",
+    "kind": "roll",
+    "stat": "weird",
+    "trig": "At the start of each mystery, to see what your fate reveals about it",
+    "full": "The Keeper gives you a helpful fact about the upcoming mystery.",
+    "part": "You catch only a faint hint.",
+    "miss": "Something bad is headed your way.",
+    "note": ""
+   },
+   {
+    "id": "chosen-here-for-a-reason",
+    "name": "I'm Here For A Reason",
+    "kind": "passive",
+    "summary": "Your fate gives you a specific job (decide what it is with the Keeper, using your fate as a guide). Until it is done you cannot die: if you are killed in play, spend a Luck point and you somehow return. The protection ends when the job is finished or when your Luck runs out."
+   }
+  ],
+  "choices": [
+   {
+    "id": "chosen-big-entrance",
+    "name": "The Big Entrance",
+    "kind": "roll",
+    "stat": "cool",
+    "trig": "When you make a showy entrance into a dangerous situation",
+    "full": "The whole room stops and listens to your opening speech until you are done.",
+    "part": "Choose one person or monster, who stops to hear you out until you finish.",
+    "miss": "Every enemy present marks you as the biggest threat.",
+    "note": ""
+   },
+   {
+    "id": "chosen-devastating",
+    "name": "Devastating",
+    "kind": "passive",
+    "summary": "You can add +1 to the harm you deal."
+   },
+   {
+    "id": "chosen-dutiful",
+    "name": "Dutiful",
+    "kind": "passive",
+    "summary": "Whenever your fate comes into play and you act consistent with one of its tags, heroic or doom, mark experience. If the tag was heroic, you also get +1 forward."
+   },
+   {
+    "id": "chosen-invincible",
+    "name": "Invincible",
+    "kind": "passive",
+    "summary": "You count as wearing 2-armour at all times. It does not add to other protection."
+   },
+   {
+    "id": "chosen-resilience",
+    "name": "Resilience",
+    "kind": "passive",
+    "summary": "You recover quickly: whenever harm is healed on you, heal one extra point. The Keeper also treats your injuries as 1 harm lower when deciding on harm moves."
+   }
+  ]
+ },
+ "gear": [
+  {
+   "id": "armor",
+   "title": "Protective gear",
+   "intro": "Optionally take protective gear worth 1-armour.",
+   "pick": 1,
+   "optional": true,
+   "kind": "armor",
+   "items": [
+    {
+     "name": "Protective gear",
+     "armor": 1,
+     "tags": ""
+    }
+   ]
+  },
+  {
+   "id": "special-weapon",
+   "kind": "builder",
+   "title": "Your special weapon",
+   "intro": "You carry a weapon you are fated to use. Build it by choosing one form, three business-end options and a material (for example handle, blade, long and magic make a magic sword).",
+   "parts": [
+    {
+     "id": "form",
+     "title": "Form (choose 1)",
+     "pick": 1,
+     "options": [
+      {
+       "label": "staff",
+       "harm": 1,
+       "tags": "hand close"
+      },
+      {
+       "label": "haft",
+       "harm": 2,
+       "tags": "hand heavy"
+      },
+      {
+       "label": "handle",
+       "harm": 1,
+       "tags": "hand balanced"
+      },
+      {
+       "label": "chain",
+       "harm": 1,
+       "tags": "hand area"
+      }
+     ]
+    },
+    {
+     "id": "end",
+     "title": "Business end (choose 3)",
+     "pick": 3,
+     "options": [
+      {
+       "label": "artifact",
+       "tags": "magic"
+      },
+      {
+       "label": "spikes",
+       "harmBonus": 1,
+       "tags": "messy"
+      },
+      {
+       "label": "blade",
+       "harmBonus": 1,
+       "tags": ""
+      },
+      {
+       "label": "heavy",
+       "harmBonus": 1,
+       "tags": ""
+      },
+      {
+       "label": "long",
+       "tags": "close"
+      },
+      {
+       "label": "throwable",
+       "tags": "close"
+      },
+      {
+       "label": "chain",
+       "tags": "area"
+      }
+     ]
+    },
+    {
+     "id": "material",
+     "title": "Material (choose 1)",
+     "text": true,
+     "suggestions": [
+      "steel",
+      "cold iron",
+      "silver",
+      "wood",
+      "stone",
+      "bone",
+      "teeth",
+      "obsidian"
+     ]
+    }
+   ]
+  }
+ ],
+ "extras": [
+  {
+   "id": "found-out",
+   "title": "How you found out about your fate",
+   "intro": "Pick one.",
+   "pick": 1,
+   "options": [
+    {
+     "id": "visions",
+     "label": "Nightmares and visions"
+    },
+    {
+     "id": "weirdo",
+     "label": "Some weirdo told you"
+    },
+    {
+     "id": "cult",
+     "label": "An ancient cult found you"
+    },
+    {
+     "id": "nemesis",
+     "label": "Sought out by your nemesis"
+    },
+    {
+     "id": "attacked",
+     "label": "Attacked by monsters"
+    },
+    {
+     "id": "trained",
+     "label": "Trained from birth"
+    },
+    {
+     "id": "prophecy",
+     "label": "You found the prophecy"
+    }
+   ]
+  },
+  {
+   "id": "heroic",
+   "title": "Fate: heroic tags",
+   "intro": "Choose two heroic tags and two doom tags. Together they sketch how your fate plays out, and they may clash, which just means fate pulls you in two directions. Each time you spend Luck, the Keeper hits you with something out of your fate.",
+   "pick": 2,
+   "options": [
+    {
+     "id": "sacrifice",
+     "label": "Sacrifice"
+    },
+    {
+     "id": "champion",
+     "label": "You are the Champion"
+    },
+    {
+     "id": "visions",
+     "label": "Visions"
+    },
+    {
+     "id": "secret-training",
+     "label": "Secret training"
+    },
+    {
+     "id": "magic",
+     "label": "Magical powers"
+    },
+    {
+     "id": "inheritance",
+     "label": "Mystical inheritance"
+    },
+    {
+     "id": "normal-life",
+     "label": "A normal life"
+    },
+    {
+     "id": "true-love",
+     "label": "True love"
+    },
+    {
+     "id": "save-world",
+     "label": "You can save the world"
+    },
+    {
+     "id": "hidden-allies",
+     "label": "Hidden allies"
+    },
+    {
+     "id": "end-monsters",
+     "label": "The end of monsters"
+    },
+    {
+     "id": "divine-help",
+     "label": "Divine help"
+    }
+   ]
+  },
+  {
+   "id": "doom",
+   "title": "Fate: doom tags",
+   "intro": "Pick two.",
+   "pick": 2,
+   "options": [
+    {
+     "id": "death",
+     "label": "Death"
+    },
+    {
+     "id": "cant-save-all",
+     "label": "You can't save everyone"
+    },
+    {
+     "id": "impossible-love",
+     "label": "Impossible love"
+    },
+    {
+     "id": "failure",
+     "label": "Failure"
+    },
+    {
+     "id": "nemesis",
+     "label": "A nemesis"
+    },
+    {
+     "id": "no-normal",
+     "label": "No normal life"
+    },
+    {
+     "id": "loss",
+     "label": "Loss of loved ones"
+    },
+    {
+     "id": "treachery",
+     "label": "Treachery"
+    },
+    {
+     "id": "doubt",
+     "label": "Doubt"
+    },
+    {
+     "id": "sympathy",
+     "label": "Sympathy with the enemy"
+    },
+    {
+     "id": "damnation",
+     "label": "Damnation"
+    },
+    {
+     "id": "hosts",
+     "label": "Hosts of monsters"
+    },
+    {
+     "id": "end-days",
+     "label": "The end of days"
+    },
+    {
+     "id": "source-evil",
+     "label": "The source of Evil"
+    }
+   ]
+  }
+ ],
+ "history": [
+  "You are family by blood. Ask them how closely.",
+  "This hunter is fated to mentor you. Explain how that came to light.",
+  "They are your closest friend and you trust them fully.",
+  "At first they were a rival, but you reached a working arrangement.",
+  "There is romance between you, or you are fated to fall for each other.",
+  "You are ordinary friends, from school, work or the like. Ask them which.",
+  "They might have taken the Chosen One role instead of you, but they flunked a trial. Tell them how.",
+  "You rescued them before they knew monsters existed. Tell them what from."
+ ],
+ "improvements": [
+  {
+   "text": "Get +1 Charm, max +3",
+   "kind": "stat",
+   "stat": "charm",
+   "max": 3
+  },
+  {
+   "text": "Get +1 Cool, max +3",
+   "kind": "stat",
+   "stat": "cool",
+   "max": 3
+  },
+  {
+   "text": "Get +1 Sharp, max +3",
+   "kind": "stat",
+   "stat": "sharp",
+   "max": 3
+  },
+  {
+   "text": "Get +1 Tough, max +3",
+   "kind": "stat",
+   "stat": "tough",
+   "max": 3
+  },
+  {
+   "text": "Get +1 Weird, max +3",
+   "kind": "stat",
+   "stat": "weird",
+   "max": 3
+  },
+  {
+   "text": "Take another Chosen move",
+   "kind": "move"
+  },
+  {
+   "text": "Take another Chosen move",
+   "kind": "move"
+  },
+  {
+   "text": "Gain an ally",
+   "kind": "other"
+  },
+  {
+   "text": "Take a move from another playbook",
+   "kind": "othermove"
+  },
+  {
+   "text": "Take a move from another playbook",
+   "kind": "othermove"
+  }
+ ],
+ "advanced": [
+  {
+   "text": "Get +1 to any rating, max +3",
+   "kind": "stat",
+   "stat": "any",
+   "max": 3
+  },
+  {
+   "text": "Get back one used Luck point",
+   "kind": "luck"
+  },
+  {
+   "text": "Change this hunter to a new type",
+   "kind": "other"
+  },
+  {
+   "text": "Create a second hunter to play as well as this one",
+   "kind": "other"
+  },
+  {
+   "text": "Mark two of the basic moves as advanced",
+   "kind": "other"
+  },
+  {
+   "text": "Mark another two of the basic moves as advanced",
+   "kind": "other"
+  },
+  {
+   "text": "Retire this hunter to safety",
+   "kind": "other"
+  },
+  {
+   "text": "Delete one of your Doom tags, and optionally one of your Heroic tags: you have changed that part of your destiny",
+   "kind": "other"
+  }
+ ]
+}

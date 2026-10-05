@@ -1,0 +1,12 @@
+{
+  "name": "hunters-journal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A plain-English Monster of the Week companion: guide, dice roller, hunter builder for all 12 playbooks, case files and bestiary.",
+  "scripts": {
+    "start": "npx --yes serve -l 5173 .",
+    "embed": "python3 tools/embed_data.py",
+    "test": "node tests/t7.js && node tests/t5.js"
+  },
+  "devDependencies": { "playwright": "^1.45.0" }
+}

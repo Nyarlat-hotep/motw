@@ -1,0 +1,445 @@
+{
+ "id": "wronged",
+ "name": "The Wronged",
+ "tagline": "Monsters took everyone you loved, and you have trained for years to kill every last one of their kind. Tough, driven, and built around hunting one type of monster.",
+ "difficulty": 0,
+ "ratings": [
+  {
+   "charm": 0,
+   "cool": 1,
+   "sharp": -1,
+   "tough": 2,
+   "weird": 1
+  },
+  {
+   "charm": 0,
+   "cool": 0,
+   "sharp": 1,
+   "tough": 2,
+   "weird": 0
+  },
+  {
+   "charm": 1,
+   "cool": 0,
+   "sharp": 1,
+   "tough": 2,
+   "weird": -1
+  },
+  {
+   "charm": -1,
+   "cool": -1,
+   "sharp": 0,
+   "tough": 2,
+   "weird": 2
+  },
+  {
+   "charm": 1,
+   "cool": -1,
+   "sharp": 0,
+   "tough": 2,
+   "weird": 1
+  }
+ ],
+ "look": [
+  {
+   "title": "Eyes",
+   "options": [
+    "sad eyes",
+    "icy eyes",
+    "angry eyes",
+    "untouchable eyes",
+    "emotionless eyes",
+    "hurt eyes",
+    "harrowed eyes"
+   ],
+   "writeIn": true
+  },
+  {
+   "title": "Clothes",
+   "options": [
+    "nondescript clothes",
+    "ragged clothes",
+    "casual clothes",
+    "hunting gear",
+    "army surplus gear",
+    "old clothes"
+   ],
+   "writeIn": true
+  }
+ ],
+ "luckSpecial": "Spending a Luck point turns up a risky lead on whatever you are hunting.",
+ "moves": {
+  "intro": "On top of every basic move you get three Wronged moves. I Know My Prey comes automatically; choose two more below.",
+  "pick": 2,
+  "auto": [
+   {
+    "id": "wronged-i-know-my-prey",
+    "name": "I Know My Prey",
+    "kind": "passive",
+    "summary": "Take +1 ongoing whenever you deliberately investigate, chase or fight the type of monster responsible for your loss."
+   }
+  ],
+  "choices": [
+   {
+    "id": "wronged-berserk",
+    "name": "Berserk",
+    "kind": "passive",
+    "summary": "Pain cannot stop you in a fight: you stay on your feet until it ends. In that time the Keeper cannot use harm moves against you and you cannot die. Once the fight is over, all the harm you took applies normally."
+   },
+   {
+    "id": "wronged-never-again",
+    "name": "NEVER AGAIN",
+    "kind": "passive",
+    "summary": "In a fight you can protect someone automatically, as though you had rolled 10+, but you cannot pick the 'suffer little harm' option."
+   },
+   {
+    "id": "wronged-what-does-not-kill-me",
+    "name": "What Does Not Kill Me...",
+    "kind": "passive",
+    "summary": "Once you have been hurt in a fight, take +1 ongoing for the rest of that fight."
+   },
+   {
+    "id": "wronged-fervor",
+    "name": "Fervor",
+    "kind": "passive",
+    "summary": "When you manipulate someone, your roll uses +Tough, not +Charm."
+   },
+   {
+    "id": "wronged-safety-first",
+    "name": "Safety First",
+    "kind": "passive",
+    "summary": "Your gear has been modified for extra protection: +1 armour, to a maximum of 2-armour."
+   },
+   {
+    "id": "wronged-diy-surgery",
+    "name": "DIY Surgery",
+    "kind": "roll",
+    "stat": "cool",
+    "trig": "When you do quick and dirty first aid on someone (including yourself)",
+    "full": "Counts as proper first aid, and the wound is also stabilized and 1 harm is healed.",
+    "part": "Counts as proper first aid, plus one extra effect of your choice from the note.",
+    "miss": "",
+    "note": "Choose one on a 7-9: the wound is stabilised but the patient has -1 forward; 1-harm is healed and the wound held for now, though it returns later as 2-harm and turns unstable again; 1-harm is healed and held, with the patient at -1 ongoing until proper treatment."
+   },
+   {
+    "id": "wronged-tools-matter",
+    "name": "Tools Matter",
+    "kind": "passive",
+    "summary": "Your signature weapon gives you +1 to kick some ass."
+   }
+  ]
+ },
+ "gear": [
+  {
+   "id": "signature-weapon",
+   "title": "Signature weapon",
+   "intro": "Pick one signature weapon.",
+   "pick": 1,
+   "auto": false,
+   "kind": "weapon",
+   "items": [
+    {
+     "name": "Sawn-off shotgun",
+     "harm": 3,
+     "tags": "hand/close messy loud reload"
+    },
+    {
+     "name": "Hand cannon",
+     "harm": 3,
+     "tags": "close loud"
+    },
+    {
+     "name": "Fighting knife",
+     "harm": 2,
+     "tags": "hand quiet"
+    },
+    {
+     "name": "Huge sword or huge axe",
+     "harm": 3,
+     "tags": "hand messy heavy"
+    },
+    {
+     "name": "Specialist weapons for destroying your foes (e.g. wooden stakes and mallet for vampires, silver dagger for werewolves)",
+     "harm": 1,
+     "tags": "4-harm against the specific creatures it targets, 1-harm otherwise; other tags by agreement with the Keeper"
+    },
+    {
+     "name": "Enchanted dagger",
+     "harm": 2,
+     "tags": "hand magic"
+    },
+    {
+     "name": "Chainsaw",
+     "harm": 3,
+     "tags": "hand messy unreliable loud heavy"
+    }
+   ]
+  },
+  {
+   "id": "practical-weapons",
+   "title": "Practical weapons",
+   "intro": "Pick two practical weapons.",
+   "pick": 2,
+   "auto": false,
+   "kind": "weapon",
+   "items": [
+    {
+     "name": ".38 revolver",
+     "harm": 2,
+     "tags": "close reload loud"
+    },
+    {
+     "name": "9mm",
+     "harm": 2,
+     "tags": "close loud"
+    },
+    {
+     "name": "Hunting rifle",
+     "harm": 2,
+     "tags": "far loud"
+    },
+    {
+     "name": "Shotgun",
+     "harm": 3,
+     "tags": "close messy loud"
+    },
+    {
+     "name": "Big knife",
+     "harm": 1,
+     "tags": "hand"
+    },
+    {
+     "name": "Brass knuckles",
+     "harm": 1,
+     "tags": "hand stealthy"
+    },
+    {
+     "name": "Assault rifle",
+     "harm": 3,
+     "tags": "close area loud reload"
+    }
+   ]
+  },
+  {
+   "id": "armor",
+   "title": "Protective wear",
+   "intro": "Your look comes with protective clothing worth 1-armour.",
+   "pick": 0,
+   "auto": true,
+   "kind": "armor",
+   "items": [
+    {
+     "name": "Protective wear, suited to your look",
+     "armor": 1,
+     "tags": ""
+    }
+   ]
+  },
+  {
+   "id": "vehicle",
+   "title": "Vehicle",
+   "intro": "Optionally take one vehicle.",
+   "pick": 1,
+   "optional": true,
+   "kind": "item",
+   "items": [
+    {
+     "name": "Classic car"
+    },
+    {
+     "name": "Classic motorcycle"
+    },
+    {
+     "name": "Plain pickup"
+    },
+    {
+     "name": "Plain van"
+    }
+   ]
+  }
+ ],
+ "extras": [
+  {
+   "id": "who-lost",
+   "title": "Who you lost",
+   "intro": "Pick one or more of these. The sheet has a blank line after each, so write in who they were.",
+   "pick": [
+    1,
+    5
+   ],
+   "options": [
+    {
+     "id": "parents",
+     "label": "Your parent(s)"
+    },
+    {
+     "id": "siblings",
+     "label": "Your sibling(s)"
+    },
+    {
+     "id": "partner",
+     "label": "Your spouse/partner"
+    },
+    {
+     "id": "children",
+     "label": "Your child(ren)"
+    },
+    {
+     "id": "best-friends",
+     "label": "Your best friend(s)"
+    }
+   ]
+  },
+  {
+   "id": "my-prey",
+   "title": "What did it? My prey",
+   "intro": "Agree a monster breed with the Keeper. That breed is your prey, and it is what took them from you.",
+   "pick": 0,
+   "text": true,
+   "placeholder": "Monster breed"
+  },
+  {
+   "id": "why-not-saved",
+   "title": "Why you could not save them",
+   "intro": "Pick as many reasons as apply for why you failed to save them.",
+   "pick": [
+    1,
+    8
+   ],
+   "options": [
+    {
+     "id": "at-fault",
+     "label": "at fault"
+    },
+    {
+     "id": "selfish",
+     "label": "selfish"
+    },
+    {
+     "id": "injured",
+     "label": "injured"
+    },
+    {
+     "id": "weak",
+     "label": "weak"
+    },
+    {
+     "id": "slow",
+     "label": "slow"
+    },
+    {
+     "id": "scared",
+     "label": "scared"
+    },
+    {
+     "id": "in-denial",
+     "label": "in denial"
+    },
+    {
+     "id": "complicit",
+     "label": "complicit"
+    }
+   ]
+  }
+ ],
+ "history": [
+  "This hunter gave you vital help during your search for revenge. Ask yourself what you needed, and tell them.",
+  "They blocked your way when you were trying to learn the truth. Ask what their reason was.",
+  "They too lost someone to these monsters. Ask who.",
+  "You are related, closely or distantly. Tell them exactly how.",
+  "You rescued them when they were a hopeless rookie. Ask them what the danger was.",
+  "You value their hard-won experience and regularly seek their advice.",
+  "They taught you the basics of fighting.",
+  "They saw you snap and rampage. Describe the situation, and ask how much damage you did around you."
+ ],
+ "improvements": [
+  {
+   "text": "Get +1 Tough, max +3",
+   "kind": "stat",
+   "stat": "tough",
+   "max": 3
+  },
+  {
+   "text": "Get +1 Cool, max +2",
+   "kind": "stat",
+   "stat": "cool",
+   "max": 2
+  },
+  {
+   "text": "Get +1 Sharp, max +2",
+   "kind": "stat",
+   "stat": "sharp",
+   "max": 2
+  },
+  {
+   "text": "Get +1 Weird, max +2",
+   "kind": "stat",
+   "stat": "weird",
+   "max": 2
+  },
+  {
+   "text": "Take another Wronged move",
+   "kind": "move"
+  },
+  {
+   "text": "Take another Wronged move",
+   "kind": "move"
+  },
+  {
+   "text": "Gain a haven, like the Expert has, with two options",
+   "kind": "other"
+  },
+  {
+   "text": "Add one more option to your haven",
+   "kind": "other"
+  },
+  {
+   "text": "Take a move from another playbook",
+   "kind": "othermove"
+  },
+  {
+   "text": "Take a move from another playbook",
+   "kind": "othermove"
+  }
+ ],
+ "advanced": [
+  {
+   "text": "Get +1 to any rating, max +3",
+   "kind": "stat",
+   "stat": "any",
+   "max": 3
+  },
+  {
+   "text": "Change this hunter to a new type",
+   "kind": "other"
+  },
+  {
+   "text": "Create a second hunter to play as well as this one",
+   "kind": "other"
+  },
+  {
+   "text": "Mark two of the basic moves as advanced",
+   "kind": "other"
+  },
+  {
+   "text": "Mark another two of the basic moves as advanced",
+   "kind": "other"
+  },
+  {
+   "text": "Retire this hunter to safety",
+   "kind": "other"
+  },
+  {
+   "text": "You track down the specific monster(s) responsible for your loss. The Keeper must make the next mystery about them",
+   "kind": "other"
+  },
+  {
+   "text": "Change the target of your vengeful rage: pick a new monster breed, and I Know My Prey now applies to them instead",
+   "kind": "other"
+  },
+  {
+   "text": "Get back one used Luck point",
+   "kind": "luck"
+  }
+ ]
+}

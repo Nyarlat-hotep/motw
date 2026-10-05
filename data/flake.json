@@ -1,0 +1,316 @@
+{
+  "id": "flake",
+  "name": "The Flake",
+  "tagline": "A conspiracy theorist who turns out to be right. You spot the hidden patterns behind the monsters, and nobody takes you seriously until it counts.",
+  "difficulty": 0,
+  "ratings": [
+    {
+      "charm": 1,
+      "cool": 1,
+      "sharp": 2,
+      "tough": -1,
+      "weird": 0
+    },
+    {
+      "charm": 0,
+      "cool": 1,
+      "sharp": 2,
+      "tough": -1,
+      "weird": 1
+    },
+    {
+      "charm": 1,
+      "cool": -1,
+      "sharp": 2,
+      "tough": 1,
+      "weird": 0
+    },
+    {
+      "charm": 1,
+      "cool": -1,
+      "sharp": 2,
+      "tough": 0,
+      "weird": 1
+    },
+    {
+      "charm": -1,
+      "cool": -1,
+      "sharp": 2,
+      "tough": 0,
+      "weird": 2
+    }
+  ],
+  "look": [
+    {
+      "title": "Eyes",
+      "options": [
+        "wild eyes",
+        "moving eyes",
+        "focused eyes",
+        "searching eyes",
+        "suspicious eyes",
+        "wide eyes",
+        "guarded eyes"
+      ],
+      "writeIn": true
+    },
+    {
+      "title": "Clothes",
+      "options": [
+        "ratty clothes",
+        "casual clothes",
+        "rumpled suit",
+        "neat clothes",
+        "comfortable clothes",
+        "army surplus gear"
+      ],
+      "writeIn": true
+    }
+  ],
+  "luckSpecial": "Whenever you burn a Luck point, name one thing about the scene you are in. The Keeper then reveals what other conspiracies that thing is linked to.",
+  "moves": {
+    "intro": "Besides the basic moves, you choose three Flake moves from the list below. Nothing is handed to you for free.",
+    "pick": 3,
+    "auto": [],
+    "choices": [
+      {
+        "id": "flake-connect-the-dots",
+        "name": "Connect the Dots",
+        "kind": "roll",
+        "stat": "sharp",
+        "trig": "At the start of a mystery, when you search for the larger pattern that events might belong to",
+        "full": "Hold 3.",
+        "part": "Hold 1.",
+        "miss": "",
+        "note": "Hold is spent during the mystery, one point per question put to the Keeper. Choose from: Is someone tied to events more than they admit? Where and when is the next key event? Which thing does the monster want from a particular person? Does this link to mysteries we already worked? How does it fit the big picture?"
+      },
+      {
+        "id": "flake-crazy-eyes",
+        "name": "Crazy Eyes",
+        "kind": "passive",
+        "summary": "Your Weird goes up by 1, to a maximum of +3."
+      },
+      {
+        "id": "flake-all-fits-together",
+        "name": "See, It All Fits Together",
+        "kind": "passive",
+        "summary": "When you manipulate someone, you may use Sharp instead of Charm."
+      },
+      {
+        "id": "flake-suspicious-mind",
+        "name": "Suspicious Mind",
+        "kind": "passive",
+        "summary": "You can always tell when someone is lying to you."
+      },
+      {
+        "id": "flake-often-overlooked",
+        "name": "Often Overlooked",
+        "kind": "roll",
+        "stat": "weird",
+        "trig": "When you act all crazy to avoid something",
+        "full": "People see you as both unthreatening and unimportant.",
+        "part": "Pick one: they see you as unthreatening, or as unimportant.",
+        "miss": "You attract lots of attention (though not all of it).",
+        "note": ""
+      },
+      {
+        "id": "flake-contrary",
+        "name": "Contrary",
+        "kind": "passive",
+        "summary": "If you ask someone for their honest opinion on the best thing for you to do, then go a different way, mark experience. If you do the exact reverse of what they said, you also get +1 ongoing to every move that follows that course."
+      },
+      {
+        "id": "flake-net-friends",
+        "name": "Net Friends",
+        "kind": "roll",
+        "stat": "charm",
+        "trig": "When you reach out to one of your online contacts for help on a mystery",
+        "full": "They are free and come through: they might repair something, crack a code, hack a system, or dig up special information.",
+        "part": "They will help, but it takes a while or you must do some of the work yourself.",
+        "miss": "You burn some bridges.",
+        "note": ""
+      },
+      {
+        "id": "flake-sneaky",
+        "name": "Sneaky",
+        "kind": "passive",
+        "summary": "Attacking by surprise or from behind does +2 harm."
+      }
+    ]
+  },
+  "gear": [
+    {
+      "id": "normal-weapons",
+      "title": "Normal weapon",
+      "intro": "Pick one.",
+      "pick": 1,
+      "auto": false,
+      "kind": "weapon",
+      "items": [
+        {
+          "name": ".38 revolver",
+          "harm": 2,
+          "tags": "close reload loud"
+        },
+        {
+          "name": "9mm",
+          "harm": 2,
+          "tags": "close loud"
+        },
+        {
+          "name": "Hunting rifle",
+          "harm": 2,
+          "tags": "far loud"
+        },
+        {
+          "name": "Magnum",
+          "harm": 3,
+          "tags": "close reload loud"
+        },
+        {
+          "name": "Shotgun",
+          "harm": 3,
+          "tags": "close messy loud"
+        },
+        {
+          "name": "Big knife",
+          "harm": 1,
+          "tags": "hand"
+        }
+      ]
+    },
+    {
+      "id": "hidden-weapons",
+      "title": "Hidden weapons",
+      "intro": "Pick two.",
+      "pick": 2,
+      "auto": false,
+      "kind": "weapon",
+      "items": [
+        {
+          "name": "Throwing knives",
+          "harm": 1,
+          "tags": "close many"
+        },
+        {
+          "name": "Holdout pistol",
+          "harm": 2,
+          "tags": "close loud reload"
+        },
+        {
+          "name": "Garrote",
+          "harm": 3,
+          "tags": "intimate"
+        },
+        {
+          "name": "Watchman's flashlight",
+          "harm": 1,
+          "tags": "hand"
+        },
+        {
+          "name": "Weighted gloves/brass knuckles",
+          "harm": 1,
+          "tags": "hand"
+        },
+        {
+          "name": "Butterfly knife/folding knife",
+          "harm": 1,
+          "tags": "hand"
+        }
+      ]
+    }
+  ],
+  "extras": [],
+  "history": [
+    "They are tied into the conspiracy somehow, and you have been watching them.",
+    "They are family. They decide what the exact relation is.",
+    "You are longtime friends whose paths crossed through a string of odd coincidences.",
+    "You survived something terrible together, such as a monster, the army or a stay in an institution. It forged complete trust between you.",
+    "You attend the same support group.",
+    "You are fellow freaks.",
+    "Everything seemed to point to teaming up, so you tracked them down and joined forces.",
+    "You know each other from cryptozoology and conspiracy websites."
+  ],
+  "improvements": [
+    {
+      "text": "Get +1 Sharp, max +3",
+      "kind": "stat",
+      "stat": "sharp",
+      "max": 3
+    },
+    {
+      "text": "Get +1 Charm, max +2",
+      "kind": "stat",
+      "stat": "charm",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Cool, max +2",
+      "kind": "stat",
+      "stat": "cool",
+      "max": 2
+    },
+    {
+      "text": "Get +1 Weird, max +2",
+      "kind": "stat",
+      "stat": "weird",
+      "max": 2
+    },
+    {
+      "text": "Take another Flake move",
+      "kind": "move"
+    },
+    {
+      "text": "Take another Flake move",
+      "kind": "move"
+    },
+    {
+      "text": "Get a haven, like the Expert has, with two options",
+      "kind": "other"
+    },
+    {
+      "text": "Gain another option for your haven",
+      "kind": "other"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    },
+    {
+      "text": "Take a move from another playbook",
+      "kind": "othermove"
+    }
+  ],
+  "advanced": [
+    {
+      "text": "Get +1 to any rating, max +3",
+      "kind": "stat",
+      "stat": "any",
+      "max": 3
+    },
+    {
+      "text": "Change this hunter to a new type",
+      "kind": "other"
+    },
+    {
+      "text": "Create a second hunter to play as well as this one",
+      "kind": "other"
+    },
+    {
+      "text": "Mark two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Mark another two of the basic moves as advanced",
+      "kind": "other"
+    },
+    {
+      "text": "Retire this hunter to safety",
+      "kind": "other"
+    },
+    {
+      "text": "Get back one used Luck point",
+      "kind": "luck"
+    }
+  ]
+}

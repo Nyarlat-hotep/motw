@@ -1,0 +1,23 @@
+
+(function(){
+  var store = {}; var subs = [];
+  function ref(path){ return { path:path, id:path.split('/').pop(),
+    get: async()=>({exists: path in store, data:()=>store[path]}),
+    set: async(d)=>{ store[path]=JSON.parse(JSON.stringify(d)); fire(); },
+    delete: async()=>{ delete store[path]; fire(); } }; }
+  function coll(p){ return { onSnapshot:function(next){ var s={p:p,next:next}; subs.push(s); setTimeout(()=>push(s),0); return ()=>{}; } }; }
+  function push(s){ var docs=Object.keys(store).filter(k=>k.indexOf(s.p+'/')===0 && k.split('/').length===2).map(k=>({id:k.split('/')[1], data:()=>store[k]})); s.next({docs:docs,size:docs.length}); }
+  function fire(){ subs.forEach(push); }
+  window.__store = store;
+  window.__seed = function(id,d){ store['party/'+id]=d; fire(); };
+  window.__saved = [];
+  window.claude = { use: async function(n){
+    if(n==='db') return { doc:ref, collection:coll };
+    if(n==='user') return { id: async()=>'me123', profiles: async(ids)=>{var o={};ids.forEach(i=>o[i]={name:i==='pal9'?'Alex':'Jacob'});return o;} };
+    if(n==='downloads') return { save: async(r)=>{ window.__saved.push(r); return {status:'saved'}; } };
+    if(n==='sample') return Object.assign(async function(input,opts){
+        window.__prompt = input; var parts=['The hunters ','arrive at the diner. ','Something breathes.'], t='';
+        for (var p of parts){ await new Promise(r=>setTimeout(r,40)); t+=p; opts.onText({text:t,delta:p}); }
+        return {text:t,truncated:false}; },{limits:async()=>({})});
+    return null; } };
+})();
