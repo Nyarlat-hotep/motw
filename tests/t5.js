@@ -16,7 +16,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   const vis = async (s) => p.locator(s).first().isVisible();
 
   // ---- TABS + keyboard ----
-  for (const t of ['guide','roll','hunter','party','bestiary','tips','notes']) {
+  for (const t of ['guide','play','roll','hunter','party','bestiary','tips','notes']) {
     await p.click('#t-'+t);
     check('tab '+t+' shows its panel only', await vis('#p-'+t) && (await p.locator('.panel:visible').count())===1);
     check('tab '+t+' aria-selected', (await p.getAttribute('#t-'+t,'aria-selected'))==='true');
@@ -196,7 +196,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
     q.on('pageerror', e => errs.push('PAGEERR2 ' + e.message));
     await q.goto('file://'+require('path').join(__dirname,'..','index.html')+''); await q.waitForTimeout(500);
     let worst = 0;
-    for (const t of ['guide','roll','hunter','party','bestiary','tips','notes']) { await q.click('#t-'+t); if (t==='hunter') await q.click('#seg-sheet'); worst = Math.max(worst, await q.evaluate(()=>document.documentElement.scrollWidth-innerWidth)); }
+    for (const t of ['guide','play','roll','hunter','party','bestiary','tips','notes']) { await q.click('#t-'+t); if (t==='hunter') await q.click('#seg-sheet'); worst = Math.max(worst, await q.evaluate(()=>document.documentElement.scrollWidth-innerWidth)); }
     check(`no horizontal overflow, ${scheme} ${w}px`, worst<=0, worst);
     const bg = await q.evaluate(()=>getComputedStyle(document.body).backgroundColor), fg = await q.evaluate(()=>getComputedStyle(document.body).color);
     check(`theme tokens apply, ${scheme}`, (scheme==='dark') === (parseInt(bg.match(/\d+/)[0])<60), bg+' / '+fg);
@@ -207,8 +207,33 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await rq.goto('file://'+require('path').join(__dirname,'..','index.html')+''); await rq.click('#t-roll'); await rq.click('#roll'); await rq.waitForTimeout(250);
   check('reduced motion: result is immediate, no flash overlay animation', await rq.locator('.tier').count()===1 && (await rq.evaluate(()=>getComputedStyle(document.getElementById('fx')).animationName))==='none');
   // keyboard
-  await p.click('#t-guide'); await p.focus('#t-guide'); await p.keyboard.press('Tab'); check('keyboard Tab moves focus between tabs', await p.evaluate(()=>document.activeElement.id)==='t-roll');
-  await p.keyboard.press('Enter'); await p.waitForTimeout(100); check('Enter activates focused tab', await vis('#p-roll'));
+  await p.click('#t-guide'); await p.focus('#t-guide'); await p.keyboard.press('Tab'); check('keyboard Tab moves focus between tabs', await p.evaluate(()=>document.activeElement.id)==='t-play');
+  await p.keyboard.press('Enter'); await p.waitForTimeout(100); check('Enter activates focused tab', await vis('#p-play'));
+  // ---- PLAY ----
+  const pp = await ctx.newPage(); pp.on('pageerror', e => errs.push('PAGEERR play ' + e.message));
+  await pp.setViewportSize({ width: 1300, height: 900 });
+  await pp.goto('file://'+require('path').join(__dirname,'..','index.html')+'#play'); await pp.waitForTimeout(700);
+  const PT = async (s) => (await pp.textContent(s)).replace(/\s+/g,' ').trim();
+  check('play: dice card moves into Play', await pp.evaluate(()=>document.getElementById('rollkit').parentElement.id)==='play-stage');
+  check('play: three columns on a laptop', await pp.evaluate(()=>getComputedStyle(document.querySelector('.play')).gridTemplateColumns.split(' ').length)===3);
+  check('play: no sideways scroll', await pp.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)<=0);
+  check('play: 8 basic move buttons', (await pp.locator('#play-moves .card').first().locator('.pmove').count())===8);
+  await pp.click('[data-pmove="inv"]');
+  check('play: picking a move selects it and its stat', (await pp.getAttribute('[data-pmove="inv"]','aria-pressed'))==='true' && (await pp.getAttribute('[data-pstat="sharp"]','aria-pressed'))==='true' && /Investigate a Mystery/.test(await PT('#play-sel')));
+  await pp.click('[data-padj="other"][data-d="1"]'); await pp.click('[data-padj="other"][data-d="1"]'); await pp.click('[data-padj="other"][data-d="1"]'); await pp.click('[data-padj="other"][data-d="1"]'); await pp.click('[data-padj="other"][data-d="1"]');
+  await pp.click('#roll'); await pp.waitForSelector('.tier', {timeout:4000}); await pp.waitForTimeout(100);
+  check('play: +5 always hits, so hold is granted', /Hold [12]\. Tap/.test(await PT('#result')), await PT('#result'));
+  const holdBefore = +(await PT('#result')).match(/Hold (\d)\. Tap/)[1];
+  await pp.locator('[data-ask]').first().click();
+  check('play: asking a question spends 1 hold', +(await PT('#result')).match(/Hold (\d)\. (?:Tap|All)/)[1]===holdBefore-1 && (await pp.getAttribute('[data-ask="0"]','aria-pressed'))==='true');
+  await pp.click('#t-roll'); check('play: dice card returns to the Roller', await pp.evaluate(()=>document.getElementById('rollkit').parentElement.id)==='roll-home');
+  await pp.click('#t-play');
+  const harm0 = await pp.locator('#pl-harm button[aria-pressed=true]').count(), luck0 = await pp.locator('#pl-luck button[aria-pressed=true]').count();
+  await pp.check('#pl-ign'); await pp.click('[data-ph="1"]'); await pp.click('[data-ph="1"]'); await pp.click('#pl-take');
+  check('play: take 3 harm, ignoring armor', (await pp.locator('#pl-harm button[aria-pressed=true]').count())===Math.min(8,harm0+3) && /Took 3 harm/.test(await PT('.pmsg')), await PT('.pmsg'));
+  await pp.click('#pl-undo');
+  check('play: Luck cancels the wound', (await pp.locator('#pl-harm button[aria-pressed=true]').count())===harm0 && (await pp.locator('#pl-luck button[aria-pressed=true]').count())===luck0-1);
+  await pp.close();
 
   console.log(results.map(r=>r.join(' | ')).join('\n'));
   const fails = results.filter(r=>r[0]==='FAIL').length;

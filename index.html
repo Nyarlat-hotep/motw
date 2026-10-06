@@ -562,6 +562,40 @@ div.wcard { cursor: default; border-color: var(--good); }
 .lvllist { list-style: none; padding: 0; margin: 8px 0; display: grid; gap: 6px; }
 .lvllist .btn { width: 100%; text-align: left; justify-content: flex-start; white-space: normal; height: auto; min-height: 44px; }
 @media (max-width: 560px) { .wopts, .wmoves, .wgrid { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---- play screen: status | moves | dice, built for a laptop window beside a call ---- */
+.wrap.wide { max-width: 1280px; }
+.play { display: grid; grid-template-columns: 296px minmax(0, 1fr) minmax(330px, 400px); gap: 16px; align-items: start; }
+@media (max-width: 1060px) { .play { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } #play-status { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 4px 20px; } }
+@media (max-width: 700px) { .play { grid-template-columns: minmax(0, 1fr); } }
+.play .small, .play .hint { font-size: 15px; }
+.pwho { display: flex; align-items: center; gap: 10px; }
+.pwho img, .pwho .av { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); background: var(--bg); flex: none; }
+.pwho b { display: block; font-family: var(--display); font-size: 21px; font-weight: 400; line-height: 1.15; }
+.pblock { margin-top: 14px; min-width: 0; }
+.pblock > .lbl { margin-bottom: 4px; }
+.play .statbtn { min-height: 48px; padding: 4px 2px; }
+.play .statbtn b { font-size: 21px; } .play .statbtn span { font-size: 13px; }
+.play .pips { gap: 4px; }
+.play .pips button { width: 28px; height: 28px; font-size: 13px; }
+.prow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 8px; margin-top: 6px; }
+.prow .ctl { display: inline-flex; align-items: center; gap: 4px; }
+.prow .ctl button { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; line-height: 1; }
+.prow .ctl button:hover { border-color: var(--accent); }
+.prow .ctl output { min-width: 2.6ch; text-align: center; font-family: var(--num); font-weight: 500; font-variant-numeric: lining-nums tabular-nums; }
+.prow label { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; }
+.prow input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); }
+.pmsg { margin: 6px 0 0; min-height: 1.2em; font-size: 15px; color: var(--warn); }
+.pmoves { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.pmove { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; text-align: left; border: 2px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 4px; padding: 8px 10px; cursor: pointer; font: inherit; font-size: 17px; min-height: 44px; min-width: 0; }
+.pmove:hover { border-color: var(--accent); }
+.pmove[aria-pressed="true"] { border-color: var(--accent); background: var(--surface2); box-shadow: inset 4px 0 0 var(--accent); }
+.pmove small { font-family: var(--display); font-size: 14px; color: var(--muted); white-space: nowrap; }
+.ppass { border-left: 3px solid var(--line); padding: 2px 0 2px 10px; margin-top: 8px; }
+.ppass summary { cursor: pointer; }
+.ppass p { margin: 4px 0 0; font-size: 16px; }
+.psel h3 { font-family: var(--display); font-size: 23px; }
+.psel p { margin: 4px 0 0; }
 </style>
 
 <div class="texture" aria-hidden="true"></div>
@@ -580,6 +614,7 @@ div.wcard { cursor: default; border-color: var(--good); }
 
   <nav class="tabs" role="tablist" aria-label="Journal sections">
     <button role="tab" id="t-guide" aria-controls="p-guide" aria-selected="true" data-tab="guide">Guide</button>
+    <button role="tab" id="t-play" aria-controls="p-play" aria-selected="false" data-tab="play">Play</button>
     <button role="tab" id="t-roll" aria-controls="p-roll" aria-selected="false" data-tab="roll">Roller</button>
     <button role="tab" id="t-hunter" aria-controls="p-hunter" aria-selected="false" data-tab="hunter">Hunter</button>
     <button role="tab" id="t-party" aria-controls="p-party" aria-selected="false" data-tab="party">Party</button>
@@ -752,6 +787,15 @@ div.wcard { cursor: default; border-color: var(--good); }
     </details>
   </section>
 
+  <!-- PLAY: everything you touch mid-session on one screen. The dice card (#rollkit) is moved in here from the Roller while this tab is open. -->
+  <section class="panel" id="p-play" role="tabpanel" aria-labelledby="t-play" hidden>
+    <div class="play">
+      <div class="card" id="play-status"></div>
+      <div id="play-moves"></div>
+      <div><div class="card" id="play-sel" style="margin-bottom:16px"></div><div id="play-stage"></div></div>
+    </div>
+  </section>
+
   <!-- ROLLER -->
   <section class="panel" id="p-roll" role="tabpanel" aria-labelledby="t-roll" hidden>
     <div class="hero" id="hero-roll" hidden></div>
@@ -777,7 +821,7 @@ div.wcard { cursor: default; border-color: var(--good); }
         <div class="odds" id="odds"></div>
       </div>
 
-      <div>
+      <div id="roll-home"><div id="rollkit">
         <div class="card">
           <div class="tray" id="tray" aria-hidden="true"><div class="dice" id="dice"></div><span class="hintskip">Tap to skip</span></div>
           <div class="stage">
@@ -793,7 +837,7 @@ div.wcard { cursor: default; border-color: var(--good); }
           </div>
           <ul class="hist" id="hist"></ul>
         </div>
-      </div>
+      </div></div>
     </div>
   </section>
 
@@ -1085,7 +1129,7 @@ function exampleCase() {
 }
 function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.hook = c.threats = c.weakness = c.npcs = c.loose = c.log = ''; c.clock = 0; c.eos = [false, false, false, false]; c.date = new Date().toISOString().slice(0, 10); return c; }
 function defaults() {
-  return { v: 1, tab: 'guide', hv: 'build', steps: {}, wiz: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false },
+  return { v: 1, tab: 'guide', hv: 'build', steps: {}, wiz: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false }, hold: { n: 0, move: '', asked: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0, adv: false },
     sheet: { name: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, moves: '', gear: '' } };
 }
@@ -1160,7 +1204,7 @@ function getPath(o, p) { return p.split('.').reduce(function (a, k) { return a =
 function setPath(o, p, v) { var ks = p.split('.'), last = ks.pop(); var t = ks.reduce(function (a, k) { return a[k]; }, o); t[last] = v; }
 
 /* ---------- tabs ---------- */
-var TABS = ['guide', 'roll', 'hunter', 'party', 'bestiary', 'tips', 'notes'];
+var TABS = ['guide', 'play', 'roll', 'hunter', 'party', 'bestiary', 'tips', 'notes'];
 function showTab(name, fromHash) {
   if (TABS.indexOf(name) < 0) name = 'guide';
   S.tab = name;
@@ -1169,6 +1213,9 @@ function showTab(name, fromHash) {
     $('#t-' + t).setAttribute('aria-selected', on ? 'true' : 'false');
     $('#p-' + t).hidden = !on;
   });
+  var kit = $('#rollkit'), home = $(name === 'play' ? '#play-stage' : '#roll-home');
+  if (kit && home && kit.parentElement !== home) home.appendChild(kit);
+  $('.wrap').classList.toggle('wide', name === 'play');
   if (name === 'party') renderParty();
   if (name === 'hunter' && S.hv === 'build') renderBuild();
   if (typeof applyTex === 'function') applyTex();
@@ -1257,7 +1304,15 @@ function renderStage() {
   var html = '<div class="tier ' + t + '">' + artImg('tier-' + t, 'tierimg') + '<h3>' + TIERNAME[t] + '</h3><p>' + esc(mv[t === 'full' ? 'full' : t === 'part' ? 'part' : 'miss']) + '</p>';
   html += gearNote(mv.id);
   if (mv.note && t !== 'miss') html += '<p class="small muted">' + esc(mv.note) + '</p>';
-  if (mv.chips && t !== 'miss') html += '<ul class="chips">' + mv.chips.map(function (c) { return '<li class="chip">' + esc(c) + '</li>'; }).join('') + '</ul>';
+  if (mv.chips && t !== 'miss') {
+    var H = S.hold, held = !!last.hold && H.move === mv.id;
+    if (held) html += '<p class="small" style="margin-top:8px"><b>Hold ' + H.n + '.</b> ' + (H.n > 0 ? 'Tap a question when you ask it.' : 'All spent.') + '</p>';
+    html += '<ul class="chips">' + mv.chips.map(function (c, i) {
+      if (!held) return '<li class="chip">' + esc(c) + '</li>';
+      var asked = H.asked.indexOf(i) >= 0;
+      return '<li><button type="button" class="chip" data-ask="' + i + '" aria-pressed="' + asked + '"' + (!asked && H.n < 1 ? ' disabled' : '') + '>' + esc(c) + '</button></li>';
+    }).join('') + '</ul>';
+  }
   if (last.total >= 12 && mv.adv) {
     html += S.roller.adv ? '<p><b>12+ Advanced:</b> ' + esc(mv.adv) + '</p>' : '<p class="small muted">You rolled 12+. This move has an Advanced result, available once your hunter has taken the advancement. Tick the box on the left if you have it.</p>';
   }
@@ -1276,7 +1331,15 @@ $('#roll').addEventListener('click', doRoll);
 $('#mv').addEventListener('change', function (e) { S.roller.move = e.target.value; S.roller.stat = BYID[e.target.value].stat; renderRoller(); scheduleSave(); });
 $('#adv').addEventListener('change', function (e) { S.roller.adv = e.target.checked; renderStage(); scheduleSave(); });
 $('#statrow').addEventListener('click', function (e) { var b = e.target.closest('[data-stat]'); if (!b) return; S.roller.stat = b.dataset.stat; renderRoller(); scheduleSave(); });
-$('#p-roll').addEventListener('click', function (e) {
+/* moves that hand you hold: how much on a 10+ and on a 7-9 */
+var HOLDS = { inv: { full: 2, part: 1 }, read: { full: 3, part: 1 } };
+function rollClicks(e) {
+  var ask = e.target.closest('[data-ask]');
+  if (ask && last && last.hold) {
+    var H = S.hold, qi = +ask.dataset.ask, at = H.asked.indexOf(qi);
+    if (at >= 0) { H.asked.splice(at, 1); H.n++; } else if (H.n > 0) { H.asked.push(qi); H.n--; }
+    renderStage(); renderPlay(); scheduleSave(); return;
+  }
   var b = e.target.closest('[data-adj]');
   if (b) {
     var k = b.dataset.adj, d = +b.dataset.d;
@@ -1285,8 +1348,10 @@ $('#p-roll').addEventListener('click', function (e) {
     renderRoller(); scheduleSave(); return;
   }
   if (e.target.id === 'markxp' && last && !last.xpMarked) { last.xpMarked = true; S.sheet.xp = Math.min(S.sheet.xp + 1, 9); renderSheet(); renderStage(); scheduleSave(); }
-  if (e.target.id === 'spendluck' && last && !last.luck && S.sheet.luck > 0) { last.luck = true; last.total = 12; S.sheet.luck--; if (S.rolls[0]) { S.rolls[0].total = 12; S.rolls[0].tier = 'full'; S.rolls[0].name += ' (Luck)'; } renderSheet(); renderRoller(); fxPlay('crit'); scheduleSave(); }
-});
+  if (e.target.id === 'spendluck' && last && !last.luck && S.sheet.luck > 0) { last.luck = true; last.total = 12; S.sheet.luck--; if (S.rolls[0]) { S.rolls[0].total = 12; S.rolls[0].tier = 'full'; S.rolls[0].name += ' (Luck)'; } if (HOLDS[last.move]) { var was = last.hold && S.hold.move === last.move ? S.hold.asked : []; S.hold = { n: Math.max(0, HOLDS[last.move].full - was.length), move: last.move, asked: was }; last.hold = true; } renderSheet(); renderRoller(); fxPlay('crit'); scheduleSave(); }
+}
+$('#p-roll').addEventListener('click', rollClicks);
+$('#p-play').addEventListener('click', rollClicks);
 $('#clearhist').addEventListener('click', function () { S.rolls = []; last = null; renderRoller(); scheduleSave(); });
 
 /* ---------- hunter ---------- */
@@ -1985,9 +2050,103 @@ function renderRollas() {
   if (!host) return;
   var av0 = sh.photo || artFor(sh.playbook), av = av0 ? '<img src="' + esc(av0) + '" alt="">' : '<span class="av"></span>';
   var a = armorVal();
+  renderPlay();
   host.innerHTML = av + '<span class="who">' + esc(sh.name || 'Your hunter') + '</span>' + (sh.playbook ? '<span class="muted small">' + esc(sh.playbook) + '</span>' : '') + '<span class="stats"><span class="chip">Luck ' + sh.luck + '</span><span class="chip">Harm ' + sh.harm + '</span>' + (a ? '<span class="chip">Armor ' + a + '</span>' : '') + '</span>';
 }
 function photoMsg(t) { $('#photomsg').textContent = t || ''; }
+
+/* ---------- play screen ---------- */
+var play = { harm: 1, ignore: false, msg: '', wound: 0 };
+function pipStr(id, cls, n, val, label) {
+  var h = '';
+  for (var i = 1; i <= n; i++) h += '<button type="button" data-n="' + i + '" aria-pressed="' + (i <= val) + '" aria-label="' + label + ' ' + i + '">' + i + '</button>';
+  return '<div class="pips ' + cls + '" id="' + id + '" role="group" aria-label="' + label + '">' + h + '</div>';
+}
+function stepStr(label, key, val, hint) {
+  return '<div class="prow"><span>' + label + (hint ? ' <span class="muted small">' + hint + '</span>' : '') + '</span><span class="ctl"><button type="button" data-padj="' + key + '" data-d="-1" aria-label="Lower ' + label + '">&minus;</button><output>' + val + '</output><button type="button" data-padj="' + key + '" data-d="1" aria-label="Raise ' + label + '">+</button></span></div>';
+}
+function pmoveBtn(m) {
+  return '<button type="button" class="pmove" data-pmove="' + esc(m.id) + '" aria-pressed="' + (S.roller.move === m.id) + '"><span>' + esc(m.name) + '</span><small>' + STATNAME[m.stat] + ' ' + fmt(S.sheet.stats[m.stat]) + '</small></button>';
+}
+function renderPlay() {
+  var host = $('#play-status'); if (!host) return;
+  var sh = S.sheet, R = S.roller, d = curPB(), a = armorVal(), w = weaponsOut();
+  var av0 = sh.photo || artFor(sh.playbook), av = av0 ? '<img src="' + esc(av0) + '" alt="">' : '<span class="av"></span>';
+  var fresh = !sh.playbook && !(sh.name && sh.name.trim());
+  var gear = w.map(function (i) { return '<li class="chip">' + esc(i.name || 'Weapon') + ' ' + (+i.val || 0) + '-harm' + (i.note ? ' <span class="muted">' + esc(String(i.note).replace(/\s*\[.*\]$/, '')) + '</span>' : '') + '</li>'; }).join('') + (a ? '<li class="chip">Armor ' + a + '</li>' : '');
+  host.innerHTML =
+    '<div><div class="pwho">' + av + '<span><b>' + esc(sh.name || 'Your hunter') + '</b><span class="muted small">' + esc(sh.playbook || 'No playbook yet') + ' &middot; Level ' + sh.level + '</span></span></div>' +
+    (fresh ? '<p class="note" style="margin:10px 0 0">No hunter yet. You can still roll the basic moves. <button type="button" class="linkbtn" data-pgo="build">Build a hunter</button></p>' : '') +
+    '<div class="pblock"><span class="lbl">Ratings</span><div class="statrow" role="group" aria-label="Stat to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmt(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div></div>' +
+    '<div class="pblock"><span class="lbl">Harm</span>' + pipStr('pl-harm', 'harm', 8, sh.harm, 'Harm') + '<p class="small' + (sh.harm >= 4 ? '' : ' muted') + '" style="margin:6px 0 0">' + (sh.unstable ? '<b style="color:var(--bad)">Unstable.</b> ' : '') + esc(harmText(sh.harm)) + '</p>' +
+      '<div class="prow"><span>Take harm</span><span class="ctl"><button type="button" data-ph="-1" aria-label="Less harm">&minus;</button><output>' + play.harm + '</output><button type="button" data-ph="1" aria-label="More harm">+</button></span><button type="button" class="btn sm" id="pl-take">Apply</button></div>' +
+      '<div class="prow"><label><input type="checkbox" id="pl-ign"' + (play.ignore ? ' checked' : '') + '> Ignores armor</label><button type="button" class="btn ghost sm" id="pl-heal1"' + (sh.harm < 1 ? ' disabled' : '') + '>Heal 1</button></div>' +
+      '<p class="pmsg" role="status">' + esc(play.msg) + '</p>' +
+      (play.wound > 0 && sh.luck > 0 ? '<button type="button" class="btn ghost sm" id="pl-undo">Spend Luck: cancel that wound</button>' : '') + '</div>' +
+    '<div class="pblock"><span class="lbl">Luck</span>' + pipStr('pl-luck', '', 7, sh.luck, 'Luck') + (d ? '<p class="small muted" style="margin:6px 0 0"><b>When you spend Luck:</b> ' + esc(d.luckSpecial) + '</p>' : '') + '</div>' +
+    '<div class="pblock"><span class="lbl">Experience</span>' + pipStr('pl-xp', '', 5, Math.min(sh.xp, 5), 'XP') + (sh.xp >= 5 ? '<div class="prow"><b>Level up ready.</b><button type="button" class="btn sm" data-pgo="sheet">Pick an improvement</button></div>' : '') + '</div>' +
+    '<div class="pblock"><span class="lbl">This roll</span>' + stepStr('+1 forward', 'forward', fmt(R.forward), '(clears)') + stepStr('+1 ongoing', 'ongoing', fmt(R.ongoing)) + stepStr('Other', 'other', fmt(R.other), '(clears)') + stepStr('Hold', 'hold', S.hold.n) + '</div>' +
+    (gear ? '<div class="pblock"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '');
+
+  var basic = MOVES.filter(function (m) { return m.g === 'basic'; }), weird = MOVES.filter(function (m) { return m.g === 'weird'; });
+  var mine = S.sheet.custom.map(function (c) { return BYID['x' + c.id]; }).filter(Boolean);
+  var pass = pbPicked().filter(function (m) { return m.kind === 'passive'; });
+  var wd = $('#pl-weird'), weirdOpen = (wd && wd.open) || R.move === 'plain' || weird.some(function (m) { return m.id === R.move; });
+  $('#play-moves').innerHTML =
+    '<div class="card"><span class="lbl">Basic moves</span><div class="pmoves">' + basic.map(pmoveBtn).join('') + '</div></div>' +
+    '<div class="card" style="margin-top:16px"><span class="lbl">' + (d ? esc(d.name) + ' moves' : 'Your playbook moves') + '</span>' +
+      (mine.length ? '<div class="pmoves">' + mine.map(pmoveBtn).join('') + '</div>' : '') +
+      pass.map(function (m) { return '<details class="ppass"><summary><b>' + esc(m.name) + '</b> <span class="muted small">no roll</span></summary><p>' + esc(m.summary) + '</p></details>'; }).join('') +
+      (!mine.length && !pass.length ? '<p class="small muted" style="margin:0">Moves you pick in Build a hunter show up here.</p>' : '') + '</div>' +
+    '<div class="card" style="margin-top:16px"><details' + (weirdOpen ? ' open' : '') + ' id="pl-weird"><summary class="lbl" style="cursor:pointer;margin:0">Weird moves and plain rolls</summary><div class="pmoves" style="margin-top:10px">' + weird.map(pmoveBtn).join('') +
+      '<button type="button" class="pmove" data-pmove="plain" aria-pressed="' + (R.move === 'plain') + '"><span>Plain roll</span><small>' + STATNAME[R.stat] + ' ' + fmt(sh.stats[R.stat]) + '</small></button></div></details></div>';
+
+  var mv = BYID[R.move] || PLAIN, m = bonus(), f = 0, p = 0, x = 0;
+  for (var i = 1; i <= 6; i++) for (var j = 1; j <= 6; j++) { var t = i + j + m; if (t >= 10) f++; else if (t >= 7) p++; else x++; }
+  function pct(n) { return Math.round(n / 36 * 100); }
+  var parts = [STATNAME[R.stat] + ' ' + fmt(sh.stats[R.stat])];
+  if (R.forward) parts.push('forward ' + fmt(R.forward)); if (R.ongoing) parts.push('ongoing ' + fmt(R.ongoing)); if (R.other) parts.push('other ' + fmt(R.other));
+  $('#play-sel').className = 'card psel';
+  $('#play-sel').innerHTML = '<h3>' + esc(mv.id === 'plain' ? 'Plain roll' : mv.name) + '</h3>' + (mv.trig ? '<p class="muted"><i>' + esc(mv.trig) + '</i></p>' : '') +
+    '<p>Roll 2d6 <b>' + fmt(m) + '</b> <span class="muted small">(' + esc(parts.join(', ')) + ')</span></p>' +
+    '<p class="small"><span class="tag full">10+ ' + pct(f) + '%</span> &middot; <span class="tag part">7-9 ' + pct(p) + '%</span> &middot; <span class="tag miss">Miss ' + pct(x) + '%</span></p>';
+}
+(function playEvents() {
+  var host = $('#p-play');
+  host.addEventListener('click', function (e) {
+    var t = e.target, sh = S.sheet, R = S.roller, g;
+    if ((g = t.closest('[data-pmove]'))) { R.move = g.dataset.pmove; if (R.move !== 'plain') R.stat = BYID[R.move].stat; renderRoller(); scheduleSave(); return; }
+    if ((g = t.closest('[data-pstat]'))) { R.stat = g.dataset.pstat; renderRoller(); scheduleSave(); return; }
+    if ((g = t.closest('[data-padj]'))) {
+      var k = g.dataset.padj, dd = +g.dataset.d;
+      if (k === 'hold') S.hold.n = clamp(S.hold.n + dd, 0, 9); else R[k] = clamp(R[k] + dd, -5, 5);
+      renderRoller(); scheduleSave(); return;
+    }
+    if ((g = t.closest('[data-ph]'))) { play.harm = clamp(play.harm + +g.dataset.ph, 1, 12); renderPlay(); return; }
+    if ((g = t.closest('.pips button')) && $('#play-status').contains(g)) {
+      var n = +g.dataset.n, id = g.parentElement.id;
+      if (id === 'pl-luck') sh.luck = sh.luck === n ? n - 1 : n;
+      if (id === 'pl-harm') { sh.harm = sh.harm === n ? n - 1 : n; if (sh.harm >= 4) sh.unstable = true; if (sh.harm === 0) sh.unstable = false; play.wound = 0; play.msg = ''; }
+      if (id === 'pl-xp') sh.xp = sh.xp === n ? n - 1 : n;
+      renderSheet(); scheduleSave(); return;
+    }
+    if (t.id === 'pl-take') {
+      var arm = play.ignore ? 0 : armorVal(), dmg = Math.max(0, play.harm - arm), before = sh.harm;
+      sh.harm = Math.min(8, sh.harm + dmg); if (sh.harm >= 4) sh.unstable = true;
+      play.wound = sh.harm - before;
+      play.msg = dmg ? 'Took ' + dmg + ' harm' + (arm ? ' (' + play.harm + ' less ' + arm + ' armor)' : '') + '. You are at ' + sh.harm + '.' : 'Your armor soaked all of it.';
+      renderSheet(); scheduleSave(); return;
+    }
+    if (t.id === 'pl-heal1') { sh.harm = Math.max(0, sh.harm - 1); if (sh.harm < 4) sh.unstable = false; play.wound = 0; play.msg = ''; renderSheet(); scheduleSave(); return; }
+    if (t.id === 'pl-undo' && play.wound > 0 && sh.luck > 0) {
+      sh.harm = Math.max(0, sh.harm - play.wound); if (sh.harm < 4) sh.unstable = false; sh.luck--;
+      play.msg = 'Luck spent. That wound is cancelled. ' + sh.luck + ' Luck left.'; play.wound = 0;
+      renderSheet(); scheduleSave(); return;
+    }
+    if ((g = t.closest('[data-pgo]'))) { setHV(g.dataset.pgo === 'sheet' ? 'sheet' : 'build'); showTab('hunter'); if (g.dataset.pgo === 'sheet') { var lv = $('#lvlup'); if (lv) lv.scrollIntoView({ block: 'center' }); } scheduleSave(); return; }
+  });
+  host.addEventListener('change', function (e) { if (e.target.id === 'pl-ign') play.ignore = e.target.checked; });
+})();
 $('#photo').addEventListener('change', function (e) {
   var f = e.target.files && e.target.files[0]; e.target.value = '';
   if (!f) return;
@@ -2627,6 +2786,7 @@ function doRoll() {
     last = { move: R.move, stat: R.stat, statVal: sv, fwd: R.forward, ong: R.ongoing, oth: R.other, d1: d1, d2: d2, total: d1 + d2 + sv + R.forward + R.ongoing + R.other, luck: false, xpMarked: false };
     S.rolls.unshift({ name: mv.id === 'plain' ? STATNAME[R.stat] + ' roll' : mv.name, d1: d1, d2: d2, mod: last.total - d1 - d2, total: last.total, tier: tierOf(last.total) });
     S.rolls = S.rolls.slice(0, 30);
+    if (HOLDS[R.move] && tierOf(last.total) !== 'miss') { S.hold = { n: HOLDS[R.move][tierOf(last.total)], move: R.move, asked: [] }; last.hold = true; }
     R.forward = 0; R.other = 0;
     renderRoller(); scheduleSave(); popSum();
     if (last.total >= 12) fxPlay('crit'); else if (tierOf(last.total) === 'miss') fxPlay('miss');

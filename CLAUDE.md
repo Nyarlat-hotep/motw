@@ -16,7 +16,9 @@ Single-file vanilla JS app for a Monster of the Week campaign. Owner: Jacob, a f
 - State `S` (defaults in `defaults()`), merged with saved data by `merge(defaults(), saved)`. An empty-object base field takes the saved value wholesale. Saved to localStorage key `hunters-journal-v1` via `scheduleSave()` / `flush()`.
 - `initStore()` also tries `window.claude` (db, user) for the claude.ai-hosted version. Outside claude.ai it falls back to localStorage. See docs/ROADMAP.md for replacing that with Supabase.
 - Helpers: `$`, `$$`, `esc`, `clamp`, `fmt`, `getPath`/`setPath`, `uid`.
-- Tabs: guide, roll, hunter, party, bestiary, tips, notes. Hunter has two views: Build (the wizard) and My sheet.
+- Tabs: guide, play, roll, hunter, party, bestiary, tips, notes. Play (`renderPlay`) is the mid-session screen; the dice card `#rollkit` is moved between `#roll-home` and `#play-stage` by `showTab`, so roller ids stay unique. Hold from Investigate and Read a Bad Situation lives in `S.hold`.
+- Hosting: `npm run build` writes `dist/` (page, worker, manifest, art). Deploy that folder, not the repo root.
+- Hunter has two views: Build (the wizard) and My sheet.
 - Wizard: `WSTEPS` (8 steps), `renderWiz`, per-playbook picks in `S.sheet.pbs[playbookName]` = {rating, look, moves, gear, build, extras, imp}.
 - Picked roll moves sync into `S.sheet.custom` and picked gear into `S.sheet.inventory`, each tagged with a `pbk` field so removal cleans up. See `syncPbMoves`, `syncPbGear`, `onPlaybookChange`.
 - Roller: `BYID` holds basic and custom moves; `renderStage` shows the result tier and the move `note`.

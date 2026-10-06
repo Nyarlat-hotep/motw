@@ -1,0 +1,6 @@
+{
+  // Cloudflare Workers static site: publishes the dist/ folder that `npm run build` writes.
+  "name": "hunters-journal",
+  "compatibility_date": "2025-01-01",
+  "assets": { "directory": "./dist" }
+}
