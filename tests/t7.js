@@ -96,7 +96,14 @@ const pmin=(p,o)=>o?0:(Array.isArray(p)?p[0]:(p|0)), pmax=p=>Array.isArray(p)?p[
   await p.locator('[data-lvl]:not([disabled])').first().click(); await p.waitForTimeout(150);
   if (await p.locator('[data-lvlstat]').count()) await p.locator('[data-lvlstat]:not([disabled])').first().click();
   check(T+'level increments', (await p.textContent('#lvl')).trim()==='1', await p.textContent('#lvl'));
-  // switch playbook cleans
+  // switch playbook cleans: old moves, gear and ratings leave with the old playbook and come back with it
+  const before=await st(); const other=DATA.find(x=>x.id!==d.id).name;
+  await p.selectOption('#f-pb', other); let sw=await st();
+  check(T+'switch clears ratings', Object.values(sw.sheet.stats).every(v=>v===0), JSON.stringify(sw.sheet.stats));
+  check(T+'switch clears playbook gear and moves', !sw.sheet.inventory.some(i=>i.pbk&&i.pbk.indexOf(d.id+'|')===0) && !sw.sheet.custom.some(c=>c.pbk&&d.moves.auto.concat(d.moves.choices).some(m=>m.id===c.pbk)));
+  await p.selectOption('#f-pb', d.name); sw=await st();
+  check(T+'switch back restores ratings', JSON.stringify(sw.sheet.stats)===JSON.stringify(before.sheet.stats), JSON.stringify(sw.sheet.stats)+' vs '+JSON.stringify(before.sheet.stats));
+  check(T+'switch back restores gear', sw.sheet.inventory.filter(i=>i.pbk).length===before.sheet.inventory.filter(i=>i.pbk).length);
   check(T+'no errors', errs.length===0, errs.join(' | '));
   await ctx.close();
  }

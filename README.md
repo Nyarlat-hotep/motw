@@ -9,11 +9,13 @@ It is one static page (`index.html`) plus images. No build step.
     npm start            # serves on http://localhost:5173
     # or just open index.html in a browser
 
-Saves go to the browser's localStorage. Use Settings and backup in the app to export or restore a hunter.
+Saves go to the browser's localStorage. Use Settings and backup in the app to download a backup file or restore one.
 
 ## Layout
 
     index.html           the whole app (HTML, CSS, JS)
+    manifest.webmanifest lets a phone or desktop install the page as an app
+    sw.js                keeps an offline copy once the page has been opened over http(s)
     img/                 art; every image is optional and the page works without it
     data/                the 12 playbooks as JSON (see data/SCHEMA.md)
     tools/embed_data.py  re-embeds data/*.json into index.html after you edit them

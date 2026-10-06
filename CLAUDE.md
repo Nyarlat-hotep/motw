@@ -9,6 +9,8 @@ Single-file vanilla JS app for a Monster of the Week campaign. Owner: Jacob, a f
 - No emoji. Avoid em dashes in user-facing copy. Keep copy friendly and beginner-oriented.
 - Support light and dark themes (CSS tokens in `:root`, dark overrides under `prefers-color-scheme` and `[data-theme]`). Check 390px width: no horizontal page scroll.
 - All images are optional; the page probes each one on load and works without them.
+- `sw.js` and `manifest.webmanifest` are the only other shipped files (offline copy and install). The page is fetched network-first, so a deploy shows up on the next online load. Bump `CACHE` in `sw.js` only to throw away old cached art.
+- Ratings are parked per playbook (`S.sheet.pbs[name].stats`) by `setPlaybook()`; always change playbook through it.
 
 ## Architecture (all in index.html)
 - State `S` (defaults in `defaults()`), merged with saved data by `merge(defaults(), saved)`. An empty-object base field takes the saved value wholesale. Saved to localStorage key `hunters-journal-v1` via `scheduleSave()` / `flush()`.
