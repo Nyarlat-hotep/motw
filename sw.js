@@ -1,7 +1,7 @@
 /* Offline copy of the journal.
    The page itself is fetched fresh whenever there is a connection (so updates show up at once) and falls back to the saved copy offline.
    Art and fonts are served from the saved copy and refreshed in the background. Missing optional images are never saved. */
-var CACHE = 'hunters-journal-shell-v1';
+var CACHE = 'hunters-journal-shell-v2';
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(['./', 'manifest.webmanifest']); }).then(function () { return self.skipWaiting(); }));
 });
