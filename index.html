@@ -438,18 +438,54 @@ details.sect > summary::after { font-family: var(--display); }
 .tray::after { content: ""; position: absolute; inset: 9px; border: 1.5px dashed rgba(227, 189, 95, .32); border-radius: 5px; pointer-events: none; }
 .dice { display: flex; gap: 64px; justify-content: center; align-items: center; height: 100%; padding-top: 14px; }
 .dice.blank { opacity: .6; }
-.slot { position: relative; width: 64px; height: 64px; flex: none; }
+.slot { position: relative; width: 64px; height: 64px; flex: none; --die-hi: #f7eed9; --die: #e6d6b2; --die-lo: #d3c096; --pip-hi: #8d2230; --pip: #4a0e16; --pip-c: #6a1420; }
 .dx, .dy, .cube3, .orient { position: absolute; inset: 0; }
 .dy { perspective: 420px; }
 .cube3, .orient { transform-style: preserve-3d; }
 .cube3 { transform: rotateX(-22deg) rotateY(-20deg) rotateZ(-6deg); }
 .slot:nth-child(2) .cube3 { transform: rotateX(-20deg) rotateY(-27deg) rotateZ(8deg); }
 .face { position: absolute; inset: 0; display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 10px; border-radius: 11px; backface-visibility: hidden;
-  background: linear-gradient(145deg, #f7eed9 0%, #e6d6b2 55%, #d3c096 100%);
+  background: linear-gradient(145deg, var(--die-hi) 0%, var(--die) 55%, var(--die-lo) 100%);
   box-shadow: inset 0 0 0 1px rgba(110, 76, 38, .4), inset 0 -5px 9px rgba(120, 82, 34, .28), inset 0 3px 5px rgba(255, 255, 255, .5); }
 .face i { border-radius: 50%; aspect-ratio: 1; align-self: center; justify-self: center; width: 100%; }
-.face i.on { background: radial-gradient(circle at 35% 30%, #8d2230 0%, #4a0e16 70%); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .5); }
+.face i.on { background: radial-gradient(circle at 35% 30%, var(--pip-hi) 0%, var(--pip) 70%); box-shadow: inset 0 1px 2px rgba(0, 0, 0, .5); }
 .face.v1 i.on { transform: scale(1.55); }
+/* dice maker: finishes, glow, the sigil on the 6, tray surfaces. Bone on leather is the untouched default. */
+.fin-resin .face { background: linear-gradient(145deg, rgba(255, 255, 255, .6) 0%, rgba(255, 255, 255, 0) 30%), linear-gradient(145deg, var(--die-hi) 0%, var(--die) 50%, var(--die-lo) 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .25), inset 0 -6px 10px rgba(0, 0, 0, .22), inset 0 3px 6px rgba(255, 255, 255, .7); }
+.fin-metal .face { border-radius: 9px; background: linear-gradient(145deg, var(--die-hi) 0%, var(--die) 22%, var(--die-lo) 45%, var(--die-hi) 62%, var(--die) 80%, var(--die-lo) 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .45), inset 0 -3px 6px rgba(0, 0, 0, .35), inset 0 2px 3px rgba(255, 255, 255, .6); }
+.fin-stone .face { border-radius: 8px; background: radial-gradient(circle at 22% 30%, rgba(0, 0, 0, .16) 0 2px, transparent 3px), radial-gradient(circle at 70% 64%, rgba(255, 255, 255, .14) 0 2px, transparent 3px), radial-gradient(circle at 44% 84%, rgba(0, 0, 0, .13) 0 1.5px, transparent 2.5px), radial-gradient(circle at 84% 20%, rgba(0, 0, 0, .12) 0 1.5px, transparent 2.5px), linear-gradient(145deg, var(--die) 0%, var(--die-lo) 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .3), inset 0 -3px 8px rgba(0, 0, 0, .25); }
+.fin-gem .face { opacity: .82; backface-visibility: visible; background: linear-gradient(145deg, rgba(255, 255, 255, .55) 0%, rgba(255, 255, 255, 0) 35%), linear-gradient(145deg, var(--die-hi) 0%, var(--die) 60%, var(--die-lo) 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .35), inset 0 0 14px rgba(255, 255, 255, .3), inset 0 -5px 10px rgba(0, 0, 0, .25); }
+.slot.glow .face i.on { box-shadow: 0 0 7px 1px var(--pip-c), inset 0 1px 2px rgba(0, 0, 0, .3); }
+.face.sig { display: block; padding: 8px; color: var(--pip-c); }
+.face.sig svg { display: block; width: 100%; height: 100%; }
+.slot.glow .face.sig svg { filter: drop-shadow(0 0 3px var(--pip-c)); }
+.tray[data-tray="felt"] { border-color: #2e2218; background: radial-gradient(ellipse at 50% 38%, #2f6a4a 0%, #1c4530 62%, #0f2a1c 100%); }
+.tray[data-tray="wood"] { border-color: #2a1a10; background: repeating-linear-gradient(92deg, rgba(0, 0, 0, .1) 0 2px, rgba(255, 255, 255, .03) 2px 7px, rgba(0, 0, 0, .06) 7px 13px), radial-gradient(ellipse at 50% 38%, #8a5a34 0%, #5e3a1f 62%, #3a2212 100%); }
+.tray[data-tray="slate"] { border-color: #22262b; background: linear-gradient(115deg, rgba(255, 255, 255, .05) 0 20%, transparent 20% 55%, rgba(255, 255, 255, .03) 55% 60%, transparent 60%), radial-gradient(ellipse at 50% 38%, #56606a 0%, #353c44 62%, #1c2126 100%); }
+.tray[data-tray="wood"]::after, .tray[data-tray="slate"]::after { display: none; }
+.tray.mini { height: 132px; margin-bottom: 12px; }
+.tray.mini .dice { padding-top: 6px; }
+.dicebar { display: flex; justify-content: flex-end; margin-top: 12px; }
+.dicepanel .dp-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px; }
+.dicepanel .dp-head h3 { margin: 0; }
+.dicepanel .lbl { margin: 16px 0 0; }
+.dicepanel .dp-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.dicepanel .dp-row input[type="text"] { flex: 1 1 180px; min-width: 0; }
+.dicepanel .dp-warn { margin: 0 0 4px; }
+.dicepanel .chip { min-height: 36px; display: inline-flex; align-items: center; gap: 6px; padding: 2px 12px; }
+.dicepanel .chip svg { width: 20px; height: 20px; flex: none; }
+.dicepanel .chip .for { font-size: 14px; opacity: .8; }
+.dicepanel .chip.del { padding: 2px 10px; color: var(--muted); }
+.myset { display: inline-flex; gap: 2px; }
+.sws { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.sw { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--line); padding: 0; cursor: pointer; }
+.sw[aria-pressed="true"] { outline: 3px solid var(--accent); outline-offset: 2px; }
+.swpick { display: inline-flex; align-items: center; gap: 6px; font-size: 16px; color: var(--muted); cursor: pointer; }
+.swpick input { width: 44px; height: 36px; padding: 0; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); cursor: pointer; }
 .fc-1 { transform: translateZ(32px); }
 .fc-6 { transform: rotateY(180deg) translateZ(32px); }
 .fc-2 { transform: rotateY(90deg) translateZ(32px); }
@@ -829,6 +865,21 @@ div.wcard { cursor: default; border-color: var(--good); }
           </div>
           <button class="btn rollbtn" id="roll" type="button">Roll 2d6</button>
           <div id="result" aria-live="polite"></div>
+          <div class="dicebar"><button class="btn ghost sm" id="dp-open" type="button" aria-expanded="false" aria-controls="dicepanel">Customize dice</button></div>
+        </div>
+        <div class="card dicepanel" id="dicepanel" style="margin-top:16px" hidden>
+          <div class="dp-head"><h3>Customize dice</h3><button class="btn ghost sm" id="dp-close" type="button">Done</button></div>
+          <div class="tray mini" id="dp-tray" aria-hidden="true"><div class="dice" id="dp-dice"></div></div>
+          <div id="dp-warn" aria-live="polite"></div>
+          <div id="dp-opts"></div>
+          <span class="lbl">Sets</span>
+          <div id="dp-sets"></div>
+          <div class="dp-row"><input type="text" id="dp-name" maxlength="40" placeholder="Name these dice" aria-label="Name for this set"><button class="btn sm" id="dp-save" type="button">Save as my set</button></div>
+          <span class="lbl">Dice code</span>
+          <p class="small muted" style="margin:4px 0 0">Trade dice with a friend. Copy your code and send it, or paste theirs here.</p>
+          <div class="dp-row"><input type="text" id="dp-code" placeholder="Paste a code" aria-label="Dice code" autocomplete="off" spellcheck="false"><button class="btn sm" id="dp-load" type="button">Use this code</button><button class="btn ghost sm" id="dp-copy" type="button">Copy code</button></div>
+          <p class="small" id="dp-msg" aria-live="polite" style="margin:10px 0 0; min-height:1.2em"></p>
+          <div class="actions"><button class="btn ghost sm" id="dp-reset" type="button">Reset to Bone and Oxblood</button></div>
         </div>
         <div class="card" style="margin-top:16px">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px">
@@ -1129,7 +1180,7 @@ function exampleCase() {
 }
 function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.hook = c.threats = c.weakness = c.npcs = c.loose = c.log = ''; c.clock = 0; c.eos = [false, false, false, false]; c.date = new Date().toISOString().slice(0, 10); return c; }
 function defaults() {
-  return { v: 1, tab: 'guide', hv: 'build', steps: {}, wiz: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false }, hold: { n: 0, move: '', asked: [] },
+  return { v: 1, tab: 'guide', hv: 'build', steps: {}, wiz: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false }, hold: { n: 0, move: '', asked: [] }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0, adv: false },
     sheet: { name: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, moves: '', gear: '' } };
 }
@@ -2670,7 +2721,7 @@ function startRecap(c) {
 }
 
 /* ---------- art hooks ---------- */
-var ART = { pb: {}, misc: {}, tex1: false, tex2: false };
+var ART = { pb: {}, misc: {}, tex1: false, tex2: false, tray: false };
 function artImg(name, cls) { return ART.misc[name] ? '<img class="' + cls + '" src="img/' + name + '.jpg" alt="">' : ''; }
 function applyTex() {
   var b = ['party', 'bestiary', 'notes'].indexOf(S.tab) >= 0, useB = ART.tex2 && (b || !ART.tex1), useA = ART.tex1 && !useB;
@@ -2683,7 +2734,7 @@ function initArt() {
   probe('img/banner.jpg', function () { var m = $('.mast'); m.style.setProperty('--banner', 'url(img/banner.jpg)'); m.classList.add('has-banner'); });
   probe('img/texture.jpg', function () { $('.texture:not(.t2)').style.backgroundImage = 'url(img/texture.jpg)'; ART.tex1 = true; applyTex(); });
   probe('img/texture2.jpg', function () { $('.texture.t2').style.backgroundImage = 'url(img/texture2.jpg)'; ART.tex2 = true; applyTex(); });
-  probe('img/tray.jpg', function () { var t = $('#tray'); t.style.backgroundImage = 'linear-gradient(rgba(20,6,10,.4), rgba(20,6,10,.5)), url(img/tray.jpg)'; t.style.backgroundSize = 'cover'; t.style.backgroundPosition = 'center'; });
+  probe('img/tray.jpg', function () { ART.tray = true; applyTray(); });
   ['tier-full', 'tier-part', 'tier-miss', 'levelup', 'empty-bestiary', 'empty-cases', 'empty-party'].forEach(function (n) {
     probe('img/' + n + '.jpg', function () { ART.misc[n] = true; renderStage(); renderSheet(); renderBeasts(); renderParty(); if (!$('#cases input:focus, #cases textarea:focus')) renderCases(); });
   });
@@ -2703,18 +2754,234 @@ function selCustom() {
   return '<optgroup label="My playbook moves">' + S.sheet.custom.map(function (c) { return '<option value="x' + c.id + '">' + esc(c.name || 'Untitled move') + ' (+' + STATNAME[BYID['x' + c.id].stat] + ')</option>'; }).join('') + '</optgroup>';
 }
 
+/* ---------- dice maker ---------- */
+/* S.dice holds the player's two dice and tray. Saved state, backups and dice codes can all come from someone else,
+   so nothing from a die reaches HTML or CSS without passing cleanDie() or strictDie() first. */
+function die0() { return { body: '#e9dcba', finish: 'bone', pip: '#6a1420', glow: false, sigil: '' }; }
+var HEX = /^#[0-9a-f]{6}$/i;
+var FINISHES = ['bone', 'resin', 'metal', 'stone', 'gem'], TRAYS = ['leather', 'felt', 'wood', 'slate'], SIGNAMES = ['', 'antler', 'lantern', 'crescent', 'eye', 'skull', 'cross'];
+var SIGILS = {
+  antler: '<path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M12 21.5v-6.5M12 15c-3-1-5-3.2-5.5-7M12 15c3-1 5-3.2 5.5-7M6.5 8L3.8 5M6.5 8L7 3.2M8.3 12L4.6 11.4M17.5 8l2.7-3M17.5 8L17 3.2M15.7 12l3.7-.6"/>',
+  lantern: '<path fill="currentColor" fill-rule="evenodd" d="M10 1.5h4v2h-4zM8.5 4.5h7l1.5 3H7zM7.5 8.5h9v10h-9zM10 10.5v6h4v-6zM6.5 19.5h11v2.5h-11z"/>',
+  crescent: '<path fill="currentColor" d="M15.5 2.6a9.6 9.6 0 1 0 5.9 14.6A8 8 0 0 1 15.5 2.6z"/>',
+  eye: '<path fill="currentColor" fill-rule="evenodd" d="M1.5 12c3-5 6.5-7.2 10.5-7.2S19.5 7 22.5 12c-3 5-6.5 7.2-10.5 7.2S4.5 17 1.5 12zM12 8.2a3.8 3.8 0 1 0 0 7.6 3.8 3.8 0 0 0 0-7.6z"/>',
+  skull: '<path fill="currentColor" fill-rule="evenodd" d="M12 2c-4.8 0-8.5 3.3-8.5 7.9 0 2.6 1.2 4.7 3 6V19.5c0 1.1.9 2 2 2h7c1.1 0 2-.9 2-2V15.9c1.8-1.3 3-3.4 3-6C20.5 5.3 16.8 2 12 2zM8.5 8.6a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4zM15.5 8.6a2.2 2.2 0 1 0 0 4.4 2.2 2.2 0 0 0 0-4.4zM12 13.6l-1.4 2.9h2.8z"/>',
+  cross: '<path fill="currentColor" d="M9.8 1.5h4.4v6h6.3v4.4h-6.3V22.5H9.8V11.9H3.5V7.5h6.3z"/>'
+};
+var BODYSW = [['#e9dcba', 'Bone'], ['#f5f5f2', 'White'], ['#c3c7cc', 'Silver'], ['#a8842c', 'Old gold'], ['#c0282c', 'Blood red'], ['#1f6b50', 'Jade'], ['#24365e', 'Midnight'], ['#2b2a2e', 'Charcoal']];
+var PIPSW = [['#6a1420', 'Oxblood'], ['#111111', 'Black'], ['#ffffff', 'White'], ['#efe4c8', 'Bone'], ['#e3bd5f', 'Gold'], ['#ff8a2a', 'Ember'], ['#c9f5d5', 'Pale green'], ['#1d2f5c', 'Ink blue']];
+function mkDie(body, finish, pip, glow, sigil) { return { body: body, finish: finish, pip: pip, glow: !!glow, sigil: sigil || '' }; }
+function mkSet(name, die, tray) { return { name: name, a: die, b: die, tray: tray }; }
+var DEFSET = mkSet('Bone and Oxblood', die0(), 'leather');
+/* one starter set per playbook, keyed by pbSlug(). Each passes the 3:1 pip readability rule (tested). */
+var DICESETS = {
+  chosen: mkSet('Destiny\'s Edge', mkDie('#a8842c', 'metal', '#ffffff', true, 'cross'), 'slate'),
+  crooked: mkSet('Loaded Pair', mkDie('#efe6cf', 'resin', '#111111', false, 'eye'), 'felt'),
+  divine: mkSet('Halo', mkDie('#f4f1ea', 'gem', '#8a6410', true, 'cross'), 'slate'),
+  expert: mkSet('Old Library', mkDie('#e4d5ae', 'bone', '#1d2f5c', false, 'lantern'), 'wood'),
+  flake: mkSet('Red String', mkDie('#c9a67a', 'stone', '#8f1218', false, 'eye'), 'wood'),
+  initiate: mkSet('Sect Relic', mkDie('#3f7f6f', 'metal', '#efe4c8', false, 'crescent'), 'slate'),
+  monstrous: mkSet('Blood Moon', mkDie('#c0282c', 'resin', '#050505', false, 'antler'), 'leather'),
+  mundane: mkSet('Kitchen Drawer', mkDie('#f5f5f2', 'resin', '#111111', false, ''), 'wood'),
+  professional: mkSet('Field Issue', mkDie('#4a5158', 'metal', '#f2f2f2', false, ''), 'felt'),
+  spellslinger: mkSet('Coal Ember', mkDie('#2b2a2e', 'stone', '#ff8a2a', true, 'crescent'), 'slate'),
+  spooky: mkSet('Graveyard Jade', mkDie('#1f6b50', 'gem', '#c9f5d5', true, 'skull'), 'leather'),
+  wronged: mkSet('Silver and Salt', mkDie('#c3c7cc', 'metal', '#6a1420', false, 'skull'), 'leather')
+};
+function hexRgb(h) { return [parseInt(h.substr(1, 2), 16), parseInt(h.substr(3, 2), 16), parseInt(h.substr(5, 2), 16)]; }
+function mixHex(h, to, amt) { return '#' + hexRgb(h).map(function (v) { var n = Math.round(v + (to - v) * amt).toString(16); return n.length < 2 ? '0' + n : n; }).join(''); }
+function lum(h) { var c = hexRgb(h).map(function (v) { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; }
+function contrast(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); }
+/* strict: for dice codes. Anything off and the whole die is refused. */
+function strictDie(d) {
+  if (!d || typeof d !== 'object' || Array.isArray(d)) return null;
+  if (typeof d.body !== 'string' || !HEX.test(d.body) || typeof d.pip !== 'string' || !HEX.test(d.pip)) return null;
+  if (FINISHES.indexOf(d.finish) < 0 || SIGNAMES.indexOf(d.sigil) < 0 || typeof d.glow !== 'boolean') return null;
+  return { body: d.body.toLowerCase(), finish: d.finish, pip: d.pip.toLowerCase(), glow: d.glow, sigil: d.sigil };
+}
+/* forgiving: for saved state. Any field that is off falls back to the default die. */
+function cleanDie(d) {
+  var o = die0();
+  if (!d || typeof d !== 'object') return o;
+  if (typeof d.body === 'string' && HEX.test(d.body)) o.body = d.body.toLowerCase();
+  if (typeof d.pip === 'string' && HEX.test(d.pip)) o.pip = d.pip.toLowerCase();
+  if (FINISHES.indexOf(d.finish) >= 0) o.finish = d.finish;
+  if (SIGNAMES.indexOf(d.sigil) >= 0) o.sigil = d.sigil;
+  o.glow = d.glow === true;
+  return o;
+}
+function curDie(idx) { var D = S.dice; return cleanDie(D.linked || !idx ? D.a : D.b); }
+function curTray() { return TRAYS.indexOf(S.dice.tray) >= 0 ? S.dice.tray : 'leather'; }
+function sameDie(x, y) { return x.body === y.body && x.finish === y.finish && x.pip === y.pip && x.glow === y.glow && x.sigil === y.sigil; }
+/* inline custom properties for one die. The default colors emit nothing, so the stylesheet's own values apply. */
+function dieVars(d) {
+  var z = die0(), v = '';
+  if (d.body !== z.body) v += '--die-hi:' + mixHex(d.body, 255, .4) + ';--die:' + d.body + ';--die-lo:' + mixHex(d.body, 0, .16) + ';';
+  if (d.pip !== z.pip) v += '--pip-hi:' + mixHex(d.pip, 255, .25) + ';--pip:' + mixHex(d.pip, 0, .22) + ';--pip-c:' + d.pip + ';';
+  return v;
+}
+function applyTray() {
+  var t = curTray(), img = t === 'leather' && ART.tray;
+  [$('#tray'), $('#dp-tray')].forEach(function (el) {
+    el.setAttribute('data-tray', t);
+    el.style.backgroundImage = img ? 'linear-gradient(rgba(20,6,10,.4), rgba(20,6,10,.5)), url(img/tray.jpg)' : '';
+    el.style.backgroundSize = img ? 'cover' : ''; el.style.backgroundPosition = img ? 'center' : '';
+  });
+}
+function b64u(s) { return btoa(unescape(encodeURIComponent(s))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+function unb64u(s) { s = s.replace(/-/g, '+').replace(/_/g, '/'); while (s.length % 4) s += '='; return decodeURIComponent(escape(atob(s))); }
+function diceCode(name) {
+  var o = { a: curDie(0), b: curDie(1), tray: curTray() };
+  if (name) o.name = name;
+  return 'HJD1.' + b64u(JSON.stringify(o));
+}
+function readCode(text) {
+  var m = /^HJD1\.([A-Za-z0-9_-]+)$/.exec(String(text || '').trim()), o, a, b;
+  if (!m) return null;
+  try { o = JSON.parse(unb64u(m[1])); } catch (e) { return null; }
+  if (!o || typeof o !== 'object' || Array.isArray(o)) return null;
+  a = strictDie(o.a); b = strictDie(o.b);
+  if (!a || !b || TRAYS.indexOf(o.tray) < 0) return null;
+  if ('name' in o && typeof o.name !== 'string') return null;
+  return { name: String(o.name || '').trim().slice(0, 40), a: a, b: b, tray: o.tray };
+}
+var dpTab = 0;
+function dpMsg(t) { $('#dp-msg').textContent = t || ''; }
+function dpBtn(attr, on, label) { return '<button class="chip" type="button" ' + attr + ' aria-pressed="' + (on ? 'true' : 'false') + '">' + label + '</button>'; }
+function dpSwatches(key, list, cur) {
+  return '<div class="sws">' + list.map(function (c) {
+    return '<button class="sw" type="button" data-dp-set="' + key + '" data-v="' + c[0] + '" style="background:' + c[0] + '" aria-label="' + c[1] + '" title="' + c[1] + '" aria-pressed="' + (cur === c[0] ? 'true' : 'false') + '"></button>';
+  }).join('') + '<label class="swpick"><input type="color" data-dp-col="' + key + '" value="' + cur + '"><span>Any color</span></label></div>';
+}
+function setIsOn(st) { return sameDie(curDie(0), cleanDie(st.a)) && sameDie(curDie(1), cleanDie(st.b || st.a)) && curTray() === st.tray; }
+function mySets() { return (Array.isArray(S.dice.sets) ? S.dice.sets : []).filter(function (st) { return st && typeof st === 'object'; }).slice(0, 12); }
+function diceWarn() {
+  var D = S.dice, out = '';
+  [0, 1].forEach(function (i) {
+    var d = curDie(i);
+    if ((i && D.linked) || contrast(d.body, d.pip) >= 3) return;
+    out += '<div class="confirm dp-warn"><p>' + (D.linked ? 'Those pips are' : 'The pips on die ' + (i + 1) + ' are') + ' hard to read against that body color.</p><button class="btn sm" type="button" data-dp-fix="' + i + '">Fix it</button></div>';
+  });
+  $('#dp-warn').innerHTML = out;
+}
+/* redraw everything that shows the dice, without touching the panel's controls (a color picker may be mid-drag) */
+function diceLive() {
+  $('#dp-dice').innerHTML = cubeHTML(6, 0) + cubeHTML(6, 1);
+  if (!rolling) $('#dice').innerHTML = last ? cubeHTML(last.d1, 0) + cubeHTML(last.d2, 1) : cubeHTML(5, 0) + cubeHTML(2, 1);
+  applyTray(); diceWarn();
+}
+function renderDice() {
+  var D = S.dice, own = pbSlug(S.sheet.playbook), h = '', d, keys, mine;
+  function cap(n) { return n.charAt(0).toUpperCase() + n.slice(1); }
+  if (D.linked) dpTab = 0;
+  d = curDie(dpTab);
+  h += '<span class="lbl">Pair</span><div class="chips">' + dpBtn('data-dp-pair="1"', D.linked, 'Matched') + dpBtn('data-dp-pair="0"', !D.linked, 'Mismatched') + '</div>';
+  if (!D.linked) h += '<div class="chips" role="group" aria-label="Which die to change">' + dpBtn('data-dp-tab="0"', !dpTab, 'Die 1') + dpBtn('data-dp-tab="1"', dpTab === 1, 'Die 2') + '</div>';
+  h += '<span class="lbl">Body</span>' + dpSwatches('body', BODYSW, d.body);
+  h += '<span class="lbl">Finish</span><div class="chips">' + FINISHES.map(function (f) { return dpBtn('data-dp-set="finish" data-v="' + f + '"', d.finish === f, cap(f)); }).join('') + '</div>';
+  h += '<span class="lbl">Pips</span>' + dpSwatches('pip', PIPSW, d.pip);
+  h += '<label class="switch" style="margin-top:12px"><input type="checkbox" id="dp-glow"' + (d.glow ? ' checked' : '') + '><span>Glowing pips</span></label>';
+  h += '<span class="lbl">Sigil on the 6</span><div class="chips">' + SIGNAMES.map(function (n) { return dpBtn('data-dp-set="sigil" data-v="' + n + '"', d.sigil === n, n ? '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + SIGILS[n] + '</svg>' + cap(n) : 'None'); }).join('') + '</div>';
+  h += '<span class="lbl">Tray</span><div class="chips">' + TRAYS.map(function (t) { return dpBtn('data-dp-tray="' + t + '"', curTray() === t, cap(t)); }).join('') + '</div>';
+  $('#dp-opts').innerHTML = h;
+  keys = Object.keys(DICESETS);
+  if (DICESETS[own]) keys = [own].concat(keys.filter(function (k) { return k !== own; }));
+  h = '<div class="chips">' + dpBtn('data-dp-use="default"', setIsOn(DEFSET), DEFSET.name) + keys.map(function (k) {
+    return dpBtn('data-dp-use="pb:' + k + '"', setIsOn(DICESETS[k]), esc(DICESETS[k].name) + (k === own ? ' <span class="for">Made for ' + esc(S.sheet.playbook) + '</span>' : ''));
+  }).join('') + '</div>';
+  mine = mySets();
+  if (mine.length) h += '<div class="chips">' + mine.map(function (st, i) {
+    var nm = esc(String(st.name || 'My set').slice(0, 40));
+    return '<span class="myset">' + dpBtn('data-dp-use="my:' + i + '"', setIsOn(st), nm) + '<button class="chip del" type="button" data-dp-del="' + i + '" aria-label="Remove ' + nm + '" title="Remove">&times;</button></span>';
+  }).join('') + '</div>';
+  $('#dp-sets').innerHTML = h;
+  diceLive();
+}
+function dpEdit(key, val) {
+  var D = S.dice, d;
+  D.a = cleanDie(D.a); D.b = cleanDie(D.b);
+  d = D.linked || !dpTab ? D.a : D.b; d[key] = val;
+  if (D.linked) D.b = cleanDie(D.a);
+  scheduleSave();
+}
+function useSet(st) {
+  var D = S.dice;
+  D.a = cleanDie(st.a); D.b = cleanDie(st.b || st.a); D.linked = sameDie(D.a, D.b);
+  D.tray = TRAYS.indexOf(st.tray) >= 0 ? st.tray : 'leather'; dpTab = 0;
+  scheduleSave(); renderDice();
+}
+function dpSel(t) { var s = t.tagName.toLowerCase(); [].forEach.call(t.attributes, function (a) { if (/^data-/.test(a.name)) s += '[' + a.name + '="' + a.value + '"]'; }); return s; }
+function dpOpen(open) {
+  $('#dicepanel').hidden = !open; $('#dp-open').setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) { dpMsg(''); renderDice(); }
+}
+$('#dp-open').addEventListener('click', function () { dpOpen($('#dicepanel').hidden); });
+$('#dp-close').addEventListener('click', function () { dpOpen(false); $('#dp-open').focus(); });
+$('#dicepanel').addEventListener('click', function (e) {
+  var t = e.target.closest('button'), D = S.dice, a, sel, f, st;
+  if (!t || dpSel(t) === 'button') return;
+  sel = dpSel(t);
+  if ((a = t.getAttribute('data-dp-pair')) !== null) { D.linked = a === '1'; D.a = cleanDie(D.a); D.b = cleanDie(D.linked ? D.a : D.b); dpTab = 0; }
+  else if ((a = t.getAttribute('data-dp-tab')) !== null) dpTab = a === '1' ? 1 : 0;
+  else if ((a = t.getAttribute('data-dp-set')) !== null) dpEdit(a, t.getAttribute('data-v'));
+  else if ((a = t.getAttribute('data-dp-tray')) !== null) D.tray = a;
+  else if ((a = t.getAttribute('data-dp-fix')) !== null) {
+    dpTab = D.linked ? 0 : +a; st = curDie(dpTab);
+    dpEdit('pip', contrast(st.body, '#111111') >= contrast(st.body, '#f5f5f5') ? '#111111' : '#f5f5f5');
+  }
+  else if ((a = t.getAttribute('data-dp-del')) !== null) { D.sets = mySets(); D.sets.splice(+a, 1); dpMsg('Set removed.'); }
+  else if ((a = t.getAttribute('data-dp-use')) !== null) {
+    st = a === 'default' ? DEFSET : a.indexOf('pb:') === 0 ? DICESETS[a.slice(3)] : mySets()[+a.slice(3)];
+    if (st) { useSet(st); dpMsg(''); }
+  }
+  scheduleSave(); renderDice();
+  f = $(sel, $('#dicepanel')); if (f) f.focus();
+});
+$('#dicepanel').addEventListener('input', function (e) {
+  var k = e.target.getAttribute('data-dp-col');
+  if (!k || !HEX.test(e.target.value)) return;
+  dpEdit(k, e.target.value.toLowerCase()); diceLive();
+});
+$('#dicepanel').addEventListener('change', function (e) {
+  var k = e.target.getAttribute('data-dp-col'), f;
+  if (e.target.id === 'dp-glow') { dpEdit('glow', e.target.checked); diceLive(); }
+  else if (k) { renderDice(); f = $('input[data-dp-col="' + (k === 'pip' ? 'pip' : 'body') + '"]', $('#dicepanel')); if (f) f.focus(); }
+});
+$('#dp-save').addEventListener('click', function () {
+  var D = S.dice, name = $('#dp-name').value.trim().slice(0, 40) || 'My set', sets = mySets(), i;
+  for (i = 0; i < sets.length; i++) if (sets[i].name === name) break;
+  if (i === sets.length && i >= 12) { dpMsg('You have 12 saved sets. Remove one to make room.'); return; }
+  sets[i] = { name: name, a: curDie(0), b: curDie(1), tray: curTray() };
+  D.sets = sets; scheduleSave(); renderDice(); dpMsg('Saved "' + name + '".');
+});
+$('#dp-copy').addEventListener('click', function () {
+  var code = diceCode($('#dp-name').value.trim().slice(0, 40)), box = $('#dp-code');
+  function fallback() { box.value = code; box.focus(); box.select(); dpMsg('Copy is blocked here. Your code is in the box, select it and copy it yourself.'); }
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(code).then(function () { dpMsg('Code copied. Send it to a friend.'); }, fallback); else fallback();
+});
+function dpLoad() {
+  var st = readCode($('#dp-code').value);
+  if (!st) { dpMsg('That is not a dice code.'); return; }
+  useSet(st); $('#dp-code').value = ''; if (st.name) $('#dp-name').value = st.name;
+  dpMsg(st.name ? 'Loaded "' + st.name + '".' : 'Dice loaded.');
+}
+$('#dp-load').addEventListener('click', dpLoad);
+$('#dp-code').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); dpLoad(); } });
+$('#dp-reset').addEventListener('click', function () { useSet(DEFSET); dpMsg('Back to Bone and Oxblood.'); });
+
 /* ---------- 3D dice ---------- */
 var ORIENT = { 1: 'rotateY(0deg)', 2: 'rotateY(-90deg)', 3: 'rotateX(-90deg)', 4: 'rotateX(90deg)', 5: 'rotateY(90deg)', 6: 'rotateY(180deg)' };
 var REST = [[-22, -20, -6], [-20, -27, 8]];
-function faceHTML(v) {
+function faceHTML(v, die) {
   var h = '';
+  if (v === 6 && die && SIGILS[die.sigil]) return '<div class="face v6 fc-6 sig"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + SIGILS[die.sigil] + '</svg></div>';
   for (var i = 0; i < 9; i++) h += '<i class="' + (PIPS[v].indexOf(i) >= 0 ? 'on' : '') + '"></i>';
   return '<div class="face v' + v + ' fc-' + v + '">' + h + '</div>';
 }
 function cubeHTML(v, idx) {
-  var f = '';
-  for (var n = 1; n <= 6; n++) f += faceHTML(n);
-  return '<div class="slot" role="img" aria-label="Die showing ' + v + '"><div class="dx"><div class="shadow"></div><div class="dy"><div class="cube3"><div class="orient" style="transform:' + ORIENT[v] + '">' + f + '</div></div></div></div></div>';
+  var f = '', die = curDie(idx), vars = dieVars(die);
+  for (var n = 1; n <= 6; n++) f += faceHTML(n, die);
+  return '<div class="slot fin-' + die.finish + (die.glow ? ' glow' : '') + '"' + (vars ? ' style="' + vars + '"' : '') + ' role="img" aria-label="Die showing ' + v + '"><div class="dx"><div class="shadow"></div><div class="dy"><div class="cube3"><div class="orient" style="transform:' + ORIENT[v] + '">' + f + '</div></div></div></div></div>';
 }
 var THROW_MS = 1200;
 function throwDice(d1, d2) {
@@ -2805,7 +3072,7 @@ document.addEventListener('click', function (e) {
 
 /* ---------- boot ---------- */
 function renderAll() {
-  renderGuide(); renderBuild(); renderSheet(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderCases(); renderBeasts(); renderSettings(); renderParty(); setHV(S.hv);
+  renderGuide(); renderBuild(); renderSheet(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderDice(); renderCases(); renderBeasts(); renderSettings(); renderParty(); setHV(S.hv);
 }
 renderAll();
 var h0 = location.hash.replace('#', '');

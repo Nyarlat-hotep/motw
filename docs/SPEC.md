@@ -21,6 +21,8 @@ Rules that apply to all of it (from CLAUDE.md): one file, ES5, no build step for
 
 ## 1. Custom dice maker
 
+Status: built 2026-10-06. Two starter sets moved off the colours in the table to pass the readability rule: The Chosen is old gold rather than pale gold (white pips), and The Monstrous is blood red rather than deep red (black pips). The Divine's gold pips are a dark gold for the same reason.
+
 ### What the player gets
 A "Customize dice" button under the dice tray (it travels with `#rollkit`, so it shows on Play and Roller). It opens a panel with a live preview made of the real 3D dice. Changes apply at once and save with the journal.
 
