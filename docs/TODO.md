@@ -5,7 +5,7 @@ Written 2026-10-08. Next session is around 2026-10-19. Feature details are in [S
 ## Before the session on the 19th
 
 - [ ] **Jacob:** add the other players' emails to the Cloudflare Access list. Nobody else can open the site until this is done.
-- [ ] **Jacob:** say when to push `main`. It holds the photo textures and the History step, and pushing it deploys them.
+- [x] Photo textures and the History step are live (pushed and deployed 2026-10-08).
 - [ ] Have one friend open the site a few days early and run a short practice: build a hunter, roll five moves, take harm, spend Luck.
 - [ ] **Jacob:** ask the Keeper whether Use Magic keeps its name in The Long Dry or gets renamed to fit the setting.
 
@@ -65,7 +65,7 @@ The campaign is a post-apocalyptic wasteland, and the journal was styled as a go
 
 - [ ] Delete branches that are already in `main`: `dice-maker`, `foundations`, `header-glow-and-fog`, `dice-textures`, `hunter-history`.
 - [ ] `hunters-journal-repo.zip` in the folder above the repo is an old copy from 2026-10-04. Remove it once nothing needs it.
-- [ ] The feature branches are only on Jacob's laptop. Push them to GitHub for safekeeping (pushing a branch other than `main` does not change the live site, but confirm that in Cloudflare first).
+- [x] Every branch is on GitHub (pushed 2026-10-08). Only `main` triggered a Cloudflare build.
 
 ## Decided, not doing
 
