@@ -2713,7 +2713,12 @@ function renderSettings() {
   $('#set-fx').checked = !!S.settings.fx; $('#set-snd').checked = !!S.settings.sound; $('#set-vol').value = Math.round(volNow() * 100); $('#set-3d').checked = !!S.settings.dice3d;
 }
 $('#set-fx').addEventListener('change', function (e) { S.settings.fx = e.target.checked; scheduleSave(); if (e.target.checked) fxPlay('crit'); });
-$('#set-snd').addEventListener('change', function (e) { S.settings.sound = e.target.checked; scheduleSave(); if (e.target.checked) hit(curDie(0), .5); });
+$('#set-snd').addEventListener('change', function (e) {
+  S.settings.sound = e.target.checked; scheduleSave();
+  if (!e.target.checked) return;
+  if (sndWarm()) setTimeout(function () { hit(curDie(0), .5); }, 450); else hit(curDie(0), .5);
+});
+$('#set-snd').addEventListener('change', function () { renderDice(); });
 $('#set-vol').addEventListener('input', function (e) { S.settings.vol = clamp(+e.target.value / 100, 0, 1); scheduleSave(); });
 $('#set-vol').addEventListener('change', function () { hit(curDie(0), .5); });
 $('#set-3d').addEventListener('change', function (e) { S.settings.dice3d = e.target.checked; scheduleSave(); d3Apply(); renderDice(); });
@@ -2959,6 +2964,7 @@ function diceLive() {
   $('#dp-dice').innerHTML = cubeHTML(6, 0) + cubeHTML(6, 1);
   if (!rolling) $('#dice').innerHTML = last ? cubeHTML(last.d1, 0) + cubeHTML(last.d2, 1) : cubeHTML(5, 0) + cubeHTML(2, 1);
   applyTray(); diceWarn();
+  if (ac && S.settings.sound) sndWarm();
 }
 function renderDice() {
   var D = S.dice, own = pbSlug(S.sheet.playbook), h = '', d, keys, mine;
@@ -2974,6 +2980,7 @@ function renderDice() {
   h += '<label class="switch" style="margin-top:12px"><input type="checkbox" id="dp-glow"' + (d.glow ? ' checked' : '') + '><span>Glowing pips</span></label>';
   h += '<span class="lbl">Sigil on the 6</span><div class="chips">' + SIGNAMES.map(function (n) { return dpBtn('data-dp-set="sigil" data-v="' + n + '"', d.sigil === n, n ? '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + SIGILS[n] + '</svg>' + cap(n) : 'None'); }).join('') + '</div>';
   h += '<span class="lbl">Tray</span><div class="chips">' + TRAYS.map(function (t) { return dpBtn('data-dp-tray="' + t + '"', curTray() === t, cap(t)); }).join('') + '</div>';
+  if (S.settings.sound) h += '<div class="actions" style="margin-top:12px"><button type="button" class="btn ghost sm" data-dp-hear="1">Hear these dice</button></div>';
   $('#dp-opts').innerHTML = h;
   keys = Object.keys(DICESETS);
   if (DICESETS[own]) keys = [own].concat(keys.filter(function (k) { return k !== own; }));
@@ -3020,6 +3027,7 @@ $('#dicepanel').addEventListener('click', function (e) {
     dpTab = D.linked ? 0 : +a; st = curDie(dpTab);
     dpEdit('pip', contrast(st.body, '#111111') >= contrast(st.body, '#f5f5f5') ? '#111111' : '#f5f5f5');
   }
+  else if (t.getAttribute('data-dp-hear') !== null) hearDice();
   else if (t.getAttribute('data-dp-3d') !== null) { S.settings.dice3d = true; $('#set-3d').checked = true; d3Apply(); }
   else if ((a = t.getAttribute('data-dp-del')) !== null) { D.sets = mySets(); D.sets.splice(+a, 1); dpMsg('Set removed.'); }
   else if ((a = t.getAttribute('data-dp-use')) !== null) {
@@ -3124,7 +3132,8 @@ var SFX = {
   resin: { f: 2500, q: 4, len: .04, g: .7 },
   metal: { f: 3800, q: 8, len: .05, g: .6, ring: .28, hold: .45, over: 1.48 },
   stone: { f: 850, q: 3, len: .07, g: .9 },
-  gem: { f: 5200, q: 5, len: .05, g: .7, ring: .18, hold: .2 }
+  gem: { f: 5200, q: 5, len: .05, g: .7, ring: .18, hold: .2 },
+  fuel: { f: 4300, q: 5, len: .05, g: .7, ring: .12, hold: .12 }
 };
 var TRAYSFX = {
   leather: { click: .4, f: 190, to: 95, g: .9, len: .13, lp: 340, n: .9 },
@@ -3144,31 +3153,100 @@ function tone(f, to, g, len, t) {
   og.gain.setValueAtTime(g, t); og.gain.exponentialRampToValueAtTime(0.001, t + len);
   o.connect(og); og.connect(master); o.start(t); o.stop(t + len + .02);
 }
-/* one bounce of one die at strength v (0 to 1) */
-function hit(die, v) {
+/* Recorded hits (snd/*.mp3, optional, see snd/README.md). Each bounce plays the tray's recording and, over it, the die's own tick.
+   A set is fetched the first time it is wanted, only once sound is on, and only over http. Until it has arrived, or if it never
+   does, that half of the bounce uses the made-up sound instead. Gem and fuel dice have no recording and keep their made-up ring. */
+var SNDSETS = { dicehit_plastic: 15, dicehit_metal: 12, dicehit_wood: 12, surface_felt: [1, 2, 3, 4, 5, 7], surface_wood_table: 7, surface_wood_tray: 7 };
+/* set: which recordings. rate: playback speed, lower is deeper. g: loudness. w: weight, which makes the landing louder and a touch deeper. */
+var DIESND = {
+  bone: { set: 'dicehit_plastic', rate: .88, g: 1 },
+  resin: { set: 'dicehit_plastic', rate: 1.04, g: .9 },
+  metal: { set: 'dicehit_metal', rate: 1, g: 1, w: 1.25 },
+  stone: { set: 'dicehit_wood', rate: .8, g: 1, w: 1.2 }
+};
+var TRAYSND = {
+  leather: { set: 'surface_felt', rate: .82, g: 1.15 },
+  felt: { set: 'surface_felt', rate: 1, g: 1 },
+  wood: { set: 'surface_wood_tray', rate: 1, g: 1 },
+  slate: { set: 'surface_wood_table', rate: 1.22, g: .9 }
+};
+var SND = window.__snd = {}; /* set name: { ready, takes: [{ b: AudioBuffer, pk: peak }] sorted quiet to loud }. On window so tests can look in. */
+function sndLoad(set) {
+  var st = SND[set], ids = SNDSETS[set], left, i;
+  if (st) return st.ready ? st.takes : null;
+  st = SND[set] = { ready: false, takes: [] };
+  if (!ids || !ac || !window.fetch || !ac.decodeAudioData || location.protocol === 'file:') return null;
+  if (typeof ids === 'number') { left = ids; ids = []; for (i = 1; i <= left; i++) ids.push(i); }
+  left = ids.length;
+  ids.forEach(function (id) {
+    fetch('snd/' + set + id + '.mp3').then(function (r) { if (!r.ok) throw 0; return r.arrayBuffer(); })
+      .then(function (ab) { return new Promise(function (ok, no) { ac.decodeAudioData(ab, ok, no); }); })
+      .then(function (b) {
+        var d = b.getChannelData(0), pk = 0, k;
+        for (k = 0; k < d.length; k++) if (Math.abs(d[k]) > pk) pk = Math.abs(d[k]);
+        if (pk > .01) st.takes.push({ b: b, pk: pk });
+      })['catch'](function () {}).then(function () {
+        if (--left) return;
+        st.takes.sort(function (x, y) { return x.pk - y.pk; }); st.ready = st.takes.length > 0;
+      });
+  });
+  return null;
+}
+/* fetch what the current dice and tray need. True if something is still on its way. */
+function sndWarm() {
+  if (!audio()) return false;
+  var sets = [], t = TRAYSND[curTray()], busy = false;
+  if (t) sets.push(t.set);
+  [curDie(0), curDie(1)].forEach(function (d) { var m = DIESND[d.finish]; if (m && sets.indexOf(m.set) < 0) sets.push(m.set); });
+  sets.forEach(function (k) { sndLoad(k); if (SND[k] && !SND[k].ready && SNDSETS[k] && location.protocol !== 'file:') busy = true; });
+  return busy;
+}
+/* play one take from a set. Harder bounces pick from the louder takes; every take is levelled by its own peak so loudness follows the bounce. */
+function sndPlay(set, v, rate, gain, t) {
+  var takes = sndLoad(set); if (!takes) return false;
+  var k = takes[clamp(Math.floor((v * 1.5 + Math.random() * .4 - .15) * takes.length), 0, takes.length - 1)];
+  var src = ac.createBufferSource(), g = ac.createGain();
+  src.buffer = k.b; src.playbackRate.value = rate * (.96 + Math.random() * .08);
+  g.gain.value = Math.min(2.5, gain * v / k.pk);
+  src.connect(g); g.connect(master); src.start(t);
+  return true;
+}
+/* one bounce of one die at strength v (0 to 1). In the hand (shaking) a recorded tray stays quiet: the dice only knock each other. */
+function hit(die, v, inHand) {
   if (!audio()) return;
   try {
-    var m = SFX[die.finish] || SFX.bone, tr = TRAYSFX[curTray()], t = ac.currentTime, f = m.f * (.94 + Math.random() * .12);
-    var src = noise(m.len, 3), bp = ac.createBiquadFilter(), g = ac.createGain();
-    bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = m.q; g.gain.value = v * m.g * tr.click * 2.2;
-    src.connect(bp); bp.connect(g); g.connect(master); src.start(t);
+    var m = SFX[die.finish] || SFX.bone, tr = TRAYSFX[curTray()], dm = DIESND[die.finish], tm = TRAYSND[curTray()], t = ac.currentTime, f = m.f * (.94 + Math.random() * .12), w = dm && dm.w || 1;
+    if (!(dm && sndPlay(dm.set, v, dm.rate, dm.g * (inHand ? 1 : .35 + .65 * tr.click) * 1.5, t))) {
+      var src = noise(m.len, 3), bp = ac.createBiquadFilter(), g = ac.createGain();
+      bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = m.q; g.gain.value = v * m.g * tr.click * 2.2;
+      src.connect(bp); bp.connect(g); g.connect(master); src.start(t);
+      if (m.ring) {
+        tone(f, f, v * m.ring, m.hold, t);
+        if (m.over) tone(f * m.over, f * m.over, v * m.ring * .5, m.hold * .7, t);
+      }
+    }
+    if (tm && SND[tm.set] && SND[tm.set].ready) { if (!inHand) sndPlay(tm.set, v, tm.rate / Math.sqrt(w), tm.g * w * 1.7, t); return; }
+    if (tm) sndLoad(tm.set);
     var th = noise(tr.len, 2), lp = ac.createBiquadFilter(), tg = ac.createGain();
     lp.type = 'lowpass'; lp.frequency.value = tr.lp; lp.Q.value = .7; tg.gain.value = v * tr.n * 1.6;
     th.connect(lp); lp.connect(tg); tg.connect(master); th.start(t);
     tone(tr.f, tr.to, v * tr.g, tr.len, t);
-    if (m.ring) {
-      tone(f, f, v * m.ring, m.hold, t);
-      if (m.over) tone(f * m.over, f * m.over, v * m.ring * .5, m.hold * .7, t);
-    }
   } catch (e) {}
 }
+/* the sound of one throw of the current dice on the current tray, without rolling: the same four bounces, fading */
+function hearDice() {
+  var wait = sndWarm() ? 450 : 0;
+  [0, 1].forEach(function (i) { [[0, .5], [360, .35], [576, .2], [708, .1]].forEach(function (h) { setTimeout(function () { hit(curDie(i), h[1]); }, wait + i * 70 + h[0]); }); });
+}
+/* if sound was left on last time, start fetching the recordings at the first touch, so the first roll already has them */
+document.addEventListener('pointerdown', function warm() { document.removeEventListener('pointerdown', warm); if (S.settings.sound) sndWarm(); });
 /* hold the Roll button to shake the dice, let go to throw. A plain click or Enter/Space still rolls at once. */
 var shake = { timer: null, on: false, rattle: null, ended: 0 };
 function shakeStart() {
   if (rolling || shake.on) return;
   shake.on = true; $('#dice').classList.add('shaking');
   (function rattle() {
-    hit(curDie(Math.random() < .5 ? 0 : 1), .12 + Math.random() * .16);
+    hit(curDie(Math.random() < .5 ? 0 : 1), .12 + Math.random() * .16, true);
     shake.rattle = setTimeout(rattle, 50 + Math.random() * 45);
   })();
 }

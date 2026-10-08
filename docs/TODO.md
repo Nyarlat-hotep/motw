@@ -15,13 +15,13 @@ Each of these is finished and tested on its own branch. They all edit `index.htm
 
 - [ ] **3D dice and the Fuel finish** (`fuel-dice`). Judge the swish and the overall look in motion. Try it on a phone.
 - [ ] **Luck candles** (`luck-candles`). Jacob: "the look could use some improvements." Review together with the sounds.
-- [ ] **Dice sounds** (`dice-sounds`). Needs a session of tuning by ear. Notes from the first pass: gem was the only die sound he liked, the other materials and trays did not match up, and leather and felt should land as more of a thud. When this merges with `fuel-dice`, the Fuel finish needs its own entry in the `SFX` table.
+- [ ] **Dice sounds** (`dice-sounds`, which now also contains everything on `fuel-dice`). Recorded hits from dice-box-threejs went in on 2026-10-08: plastic, metal and wood dice on felt, wood tray and wood table. Bone, stone, leather and slate borrow the nearest recording at a different speed; gem and fuel keep the made-up glass ring Jacob liked. Needs his ear: use "Hear these dice" in the dice maker to try each die on each tray, and note which pairs are wrong. Notes from the first, made-up pass: gem was the only die sound he liked, the others did not match up, and leather and felt should land as more of a thud.
 
-### Recordings to audition for the sounds session
+### Recordings for the sounds
 
-The sounds on `dice-sounds` are made in code. Real recordings, sorted by die and by surface, would give a truer starting point. Found 2026-10-08; licenses are as listed on each page and need a second look before anything ships.
+The first pass was made entirely in code. Real recordings, sorted by die and by surface, give a truer starting point. Found 2026-10-08; licenses are as listed on each page and need a second look before anything ships.
 
-- [3d-dice/dice-box-threejs](https://github.com/3d-dice/dice-box-threejs) (`public/sounds`): the closest fit. Short hits split by die (plastic, metal, wood, coin) and by surface (felt, wood table, wood tray, metal), 75 small files. The repo is MIT, but it does not say where the recordings came from, so ask before shipping them.
+- [3d-dice/dice-box-threejs](https://github.com/3d-dice/dice-box-threejs) (`public/sounds`): **in use since 2026-10-08**, see `snd/README.md`. The closest fit. Short hits split by die (plastic, metal, wood, coin) and by surface (felt, wood table, wood tray, metal), 75 small files. The repo is MIT, but it does not say where the recordings came from, so ask before shipping them.
 - [Kenney Casino Audio](https://opengameart.org/content/54-casino-sound-effects-cards-dice-chips): CC0, 12 dice handling sounds (throws, shakes, grabs). No materials or surfaces named.
 - [Halfwits and Failed Crits, Rolling Dice](https://halfwitsfailedcrits.itch.io/sfx-pack-rolling-dice): CC0, pay what you want, studio recorded, one to ten dice at a time.
 - [2 dice roll, 29 throws](https://lpc.opengameart.org/content/2-dice-roll-29-throws): CC0, two dice, 29 takes.
