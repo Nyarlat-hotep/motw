@@ -1,7 +1,7 @@
 """Turns source photos into the small art files the dice maker uses.
 
 Die finishes become 256px grey tiles with the lighting flattened, so the page can lay them over any body colour.
-Trays are cropped and saved as 1200px JPEGs.
+Trays are cropped and saved as 1200px JPEGs. The reflection panorama for the 3D dice becomes img/env.jpg.
 
     python tools/make_textures.py <folder of source images>
 
@@ -45,5 +45,10 @@ for name, (f, box) in TRAYS.items():
     if box: im = im.crop(box)
     im = im.resize((1200, round(1200 * im.height / im.width)), Image.LANCZOS)
     im.save(os.path.join(OUT, 'tray-' + name + '.jpg'), quality=78, optimize=True, progressive=True)
+
+# what shiny and clear 3D dice reflect: a 2:1 panorama, kept small because it is only ever seen blurred in a die
+ENV = '20.webp'
+if os.path.exists(os.path.join(SRC, ENV)):
+    Image.open(os.path.join(SRC, ENV)).convert('RGB').resize((1024, 512), Image.LANCZOS).save(os.path.join(OUT, 'env.jpg'), quality=82, optimize=True, progressive=True)
 
 print('wrote', len(DICE), 'die textures and', len(TRAYS), 'trays')

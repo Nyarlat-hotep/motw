@@ -19,7 +19,7 @@ Each of these is finished and tested on its own branch. They all edit `index.htm
 
 ## 3D dice follow-ups
 
-- [ ] Reflection panorama: Jacob is generating it. Save as `img/env.jpg` (2:1). No code change needed.
+- [x] Reflection panorama: a desert garage, in as `img/env.jpg` (2026-10-08). Two more are generating; compare them and keep the best.
 - [ ] Scuffed glass texture: Jacob is generating it. Wire it in as surface wear on the clear shell.
 - [ ] The dice maker's preview is still the flat dice. Show the 3D dice there when 3D is on.
 - [ ] Bring back the dimmed look before the first roll (lost when the tray moved into the 3D scene).
