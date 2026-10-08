@@ -165,6 +165,21 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
     document.body.insertBefore(g, document.body.firstChild);
   });
   check('traced sigils: pentagram and pentacle are offered, and the skull is the traced art', await p.evaluate(()=>{ const q=(n)=>document.querySelector('[data-dp-set="sigil"][data-v="'+n+'"] svg path'); return !!q('pentagram') && !!q('pentacle') && q('skull').getAttribute('transform')==='scale(.1)' && q('skull').getAttribute('d').length>500; }));
+  // ---- the sigil pack: groups, a grid per group, and a pack sigil on a die ----
+  const grp = (name) => p.evaluate((name)=>{ [...document.querySelectorAll('[data-dp-sg]')].find(b=>b.textContent===name).click(); return document.querySelectorAll('.siggrid [data-dp-set="sigil"]').length - 1; }, name);
+  check('sigils come in groups', (await p.evaluate(()=>[...document.querySelectorAll('[data-dp-sg]')].map(b=>b.textContent).join(',')))==='Classic,Wasteland,Monsters,Spirits,Symbols,Tarot,Runes,Elements');
+  check('Tarot has all 22 cards, Runes all 24, and every sigil button has a name', (await grp('Tarot'))===22 && (await grp('Runes'))===24 && await p.evaluate(()=>[...document.querySelectorAll('.siggrid [data-v]')].every(b=>!b.getAttribute('data-v') || (b.getAttribute('aria-label')||'').length>2)));
+  await grp('Tarot'); await p.click('.siggrid [data-v="tarot-moon"]');
+  const moon = await slot(0);
+  check('choosing The Moon puts it on the 6 only, names it, and marks it chosen', moon.sig===1 && moon.sigOn6 && /The Moon/.test(await p.textContent('#dp-opts .signame')) && (await p.getAttribute('.siggrid [data-v="tarot-moon"]','aria-pressed'))==='true');
+  check('the picker stays on the group you were browsing', (await p.getAttribute('[data-dp-sg="5"]','aria-pressed'))==='true');
+  check('a pack sigil is saved with the die', (await saved()).a.sigil==='tarot-moon');
+  await grp('Runes'); await p.click('.siggrid [data-v="rune-algiz"]');
+  check('a rune works the same way', (await saved()).a.sigil==='rune-algiz' && (await slot(0)).sigOn6);
+  check('credits name the icon authors and the fonts', await p.evaluate(()=>{ const c = document.getElementById('credits').textContent; return /Lorc/.test(c) && /Delapouite/.test(c) && /Caro Asercion/.test(c) && /game-icons\.net/.test(c) && /Open Font License/.test(c); }));
+  await p.locator('#dp-opts').screenshot({ path: path.join(__dirname,'out','dice-sigil-picker.png') });
+  await p.click('.siggrid [data-v=""]');
+
   await p.locator('#gal').screenshot({ path: path.join(__dirname,'out','dice-sets.png') });
 
   console.log(results.map(r=>r.join(' | ')).join('\n'));

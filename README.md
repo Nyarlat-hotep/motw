@@ -25,3 +25,11 @@ Saves go to the browser's localStorage. Use Settings and backup in the app to do
 ## Playbook text
 
 The playbook summaries are plain-English paraphrase written for this table. Ratings, harm, armor, tags and pick counts are exact. Keep the repo private, and treat a printed playbook sheet as the final word on any detail.
+
+## Credits
+
+- Some dice sigils are icons by Lorc, Delapouite, Skoll, Cathelineau, Carl Olsen and Caro Asercion from [game-icons.net](https://game-icons.net), CC BY 3.0.
+- Runes and alchemical signs are outlines from the Noto fonts, SIL Open Font License 1.1 (`vendor/OFL-Noto.txt`).
+- 3D lighting, trays and die materials: [Poly Haven](https://polyhaven.com) and [ambientCG](https://ambientcg.com), CC0.
+- Dice sounds: [Kenney](https://kenney.nl) (CC0) and the dice-box-threejs project (see `snd/README.md`).
+- 3D dice are drawn with [three.js](https://threejs.org), MIT (`vendor/three.LICENSE`).

@@ -60,7 +60,7 @@ Researched 2026-10-08. Nothing from these is in the app yet; `tests/out/sigil-re
 - [game-icons.net](https://game-icons.net) ([github.com/game-icons/icons](https://github.com/game-icons/icons)): 4,239 one-color SVG icons made for games. Already the right shape for a sigil, so no tracing needed. It has the wasteland ones (gas mask, jerrycan, oil drum, biohazard, radioactive, hazard sign, scorpion, vulture, cactus, tire tracks, cog, wrench) and the occult ones (pentacle, triquetra, ankh, all-seeing eye, raven, wolf head, rune stone, crossed bones). License is CC BY 3.0: free to use, but the credits must say "Icons made by" and the author's name. Two authors (Viscious Speed, Zeromancer) are CC0. Needs a credits line somewhere in the journal.
 - Runes: the [Noto Sans Runic](https://fontsource.org/fonts/noto-sans-runic/about) font has all 93 Unicode runes (the Elder Futhark among them). Alchemical signs: [Noto Sans Symbols](https://fontsource.org/fonts/noto-sans-symbols/about). Both are under the SIL Open Font License, which allows this use; keep the license text with them. A letter is turned into an outline with fontTools, then it is a sigil like any other.
 - Not suitable as found: the itch.io rune and alchemy packs seen were pixel art, no-derivatives, or non-commercial.
-- **Jacob:** pick which symbols to add. Each one costs about 1 to 3 KB in the page.
+- [x] First pass added 2026-10-08: 99 sigils in seven groups (Wasteland, Monsters, Spirits, Symbols, all 22 Tarot cards, the 24 Elder Futhark runes, Elements), about 95 KB in the page, with a Credits section naming the icon authors. To add more, add a line in `tools/make_sigil_pack.py` and rerun it.
 
 ## Gaps for new players
 
