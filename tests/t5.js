@@ -103,7 +103,8 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await p.locator('.item').nth(2).locator('[data-rm]').click(); check('remove item', (await p.locator('.item').count())===2 && /Removed/.test(await T('#invundo')));
   await p.click('#undorm'); check('undo restores item', (await p.locator('.item').count())===3);
   // bonds + custom moves
-  await p.click('#addbond'); await p.fill('.bond [data-b=who]','Hector'); await p.selectOption('.bond [data-b=tie]','Mentor'); await p.fill('.bond [data-b=note]','Taught me to read a room');
+  await p.click('#addbond'); await p.fill('.bond [data-b=who]','Hector'); await p.selectOption('.bond [data-b=tie]','Mentor'); await p.fill('.bond [data-b=note]','Taught me to read a room'); await p.fill('.bond [data-b=theirs]','Pulled me out of a fire');
+  check('history: what they picked for you is saved', await p.evaluate(()=>{ window.dispatchEvent(new Event('pagehide')); return JSON.parse(localStorage.getItem('hunters-journal-v1')).sheet.bonds[0].theirs; })==='Pulled me out of a fire');
   check('bond added', (await p.locator('.bond').count())===1);
   await p.fill('#mvpaste','Last Stand: When you stand your ground against a monster, roll +Tough. On a 10+, the monster backs off and you take +1 forward. On a 7-9, you hold but take 1 harm. On a miss, it breaks through.'); await p.click('#mvparse');
   check('pasted move parsed into fields', (await p.inputValue('.cm [data-m=name]'))==='Last Stand' && (await p.inputValue('.cm [data-m=stat]'))==='tough' && /backs off/.test(await p.inputValue('.cm [data-m=full]')));
