@@ -15,7 +15,7 @@ from PIL import Image, ImageFilter
 from contourpy import contour_generator
 from scipy.ndimage import label
 
-SRC = sys.argv[1]
+SRC = sys.argv[1] if len(sys.argv) > 1 else '.'
 PAGE = os.path.join(os.path.dirname(__file__), '..', 'index.html')
 
 def load(f): return np.asarray(Image.open(os.path.join(SRC, f)).convert('RGB')).astype(np.float32)
@@ -47,20 +47,27 @@ def thicken(m, grow, shrink):
     im = Image.fromarray((np.clip(m, 0, 1) * 255).astype(np.uint8)).filter(ImageFilter.MaxFilter(grow))
     if shrink > 1: im = im.filter(ImageFilter.MinFilter(shrink))
     return np.asarray(im).astype(np.float32) / 255
+def oval(a, cx, cy, rx, ry):
+    yy, xx = np.mgrid[0:a.shape[0], 0:a.shape[1]]
+    return (((xx - cx) / float(rx)) ** 2 + ((yy - cy) / float(ry)) ** 2) < 1
 def lantern():
-    a = load('36.webp'); rows = np.mgrid[0:a.shape[0], 0:a.shape[1]][0]
-    lit = ramp(lum(a), 30, 60) * (rows < a.shape[0] * .9)           # stop above the table it stands on
-    return thicken(lit, 15, 7)                                      # the photo is thin highlights; a stamp needs solid metal
+    a = load('37.webp'); rows, cols = np.mgrid[0:a.shape[0], 0:a.shape[1]]
+    wire = (rows < 300) | ((rows < 412) & ((cols > 860) | (cols < 625)))   # the handle and the rope it hangs from
+    return thicken(ramp(lum(a), 28, 60) * ~wire, 13, 7)             # the photo is thin highlights; a stamp needs solid metal
 def eye():
-    a = load('38.webp'); L = lum(a); yy, xx = np.mgrid[0:a.shape[0], 0:a.shape[1]]
-    lids = (((xx - 512) / 330.) ** 2 + ((yy - 468) / 215.) ** 2) < 1   # keep to the eye itself, not shine on the skin
-    pupil = (((xx - 512) ** 2 + (yy - 474) ** 2) ** .5 < 70) * 1.
-    return np.maximum(thicken(ramp(L, 118, 150) * lids, 9, 5), pupil)  # the white of the eye, plus the pupil as a dot
+    a = load('38.webp')
+    white = thicken(ramp(lum(a), 118, 150) * oval(a, 512, 468, 330, 215), 9, 5)   # the white of the eye, not shine on the skin
+    iris = oval(a, 511, 478, 138, 138) & ~oval(a, 511, 478, 118, 118)
+    return np.maximum(np.maximum(white, oval(a, 511, 478, 62, 62) * 1.), iris * 1.)  # plus a ring for the iris and a dot for the pupil
+def pupil():
+    a = load('40.webp'); far = oval(a, 511, 499, 470, 470) & ~oval(a, 511, 499, 150, 150)
+    gaps = thicken(ramp(78 - lum(a), 0, 22) * far, 5, 3)             # the dark rim of the iris and the gaps between its fibres
+    return np.maximum(gaps, oval(a, 511, 499, 150, 150) * 1.)
 
 # name: (function, blur before tracing, smallest island or hole kept, how closely the outline follows, in 240ths of the face)
 SIGILS = {'pentagram': (pentagram, 1.2, 14, .5), 'pentacle': (pentacle, 1.2, 14, .5), 'crescent': (crescent, 1.5, 30, .35),
           'skull': (skull, 1.6, 16, .45), 'antler': (antler, 1.2, 60, .45),
-          'lantern': (lantern, 1.4, 30, .45), 'eye': (eye, 1.6, 30, .45)}
+          'lantern': (lantern, 1.4, 30, .45), 'eye': (eye, 1.6, 30, .45), 'pupil': (pupil, 1.4, 30, .45)}
 
 def square(alpha):
     """crop to the mark, centre it in a square with a small margin, 256px"""
@@ -97,13 +104,14 @@ def trace(mask, blur, small, eps):
         d += 'M' + ' '.join('%d %d' % (q[0], q[1]) for q in p[:-1]) + 'z'
     return '<path fill="currentColor" fill-rule="evenodd" transform="scale(.1)" d="' + d + '"/>'
 
-out = []
-for name, (fn, blur, small, eps) in SIGILS.items():
-    path = trace(square(fn()), blur, small, eps)
-    out.append("  %s: '%s'" % (name, path)); print('%-10s %5.1f KB' % (name, len(path) / 1024.))
-block = '/*SIGILART*/\nvar SIGILART = {\n' + ',\n'.join(out) + '\n};\n/*END SIGILART*/'
-page = open(PAGE, encoding='utf-8').read()
-new, n = re.subn(r'/\*SIGILART\*/.*?/\*END SIGILART\*/', lambda m: block, page, flags=re.S)
-if n != 1: sys.exit('could not find the /*SIGILART*/ block in index.html')
-open(PAGE, 'w', encoding='utf-8', newline='').write(new)
-print('wrote', len(out), 'sigils into index.html')
+if __name__ == '__main__':
+    out = []
+    for name, (fn, blur, small, eps) in SIGILS.items():
+        path = trace(square(fn()), blur, small, eps)
+        out.append("  %s: '%s'" % (name, path)); print('%-10s %5.1f KB' % (name, len(path) / 1024.))
+    block = '/*SIGILART*/\nvar SIGILART = {\n' + ',\n'.join(out) + '\n};\n/*END SIGILART*/'
+    page = open(PAGE, encoding='utf-8').read()
+    new, n = re.subn(r'/\*SIGILART\*/.*?/\*END SIGILART\*/', lambda m: block, page, flags=re.S)
+    if n != 1: sys.exit('could not find the /*SIGILART*/ block in index.html')
+    open(PAGE, 'w', encoding='utf-8', newline='').write(new)
+    print('wrote', len(out), 'sigils into index.html')

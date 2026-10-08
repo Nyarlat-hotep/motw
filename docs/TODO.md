@@ -17,6 +17,18 @@ Each of these is finished and tested on its own branch. They all edit `index.htm
 - [ ] **Luck candles** (`luck-candles`). Jacob: "the look could use some improvements." Review together with the sounds.
 - [ ] **Dice sounds** (`dice-sounds`). Needs a session of tuning by ear. Notes from the first pass: gem was the only die sound he liked, the other materials and trays did not match up, and leather and felt should land as more of a thud. When this merges with `fuel-dice`, the Fuel finish needs its own entry in the `SFX` table.
 
+### Recordings to audition for the sounds session
+
+The sounds on `dice-sounds` are made in code. Real recordings, sorted by die and by surface, would give a truer starting point. Found 2026-10-08; licenses are as listed on each page and need a second look before anything ships.
+
+- [3d-dice/dice-box-threejs](https://github.com/3d-dice/dice-box-threejs) (`public/sounds`): the closest fit. Short hits split by die (plastic, metal, wood, coin) and by surface (felt, wood table, wood tray, metal), 75 small files. The repo is MIT, but it does not say where the recordings came from, so ask before shipping them.
+- [Kenney Casino Audio](https://opengameart.org/content/54-casino-sound-effects-cards-dice-chips): CC0, 12 dice handling sounds (throws, shakes, grabs). No materials or surfaces named.
+- [Halfwits and Failed Crits, Rolling Dice](https://halfwitsfailedcrits.itch.io/sfx-pack-rolling-dice): CC0, pay what you want, studio recorded, one to ten dice at a time.
+- [2 dice roll, 29 throws](https://lpc.opengameart.org/content/2-dice-roll-29-throws): CC0, two dice, 29 takes.
+- [Freesound](https://freesound.org): single clips, license varies by clip, so filter for CC0. Useful ones seen: metal dice on wood (LoafDV), dice on a wood table with many variations (eduardvlog), plastic dice on hard wood (dermotte).
+- [Rogue Waves, Cards and Dice](https://rogue-waves.itch.io/cardanddice): not free (24 euros), but the only pack found that records the same dice on felt, wood and cork. Worth it only if the free ones fall short.
+- Nothing found for glass or gem dice, or for leather or slate. Those would be recorded at home or shaped from the nearest match.
+
 ## 3D dice follow-ups
 
 - [x] Reflection panorama: a desert garage, in as `img/env.jpg` (2026-10-08). Two more are generating; compare them and keep the best.
@@ -30,7 +42,7 @@ Each of these is finished and tested on its own branch. They all edit `index.htm
 ## Sigils
 
 - [x] Skull, antler, crescent, pentagram and pentacle traced from Jacob's artwork as one-color stamps (2026-10-08, on `fuel-dice`).
-- [x] Lantern and eye traced from a second batch (2026-10-08). The cross stays hand-drawn.
+- [x] Lantern, eye and a new pupil sigil traced from a second batch (2026-10-08), after comparing every eye and lantern photo side by side. The cross stays hand-drawn.
 - [ ] The gold seal and ice compass were too fine to read at die size. Redo as a flat white symbol on pure black with thick strokes if they are still wanted, then trace with `python tools/make_sigils.py <folder>`.
 
 ## Gaps for new players
