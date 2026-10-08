@@ -56,9 +56,9 @@ const STUB = () => {
   let p = await open(false);
   await p.click('#roll'); await landed(p, 1);
   check('sound off: no recording is fetched, even after a roll', p.snd.length===0, p.snd.length);
-  await sndOn(p); await ready(p, ['surface_felt', 'dicehit_plastic']);
+  await sndOn(p); await ready(p, ['surface_felt', 'surface_soft', 'dicehit_plastic']);
   let sets = await p.evaluate(()=>{ const o = {}; for (const k in __snd) o[k] = { n: __snd[k].takes.length, sorted: __snd[k].takes.every((t, i, a)=>!i || a[i-1].pk <= t.pk), quiet: Math.min(...__snd[k].takes.map(t=>t.pk)), dur: Math.max(...__snd[k].takes.map(t=>t.b.duration)) }; return o; });
-  check('sound on: bone on leather fetches the felt takes and the plastic takes, nothing else', JSON.stringify(count(p.snd))===JSON.stringify({ surface_felt: 6, dicehit_plastic: 15 }), JSON.stringify(count(p.snd)));
+  check('sound on: bone on leather fetches the felt takes, the soft thuds and the plastic takes, nothing else', JSON.stringify(count(p.snd))===JSON.stringify({ surface_felt: 6, surface_soft: 5, dicehit_plastic: 15 }), JSON.stringify(count(p.snd)));
   check('the real files decode: 6 felt and 15 plastic takes, sorted quiet to loud, none silent', sets.surface_felt.n===6 && sets.dicehit_plastic.n===15 && sets.surface_felt.sorted && sets.dicehit_plastic.sorted && sets.surface_felt.quiet>.01 && sets.dicehit_plastic.quiet>.01, JSON.stringify(sets));
   check('takes are short', sets.surface_felt.dur<.6 && sets.dicehit_plastic.dur<.2, sets.surface_felt.dur+' '+sets.dicehit_plastic.dur);
   await p.click('#roll'); await landed(p, 2);
@@ -66,12 +66,13 @@ const STUB = () => {
 
   // ---- what plays, counted with a stand-in ----
   p = await open(true);
-  await sndOn(p); await ready(p, ['surface_felt', 'dicehit_plastic']); await p.waitForTimeout(600);
+  await sndOn(p); await ready(p, ['surface_felt', 'surface_soft', 'dicehit_plastic']); await p.waitForTimeout(600);
   let a = await played(p);
-  check('turning sound on waits for the recordings, then plays one recorded sample hit', JSON.stringify(count(a.played))===JSON.stringify({ dicehit_plastic: 1, surface_felt: 1 }) && a.osc===0, JSON.stringify(a.played));
+  check('turning sound on waits for the recordings, then plays one recorded sample hit', JSON.stringify(count(a.played))===JSON.stringify({ dicehit_plastic: 1, surface_felt: 1, surface_soft: 1 }) && a.osc===0, JSON.stringify(a.played));
   await p.click('#roll'); await landed(p, 1);
   a = await played(p); let c = count(a.played.filter(k=>/^(dicehit|surface)/.test(k)));
-  check('bone on leather: 8 bounces, each a felt take and a plastic take, no made-up clicks or thuds', c.surface_felt===8 && c.dicehit_plastic===8 && a.bq.length===0, JSON.stringify(count(a.played)));
+  check('bone on leather: 8 bounces, each a felt take over a soft thud plus a plastic take, no made-up clicks or thuds', c.surface_felt===8 && c.surface_soft===8 && c.dicehit_plastic===8 && a.bq.length===0, JSON.stringify(count(a.played)));
+  check('the thud under leather is sped up so small speakers can play it', a.rates.filter((r, i)=>a.played[i]==='surface_soft').every(r=>r>2 && r<2.4), a.rates.join(','));
   check('leather plays the felt takes slower, for a deeper thud', a.rates.filter((r, i)=>a.played[i]==='surface_felt').every(r=>r>.74 && r<.9), a.rates.join(','));
 
   await p.click('#dp-open'); await p.click('[data-dp-tray="wood"]'); await p.click('[data-dp-set="finish"][data-v="metal"]');
@@ -82,12 +83,14 @@ const STUB = () => {
   check('metal on wood: 8 wood tray takes and 8 metal takes', c.surface_wood_tray===8 && c.dicehit_metal===8, JSON.stringify(c));
   check('a heavy die lands a little deeper than the tray alone', a.rates.filter((r, i)=>a.played[i]==='surface_wood_tray').every(r=>r>.82 && r<.96), a.rates.join(','));
 
-  await p.click('[data-dp-set="finish"][data-v="gem"]'); await played(p); await p.click('#roll'); await landed(p, 3);
+  await p.click('[data-dp-set="finish"][data-v="gem"]'); await ready(p, ['dicehit_glass']); await played(p); await p.click('#roll'); await landed(p, 3);
   a = await played(p); c = count(a.played);
-  check('gem has no recording: its made-up click and ring over the recorded tray', c.surface_wood_tray===8 && !c.dicehit_metal && !c.dicehit_plastic && a.bq.filter(f=>f>4800 && f<5600).length===8 && a.osc>=8, JSON.stringify(c)+' '+a.bq.join(','));
+  const gemRates = a.rates.filter((r, i)=>a.played[i]==='dicehit_glass');
+  check('gem: 8 glass taps played fast, each with a ring, over the recorded tray', c.surface_wood_tray===8 && c.dicehit_glass===8 && !c.surface_soft && a.bq.length===0 && a.osc>=8 && gemRates.every(r=>r>3.7 && r<4.4), JSON.stringify(c)+' '+gemRates.join(','));
   await p.click('[data-dp-set="finish"][data-v="fuel"]'); await played(p); await p.click('#roll'); await landed(p, 4);
-  a = await played(p);
-  check('fuel has its own made-up click, lower than gem', a.bq.length===8 && a.bq.every(f=>f>3950 && f<4650), a.bq.join(','));
+  a = await played(p); c = count(a.played);
+  const fuelRates = a.rates.filter((r, i)=>a.played[i]==='dicehit_glass');
+  check('fuel: the same glass taps, lower than gem', c.dicehit_glass===8 && fuelRates.every(r=>r>2.8 && r<3.2), fuelRates.join(','));
 
   // shaking: dice in the hand knock each other, the tray stays quiet
   await p.click('[data-dp-set="finish"][data-v="stone"]'); await ready(p, ['dicehit_wood']); await played(p);
@@ -115,8 +118,8 @@ const STUB = () => {
   // ---- sound left on from last time: the first touch fetches, before any roll ----
   p = await open(true, { v: 1, settings: { fx: true, sound: true, vol: .6 } });
   check('sound already on: nothing is fetched until the first touch', p.snd.length===0, p.snd.length);
-  await p.click('#dp-open'); await ready(p, ['surface_felt', 'dicehit_plastic']);
-  check('the first touch fetches the recordings', p.snd.length===21, p.snd.length);
+  await p.click('#dp-open'); await ready(p, ['surface_felt', 'surface_soft', 'dicehit_plastic']);
+  check('the first touch fetches the recordings', p.snd.length===26, p.snd.length);
 
   console.log(results.map(r=>r.join(' | ')).join('\n'));
   const fails = results.filter(r=>r[0]==='FAIL').length;

@@ -3155,18 +3155,22 @@ function tone(f, to, g, len, t) {
 }
 /* Recorded hits (snd/*.mp3, optional, see snd/README.md). Each bounce plays the tray's recording and, over it, the die's own tick.
    A set is fetched the first time it is wanted, only once sound is on, and only over http. Until it has arrived, or if it never
-   does, that half of the bounce uses the made-up sound instead. Gem and fuel dice have no recording and keep their made-up ring. */
-var SNDSETS = { dicehit_plastic: 15, dicehit_metal: 12, dicehit_wood: 12, surface_felt: [1, 2, 3, 4, 5, 7], surface_wood_table: 7, surface_wood_tray: 7 };
-/* set: which recordings. rate: playback speed, lower is deeper. g: loudness. w: weight, which makes the landing louder and a touch deeper. */
+   does, that half of the bounce uses the made-up sound instead. */
+var SNDSETS = { dicehit_plastic: 15, dicehit_metal: 12, dicehit_wood: 12, dicehit_glass: 5, surface_felt: [1, 2, 3, 4, 5, 7], surface_wood_table: 7, surface_wood_tray: 7, surface_soft: 5 };
+/* set: which recordings. rate: playback speed, lower is deeper. g: loudness. w: weight, which makes the landing louder and a touch deeper.
+   ring: how much of the finish's made-up ring (SFX) to add on top; the glass recording is a tap on a pane, so a small die needs it sped up and ringing.
+   under: a second recording played beneath a tray's own, here a low thud for the soft trays. */
 var DIESND = {
   bone: { set: 'dicehit_plastic', rate: .88, g: 1 },
   resin: { set: 'dicehit_plastic', rate: 1.04, g: .9 },
   metal: { set: 'dicehit_metal', rate: 1, g: 1, w: 1.25 },
-  stone: { set: 'dicehit_wood', rate: .8, g: 1, w: 1.2 }
+  stone: { set: 'dicehit_wood', rate: .8, g: 1, w: 1.2 },
+  gem: { set: 'dicehit_glass', rate: 4, g: .8, ring: .6 },
+  fuel: { set: 'dicehit_glass', rate: 3, g: .8, w: 1.15, ring: .5 }
 };
 var TRAYSND = {
-  leather: { set: 'surface_felt', rate: .82, g: 1.15 },
-  felt: { set: 'surface_felt', rate: 1, g: 1 },
+  leather: { set: 'surface_felt', rate: .82, g: .85, under: { set: 'surface_soft', rate: 2.2, g: 1 } },
+  felt: { set: 'surface_felt', rate: 1, g: 1, under: { set: 'surface_soft', rate: 2.6, g: .45 } },
   wood: { set: 'surface_wood_tray', rate: 1, g: 1 },
   slate: { set: 'surface_wood_table', rate: 1.22, g: .9 }
 };
@@ -3197,6 +3201,7 @@ function sndWarm() {
   if (!audio()) return false;
   var sets = [], t = TRAYSND[curTray()], busy = false;
   if (t) sets.push(t.set);
+  if (t && t.under) sets.push(t.under.set);
   [curDie(0), curDie(1)].forEach(function (d) { var m = DIESND[d.finish]; if (m && sets.indexOf(m.set) < 0) sets.push(m.set); });
   sets.forEach(function (k) { sndLoad(k); if (SND[k] && !SND[k].ready && SNDSETS[k] && location.protocol !== 'file:') busy = true; });
   return busy;
@@ -3216,7 +3221,9 @@ function hit(die, v, inHand) {
   if (!audio()) return;
   try {
     var m = SFX[die.finish] || SFX.bone, tr = TRAYSFX[curTray()], dm = DIESND[die.finish], tm = TRAYSND[curTray()], t = ac.currentTime, f = m.f * (.94 + Math.random() * .12), w = dm && dm.w || 1;
-    if (!(dm && sndPlay(dm.set, v, dm.rate, dm.g * (inHand ? 1 : .35 + .65 * tr.click) * 1.5, t))) {
+    if (dm && sndPlay(dm.set, v, dm.rate, dm.g * (inHand ? 1 : .35 + .65 * tr.click) * 1.5, t)) {
+      if (dm.ring && m.ring) tone(f, f, v * m.ring * dm.ring, m.hold, t);
+    } else {
       var src = noise(m.len, 3), bp = ac.createBiquadFilter(), g = ac.createGain();
       bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = m.q; g.gain.value = v * m.g * tr.click * 2.2;
       src.connect(bp); bp.connect(g); g.connect(master); src.start(t);
@@ -3225,7 +3232,10 @@ function hit(die, v, inHand) {
         if (m.over) tone(f * m.over, f * m.over, v * m.ring * .5, m.hold * .7, t);
       }
     }
-    if (tm && SND[tm.set] && SND[tm.set].ready) { if (!inHand) sndPlay(tm.set, v, tm.rate / Math.sqrt(w), tm.g * w * 1.7, t); return; }
+    if (tm && SND[tm.set] && SND[tm.set].ready) {
+      if (!inHand) { sndPlay(tm.set, v, tm.rate / Math.sqrt(w), tm.g * w * 1.7, t); if (tm.under) sndPlay(tm.under.set, v, tm.under.rate / Math.sqrt(w), tm.under.g * w * 1.7, t); }
+      return;
+    }
     if (tm) sndLoad(tm.set);
     var th = noise(tr.len, 2), lp = ac.createBiquadFilter(), tg = ac.createGain();
     lp.type = 'lowpass'; lp.frequency.value = tr.lp; lp.Q.value = .7; tg.gain.value = v * tr.n * 1.6;
