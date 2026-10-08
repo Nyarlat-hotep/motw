@@ -27,6 +27,11 @@ Each of these is finished and tested on its own branch. They all edit `index.htm
 - [ ] Make hold-to-shake (on `dice-sounds`) move the 3D dice and the liquid.
 - [ ] Decide whether 3D should become the default once it has been through a real session.
 
+## Sigils
+
+- [x] Skull, antler, crescent, pentagram and pentacle traced from Jacob's artwork as one-color stamps (2026-10-08, on `fuel-dice`).
+- [ ] **Jacob:** redo the eye, lantern, gold seal and ice compass as a flat white symbol on pure black with thick strokes, then trace them with `python tools/make_sigils.py <folder>`. The built-in eye, lantern and cross stay until then.
+
 ## Gaps for new players
 
 From the review on 2026-10-07. Small, and they help most on the first night.

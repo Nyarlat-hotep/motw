@@ -164,6 +164,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
     [...document.querySelectorAll('[data-dp-use^="pb:"]')].map(b=>b.getAttribute('data-dp-use')).forEach(function(k){ document.querySelector('[data-dp-use="'+k+'"]').click(); const t=document.getElementById('dp-tray').cloneNode(true); t.removeAttribute('id'); t.style.margin='0'; const w=document.createElement('div'); w.innerHTML='<div style="color:#fff;font:13px sans-serif;padding:2px">'+k.slice(3)+'</div>'; w.appendChild(t); g.appendChild(w); });
     document.body.insertBefore(g, document.body.firstChild);
   });
+  check('traced sigils: pentagram and pentacle are offered, and the skull is the traced art', await p.evaluate(()=>{ const q=(n)=>document.querySelector('[data-dp-set="sigil"][data-v="'+n+'"] svg path'); return !!q('pentagram') && !!q('pentacle') && q('skull').getAttribute('transform')==='scale(.1)' && q('skull').getAttribute('d').length>500; }));
   await p.locator('#gal').screenshot({ path: path.join(__dirname,'out','dice-sets.png') });
 
   console.log(results.map(r=>r.join(' | ')).join('\n'));
