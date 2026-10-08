@@ -75,7 +75,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await p.click('[data-dp-use="default"]'); await p.waitForTimeout(150);
   check('changing the set rebuilds the 3D dice (bone has no liquid) and swaps the tray photo', await p.evaluate(() => __d3.dice.length === 2 && __d3.dice.every(d => !d.plane && d.die.finish === 'bone')) && await p.waitForFunction(() => __d3.traySrc === 'img/tray.jpg' && __d3.floorOn, null, { timeout: 8000 }).then(() => true, () => false));
   await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-bone.png') });
-  for (const f of ['resin','metal','stone','wood','rust','gem']) { await p.click('[data-dp-set="finish"][data-v="'+f+'"]'); await p.waitForTimeout(120); await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-'+f+'.png') }); }
+  for (const f of ['resin','metal','chrome','stone','marble','wood','rust','carbon','oil','magma','frost','gem']) { await p.click('[data-dp-set="finish"][data-v="'+f+'"]'); await p.waitForTimeout(120); await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-'+f+'.png') }); }
   check('each finish draws', (await lit(p)) > 300);
   await p.click('[data-dp-set="sigil"][data-v="skull"]'); await p.waitForTimeout(200);
   check('a sigil does not break the 3D dice', (await d3(p)).n===2);
@@ -87,6 +87,13 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   check('rust dice: color detail, relief, shine and the rust layer all loaded, and each face has its own shine picture', await p.evaluate(()=>{ const t = __d3.tiles.rust || {}, m = __d3.dice[0].g.children[0].material[0]; return !!(t.grain && t.h && t.r && t.c) && __d3.dice[0].die.finish==='rust' && m.roughnessMap && m.roughnessMap !== m.bumpMap; }));
   check('metal and stone now have shine pictures too, bone still uses one photo', await p.evaluate(()=>!!(__d3.tiles.metal.r && __d3.tiles.metal.h && __d3.tiles.stone.r) && !__d3.tiles.bone.r));
   await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-scrapyard.png') });
+  await p.click('[data-dp-use="default"]'); await p.waitForTimeout(200);
+
+  await p.click('[data-dp-use="x:core"]'); await p.waitForTimeout(500);
+  check('magma dice give off light from their flows as well as their pips', await p.evaluate(()=>{ const d = __d3.dice[0], m = d.g.children[0].material[0]; return d.die.finish==='magma' && !!__d3.tiles.magma.e && !!m.emissiveMap && !!d.halo; }));
+  await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-core-sample.png') });
+  await p.click('[data-dp-set="finish"][data-v="frost"]'); await p.waitForTimeout(300);
+  check('frost dice are see-through, with ice cracks on the shell', await p.evaluate(()=>{ const d = __d3.dice[0]; return !d.plane && d.g.children.some(c=>Array.isArray(c.material) && c.material[0].blending===__d3.T.AdditiveBlending); }));
   await p.click('[data-dp-use="default"]'); await p.waitForTimeout(200);
 
   // ---- trays with relief, and the wasteland trays ----

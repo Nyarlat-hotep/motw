@@ -3,7 +3,7 @@ var fs = require('fs'), path = require('path');
 var root = path.join(__dirname, '..'), out = path.join(root, 'dist');
 fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(path.join(out, 'img'), { recursive: true });
-['index.html', 'sw.js', 'manifest.webmanifest'].forEach(function (f) { fs.copyFileSync(path.join(root, f), path.join(out, f)); });
+['index.html', 'sw.js', 'manifest.webmanifest', 'sigils.js'].forEach(function (f) { fs.copyFileSync(path.join(root, f), path.join(out, f)); });
 fs.readdirSync(path.join(root, 'img')).forEach(function (f) { fs.copyFileSync(path.join(root, 'img', f), path.join(out, 'img', f)); });
 fs.mkdirSync(path.join(out, 'snd'), { recursive: true });
 fs.readdirSync(path.join(root, 'snd')).forEach(function (v) { fs.copyFileSync(path.join(root, 'snd', v), path.join(out, 'snd', v)); });

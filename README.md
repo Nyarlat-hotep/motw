@@ -28,7 +28,7 @@ The playbook summaries are plain-English paraphrase written for this table. Rati
 
 ## Credits
 
-- Some dice sigils are icons by Lorc, Delapouite, Skoll, Cathelineau, Carl Olsen and Caro Asercion from [game-icons.net](https://game-icons.net), CC BY 3.0.
+- Some dice sigils are icons by Lorc, Delapouite, Skoll, Caro Asercion, Carl Olsen, Cathelineau and DarkZaitzev from [game-icons.net](https://game-icons.net), CC BY 3.0.
 - Runes and alchemical signs are outlines from the Noto fonts, SIL Open Font License 1.1 (`vendor/OFL-Noto.txt`).
 - 3D lighting, trays and die materials: [Poly Haven](https://polyhaven.com) and [ambientCG](https://ambientcg.com), CC0.
 - Dice sounds: [Kenney](https://kenney.nl) (CC0) and the dice-box-threejs project (see `snd/README.md`).

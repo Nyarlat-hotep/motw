@@ -167,20 +167,35 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   check('traced sigils: pentagram and pentacle are offered, and the skull is the traced art', await p.evaluate(()=>{ const q=(n)=>document.querySelector('[data-dp-set="sigil"][data-v="'+n+'"] svg path'); return !!q('pentagram') && !!q('pentacle') && q('skull').getAttribute('transform')==='scale(.1)' && q('skull').getAttribute('d').length>500; }));
   // ---- the sigil pack: groups, a grid per group, and a pack sigil on a die ----
   const grp = (name) => p.evaluate((name)=>{ [...document.querySelectorAll('[data-dp-sg]')].find(b=>b.textContent===name).click(); return document.querySelectorAll('.siggrid [data-dp-set="sigil"]').length - 1; }, name);
-  check('sigils come in groups', (await p.evaluate(()=>[...document.querySelectorAll('[data-dp-sg]')].map(b=>b.textContent).join(',')))==='Classic,Wasteland,Monsters,Spirits,Symbols,Tarot,Runes,Elements');
+  check('sigils come in groups', (await p.evaluate(()=>[...document.querySelectorAll('[data-dp-sg]')].map(b=>b.textContent).join(',')))==='Classic,Wasteland,Hunter,Monsters,Beasts,Spirits,Symbols,Tarot,Runes,Elements,Zodiac,Glyphs');
   check('Tarot has all 22 cards, Runes all 24, and every sigil button has a name', (await grp('Tarot'))===22 && (await grp('Runes'))===24 && await p.evaluate(()=>[...document.querySelectorAll('.siggrid [data-v]')].every(b=>!b.getAttribute('data-v') || (b.getAttribute('aria-label')||'').length>2)));
   await grp('Tarot'); await p.click('.siggrid [data-v="tarot-moon"]');
   const moon = await slot(0);
   check('choosing The Moon puts it on the 6 only, names it, and marks it chosen', moon.sig===1 && moon.sigOn6 && /The Moon/.test(await p.textContent('#dp-opts .signame')) && (await p.getAttribute('.siggrid [data-v="tarot-moon"]','aria-pressed'))==='true');
-  check('the picker stays on the group you were browsing', (await p.getAttribute('[data-dp-sg="5"]','aria-pressed'))==='true');
+  check('the picker stays on the group you were browsing', await p.evaluate(()=>[...document.querySelectorAll('[data-dp-sg]')].find(b=>b.textContent==='Tarot').getAttribute('aria-pressed'))==='true');
   check('a pack sigil is saved with the die', (await saved()).a.sigil==='tarot-moon');
   await grp('Runes'); await p.click('.siggrid [data-v="rune-algiz"]');
   check('a rune works the same way', (await saved()).a.sigil==='rune-algiz' && (await slot(0)).sigOn6);
   check('credits name the icon authors and the fonts', await p.evaluate(()=>{ const c = document.getElementById('credits').textContent; return /Lorc/.test(c) && /Delapouite/.test(c) && /Caro Asercion/.test(c) && /game-icons\.net/.test(c) && /Open Font License/.test(c); }));
+  check('the library holds over 200 sigils, every key unique and allowed on a die', await p.evaluate(()=>{ const keys = new Set(); let n = 0; window.HJ_SIGILS.forEach(g=>g[1].forEach(s=>{ keys.add(s[0]); n++; })); return n > 200 && keys.size === n; }));
+  check('fourteen finishes are offered, Oil slick by its full name', (await p.locator('[data-dp-set="finish"]').count())===14 && (await p.textContent('[data-dp-set="finish"][data-v="oil"]'))==='Oil slick');
+  await p.click('[data-dp-set="finish"][data-v="magma"]');
+  check('a newer finish also carries the class of the one it is like', (await slot(0)).cls.split(' ').indexOf('fin-magma')>=0 && (await slot(0)).cls.split(' ').indexOf('fin-stone')>=0 && (await saved()).a.finish==='magma');
+  await p.click('[data-dp-set="finish"][data-v="bone"]');
+  for (const k of ['rig','slick','core','scrap','tank']) { await p.click('[data-dp-use="x:'+k+'"]'); if (await p.locator('.dp-warn').count()) check('campaign set '+k+' passes the readability rule', false); }
+  check('campaign sets are readable and use sigils from the library', (await saved()).a.finish==='fuel' && await p.evaluate(()=>{ document.querySelector('[data-dp-use="x:rig"]').click(); return !!document.querySelector('#dice .face.sig svg path'); }));
+  await p.click('[data-dp-use="default"]');
   await p.locator('#dp-opts').screenshot({ path: path.join(__dirname,'out','dice-sigil-picker.png') });
   await p.click('.siggrid [data-v=""]');
 
   await p.locator('#gal').screenshot({ path: path.join(__dirname,'out','dice-sets.png') });
+
+  // ---- without sigils.js the journal still works, with the classic sigils ----
+  const ctxN = await b.newContext({ viewport: { width: 1100, height: 900 } });
+  await ctxN.route('**/sigils.js', r => r.abort());
+  const pn = await ctxN.newPage(); let nErr = 0; pn.on('pageerror', () => nErr++);
+  await pn.goto(URL+'#roll'); await pn.waitForTimeout(600); await pn.click('#dp-open');
+  check('no sigils.js: one group, the nine classics, no errors, and rolling works', nErr===0 && (await pn.locator('[data-dp-sg]').count())===1 && (await pn.locator('.siggrid [data-dp-set="sigil"]').count())===10 && await pn.evaluate(()=>{ document.getElementById('roll').click(); return true; }));
 
   console.log(results.map(r=>r.join(' | ')).join('\n'));
   const fails = results.filter(r=>r[0]==='FAIL').length;

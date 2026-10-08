@@ -89,13 +89,17 @@ if PH:
 # Die finishes made from real material sets (CC0). Each set has separate pictures for color, relief and shine, so a die gets
 # three grey tiles instead of one photo doing all three jobs: die-<finish>.jpg (color detail), -h.jpg (relief), -r.jpg (shine).
 # Give the folder of extracted ambientCG "<id>_1K-JPG" downloads as a third argument.
-#   finish: (where from, id, how much of the 1024px picture one die face shows, contrast, which extra tiles: h relief, r shine)
+#   finish: (where from, id, how much of the 1024px picture one die face shows, contrast, which extra tiles: h relief, r shine, e glow)
 ACG = sys.argv[3] if len(sys.argv) > 3 else None
 MATS = {
     'metal': ('acg', 'Metal038', 620, 1.4, 'hr'),      # worn, scratched steel
     'stone': ('acg', 'Granite002A', 640, 1.0, 'r'),    # speckled granite, polished, so no relief of its own
     'wood': ('ph', 'oak_veneer_01', 330, 1.3, 'r'),    # oak, close enough in that the grain reads on a small die; veneer is flat too
     'rust': ('ph', 'rusty_metal_03', 560, .9, 'hr'),   # painted steel with rust coming through
+    'marble': ('acg', 'Marble012', 700, 1.9, 'r'),     # white marble with grey veins, polished
+    'carbon': ('acg', 'Fabric004', 300, 1.6, 'h'),     # carbon fibre weave
+    'magma': ('acg', 'Lava004', 520, 1.0, 'hre'),      # cooled lava; its glowing flows become light in the pip color
+    'frost': ('acg', 'Ice003', 520, 1.3, ''),          # cracked lake ice, used as the white cracks in a frosted die
 }
 mats = 0
 for name, (lib, pid, size, c, extra) in MATS.items():
@@ -107,6 +111,10 @@ for name, (lib, pid, size, c, extra) in MATS.items():
         if tail and tail[1] not in extra: continue
         im = Image.open(part(kind)).convert('RGB').crop(box)
         flatten(im, c).resize((256, 256), Image.LANCZOS).save(os.path.join(OUT, 'die-%s%s.jpg' % (name, tail)), quality=80, optimize=True)
+    if 'e' in extra:
+        # where the material gives off light: kept as it is (not flattened), with only the brighter flows left in
+        glow = np.asarray(Image.open(os.path.join(root, pid, '%s_1K-JPG_Emission.jpg' % pid)).convert('L').crop(box).resize((256, 256), Image.LANCZOS)).astype(np.float32) / 255
+        Image.fromarray((np.clip((glow - .3) / .45, 0, 1) ** 1.4 * 255).astype(np.uint8)).save(os.path.join(OUT, 'die-%s-e.jpg' % name), quality=80, optimize=True)
     if name == 'rust':
         # the rust itself keeps its own color whatever the die is painted: a see-through picture with only the rusty parts in it
         a = np.asarray(Image.open(part('color')).convert('RGB').crop(box).resize((256, 256), Image.LANCZOS)).astype(np.float32)

@@ -39,6 +39,8 @@ The first pass was made entirely in code. Real recordings, sorted by die and by 
 - [x] Lighting moods (2026-10-08): Garage, Dusk and Lantern, each a real HDR surrounding from Poly Haven. Jacob's garage panorama is now only the stand-in while one loads. Glowing pips now give off light.
 - [x] Trays with relief (2026-10-08): the four photo trays have relief worked out from their own photos, and three wasteland trays (rust, dust, concrete) come whole from Poly Haven with relief and shine maps. They have sounds too: rust rings like metal.
 - [x] Die materials from real material sets (2026-10-08): metal is now worn steel and stone is granite (both ambientCG), and two new finishes, wood (oak) and rust (painted steel with rust coming through, in any body color), come from Poly Haven. Scrapyard is a starter set using rust. Bone, resin and gem still use Jacob's photos.
+- [x] Six more finishes the same day, fourteen in all: Chrome, Marble, Carbon, Oil slick, Magma (its flows glow in the pip color) and Frost (a see-through die with ice cracks). Starter sets War Rig, Oil Slick and Core Sample use them. Each borrows the sound of the nearest older finish for now.
+- [ ] Finishes still worth adding: copper or brass with patina, sandstone, obsidian, a second wood. Give the new finishes sounds of their own when the sounds are tuned.
 - [ ] A wasteland color palette for bodies and pips (rust, sand, hazard yellow, oil black, coolant green).
 - [x] Scuffed glass: in as `img/die-glass.jpg`, drawn as scratches on the Fuel shell (2026-10-08).
 - [ ] The dice maker's preview is still the flat dice. Show the 3D dice there when 3D is on.
@@ -60,7 +62,9 @@ Researched 2026-10-08. Nothing from these is in the app yet; `tests/out/sigil-re
 - [game-icons.net](https://game-icons.net) ([github.com/game-icons/icons](https://github.com/game-icons/icons)): 4,239 one-color SVG icons made for games. Already the right shape for a sigil, so no tracing needed. It has the wasteland ones (gas mask, jerrycan, oil drum, biohazard, radioactive, hazard sign, scorpion, vulture, cactus, tire tracks, cog, wrench) and the occult ones (pentacle, triquetra, ankh, all-seeing eye, raven, wolf head, rune stone, crossed bones). License is CC BY 3.0: free to use, but the credits must say "Icons made by" and the author's name. Two authors (Viscious Speed, Zeromancer) are CC0. Needs a credits line somewhere in the journal.
 - Runes: the [Noto Sans Runic](https://fontsource.org/fonts/noto-sans-runic/about) font has all 93 Unicode runes (the Elder Futhark among them). Alchemical signs: [Noto Sans Symbols](https://fontsource.org/fonts/noto-sans-symbols/about). Both are under the SIL Open Font License, which allows this use; keep the license text with them. A letter is turned into an outline with fontTools, then it is a sigil like any other.
 - Not suitable as found: the itch.io rune and alchemy packs seen were pixel art, no-derivatives, or non-commercial.
-- [x] First pass added 2026-10-08: 99 sigils in seven groups (Wasteland, Monsters, Spirits, Symbols, all 22 Tarot cards, the 24 Elder Futhark runes, Elements), about 95 KB in the page, with a Credits section naming the icon authors. To add more, add a line in `tools/make_sigil_pack.py` and rerun it.
+- [x] Sigil library (2026-10-08): 243 ready-made sigils in eleven groups (Wasteland, Hunter, Monsters, Beasts, Spirits, Symbols, all 22 Tarot cards, the 24 Elder Futhark runes, Elements, Zodiac, Glyphs), plus the nine classics. They live in `sigils.js` (about 255 KB), not in the page, and a Credits section names the icon authors. To add more, add an entry in `tools/make_sigil_pack.py` and rerun it.
+- [ ] More sigils when wanted: game-icons has about 4,000 unused. Eight card-suit and star glyphs are not in the Noto font used and were skipped; game-icons has equivalents.
+- [ ] With over 250 sigils, a search box in the picker would help.
 
 ## Gaps for new players
 
@@ -98,6 +102,7 @@ The campaign is a post-apocalyptic wasteland, and the journal was styled as a go
 
 ## Housekeeping
 
+- [ ] `tests/t5.js` has a check that depends on luck ("Mark XP reachable": it needs a miss within 25 rolls) and fails about one run in ten. Make it roll a fixed result instead.
 - [ ] Delete branches that are already in `main`: `dice-maker`, `foundations`, `header-glow-and-fog`, `dice-textures`, `hunter-history`.
 - [ ] `hunters-journal-repo.zip` in the folder above the repo is an old copy from 2026-10-04. Remove it once nothing needs it.
 - [x] Every branch is on GitHub (pushed 2026-10-08). Only `main` triggered a Cloudflare build.
