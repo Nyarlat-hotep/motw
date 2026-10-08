@@ -467,6 +467,13 @@ details.sect > summary::after { font-family: var(--display); }
 .tray[data-tray="wood"] { border-color: #2a1a10; background: repeating-linear-gradient(92deg, rgba(0, 0, 0, .1) 0 2px, rgba(255, 255, 255, .03) 2px 7px, rgba(0, 0, 0, .06) 7px 13px), radial-gradient(ellipse at 50% 38%, #8a5a34 0%, #5e3a1f 62%, #3a2212 100%); }
 .tray[data-tray="slate"] { border-color: #22262b; background: linear-gradient(115deg, rgba(255, 255, 255, .05) 0 20%, transparent 20% 55%, rgba(255, 255, 255, .03) 55% 60%, transparent 60%), radial-gradient(ellipse at 50% 38%, #56606a 0%, #353c44 62%, #1c2126 100%); }
 .tray[data-tray="wood"]::after, .tray[data-tray="slate"]::after { display: none; }
+.dice.shaking .slot .dx { animation: dshake .16s linear infinite; }
+.dice.shaking .slot:nth-child(2) .dx { animation-duration: .13s; animation-direction: reverse; }
+@keyframes dshake { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 25% { transform: translate(-2px, 1px) rotate(-3deg); } 75% { transform: translate(2px, -1px) rotate(3deg); } }
+@media (prefers-reduced-motion: reduce) { .dice.shaking .slot .dx { animation: none; } }
+#roll { touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.volrow { display: flex; align-items: center; gap: 12px; margin-top: 10px; max-width: 360px; }
+.volrow input { flex: 1; min-width: 0; accent-color: var(--accent); }
 .tray.mini { height: 132px; margin-bottom: 12px; }
 .tray.mini .dice { padding-top: 6px; }
 .dicebar { display: flex; justify-content: flex-end; margin-top: 12px; }
@@ -1045,7 +1052,9 @@ div.wcard { cursor: default; border-color: var(--good); }
     <div class="body">
       <h3>Big moments</h3>
       <label class="switch"><input type="checkbox" id="set-fx"><span>Lightning on a 12+, a shake on a miss, a glow on level-up</span></label>
-      <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-snd"><span>Sound: dice clatter, thunder and a low thud (starts only after you roll)</span></label>
+      <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-snd"><span>Sound: dice that sound like what they are made of, a bell on a 10+, thunder on a 12+ and a low thud on a miss</span></label>
+      <label class="volrow"><span>Volume</span><input type="range" id="set-vol" min="0" max="100" step="5"></label>
+      <p class="small muted" style="margin:6px 0 0">Sound is off unless you turn it on, because on a call your microphone may pick it up. Hold the Roll button to shake the dice, let go to throw.</p>
       <h3>Backup</h3>
       <p class="small muted">Your journal saves on its own. A backup file is a second copy you control, handy before you try something big or want to move devices.</p>
       <div class="actions">
@@ -1180,7 +1189,7 @@ function exampleCase() {
 }
 function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.hook = c.threats = c.weakness = c.npcs = c.loose = c.log = ''; c.clock = 0; c.eos = [false, false, false, false]; c.date = new Date().toISOString().slice(0, 10); return c; }
 function defaults() {
-  return { v: 1, tab: 'guide', hv: 'build', steps: {}, wiz: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false }, hold: { n: 0, move: '', asked: [] }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
+  return { v: 1, tab: 'guide', hv: 'build', steps: {}, wiz: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6 }, hold: { n: 0, move: '', asked: [] }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0, adv: false },
     sheet: { name: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, moves: '', gear: '' } };
 }
@@ -1378,7 +1387,7 @@ function renderHist() {
   if (!S.rolls.length) { el.innerHTML = '<li class="muted"><span></span>No rolls yet. Your last ten show up here.<span></span></li>'; return; }
   el.innerHTML = S.rolls.slice(0, 10).map(function (r) { return '<li><b>' + r.total + '</b><span>' + esc(r.name) + ' <span class="muted">(' + r.d1 + '+' + r.d2 + ' ' + fmt(r.mod) + ')</span></span><span class="tag ' + r.tier + '">' + TIERNAME[r.tier] + '</span></li>'; }).join('');
 }
-$('#roll').addEventListener('click', doRoll);
+$('#roll').addEventListener('click', function () { if (Date.now() - shake.ended < 400) return; doRoll(); });
 $('#mv').addEventListener('change', function (e) { S.roller.move = e.target.value; S.roller.stat = BYID[e.target.value].stat; renderRoller(); scheduleSave(); });
 $('#adv').addEventListener('change', function (e) { S.roller.adv = e.target.checked; renderStage(); scheduleSave(); });
 $('#statrow').addEventListener('click', function (e) { var b = e.target.closest('[data-stat]'); if (!b) return; S.roller.stat = b.dataset.stat; renderRoller(); scheduleSave(); });
@@ -1399,7 +1408,7 @@ function rollClicks(e) {
     renderRoller(); scheduleSave(); return;
   }
   if (e.target.id === 'markxp' && last && !last.xpMarked) { last.xpMarked = true; S.sheet.xp = Math.min(S.sheet.xp + 1, 9); renderSheet(); renderStage(); scheduleSave(); }
-  if (e.target.id === 'spendluck' && last && !last.luck && S.sheet.luck > 0) { last.luck = true; last.total = 12; S.sheet.luck--; if (S.rolls[0]) { S.rolls[0].total = 12; S.rolls[0].tier = 'full'; S.rolls[0].name += ' (Luck)'; } if (HOLDS[last.move]) { var was = last.hold && S.hold.move === last.move ? S.hold.asked : []; S.hold = { n: Math.max(0, HOLDS[last.move].full - was.length), move: last.move, asked: was }; last.hold = true; } renderSheet(); renderRoller(); fxPlay('crit'); scheduleSave(); }
+  if (e.target.id === 'spendluck' && last && !last.luck && S.sheet.luck > 0) { last.luck = true; last.total = 12; S.sheet.luck--; if (S.rolls[0]) { S.rolls[0].total = 12; S.rolls[0].tier = 'full'; S.rolls[0].name += ' (Luck)'; } if (HOLDS[last.move]) { var was = last.hold && S.hold.move === last.move ? S.hold.asked : []; S.hold = { n: Math.max(0, HOLDS[last.move].full - was.length), move: last.move, asked: was }; last.hold = true; } renderSheet(); renderRoller(); fxPlay('crit'); stinger(12); scheduleSave(); }
 }
 $('#p-roll').addEventListener('click', rollClicks);
 $('#p-play').addEventListener('click', rollClicks);
@@ -2608,25 +2617,51 @@ document.addEventListener('change', function (e) {
 });
 
 /* ---------- big moments ---------- */
-var ac = null;
-function sound(kind) {
+var ac = null, master = null;
+function volNow() { var v = S.settings.vol; return typeof v === 'number' && v >= 0 && v <= 1 ? v : .6; }
+/* the audio context, or null while sound is off. Everything connects to `master`, which carries the volume. */
+function audio() {
+  if (!S.settings.sound) return null;
   try {
-    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    if (!ac) { ac = new (window.AudioContext || window.webkitAudioContext)(); master = ac.createGain(); master.connect(ac.destination); }
     if (ac.state === 'suspended') ac.resume();
+    master.gain.value = volNow();
+    return ac;
+  } catch (e) { return null; }
+}
+function sound(kind) {
+  if (!audio()) return;
+  try {
     var t = ac.currentTime, len = kind === 'crit' ? 1.8 : kind === 'level' ? 1.0 : 0.45;
     var buf = ac.createBuffer(1, Math.floor(ac.sampleRate * len), ac.sampleRate), d = buf.getChannelData(0);
     for (var i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, kind === 'crit' ? 2.4 : 4);
     var src = ac.createBufferSource(); src.buffer = buf;
     var lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = kind === 'crit' ? 800 : 200;
     var g = ac.createGain(); g.gain.value = 0.4;
-    src.connect(lp); lp.connect(g); g.connect(ac.destination); src.start(t);
+    src.connect(lp); lp.connect(g); g.connect(master); src.start(t);
     if (kind !== 'crit') {
       var o = ac.createOscillator(), og = ac.createGain(); o.type = kind === 'level' ? 'triangle' : 'sine';
       o.frequency.setValueAtTime(kind === 'level' ? 220 : 90, t); o.frequency.exponentialRampToValueAtTime(kind === 'level' ? 440 : 40, t + 0.4);
       og.gain.setValueAtTime(0.35, t); og.gain.exponentialRampToValueAtTime(0.001, t + (kind === 'level' ? 1.0 : 0.45));
-      o.connect(og); og.connect(ac.destination); o.start(t); o.stop(t + 1.1);
+      o.connect(og); og.connect(master); o.start(t); o.stop(t + 1.1);
     }
   } catch (e) {}
+}
+/* a low bell: two sines a hair apart so they beat, plus a quiet overtone */
+function bell() {
+  if (!audio()) return;
+  try {
+    var t = ac.currentTime;
+    [[196, .22], [197.6, .22], [541, .06]].forEach(function (p) {
+      var o = ac.createOscillator(), g = ac.createGain(); o.type = 'sine'; o.frequency.value = p[0];
+      g.gain.setValueAtTime(p[1], t); g.gain.exponentialRampToValueAtTime(0.001, t + 1.8);
+      o.connect(g); g.connect(master); o.start(t); o.stop(t + 1.9);
+    });
+  } catch (e) {}
+}
+/* at most one per roll: bell on a 10+, bell and thunder on a 12+, thud on a miss, nothing on a 7-9 */
+function stinger(total) {
+  if (total >= 12) { bell(); sound('crit'); } else if (total >= 10) bell(); else if (total < 7) sound('miss');
 }
 function fxPlay(kind) {
   if (!S.settings.fx) return;
@@ -2637,7 +2672,7 @@ function fxPlay(kind) {
     if (kind === 'miss') { w.classList.remove('shake'); void w.offsetWidth; w.classList.add('shake'); setTimeout(function () { w.classList.remove('shake'); }, 600); }
     if (kind === 'crit') { var t = $('#result .tier'); if (t) { t.classList.add('boom'); } }
   }
-  if (S.settings.sound) sound(kind);
+  if (kind === 'level') sound(kind);
 }
 
 /* ---------- backup + restore ---------- */
@@ -2645,10 +2680,12 @@ var caps = { dl: null, sample: null };
 function bkMsg(t) { $('#bk-msg').textContent = t || ''; }
 function backupText() { return JSON.stringify({ app: 'hunters-journal', v: 1, exported: new Date().toISOString(), journal: S }, null, 1); }
 function renderSettings() {
-  $('#set-fx').checked = !!S.settings.fx; $('#set-snd').checked = !!S.settings.sound;
+  $('#set-fx').checked = !!S.settings.fx; $('#set-snd').checked = !!S.settings.sound; $('#set-vol').value = Math.round(volNow() * 100);
 }
 $('#set-fx').addEventListener('change', function (e) { S.settings.fx = e.target.checked; scheduleSave(); if (e.target.checked) fxPlay('crit'); });
-$('#set-snd').addEventListener('change', function (e) { S.settings.sound = e.target.checked; scheduleSave(); if (e.target.checked) sound('miss'); });
+$('#set-snd').addEventListener('change', function (e) { S.settings.sound = e.target.checked; scheduleSave(); if (e.target.checked) hit(curDie(0), .5); });
+$('#set-vol').addEventListener('input', function (e) { S.settings.vol = clamp(+e.target.value / 100, 0, 1); scheduleSave(); });
+$('#set-vol').addEventListener('change', function () { hit(curDie(0), .5); });
 $('#bk-save').addEventListener('click', function () {
   var d = new Date().toISOString().slice(0, 10);
   if (!caps.dl) {
@@ -3017,30 +3054,88 @@ function throwDice(d1, d2) {
     ], { duration: dur, delay: delay, fill: 'backwards' }));
     function s(o, sc, op) { return { offset: o, transform: 'scale(' + sc + ')', opacity: op }; }
     anims.push(sh.animate([s(0, .4, .1), s(.34, 1, .6), s(.5, .7, .3), s(.64, 1, .58), s(.74, .88, .45), s(.82, 1, .56), s(.88, .95, .5), s(.93, 1, .55), s(1, 1, .55)], { duration: dur, delay: delay, fill: 'backwards' }));
-    if (S.settings.sound) [[.34, .5], [.64, .35], [.82, .2], [.93, .1]].forEach(function (h) { setTimeout(function () { clack(h[1]); }, delay + dur * h[0]); });
+    if (S.settings.sound) [[.34, .5], [.64, .35], [.82, .2], [.93, .1]].forEach(function (h) { hitTimers.push(setTimeout(function () { hit(curDie(i), h[1]); }, delay + dur * h[0])); });
   });
   var thump = tray.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(2px)' }, { transform: 'translateY(0)' }], { duration: 140, delay: THROW_MS * .34, easing: 'ease-out' });
   anims.push(thump);
   return anims;
 }
-function clack(v) {
+/* A bounce is two sounds. The die gives the click: a tight band of noise at its own pitch (a high q makes it a tone, not a hiss),
+   and metal and gem ring on after. The tray gives the thud: low noise plus a falling tone, kept above about 150 Hz because
+   laptop speakers play nothing lower. Soft trays also swallow most of the click, so leather and felt land as a thud. */
+var SFX = {
+  bone: { f: 1500, q: 3.5, len: .05, g: .8 },
+  resin: { f: 2500, q: 4, len: .04, g: .7 },
+  metal: { f: 3800, q: 8, len: .05, g: .6, ring: .28, hold: .45, over: 1.48 },
+  stone: { f: 850, q: 3, len: .07, g: .9 },
+  gem: { f: 5200, q: 5, len: .05, g: .7, ring: .18, hold: .2 }
+};
+var TRAYSFX = {
+  leather: { click: .4, f: 190, to: 95, g: .9, len: .13, lp: 340, n: .9 },
+  felt: { click: .22, f: 160, to: 85, g: .75, len: .11, lp: 260, n: .8 },
+  wood: { click: .9, f: 240, to: 170, g: .7, len: .15, lp: 750, n: .5 },
+  slate: { click: 1, f: 320, to: 260, g: .3, len: .05, lp: 1600, n: .35 }
+};
+var hitTimers = [];
+function noise(len, pow) {
+  var buf = ac.createBuffer(1, Math.floor(ac.sampleRate * len), ac.sampleRate), d = buf.getChannelData(0), src;
+  for (var i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, pow);
+  src = ac.createBufferSource(); src.buffer = buf; return src;
+}
+function tone(f, to, g, len, t) {
+  var o = ac.createOscillator(), og = ac.createGain(); o.type = 'sine';
+  o.frequency.setValueAtTime(f, t); if (to !== f) o.frequency.exponentialRampToValueAtTime(to, t + len);
+  og.gain.setValueAtTime(g, t); og.gain.exponentialRampToValueAtTime(0.001, t + len);
+  o.connect(og); og.connect(master); o.start(t); o.stop(t + len + .02);
+}
+/* one bounce of one die at strength v (0 to 1) */
+function hit(die, v) {
+  if (!audio()) return;
   try {
-    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
-    if (ac.state === 'suspended') ac.resume();
-    var t = ac.currentTime, len = 0.06, buf = ac.createBuffer(1, Math.floor(ac.sampleRate * len), ac.sampleRate), d = buf.getChannelData(0);
-    for (var i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 3);
-    var src = ac.createBufferSource(); src.buffer = buf;
-    var hp = ac.createBiquadFilter(); hp.type = 'bandpass'; hp.frequency.value = 1900 + Math.random() * 900; hp.Q.value = 1.2;
-    var g = ac.createGain(); g.gain.value = v * 0.6;
-    src.connect(hp); hp.connect(g); g.connect(ac.destination); src.start(t);
+    var m = SFX[die.finish] || SFX.bone, tr = TRAYSFX[curTray()], t = ac.currentTime, f = m.f * (.94 + Math.random() * .12);
+    var src = noise(m.len, 3), bp = ac.createBiquadFilter(), g = ac.createGain();
+    bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = m.q; g.gain.value = v * m.g * tr.click * 2.2;
+    src.connect(bp); bp.connect(g); g.connect(master); src.start(t);
+    var th = noise(tr.len, 2), lp = ac.createBiquadFilter(), tg = ac.createGain();
+    lp.type = 'lowpass'; lp.frequency.value = tr.lp; lp.Q.value = .7; tg.gain.value = v * tr.n * 1.6;
+    th.connect(lp); lp.connect(tg); tg.connect(master); th.start(t);
+    tone(tr.f, tr.to, v * tr.g, tr.len, t);
+    if (m.ring) {
+      tone(f, f, v * m.ring, m.hold, t);
+      if (m.over) tone(f * m.over, f * m.over, v * m.ring * .5, m.hold * .7, t);
+    }
   } catch (e) {}
 }
+/* hold the Roll button to shake the dice, let go to throw. A plain click or Enter/Space still rolls at once. */
+var shake = { timer: null, on: false, rattle: null, ended: 0 };
+function shakeStart() {
+  if (rolling || shake.on) return;
+  shake.on = true; $('#dice').classList.add('shaking');
+  (function rattle() {
+    hit(curDie(Math.random() < .5 ? 0 : 1), .12 + Math.random() * .16);
+    shake.rattle = setTimeout(rattle, 50 + Math.random() * 45);
+  })();
+}
+function shakeEnd(e) {
+  clearTimeout(shake.timer); shake.timer = null;
+  if (!shake.on) return;
+  shake.on = false; clearTimeout(shake.rattle); $('#dice').classList.remove('shaking');
+  shake.ended = Date.now();
+  if (e && e.type === 'pointercancel') return;
+  doRoll();
+}
+$('#roll').addEventListener('pointerdown', function (e) {
+  if (rolling || (e.button && e.pointerType === 'mouse')) return;
+  clearTimeout(shake.timer); shake.timer = setTimeout(shakeStart, 250);
+});
+['pointerup', 'pointerleave', 'pointercancel'].forEach(function (n) { $('#roll').addEventListener(n, shakeEnd); });
+$('#roll').addEventListener('contextmenu', function (e) { if (shake.on || shake.timer) e.preventDefault(); });
 var skipAnims = null;
 function popSum() { var s = $('#sum'); if (!s) return; s.classList.remove('pop'); void s.offsetWidth; s.classList.add('pop'); }
 function doRoll() {
   if (rolling) return;
   rolling = true;
-  var btn = $('#roll'); btn.disabled = true;
+  var btn = $('#roll'), hadFocus = document.activeElement === btn; btn.disabled = true;
   var R = S.roller, mv = BYID[R.move];
   var d1 = rnd6(), d2 = rnd6();
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -3048,6 +3143,7 @@ function doRoll() {
   function finish() {
     if (!rolling) return;
     rolling = false; btn.disabled = false; skipAnims = null;
+    if (hadFocus) btn.focus(); /* a disabled button drops focus; give it back so Enter or Space can roll again */
     $('#tray').classList.remove('rolling');
     var sv = S.sheet.stats[R.stat];
     last = { move: R.move, stat: R.stat, statVal: sv, fwd: R.forward, ong: R.ongoing, oth: R.other, d1: d1, d2: d2, total: d1 + d2 + sv + R.forward + R.ongoing + R.other, luck: false, xpMarked: false };
@@ -3056,7 +3152,9 @@ function doRoll() {
     if (HOLDS[R.move] && tierOf(last.total) !== 'miss') { S.hold = { n: HOLDS[R.move][tierOf(last.total)], move: R.move, asked: [] }; last.hold = true; }
     R.forward = 0; R.other = 0;
     renderRoller(); scheduleSave(); popSum();
+    hitTimers.forEach(clearTimeout); hitTimers = [];
     if (last.total >= 12) fxPlay('crit'); else if (tierOf(last.total) === 'miss') fxPlay('miss');
+    stinger(last.total);
   }
   if (reduce || !Element.prototype.animate) { finish(); return; }
   $('#sum').innerHTML = '&hellip;<small>Rolling. Tap the tray to skip</small>';

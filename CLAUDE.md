@@ -25,10 +25,11 @@ Single-file vanilla JS app for a Monster of the Week campaign. Owner: Jacob, a f
 - Level up: `levelPanel` / `levelDone` use the playbook's `improvements` and `advanced` lists.
 - Name generator: block between `/*NAMEGEN*/` and `/*END NAMEGEN*/` (Appalachian names, 1600s-1800s, with Soulsborne-style titles).
 - Party card: `partyBody()` builds what is shared.
+- Sound: everything goes through `audio()`, which returns null while `S.settings.sound` is off, so no audio nodes exist until the player turns sound on. `hit(die, v)` is one bounce (tables `SFX` by finish, `TRAYSFX` by tray); `stinger(total)` is the end-of-roll sound. Holding Roll shakes (`shakeStart`/`shakeEnd`).
 - Dice maker: `S.dice` (two dice, tray, saved sets), starter sets in `DICESETS` keyed by `pbSlug()`. `cubeHTML` styles each die through `curDie()` and `dieVars()`. Saved dice go through `cleanDie()` and dice codes (`HJD1.`) through the stricter `strictDie()` before anything reaches HTML or CSS; keep it that way.
 
 ## Tests
-`npm install`, then `npm test`. `tests/t7.js` drives all 12 playbooks through the builder, gear, details, bonds, level-up and phone-width overflow in both themes (`node tests/t7.js chosen` runs one). `tests/t5.js` is the broader regression suite. `tests/t8.js` covers the dice maker. All three open `index.html` with Playwright and write screenshots to `tests/out/`.
+`npm install`, then `npm test`. `tests/t7.js` drives all 12 playbooks through the builder, gear, details, bonds, level-up and phone-width overflow in both themes (`node tests/t7.js chosen` runs one). `tests/t5.js` is the broader regression suite. `tests/t8.js` covers the dice maker and `tests/t9.js` the dice sounds (with a counting stand-in for AudioContext). All of them open `index.html` with Playwright and write screenshots to `tests/out/`.
 
 ## Next big task
-Build from docs/SPEC.md, in its suggested order. The dice maker (feature 1) is built; next are dice sounds, Luck candles and the hunter card image. The shared table (docs/ROADMAP.md) comes after, and its backend choice is still open: see feature 8 in the spec.
+Build from docs/SPEC.md, in its suggested order. The dice maker and dice sounds (features 1 and 2) are built; next are Luck candles and the hunter card image. The shared table (docs/ROADMAP.md) comes after, and its backend choice is still open: see feature 8 in the spec.

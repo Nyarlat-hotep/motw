@@ -96,6 +96,8 @@ Numerals or Roman numerals in place of pips (decided against for now), a sigil o
 
 ## 2. Dice sounds
 
+Status: built 2026-10-06. The numbers in `SFX` and `TRAYSFX` are first guesses that have not been tuned by ear yet. Stingers no longer depend on the "big moments" switch, only on the sound switch.
+
 ### Today
 `clack(v)` plays one band-passed noise burst per bounce, and `sound(kind)` plays a rumble for crit, miss and level-up. Sound is off by default (`S.settings.sound`). It is thin and the same for every die.
 

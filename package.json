@@ -7,7 +7,7 @@
     "start": "npx --yes serve -l 5173 .",
     "embed": "python3 tools/embed_data.py",
     "build": "node tools/build.js",
-    "test": "node tests/t7.js && node tests/t5.js && node tests/t8.js"
+    "test": "node tests/t7.js && node tests/t5.js && node tests/t8.js && node tests/t9.js"
   },
   "devDependencies": { "playwright": "^1.45.0" }
 }
