@@ -80,6 +80,17 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await p.click('[data-dp-set="sigil"][data-v="skull"]'); await p.waitForTimeout(200);
   check('a sigil does not break the 3D dice', (await d3(p)).n===2);
 
+  // ---- trays with relief, and the wasteland trays ----
+  check('wasteland trays are offered: rust, dust and concrete', (await p.locator('[data-dp-tray="rust"], [data-dp-tray="dust"], [data-dp-tray="concrete"]').count())===3);
+  await p.click('[data-dp-tray="rust"]');
+  const rustOk = await p.waitForFunction(()=>{ const m = __d3.floor.material; return __d3.traySrc==='img/tray-rust.jpg' && __d3.floorOn && m.normalMap && m.roughnessMap && /tray-rust-n/.test(m.normalMap.image.src) && /tray-rust-r/.test(m.roughnessMap.image.src); }, null, { timeout: 10000 }).then(()=>true, ()=>false);
+  check('rust tray: its photo, relief and shine maps are all on the floor', rustOk);
+  await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-rust-tray.png') });
+  await p.click('[data-dp-tray="slate"]');
+  const slateOk = await p.waitForFunction(()=>{ const m = __d3.floor.material; return __d3.traySrc==='img/tray-slate.jpg' && m.normalMap && /tray-slate-n/.test(m.normalMap.image.src) && !m.roughnessMap; }, null, { timeout: 10000 }).then(()=>true, ()=>false);
+  check('slate tray: relief worked out from its own photo, and the rust maps are gone', slateOk);
+  check('the flat tray underneath still shows the same tray', (await p.getAttribute('#tray','data-tray'))==='slate');
+
   // ---- lighting moods, and pips that give off light ----
   check('lighting: three moods offered, Garage chosen, its surroundings loaded', (await p.locator('[data-dp-light]').count())===3 && (await p.getAttribute('[data-dp-light="garage"]','aria-pressed'))==='true' && await p.waitForFunction(()=>__d3.envs && __d3.envs.garage && __d3.scene.environment===__d3.envs.garage, null, { timeout: 15000 }).then(()=>true, ()=>false));
   check('only the chosen mood is fetched', p.reqs.filter(u=>/env-garage[.]hdr/.test(u)).length===1 && !p.reqs.some(u=>/env-(dusk|night)[.]hdr/.test(u)));

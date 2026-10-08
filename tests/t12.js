@@ -101,6 +101,13 @@ const STUB = () => {
   check('holding Roll: stone dice knock together (wood takes), no tray takes', c.dicehit_wood>=3 && !c.surface_wood_tray, JSON.stringify(c));
   await p.mouse.up(); await landed(p, 5);
 
+  // a wasteland tray: rusted plate rings like metal
+  await p.click('[data-dp-tray="rust"]'); await ready(p, ['surface_metal']); await played(p);
+  await p.locator('[data-dp-hear]').scrollIntoViewIfNeeded(); await p.click('[data-dp-hear]'); await p.waitForTimeout(1100);
+  a = await played(p); c = count(a.played);
+  check('rust tray: every bounce lands on a metal take', c.surface_metal===8 && !c.surface_wood_tray, JSON.stringify(c));
+  await p.click('[data-dp-tray="wood"]'); await p.waitForTimeout(150);
+
   // a button in the dice maker plays one throw without rolling
   await p.locator('[data-dp-hear]').scrollIntoViewIfNeeded(); await played(p); await p.click('[data-dp-hear]'); await p.waitForTimeout(1100);
   a = await played(p); c = count(a.played);

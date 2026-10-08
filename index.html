@@ -482,7 +482,10 @@ details.sect > summary::after { font-family: var(--display); }
 .tray[data-tray="felt"] { border-color: #2e2218; background: radial-gradient(ellipse at 50% 38%, #2f6a4a 0%, #1c4530 62%, #0f2a1c 100%); }
 .tray[data-tray="wood"] { border-color: #2a1a10; background: repeating-linear-gradient(92deg, rgba(0, 0, 0, .1) 0 2px, rgba(255, 255, 255, .03) 2px 7px, rgba(0, 0, 0, .06) 7px 13px), radial-gradient(ellipse at 50% 38%, #8a5a34 0%, #5e3a1f 62%, #3a2212 100%); }
 .tray[data-tray="slate"] { border-color: #22262b; background: linear-gradient(115deg, rgba(255, 255, 255, .05) 0 20%, transparent 20% 55%, rgba(255, 255, 255, .03) 55% 60%, transparent 60%), radial-gradient(ellipse at 50% 38%, #56606a 0%, #353c44 62%, #1c2126 100%); }
-.tray[data-tray="wood"]::after, .tray[data-tray="slate"]::after { display: none; }
+.tray[data-tray="rust"] { border-color: #2a1c14; background: radial-gradient(circle at 24% 30%, rgba(190, 196, 200, .28) 0 9%, transparent 22%), radial-gradient(circle at 70% 62%, rgba(60, 22, 8, .5) 0 12%, transparent 30%), radial-gradient(ellipse at 50% 38%, #8a4a26 0%, #5e2e16 62%, #2e160b 100%); }
+.tray[data-tray="dust"] { border-color: #2e2318; background: radial-gradient(circle at 30% 60%, rgba(0, 0, 0, .12) 0 2px, transparent 3px), radial-gradient(circle at 64% 34%, rgba(255, 255, 255, .1) 0 2px, transparent 3px), radial-gradient(ellipse at 50% 38%, #9a7448 0%, #6e4f2e 62%, #3a2916 100%); }
+.tray[data-tray="concrete"] { border-color: #24262a; background: linear-gradient(100deg, rgba(255, 255, 255, .04) 0 30%, transparent 30% 70%, rgba(0, 0, 0, .06) 70%), radial-gradient(ellipse at 50% 38%, #74767a 0%, #4c4e52 62%, #26272a 100%); }
+.tray[data-tray="wood"]::after, .tray[data-tray="slate"]::after, .tray[data-tray="rust"]::after, .tray[data-tray="dust"]::after, .tray[data-tray="concrete"]::after { display: none; }
 .dice.shaking .slot .dx { animation: dshake .16s linear infinite; }
 .dice.shaking .slot:nth-child(2) .dx { animation-duration: .13s; animation-direction: reverse; }
 @keyframes dshake { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 25% { transform: translate(-2px, 1px) rotate(-3deg); } 75% { transform: translate(2px, -1px) rotate(3deg); } }
@@ -2810,7 +2813,7 @@ function initArt() {
   probe('img/tray.jpg', function () { ART.tray = true; applyTray(); });
   probe('img/die-glass.jpg', function (im) { D3.scuffImg = im; D3.sig = ''; d3Sync(); });
   probe('img/env.jpg', function (im) { D3.envImg = im; if (D3.renderer) { d3Env(); d3Mood(); } });
-  ['felt', 'wood', 'slate'].forEach(function (t) { probe('img/tray-' + t + '.jpg', function () { ART.trays[t] = true; applyTray(); }); });
+  TRAYS.forEach(function (t) { if (t !== 'leather') probe('img/tray-' + t + '.jpg', function () { ART.trays[t] = true; applyTray(); }); });
   FINISHES.forEach(function (fn) { if (fn !== 'fuel') probe('img/die-' + fn + '.jpg', function (im) { D3.tiles[fn] = im; D3.sig = ''; d3Sync(); document.documentElement.classList.add('tx-' + fn); }); });
   ['tier-full', 'tier-part', 'tier-miss', 'levelup', 'empty-bestiary', 'empty-cases', 'empty-party'].forEach(function (n) {
     probe('img/' + n + '.jpg', function () { ART.misc[n] = true; renderStage(); renderSheet(); renderBeasts(); renderParty(); if (!$('#cases input:focus, #cases textarea:focus')) renderCases(); });
@@ -2836,7 +2839,7 @@ function selCustom() {
    so nothing from a die reaches HTML or CSS without passing cleanDie() or strictDie() first. */
 function die0() { return { body: '#e9dcba', finish: 'bone', pip: '#6a1420', glow: false, sigil: '' }; }
 var HEX = /^#[0-9a-f]{6}$/i;
-var FINISHES = ['bone', 'resin', 'metal', 'stone', 'gem', 'fuel'], TRAYS = ['leather', 'felt', 'wood', 'slate'], SIGNAMES = ['', 'antler', 'lantern', 'crescent', 'eye', 'skull', 'cross', 'pentagram', 'pentacle', 'pupil'];
+var FINISHES = ['bone', 'resin', 'metal', 'stone', 'gem', 'fuel'], TRAYS = ['leather', 'felt', 'wood', 'slate', 'rust', 'dust', 'concrete'], SIGNAMES = ['', 'antler', 'lantern', 'crescent', 'eye', 'skull', 'cross', 'pentagram', 'pentacle', 'pupil'];
 var SIGILS = {
   antler: '<path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M12 21.5v-6.5M12 15c-3-1-5-3.2-5.5-7M12 15c3-1 5-3.2 5.5-7M6.5 8L3.8 5M6.5 8L7 3.2M8.3 12L4.6 11.4M17.5 8l2.7-3M17.5 8L17 3.2M15.7 12l3.7-.6"/>',
   lantern: '<path fill="currentColor" fill-rule="evenodd" d="M10 1.5h4v2h-4zM8.5 4.5h7l1.5 3H7zM7.5 8.5h9v10h-9zM10 10.5v6h4v-6zM6.5 19.5h11v2.5h-11z"/>',
@@ -3141,7 +3144,10 @@ var TRAYSFX = {
   leather: { click: .4, f: 190, to: 95, g: .9, len: .13, lp: 340, n: .9 },
   felt: { click: .22, f: 160, to: 85, g: .75, len: .11, lp: 260, n: .8 },
   wood: { click: .9, f: 240, to: 170, g: .7, len: .15, lp: 750, n: .5 },
-  slate: { click: 1, f: 320, to: 260, g: .3, len: .05, lp: 1600, n: .35 }
+  slate: { click: 1, f: 320, to: 260, g: .3, len: .05, lp: 1600, n: .35 },
+  rust: { click: 1, f: 430, to: 390, g: .4, len: .11, lp: 2800, n: .4 },
+  dust: { click: .25, f: 170, to: 90, g: .8, len: .1, lp: 300, n: .9 },
+  concrete: { click: 1, f: 300, to: 240, g: .3, len: .05, lp: 1400, n: .4 }
 };
 var hitTimers = [];
 function noise(len, pow) {
@@ -3158,7 +3164,7 @@ function tone(f, to, g, len, t) {
 /* Recorded hits (snd/*.mp3, optional, see snd/README.md). Each bounce plays the tray's recording and, over it, the die's own tick.
    A set is fetched the first time it is wanted, only once sound is on, and only over http. Until it has arrived, or if it never
    does, that half of the bounce uses the made-up sound instead. */
-var SNDSETS = { dicehit_plastic: 15, dicehit_metal: 12, dicehit_wood: 12, dicehit_glass: 5, surface_felt: [1, 2, 3, 4, 5, 7], surface_wood_table: 7, surface_wood_tray: 7, surface_soft: 5 };
+var SNDSETS = { dicehit_plastic: 15, dicehit_metal: 12, dicehit_wood: 12, dicehit_glass: 5, surface_felt: [1, 2, 3, 4, 5, 7], surface_wood_table: 7, surface_wood_tray: 7, surface_metal: 9, surface_soft: 5 };
 /* set: which recordings. rate: playback speed, lower is deeper. g: loudness. w: weight, which makes the landing louder and a touch deeper.
    ring: how much of the finish's made-up ring (SFX) to add on top; the glass recording is a tap on a pane, so a small die needs it sped up and ringing.
    under: a second recording played beneath a tray's own, here a low thud for the soft trays. */
@@ -3174,7 +3180,10 @@ var TRAYSND = {
   leather: { set: 'surface_felt', rate: .82, g: .85, under: { set: 'surface_soft', rate: 2.2, g: 1 } },
   felt: { set: 'surface_felt', rate: 1, g: 1, under: { set: 'surface_soft', rate: 2.6, g: .45 } },
   wood: { set: 'surface_wood_tray', rate: 1, g: 1 },
-  slate: { set: 'surface_wood_table', rate: 1.22, g: .9 }
+  slate: { set: 'surface_wood_table', rate: 1.22, g: .9 },
+  rust: { set: 'surface_metal', rate: .9, g: .55 },
+  dust: { set: 'surface_felt', rate: .9, g: .6, under: { set: 'surface_soft', rate: 2.4, g: .8 } },
+  concrete: { set: 'surface_wood_table', rate: 1.32, g: .9 }
 };
 var SND = window.__snd = {}; /* set name: { ready, takes: [{ b: AudioBuffer, pk: peak }] sorted quiet to loud }. On window so tests can look in. */
 function sndLoad(set) {
@@ -3293,7 +3302,11 @@ var D3MAT = {
   metal: { rough: .34, grain: .6, relief: .35, o: { metalness: 1 } },
   stone: { rough: .9, grain: .9, relief: .8, o: {} }
 };
-var D3TRAY = { leather: { rough: .5, tint: '#8f8386' }, felt: { rough: 1, tint: '#d9d9d9' }, wood: { rough: .45, tint: '#dedede' }, slate: { rough: .7, tint: '#e2e2e2' } };
+/* rough and tint shade the tray photo. n is how strong its relief map is (img/tray-<name>-n.jpg). r means it also has a map of how shiny each spot is (-r.jpg). */
+var D3TRAY = {
+  leather: { rough: .5, tint: '#8f8386', n: .7 }, felt: { rough: 1, tint: '#d9d9d9', n: .6 }, wood: { rough: .45, tint: '#dedede', n: .8 }, slate: { rough: .7, tint: '#e2e2e2', n: 1 },
+  rust: { rough: 1, tint: '#e6e6e6', n: 1.1, r: true }, dust: { rough: 1, tint: '#e6e6e6', n: 1.3, r: true }, concrete: { rough: 1, tint: '#e6e6e6', n: .9, r: true }
+};
 var D3BOUNCE = [[0, .34, 3.2], [.34, .64, .9], [.64, .82, .32], [.82, .93, .1]]; /* from, to, height: same beats as the flat dice so sounds line up */
 /* Lighting moods. Each is a real photographed surrounding (img/env-*.hdr, from Poly Haven, CC0) plus a lamp of our own placed where its
    brightest light is, so shadows and reflections agree. az is where that bright spot sits in the photo, in degrees (tools/make_env.py
@@ -3424,16 +3437,26 @@ function d3Size() {
 /* put the current tray photo on the floor. applyTray() says which one. */
 function d3Tray() {
   if (!D3.renderer) return;
-  var T = D3.T, src = D3.trayImg || '', k = D3TRAY[curTray()] || D3TRAY.slate;
+  var T = D3.T, src = D3.trayImg || '', name = curTray(), k = D3TRAY[name] || D3TRAY.slate;
   if (src === D3.traySrc) return;
   D3.traySrc = src;
+  function extra(file, slot, ready) {
+    new T.TextureLoader().load('img/tray-' + name + file, function (tex) {
+      if (D3.traySrc !== src) { tex.dispose(); return; }
+      var m = D3.floor.material; if (m[slot]) m[slot].dispose(); m[slot] = tex; ready(m); m.needsUpdate = true; d3Kick(0);
+    }, undefined, function () {});
+  }
   function done(on) { D3.floor.visible = on; D3.sheet.visible = !on; D3.floorOn = on; D3.sig = ''; d3Sync(); d3Kick(0); }
   if (!src) { done(false); return; }
   new T.TextureLoader().load(src, function (tex) {
     if (D3.traySrc !== src) { tex.dispose(); return; }
     var m = D3.floor.material, old = m.map;
     tex.colorSpace = T.SRGBColorSpace; tex.anisotropy = 8;
-    m.map = tex; m.roughness = k.rough; m.color.set(k.tint); m.needsUpdate = true; if (old) old.dispose();
+    m.map = tex; m.roughness = k.rough; m.color.set(k.tint); if (old) old.dispose();
+    ['normalMap', 'roughnessMap'].forEach(function (slot) { if (m[slot]) { m[slot].dispose(); m[slot] = null; } });
+    m.needsUpdate = true;
+    if (k.n) extra('-n.jpg', 'normalMap', function (mm) { mm.normalScale.set(k.n, k.n); });
+    if (k.r) extra('-r.jpg', 'roughnessMap', function (mm) { mm.roughness = 1; });
     done(true);
   }, undefined, function () { if (D3.traySrc === src) done(false); });
 }

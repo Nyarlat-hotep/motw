@@ -37,7 +37,9 @@ The first pass was made entirely in code. Real recordings, sorted by die and by 
 ## 3D dice follow-ups
 
 - [x] Lighting moods (2026-10-08): Garage, Dusk and Lantern, each a real HDR surrounding from Poly Haven. Jacob's garage panorama is now only the stand-in while one loads. Glowing pips now give off light.
-- [ ] Tray and die materials with real surface relief from Poly Haven and ambientCG (both CC0), including wasteland trays: rusted plate, cracked ground, stained concrete.
+- [x] Trays with relief (2026-10-08): the four photo trays have relief worked out from their own photos, and three wasteland trays (rust, dust, concrete) come whole from Poly Haven with relief and shine maps. They have sounds too: rust rings like metal.
+- [ ] Die materials from real material sets: a corroded-metal finish is the obvious first one (ambientCG has the most rust). Bone and resin would gain little.
+- [ ] A wasteland color palette for bodies and pips (rust, sand, hazard yellow, oil black, coolant green).
 - [x] Scuffed glass: in as `img/die-glass.jpg`, drawn as scratches on the Fuel shell (2026-10-08).
 - [ ] The dice maker's preview is still the flat dice. Show the 3D dice there when 3D is on.
 - [ ] Bring back the dimmed look before the first roll (lost when the tray moved into the 3D scene).

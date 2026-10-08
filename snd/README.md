@@ -21,15 +21,16 @@ Two sources.
 | `dicehit_wood1` to `12` | wooden dice knocking together | stone (slowed) |
 | `surface_felt1` to `7` (no 6) | a die landing on felt | felt, and leather (slowed) |
 | `surface_wood_tray1` to `7` | a die landing in a wooden tray | wood |
-| `surface_wood_table1` to `7` | a die landing on a wooden table | slate (sped up) |
+| `surface_wood_table1` to `7` | a die landing on a wooden table | slate and concrete (sped up) |
+| `surface_metal1` to `9` | a die landing on metal | the rust tray |
 | `dicehit_glass1` to `5` | a light tap on glass (Kenney `impactGlass_light`) | gem and fuel dice, played three to four times faster with a made-up ring on top |
 | `surface_soft1` to `5` | a soft, low thud (Kenney `impactSoft_medium`) | laid under the felt recording for leather, and more quietly for felt |
 
-Left out of the dice-box-threejs copy: `dicehit_coin` and `surface_metal` (nothing uses them yet; a metal tray would), and `surface_felt6` (silent).
+Left out of the dice-box-threejs copy: `dicehit_coin` (nothing uses it) and `surface_felt6` (silent).
 
 ## What is still an approximation
 
-Nothing found was recorded with bone, stone, glass or gem dice, or on leather or slate. Those use the nearest recording at a different speed: bone is slowed plastic, stone is slowed wood, glass is a sped-up tap on a pane, leather is slowed felt over a thud, slate is a sped-up wooden table.
+Nothing found was recorded with bone, stone, glass or gem dice, or on leather or slate. Those use the nearest recording at a different speed: bone is slowed plastic, stone is slowed wood, glass is a sped-up tap on a pane, leather is slowed felt over a thud, slate and concrete are a sped-up wooden table, and the dust tray is felt over a thud.
 
 ## How they are used
 

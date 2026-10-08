@@ -3,7 +3,7 @@
 Die finishes become 256px grey tiles with the lighting flattened, so the page can lay them over any body colour.
 Trays are cropped and saved as 1200px JPEGs. The reflection panorama for the 3D dice becomes img/env.jpg.
 
-    python tools/make_textures.py <folder of source images>
+    python tools/make_textures.py <folder of source images> [<folder of Poly Haven downloads>]
 
 The crop boxes below are (left, top, right, bottom) in source pixels.
 """
@@ -57,4 +57,36 @@ ENV = '20.webp'
 if os.path.exists(os.path.join(SRC, ENV)):
     Image.open(os.path.join(SRC, ENV)).convert('RGB').resize((1024, 512), Image.LANCZOS).save(os.path.join(OUT, 'env.jpg'), quality=82, optimize=True, progressive=True)
 
-print('wrote', len(DICE), 'die textures and', len(TRAYS), 'trays')
+# Trays for the 3D dice also get a relief map ("normal map"), so light catches grain, creases and scratches.
+# The four photo trays have theirs worked out from the photo itself, which keeps every mark exactly where it is in the picture.
+import numpy as np
+
+def relief(color_path, out_path, strength):
+    im = Image.open(color_path).convert('L'); im = im.resize((1024, round(1024 * im.height / im.width)), Image.LANCZOS)
+    h = np.asarray(im.filter(ImageFilter.GaussianBlur(1.1))).astype(np.float32) / 255.
+    dy, dx = np.gradient(h)                                   # brighter is treated as higher
+    n = np.stack([-dx * strength, dy * strength, np.ones_like(h)], -1); n /= np.linalg.norm(n, axis=-1, keepdims=True)
+    Image.fromarray(((n * .5 + .5) * 255).astype(np.uint8)).save(out_path, quality=84, optimize=True)
+
+for name, strength in (('leather', 9), ('felt', 7), ('wood', 9), ('slate', 12)):
+    color = os.path.join(OUT, 'tray.jpg' if name == 'leather' else 'tray-%s.jpg' % name)
+    if os.path.exists(color): relief(color, os.path.join(OUT, 'tray-%s-n.jpg' % name), strength)
+
+# Wasteland trays come whole from Poly Haven (https://polyhaven.com, CC0): color, relief and a map of how shiny each spot is.
+# Give the folder holding "<id>_diff.jpg", "<id>_nor.jpg" and "<id>_rough.jpg" (the 1k JPG downloads) as a second argument.
+PH = sys.argv[2] if len(sys.argv) > 2 else None
+WASTE = {'rust': 'rusty_metal_04', 'dust': 'brown_mud_dry', 'concrete': 'concrete_floor_worn_001'}
+made = 0
+if PH:
+    yy, xx = np.mgrid[0:576, 0:1200]
+    edge = np.clip(1.08 - (((xx - 600) / 600.) ** 2 + ((yy - 288) / 288.) ** 2) * .5, .38, 1)[..., None]   # the same dark corners the photo trays have
+    for name, pid in WASTE.items():
+        top = lambda kind: Image.open(os.path.join(PH, '%s_%s.jpg' % (pid, kind))).convert('RGB').crop((0, 0, 1024, 512))
+        c = np.asarray(top('diff').resize((1200, 576), Image.LANCZOS)).astype(np.float32) * edge
+        Image.fromarray(c.clip(0, 255).astype(np.uint8)).save(os.path.join(OUT, 'tray-%s.jpg' % name), quality=78, optimize=True, progressive=True)
+        top('nor').save(os.path.join(OUT, 'tray-%s-n.jpg' % name), quality=84, optimize=True)
+        top('rough').convert('L').resize((512, 256), Image.LANCZOS).save(os.path.join(OUT, 'tray-%s-r.jpg' % name), quality=80, optimize=True)
+        made += 1
+
+print('wrote', len(DICE), 'die textures,', len(TRAYS), 'photo trays with relief and', made, 'wasteland trays')
+
