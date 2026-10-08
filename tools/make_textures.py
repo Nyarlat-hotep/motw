@@ -3,7 +3,7 @@
 Die finishes become 256px grey tiles with the lighting flattened, so the page can lay them over any body colour.
 Trays are cropped and saved as 1200px JPEGs. The reflection panorama for the 3D dice becomes img/env.jpg.
 
-    python tools/make_textures.py <folder of source images> [<folder of Poly Haven downloads>]
+    python tools/make_textures.py <folder of source images> [<folder of Poly Haven downloads> [<folder of ambientCG downloads>]]
 
 The crop boxes below are (left, top, right, bottom) in source pixels.
 """
@@ -16,8 +16,6 @@ OUT = os.path.join(os.path.dirname(__file__), '..', 'img')
 # finish: (source file, crop box, contrast)
 DICE = {
     'gem':   ('2.webp',  (330, 300, 730, 700), 1.0),
-    'stone': ('4.webp',  (100, 100, 800, 800), 1.0),
-    'metal': ('8.webp',  (100, 100, 800, 800), 1.3),
     'resin': ('10.webp', (300, 380, 900, 980), 2.2),
     'bone':  ('15.webp', (130, 60, 760, 690), 1.3),
 }
@@ -88,5 +86,35 @@ if PH:
         top('rough').convert('L').resize((512, 256), Image.LANCZOS).save(os.path.join(OUT, 'tray-%s-r.jpg' % name), quality=80, optimize=True)
         made += 1
 
-print('wrote', len(DICE), 'die textures,', len(TRAYS), 'photo trays with relief and', made, 'wasteland trays')
+# Die finishes made from real material sets (CC0). Each set has separate pictures for color, relief and shine, so a die gets
+# three grey tiles instead of one photo doing all three jobs: die-<finish>.jpg (color detail), -h.jpg (relief), -r.jpg (shine).
+# Give the folder of extracted ambientCG "<id>_1K-JPG" downloads as a third argument.
+#   finish: (where from, id, how much of the 1024px picture one die face shows, contrast, which extra tiles: h relief, r shine)
+ACG = sys.argv[3] if len(sys.argv) > 3 else None
+MATS = {
+    'metal': ('acg', 'Metal038', 620, 1.4, 'hr'),      # worn, scratched steel
+    'stone': ('acg', 'Granite002A', 640, 1.0, 'r'),    # speckled granite, polished, so no relief of its own
+    'wood': ('ph', 'oak_veneer_01', 330, 1.3, 'r'),    # oak, close enough in that the grain reads on a small die; veneer is flat too
+    'rust': ('ph', 'rusty_metal_03', 560, .9, 'hr'),   # painted steel with rust coming through
+}
+mats = 0
+for name, (lib, pid, size, c, extra) in MATS.items():
+    root = PH if lib == 'ph' else ACG
+    if not root: continue
+    part = (lambda kind: os.path.join(root, '%s_%s.jpg' % (pid, {'color': 'diff', 'relief': 'disp', 'shine': 'rough'}[kind]))) if lib == 'ph' else            (lambda kind: os.path.join(root, pid, '%s_1K-JPG_%s.jpg' % (pid, {'color': 'Color', 'relief': 'Displacement', 'shine': 'Roughness'}[kind])))
+    box = (100, 100, 100 + size, 100 + size)
+    for kind, tail in (('color', ''), ('relief', '-h'), ('shine', '-r')):
+        if tail and tail[1] not in extra: continue
+        im = Image.open(part(kind)).convert('RGB').crop(box)
+        flatten(im, c).resize((256, 256), Image.LANCZOS).save(os.path.join(OUT, 'die-%s%s.jpg' % (name, tail)), quality=80, optimize=True)
+    if name == 'rust':
+        # the rust itself keeps its own color whatever the die is painted: a see-through picture with only the rusty parts in it
+        a = np.asarray(Image.open(part('color')).convert('RGB').crop(box).resize((256, 256), Image.LANCZOS)).astype(np.float32)
+        redness = (a[..., 0] - a[..., 1]) / (a[..., 0] + a[..., 1] + 1e-3)          # rust is redder than the paint
+        alpha = np.clip((redness - .21) / .10, 0, 1) * 255
+        Image.fromarray(np.dstack([a, alpha]).astype(np.uint8), 'RGBA').save(os.path.join(OUT, 'die-rust-c.png'), optimize=True)
+    mats += 1
+
+print('wrote', len(DICE), 'photo die textures,', mats, 'die finishes from material sets,', len(TRAYS), 'photo trays with relief and', made, 'wasteland trays')
+
 

@@ -17,8 +17,8 @@ Two sources.
 | Files | What | Used for |
 |---|---|---|
 | `dicehit_plastic1` to `15` | plastic dice knocking together | bone (slowed a little) and resin |
-| `dicehit_metal1` to `12` | metal dice knocking together | metal |
-| `dicehit_wood1` to `12` | wooden dice knocking together | stone (slowed) |
+| `dicehit_metal1` to `12` | metal dice knocking together | metal, and rust (slowed a little) |
+| `dicehit_wood1` to `12` | wooden dice knocking together | wood, and stone (slowed) |
 | `surface_felt1` to `7` (no 6) | a die landing on felt | felt, and leather (slowed) |
 | `surface_wood_tray1` to `7` | a die landing in a wooden tray | wood |
 | `surface_wood_table1` to `7` | a die landing on a wooden table | slate and concrete (sped up) |

@@ -101,6 +101,18 @@ const STUB = () => {
   check('holding Roll: stone dice knock together (wood takes), no tray takes', c.dicehit_wood>=3 && !c.surface_wood_tray, JSON.stringify(c));
   await p.mouse.up(); await landed(p, 5);
 
+  // wooden dice use the wooden recordings as they are; rusty dice use the metal ones, a little lower
+  await p.click('[data-dp-set="finish"][data-v="wood"]'); await ready(p, ['dicehit_wood']); await played(p);
+  await p.locator('[data-dp-hear]').scrollIntoViewIfNeeded(); await p.click('[data-dp-hear]'); await p.waitForTimeout(1100);
+  a = await played(p); c = count(a.played);
+  const woodRates = a.rates.filter((r, i)=>a.played[i]==='dicehit_wood');
+  check('wooden dice: 8 wood takes at their natural speed', c.dicehit_wood===8 && woodRates.every(r=>r>.93 && r<1.07), woodRates.join(','));
+  await p.click('[data-dp-set="finish"][data-v="rust"]'); await ready(p, ['dicehit_metal']); await played(p);
+  await p.click('[data-dp-hear]'); await p.waitForTimeout(1100);
+  a = await played(p); c = count(a.played);
+  check('rusty dice: 8 metal takes', c.dicehit_metal===8, JSON.stringify(c));
+  await p.click('[data-dp-set="finish"][data-v="stone"]'); await p.waitForTimeout(150);
+
   // a wasteland tray: rusted plate rings like metal
   await p.click('[data-dp-tray="rust"]'); await ready(p, ['surface_metal']); await played(p);
   await p.locator('[data-dp-hear]').scrollIntoViewIfNeeded(); await p.click('[data-dp-hear]'); await p.waitForTimeout(1100);

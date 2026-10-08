@@ -75,10 +75,19 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await p.click('[data-dp-use="default"]'); await p.waitForTimeout(150);
   check('changing the set rebuilds the 3D dice (bone has no liquid) and swaps the tray photo', await p.evaluate(() => __d3.dice.length === 2 && __d3.dice.every(d => !d.plane && d.die.finish === 'bone')) && await p.waitForFunction(() => __d3.traySrc === 'img/tray.jpg' && __d3.floorOn, null, { timeout: 8000 }).then(() => true, () => false));
   await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-bone.png') });
-  for (const f of ['resin','metal','stone','gem']) { await p.click('[data-dp-set="finish"][data-v="'+f+'"]'); await p.waitForTimeout(120); await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-'+f+'.png') }); }
+  for (const f of ['resin','metal','stone','wood','rust','gem']) { await p.click('[data-dp-set="finish"][data-v="'+f+'"]'); await p.waitForTimeout(120); await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-'+f+'.png') }); }
   check('each finish draws', (await lit(p)) > 300);
   await p.click('[data-dp-set="sigil"][data-v="skull"]'); await p.waitForTimeout(200);
   check('a sigil does not break the 3D dice', (await d3(p)).n===2);
+
+  // ---- finishes made from material sets ----
+  check('wood and rust are offered as finishes, and Scrapyard as a set', (await p.locator('[data-dp-set="finish"][data-v="wood"], [data-dp-set="finish"][data-v="rust"], [data-dp-use="x:scrap"]').count())===3);
+  await p.click('[data-dp-use="x:scrap"]'); await p.waitForTimeout(400);
+  check('Scrapyard passes the pip readability rule', !(await p.locator('.dp-warn').count()));
+  check('rust dice: color detail, relief, shine and the rust layer all loaded, and each face has its own shine picture', await p.evaluate(()=>{ const t = __d3.tiles.rust || {}, m = __d3.dice[0].g.children[0].material[0]; return !!(t.grain && t.h && t.r && t.c) && __d3.dice[0].die.finish==='rust' && m.roughnessMap && m.roughnessMap !== m.bumpMap; }));
+  check('metal and stone now have shine pictures too, bone still uses one photo', await p.evaluate(()=>!!(__d3.tiles.metal.r && __d3.tiles.metal.h && __d3.tiles.stone.r) && !__d3.tiles.bone.r));
+  await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-scrapyard.png') });
+  await p.click('[data-dp-use="default"]'); await p.waitForTimeout(200);
 
   // ---- trays with relief, and the wasteland trays ----
   check('wasteland trays are offered: rust, dust and concrete', (await p.locator('[data-dp-tray="rust"], [data-dp-tray="dust"], [data-dp-tray="concrete"]').count())===3);
@@ -109,7 +118,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await p.evaluate(() => document.getElementById('set-3d').click()); await p.waitForTimeout(200);
   check('switching on again reuses the same canvas', (await p.locator('#tray canvas').count())===1 && (await d3(p)).state==='on');
   await p.evaluate(() => window.dispatchEvent(new Event('pagehide'))); await p.reload(); await p.waitForFunction(() => __d3.state === 'on', null, { timeout: 15000 });
-  check('reload starts in 3D with the saved dice', (await d3(p)).n===2 && await p.evaluate(() => __d3.dice[0].die.finish === 'gem'));
+  check('reload starts in 3D with the saved dice', (await d3(p)).n===2 && await p.evaluate(() => __d3.dice[0].die.finish === 'bone' && __d3.dice[0].die.glow === true));
 
   // ---- phone ----
   const m = await open({ viewport: { width: 390, height: 800 }, colorScheme: 'light' }, { v: 1, settings: { fx: true, sound: false, dice3d: true }, dice: { linked: true, a: { body: '#b8650f', finish: 'fuel', pip: '#fff4d6', glow: false, sigil: '' }, b: { body: '#b8650f', finish: 'fuel', pip: '#fff4d6', glow: false, sigil: '' }, tray: 'slate', sets: [] } });

@@ -464,13 +464,22 @@ details.sect > summary::after { font-family: var(--display); }
 .fin-gem .face { opacity: .82; backface-visibility: visible; background: linear-gradient(145deg, rgba(255, 255, 255, .55) 0%, rgba(255, 255, 255, 0) 35%), linear-gradient(145deg, var(--die-hi) 0%, var(--die) 60%, var(--die-lo) 100%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .35), inset 0 0 14px rgba(255, 255, 255, .3), inset 0 -5px 10px rgba(0, 0, 0, .25); }
 /* optional photo grain per finish (img/die-*.jpg, grey tiles). It sits between the face color and the pips, so any body color keeps its hue. */
-.tx-bone .fin-bone .face, .tx-resin .fin-resin .face, .tx-metal .fin-metal .face, .tx-stone .fin-stone .face, .tx-gem .fin-gem .face { isolation: isolate; }
-.tx-bone .fin-bone .face::before, .tx-resin .fin-resin .face::before, .tx-metal .fin-metal .face::before, .tx-stone .fin-stone .face::before, .tx-gem .fin-gem .face::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background-size: cover; mix-blend-mode: overlay; pointer-events: none; }
+.tx-bone .fin-bone .face, .tx-resin .fin-resin .face, .tx-metal .fin-metal .face, .tx-stone .fin-stone .face, .tx-wood .fin-wood .face, .tx-rust .fin-rust .face, .tx-gem .fin-gem .face { isolation: isolate; }
+.tx-bone .fin-bone .face::before, .tx-resin .fin-resin .face::before, .tx-metal .fin-metal .face::before, .tx-stone .fin-stone .face::before, .tx-wood .fin-wood .face::before, .tx-rust .fin-rust .face::before, .tx-gem .fin-gem .face::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background-size: cover; mix-blend-mode: overlay; pointer-events: none; }
 .tx-bone .fin-bone .face::before { background-image: url(img/die-bone.jpg); opacity: .6; }
 .tx-resin .fin-resin .face::before { background-image: url(img/die-resin.jpg); opacity: .5; }
 .tx-metal .fin-metal .face::before { background-image: url(img/die-metal.jpg); opacity: .65; }
 .tx-stone .fin-stone .face::before { background-image: url(img/die-stone.jpg); opacity: .75; }
 .tx-gem .fin-gem .face::before { background-image: url(img/die-gem.jpg); opacity: .7; }
+.tx-wood .fin-wood .face::before { background-image: url(img/die-wood.jpg); opacity: .85; }
+.tx-rust .fin-rust .face::before { background-image: url(img/die-rust.jpg); opacity: .7; }
+/* the rust itself, in its own color over whatever the die is painted. With the photo there, the drawn blotches above are not needed. */
+.txc-rust .fin-rust .face { background: linear-gradient(145deg, var(--die-hi) 0%, var(--die) 50%, var(--die-lo) 100%); }
+.txc-rust .fin-rust .face::after { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background: url(img/die-rust-c.png) center / cover; pointer-events: none; }
+.fin-wood .face { border-radius: 9px; background: repeating-linear-gradient(88deg, rgba(0, 0, 0, .07) 0 1px, transparent 1px 5px, rgba(255, 255, 255, .05) 5px 6px, transparent 6px 11px), linear-gradient(145deg, var(--die-hi) 0%, var(--die) 55%, var(--die-lo) 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .3), inset 0 -4px 8px rgba(0, 0, 0, .22), inset 0 2px 4px rgba(255, 255, 255, .3); }
+.fin-rust .face { border-radius: 8px; background: radial-gradient(circle at 78% 24%, rgba(120, 52, 18, .85) 0 9%, transparent 24%), radial-gradient(circle at 20% 76%, rgba(96, 40, 14, .8) 0 12%, transparent 30%), radial-gradient(circle at 60% 88%, rgba(140, 66, 24, .6) 0 6%, transparent 16%), linear-gradient(145deg, var(--die-hi) 0%, var(--die) 50%, var(--die-lo) 100%);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .45), inset 0 -3px 7px rgba(0, 0, 0, .35), inset 0 2px 3px rgba(255, 255, 255, .25); }
 .fin-fuel .face { opacity: .86; backface-visibility: visible; background: linear-gradient(to top, var(--die) 0 56%, rgba(255, 255, 255, .5) 56% 58%, rgba(255, 255, 255, .1) 58%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .4), inset 0 0 12px rgba(255, 255, 255, .25), inset 0 -5px 10px rgba(0, 0, 0, .25); }
 .d3cv { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
@@ -2814,7 +2823,12 @@ function initArt() {
   probe('img/die-glass.jpg', function (im) { D3.scuffImg = im; D3.sig = ''; d3Sync(); });
   probe('img/env.jpg', function (im) { D3.envImg = im; if (D3.renderer) { d3Env(); d3Mood(); } });
   TRAYS.forEach(function (t) { if (t !== 'leather') probe('img/tray-' + t + '.jpg', function () { ART.trays[t] = true; applyTray(); }); });
-  FINISHES.forEach(function (fn) { if (fn !== 'fuel') probe('img/die-' + fn + '.jpg', function (im) { D3.tiles[fn] = im; D3.sig = ''; d3Sync(); document.documentElement.classList.add('tx-' + fn); }); });
+    FINISHES.forEach(function (fn) {
+      if (fn === 'fuel') return;
+      function got(part, cls) { return function (im) { (D3.tiles[fn] = D3.tiles[fn] || {})[part] = im; D3.sig = ''; d3Sync(); if (cls) document.documentElement.classList.add(cls); }; }
+    probe('img/die-' + fn + '.jpg', got('grain', 'tx-' + fn));
+    (DIEART[fn] || '').split('').forEach(function (p) { probe('img/die-' + fn + '-' + p + (p === 'c' ? '.png' : '.jpg'), got(p, p === 'c' ? 'txc-' + fn : '')); });
+    });
   ['tier-full', 'tier-part', 'tier-miss', 'levelup', 'empty-bestiary', 'empty-cases', 'empty-party'].forEach(function (n) {
     probe('img/' + n + '.jpg', function () { ART.misc[n] = true; renderStage(); renderSheet(); renderBeasts(); renderParty(); if (!$('#cases input:focus, #cases textarea:focus')) renderCases(); });
   });
@@ -2839,7 +2853,7 @@ function selCustom() {
    so nothing from a die reaches HTML or CSS without passing cleanDie() or strictDie() first. */
 function die0() { return { body: '#e9dcba', finish: 'bone', pip: '#6a1420', glow: false, sigil: '' }; }
 var HEX = /^#[0-9a-f]{6}$/i;
-var FINISHES = ['bone', 'resin', 'metal', 'stone', 'gem', 'fuel'], TRAYS = ['leather', 'felt', 'wood', 'slate', 'rust', 'dust', 'concrete'], SIGNAMES = ['', 'antler', 'lantern', 'crescent', 'eye', 'skull', 'cross', 'pentagram', 'pentacle', 'pupil'];
+var FINISHES = ['bone', 'resin', 'metal', 'stone', 'wood', 'rust', 'gem', 'fuel'], DIEART = { metal: 'hr', stone: 'r', wood: 'r', rust: 'hrc' }, TRAYS = ['leather', 'felt', 'wood', 'slate', 'rust', 'dust', 'concrete'], SIGNAMES = ['', 'antler', 'lantern', 'crescent', 'eye', 'skull', 'cross', 'pentagram', 'pentacle', 'pupil'];
 var SIGILS = {
   antler: '<path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M12 21.5v-6.5M12 15c-3-1-5-3.2-5.5-7M12 15c3-1 5-3.2 5.5-7M6.5 8L3.8 5M6.5 8L7 3.2M8.3 12L4.6 11.4M17.5 8l2.7-3M17.5 8L17 3.2M15.7 12l3.7-.6"/>',
   lantern: '<path fill="currentColor" fill-rule="evenodd" d="M10 1.5h4v2h-4zM8.5 4.5h7l1.5 3H7zM7.5 8.5h9v10h-9zM10 10.5v6h4v-6zM6.5 19.5h11v2.5h-11z"/>',
@@ -2868,7 +2882,7 @@ function mkDie(body, finish, pip, glow, sigil) { return { body: body, finish: fi
 function mkSet(name, die, tray) { return { name: name, a: die, b: die, tray: tray }; }
 var DEFSET = mkSet('Bone and Oxblood', die0(), 'leather');
 /* sets that belong to the campaign rather than a playbook */
-var XSETS = { tank: mkSet('Last Tank', mkDie('#b8650f', 'fuel', '#fff4d6', false, ''), 'slate') };
+var XSETS = { tank: mkSet('Last Tank', mkDie('#b8650f', 'fuel', '#fff4d6', false, ''), 'slate'), scrap: mkSet('Scrapyard', mkDie('#c9a227', 'rust', '#111111', false, 'skull'), 'rust') };
 /* one starter set per playbook, keyed by pbSlug(). Each passes the 3:1 pip readability rule (tested). */
 var DICESETS = {
   chosen: mkSet('Destiny\'s Edge', mkDie('#a8842c', 'metal', '#ffffff', true, 'cross'), 'slate'),
@@ -3138,6 +3152,8 @@ var SFX = {
   metal: { f: 3800, q: 8, len: .05, g: .6, ring: .28, hold: .45, over: 1.48 },
   stone: { f: 850, q: 3, len: .07, g: .9 },
   gem: { f: 5200, q: 5, len: .05, g: .7, ring: .18, hold: .2 },
+  wood: { f: 1150, q: 3, len: .06, g: .85 },
+  rust: { f: 3100, q: 6, len: .05, g: .6, ring: .12, hold: .2, over: 1.48 },
   fuel: { f: 4300, q: 5, len: .05, g: .7, ring: .12, hold: .12 }
 };
 var TRAYSFX = {
@@ -3173,6 +3189,8 @@ var DIESND = {
   resin: { set: 'dicehit_plastic', rate: 1.04, g: .9 },
   metal: { set: 'dicehit_metal', rate: 1, g: 1, w: 1.25 },
   stone: { set: 'dicehit_wood', rate: .8, g: 1, w: 1.2 },
+  wood: { set: 'dicehit_wood', rate: 1, g: 1 },
+  rust: { set: 'dicehit_metal', rate: .9, g: .95, w: 1.2 },
   gem: { set: 'dicehit_glass', rate: 4, g: .8, ring: .6 },
   fuel: { set: 'dicehit_glass', rate: 3, g: .8, w: 1.15, ring: .5 }
 };
@@ -3299,8 +3317,10 @@ var D3REST = [{ x: -.98, z: -.06, yaw: -.38 }, { x: .98, z: .1, yaw: .3 }];
 var D3MAT = {
   bone: { rough: .55, grain: .75, relief: .4, o: {} },
   resin: { rough: .14, grain: .35, relief: 0, o: { clearcoat: 1, clearcoatRoughness: .08 } },
-  metal: { rough: .34, grain: .6, relief: .35, o: { metalness: 1 } },
-  stone: { rough: .9, grain: .9, relief: .8, o: {} }
+  metal: { rough: .36, grain: .7, relief: .6, o: { metalness: 1 } },
+  stone: { rough: .42, grain: .9, relief: .2, o: {} },
+  wood: { rough: .6, grain: .95, relief: .45, o: {}, dir: true },
+  rust: { rough: .78, grain: .6, relief: .9, o: {} }
 };
 /* rough and tint shade the tray photo. n is how strong its relief map is (img/tray-<name>-n.jpg). r means it also has a map of how shiny each spot is (-r.jpg). */
 var D3TRAY = {
@@ -3473,9 +3493,15 @@ function d3Box(size, rad, seg) {
 /* one face as two pictures: the color (body, grain, wear, pips) and a relief map where pips are drilled in.
    Clear dice get painted pips only and no relief. */
 function d3Face(v, die, clear) {
-  var T = D3.T, k = D3MAT[die.finish] || D3MAT.bone, tile = D3.tiles[die.finish], c = document.createElement('canvas'), b = document.createElement('canvas'), x, y, g, i;
+  var T = D3.T, k = D3MAT[die.finish] || D3MAT.bone, art = D3.tiles[die.finish] || {}, tile = art.grain, c = document.createElement('canvas'), b = document.createElement('canvas'), x, y, g, i, r = null, w = null;
   c.width = c.height = b.width = b.height = 256; x = c.getContext('2d'); y = b.getContext('2d');
-  var out = { map: new T.CanvasTexture(c), bump: clear ? null : new T.CanvasTexture(b), glow: null }, e = null, z = null;
+  var turn = k.dir ? 0 : Math.floor(Math.random() * 4), flipX = Math.random() < .5, flipY = k.dir ? Math.random() < .5 : false;
+  function put(ctx, img, alpha, mode) {
+    ctx.save(); ctx.globalAlpha = alpha; if (mode) ctx.globalCompositeOperation = mode;
+    ctx.translate(128, 128); ctx.rotate(turn * Math.PI / 2); ctx.scale(flipX ? -1 : 1, flipY ? -1 : 1); ctx.drawImage(img, -128, -128, 256, 256); ctx.restore();
+  }
+  var out = { map: new T.CanvasTexture(c), bump: clear ? null : new T.CanvasTexture(b), rough: null, glow: null }, e = null, z = null;
+  if (!clear && art.r) { r = document.createElement('canvas'); r.width = r.height = 256; w = r.getContext('2d'); w.fillStyle = '#808080'; w.fillRect(0, 0, 256, 256); put(w, art.r, 1); out.rough = new T.CanvasTexture(r); }
   out.map.colorSpace = T.SRGBColorSpace; out.map.anisotropy = 4;
   if (die.glow) {
     /* glowing pips really give off light: a black picture with the pips and a soft halo in white, used as the face's own light */
@@ -3486,10 +3512,9 @@ function d3Face(v, die, clear) {
   if (!clear) {
     x.fillStyle = die.body; x.fillRect(0, 0, 256, 256);
     y.fillStyle = '#808080'; y.fillRect(0, 0, 256, 256);
-    if (tile) {
-      x.globalCompositeOperation = 'overlay'; x.globalAlpha = k.grain; x.drawImage(tile, 0, 0, 256, 256); x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1;
-      y.globalAlpha = k.relief; y.drawImage(tile, 0, 0, 256, 256); y.globalAlpha = 1;
-    }
+    if (tile) put(x, tile, k.grain, 'overlay');
+    if (art.c) put(x, art.c, 1);
+    if (art.h || tile) put(y, art.h || tile, k.relief);
     /* handling: darker toward the edges, a few fine scratches */
     g = x.createRadialGradient(128, 128, 96, 128, 128, 186); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.2)');
     x.fillStyle = g; x.fillRect(0, 0, 256, 256);
@@ -3528,6 +3553,7 @@ function d3Face(v, die, clear) {
       x.strokeStyle = 'rgba(0,0,0,.28)'; x.lineWidth = 2; x.beginPath(); x.arc(px, py, pr + 1, 0, Math.PI * 2); x.stroke();
       g = y.createRadialGradient(px, py, pr * .2, px, py, pr * 1.12); g.addColorStop(0, '#1c1c1c'); g.addColorStop(.75, '#3a3a3a'); g.addColorStop(1, 'rgba(128,128,128,0)');
       y.fillStyle = g; y.beginPath(); y.arc(px, py, pr * 1.12, 0, Math.PI * 2); y.fill();
+      if (w) { w.fillStyle = '#4a4a4a'; w.beginPath(); w.arc(px, py, pr, 0, Math.PI * 2); w.fill(); }
     }
   }
   return out;
@@ -3546,7 +3572,7 @@ function d3Build(die) {
   if (!glass) {
     var k = D3MAT[die.finish] || D3MAT.bone;
     mats = D3FACE.map(function (v) {
-      var f = d3Face(v, die, false), o = lit({ map: f.map, bumpMap: f.bump, bumpScale: 2.4, roughnessMap: f.bump, roughness: Math.min(1, k.rough * 2), metalness: 0 }, f);
+      var f = d3Face(v, die, false), o = lit({ map: f.map, bumpMap: f.bump, bumpScale: 2.4, roughnessMap: f.rough || f.bump, roughness: Math.min(1, k.rough * 2), metalness: 0 }, f);
       for (var n in k.o) o[n] = k.o[n];
       return new T.MeshPhysicalMaterial(o);
     });
@@ -3596,6 +3622,7 @@ function d3Drop(d) {
     (Array.isArray(o.material) ? o.material : [o.material]).forEach(function (m) {
       if (m.map && m.map !== D3.blob) m.map.dispose();
       if (m.bumpMap) m.bumpMap.dispose();
+      if (m.roughnessMap && m.roughnessMap !== m.bumpMap) m.roughnessMap.dispose();
       if (m.emissiveMap) m.emissiveMap.dispose();
       m.dispose();
     });
