@@ -459,6 +459,14 @@ details.sect > summary::after { font-family: var(--display); }
   box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .3), inset 0 -3px 8px rgba(0, 0, 0, .25); }
 .fin-gem .face { opacity: .82; backface-visibility: visible; background: linear-gradient(145deg, rgba(255, 255, 255, .55) 0%, rgba(255, 255, 255, 0) 35%), linear-gradient(145deg, var(--die-hi) 0%, var(--die) 60%, var(--die-lo) 100%);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .35), inset 0 0 14px rgba(255, 255, 255, .3), inset 0 -5px 10px rgba(0, 0, 0, .25); }
+/* optional photo grain per finish (img/die-*.jpg, grey tiles). It sits between the face color and the pips, so any body color keeps its hue. */
+.tx-bone .fin-bone .face, .tx-resin .fin-resin .face, .tx-metal .fin-metal .face, .tx-stone .fin-stone .face, .tx-gem .fin-gem .face { isolation: isolate; }
+.tx-bone .fin-bone .face::before, .tx-resin .fin-resin .face::before, .tx-metal .fin-metal .face::before, .tx-stone .fin-stone .face::before, .tx-gem .fin-gem .face::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; background-size: cover; mix-blend-mode: overlay; pointer-events: none; }
+.tx-bone .fin-bone .face::before { background-image: url(img/die-bone.jpg); opacity: .6; }
+.tx-resin .fin-resin .face::before { background-image: url(img/die-resin.jpg); opacity: .5; }
+.tx-metal .fin-metal .face::before { background-image: url(img/die-metal.jpg); opacity: .65; }
+.tx-stone .fin-stone .face::before { background-image: url(img/die-stone.jpg); opacity: .75; }
+.tx-gem .fin-gem .face::before { background-image: url(img/die-gem.jpg); opacity: .7; }
 .slot.glow .face i.on { box-shadow: 0 0 7px 1px var(--pip-c), inset 0 1px 2px rgba(0, 0, 0, .3); }
 .face.sig { display: block; padding: 8px; color: var(--pip-c); }
 .face.sig svg { display: block; width: 100%; height: 100%; }
@@ -2721,7 +2729,7 @@ function startRecap(c) {
 }
 
 /* ---------- art hooks ---------- */
-var ART = { pb: {}, misc: {}, tex1: false, tex2: false, tray: false };
+var ART = { pb: {}, misc: {}, tex1: false, tex2: false, tray: false, trays: {} };
 function artImg(name, cls) { return ART.misc[name] ? '<img class="' + cls + '" src="img/' + name + '.jpg" alt="">' : ''; }
 function applyTex() {
   var b = ['party', 'bestiary', 'notes'].indexOf(S.tab) >= 0, useB = ART.tex2 && (b || !ART.tex1), useA = ART.tex1 && !useB;
@@ -2735,6 +2743,8 @@ function initArt() {
   probe('img/texture.jpg', function () { $('.texture:not(.t2)').style.backgroundImage = 'url(img/texture.jpg)'; ART.tex1 = true; applyTex(); });
   probe('img/texture2.jpg', function () { $('.texture.t2').style.backgroundImage = 'url(img/texture2.jpg)'; ART.tex2 = true; applyTex(); });
   probe('img/tray.jpg', function () { ART.tray = true; applyTray(); });
+  ['felt', 'wood', 'slate'].forEach(function (t) { probe('img/tray-' + t + '.jpg', function () { ART.trays[t] = true; applyTray(); }); });
+  FINISHES.forEach(function (fn) { probe('img/die-' + fn + '.jpg', function () { document.documentElement.classList.add('tx-' + fn); }); });
   ['tier-full', 'tier-part', 'tier-miss', 'levelup', 'empty-bestiary', 'empty-cases', 'empty-party'].forEach(function (n) {
     probe('img/' + n + '.jpg', function () { ART.misc[n] = true; renderStage(); renderSheet(); renderBeasts(); renderParty(); if (!$('#cases input:focus, #cases textarea:focus')) renderCases(); });
   });
@@ -2821,10 +2831,11 @@ function dieVars(d) {
   return v;
 }
 function applyTray() {
-  var t = curTray(), img = t === 'leather' && ART.tray;
+  var t = curTray(), img = t === 'leather' ? ART.tray && 'img/tray.jpg' : ART.trays[t] && 'img/tray-' + t + '.jpg';
+  var shade = t === 'leather' ? 'linear-gradient(rgba(20,6,10,.4), rgba(20,6,10,.5)), ' : 'linear-gradient(rgba(0,0,0,.1), rgba(0,0,0,.2)), ';
   [$('#tray'), $('#dp-tray')].forEach(function (el) {
     el.setAttribute('data-tray', t);
-    el.style.backgroundImage = img ? 'linear-gradient(rgba(20,6,10,.4), rgba(20,6,10,.5)), url(img/tray.jpg)' : '';
+    el.style.backgroundImage = img ? shade + 'url(' + img + ')' : '';
     el.style.backgroundSize = img ? 'cover' : ''; el.style.backgroundPosition = img ? 'center' : '';
   });
 }

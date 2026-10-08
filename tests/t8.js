@@ -48,7 +48,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   check('a sigil replaces the pips on the 6 only', sg.sig===1 && sg.sigOn6 && sg.pipFaces===5, JSON.stringify(sg));
   check('die label is unchanged by a sigil', /^Die showing \d$/.test(sg.label));
   await p.click('[data-dp-tray="slate"]');
-  check('tray surface changes on both trays', (await p.getAttribute('#tray','data-tray'))==='slate' && (await p.getAttribute('#dp-tray','data-tray'))==='slate' && (await p.evaluate(()=>document.getElementById('tray').style.backgroundImage))==='');
+  check('tray surface changes on both trays', (await p.getAttribute('#tray','data-tray'))==='slate' && (await p.getAttribute('#dp-tray','data-tray'))==='slate' && /tray-slate.jpg/.test(await p.evaluate(()=>document.getElementById('tray').style.backgroundImage)));
 
   // ---- readability rule ----
   await p.click('[data-dp-set="body"][data-v="#f5f5f2"]'); await p.click('[data-dp-set="pip"][data-v="#ffffff"]');

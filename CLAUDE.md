@@ -8,7 +8,7 @@ Single-file vanilla JS app for a Monster of the Week campaign. Owner: Jacob, a f
 - Playbook moves and descriptions are plain-English paraphrase on purpose. Do not paste text from the official playbooks. Mechanical facts stay exact: ratings lines, harm/armor numbers, tags, thresholds, pick counts.
 - No emoji. Avoid em dashes in user-facing copy. Keep copy friendly and beginner-oriented.
 - Support light and dark themes (CSS tokens in `:root`, dark overrides under `prefers-color-scheme` and `[data-theme]`). Check 390px width: no horizontal page scroll.
-- All images are optional; the page probes each one on load and works without them.
+- All images are optional; the page probes each one on load and works without them. Die grain (`img/die-<finish>.jpg`) and tray photos (`img/tray-<tray>.jpg`, leather is `img/tray.jpg`) are made from source photos by `python tools/make_textures.py <folder>`; the crop boxes live in that script.
 - `sw.js` and `manifest.webmanifest` are the only other shipped files (offline copy and install). The page is fetched network-first, so a deploy shows up on the next online load. Bump `CACHE` in `sw.js` only to throw away old cached art.
 - Ratings are parked per playbook (`S.sheet.pbs[name].stats`) by `setPlaybook()`; always change playbook through it.
 
