@@ -20,7 +20,7 @@ Each of these is finished and tested on its own branch. They all edit `index.htm
 ## 3D dice follow-ups
 
 - [x] Reflection panorama: a desert garage, in as `img/env.jpg` (2026-10-08). Two more are generating; compare them and keep the best.
-- [ ] Scuffed glass texture: Jacob is generating it. Wire it in as surface wear on the clear shell.
+- [x] Scuffed glass: in as `img/die-glass.jpg`, drawn as scratches on the Fuel shell (2026-10-08).
 - [ ] The dice maker's preview is still the flat dice. Show the 3D dice there when 3D is on.
 - [ ] Bring back the dimmed look before the first roll (lost when the tray moved into the 3D scene).
 - [ ] Check speed on a mid-range phone. If clear dice are slow, fall back to the cheaper glass there.
@@ -30,7 +30,8 @@ Each of these is finished and tested on its own branch. They all edit `index.htm
 ## Sigils
 
 - [x] Skull, antler, crescent, pentagram and pentacle traced from Jacob's artwork as one-color stamps (2026-10-08, on `fuel-dice`).
-- [ ] **Jacob:** redo the eye, lantern, gold seal and ice compass as a flat white symbol on pure black with thick strokes, then trace them with `python tools/make_sigils.py <folder>`. The built-in eye, lantern and cross stay until then.
+- [x] Lantern and eye traced from a second batch (2026-10-08). The cross stays hand-drawn.
+- [ ] The gold seal and ice compass were too fine to read at die size. Redo as a flat white symbol on pure black with thick strokes if they are still wanted, then trace with `python tools/make_sigils.py <folder>`.
 
 ## Gaps for new players
 

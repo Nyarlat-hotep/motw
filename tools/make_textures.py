@@ -46,6 +46,12 @@ for name, (f, box) in TRAYS.items():
     im = im.resize((1200, round(1200 * im.height / im.width)), Image.LANCZOS)
     im.save(os.path.join(OUT, 'tray-' + name + '.jpg'), quality=78, optimize=True, progressive=True)
 
+# scratches for the clear shell of 3D fuel dice: kept as light marks on black, because the page adds it as light
+GLASS = ('34.webp', (95, 95, 930, 930))
+if os.path.exists(os.path.join(SRC, GLASS[0])):
+    g = Image.open(os.path.join(SRC, GLASS[0])).convert('L').crop(GLASS[1]).resize((512, 512), Image.LANCZOS)
+    g.point(lambda v: max(0, min(255, int((v - 26) * 1.9)))).save(os.path.join(OUT, 'die-glass.jpg'), quality=82, optimize=True)
+
 # what shiny and clear 3D dice reflect: a 2:1 panorama, kept small because it is only ever seen blurred in a die
 ENV = '20.webp'
 if os.path.exists(os.path.join(SRC, ENV)):
