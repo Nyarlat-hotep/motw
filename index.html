@@ -471,6 +471,10 @@ details.sect > summary::after { font-family: var(--display); }
 .tx-metal .fin-metal .face::before { background-image: url(img/die-metal.jpg); opacity: .65; }
 .tx-stone .fin-stone .face::before { background-image: url(img/die-stone.jpg); opacity: .75; }
 .tx-gem .fin-gem .face::before { background-image: url(img/die-gem.jpg); opacity: .7; }
+.fin-fuel .face { opacity: .86; backface-visibility: visible; background: linear-gradient(to top, var(--die) 0 56%, rgba(255, 255, 255, .5) 56% 58%, rgba(255, 255, 255, .1) 58%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .4), inset 0 0 12px rgba(255, 255, 255, .25), inset 0 -5px 10px rgba(0, 0, 0, .25); }
+.d3cv { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.tray.d3on > .dice { visibility: hidden; }
 .slot.glow .face i.on { box-shadow: 0 0 7px 1px var(--pip-c), inset 0 1px 2px rgba(0, 0, 0, .3); }
 .face.sig { display: block; padding: 8px; color: var(--pip-c); }
 .face.sig svg { display: block; width: 100%; height: 100%; }
@@ -1059,6 +1063,8 @@ div.wcard { cursor: default; border-color: var(--good); }
       <h3>Big moments</h3>
       <label class="switch"><input type="checkbox" id="set-fx"><span>Lightning on a 12+, a shake on a miss, a glow on level-up</span></label>
       <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-snd"><span>Sound: dice clatter, thunder and a low thud (starts only after you roll)</span></label>
+      <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-3d"><span>3D dice (new): the dice tumble in real 3D, and Fuel dice show their liquid. Best on a recent phone or computer.</span></label>
+      <p class="small muted" id="d3msg" role="status" style="margin:6px 0 0"></p>
       <h3>Backup</h3>
       <p class="small muted">Your journal saves on its own. A backup file is a second copy you control, handy before you try something big or want to move devices.</p>
       <div class="actions">
@@ -1193,7 +1199,7 @@ function exampleCase() {
 }
 function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.hook = c.threats = c.weakness = c.npcs = c.loose = c.log = ''; c.clock = 0; c.eos = [false, false, false, false]; c.date = new Date().toISOString().slice(0, 10); return c; }
 function defaults() {
-  return { v: 1, tab: 'guide', hv: 'build', steps: {}, wiz: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false }, hold: { n: 0, move: '', asked: [] }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
+  return { v: 1, tab: 'guide', hv: 'build', steps: {}, wiz: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, dice3d: false }, hold: { n: 0, move: '', asked: [] }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0, adv: false },
     sheet: { name: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, moves: '', gear: '' } };
 }
@@ -2669,9 +2675,10 @@ var caps = { dl: null, sample: null };
 function bkMsg(t) { $('#bk-msg').textContent = t || ''; }
 function backupText() { return JSON.stringify({ app: 'hunters-journal', v: 1, exported: new Date().toISOString(), journal: S }, null, 1); }
 function renderSettings() {
-  $('#set-fx').checked = !!S.settings.fx; $('#set-snd').checked = !!S.settings.sound;
+  $('#set-fx').checked = !!S.settings.fx; $('#set-snd').checked = !!S.settings.sound; $('#set-3d').checked = !!S.settings.dice3d;
 }
 $('#set-fx').addEventListener('change', function (e) { S.settings.fx = e.target.checked; scheduleSave(); if (e.target.checked) fxPlay('crit'); });
+$('#set-3d').addEventListener('change', function (e) { S.settings.dice3d = e.target.checked; scheduleSave(); d3Apply(); renderDice(); });
 $('#set-snd').addEventListener('change', function (e) { S.settings.sound = e.target.checked; scheduleSave(); if (e.target.checked) sound('miss'); });
 $('#bk-save').addEventListener('click', function () {
   var d = new Date().toISOString().slice(0, 10);
@@ -2760,7 +2767,7 @@ function initArt() {
   probe('img/texture2.jpg', function () { $('.texture.t2').style.backgroundImage = 'url(img/texture2.jpg)'; ART.tex2 = true; applyTex(); });
   probe('img/tray.jpg', function () { ART.tray = true; applyTray(); });
   ['felt', 'wood', 'slate'].forEach(function (t) { probe('img/tray-' + t + '.jpg', function () { ART.trays[t] = true; applyTray(); }); });
-  FINISHES.forEach(function (fn) { probe('img/die-' + fn + '.jpg', function () { document.documentElement.classList.add('tx-' + fn); }); });
+  FINISHES.forEach(function (fn) { if (fn !== 'fuel') probe('img/die-' + fn + '.jpg', function (im) { D3.tiles[fn] = im; D3.sig = ''; d3Sync(); document.documentElement.classList.add('tx-' + fn); }); });
   ['tier-full', 'tier-part', 'tier-miss', 'levelup', 'empty-bestiary', 'empty-cases', 'empty-party'].forEach(function (n) {
     probe('img/' + n + '.jpg', function () { ART.misc[n] = true; renderStage(); renderSheet(); renderBeasts(); renderParty(); if (!$('#cases input:focus, #cases textarea:focus')) renderCases(); });
   });
@@ -2785,7 +2792,7 @@ function selCustom() {
    so nothing from a die reaches HTML or CSS without passing cleanDie() or strictDie() first. */
 function die0() { return { body: '#e9dcba', finish: 'bone', pip: '#6a1420', glow: false, sigil: '' }; }
 var HEX = /^#[0-9a-f]{6}$/i;
-var FINISHES = ['bone', 'resin', 'metal', 'stone', 'gem'], TRAYS = ['leather', 'felt', 'wood', 'slate'], SIGNAMES = ['', 'antler', 'lantern', 'crescent', 'eye', 'skull', 'cross'];
+var FINISHES = ['bone', 'resin', 'metal', 'stone', 'gem', 'fuel'], TRAYS = ['leather', 'felt', 'wood', 'slate'], SIGNAMES = ['', 'antler', 'lantern', 'crescent', 'eye', 'skull', 'cross'];
 var SIGILS = {
   antler: '<path fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" d="M12 21.5v-6.5M12 15c-3-1-5-3.2-5.5-7M12 15c3-1 5-3.2 5.5-7M6.5 8L3.8 5M6.5 8L7 3.2M8.3 12L4.6 11.4M17.5 8l2.7-3M17.5 8L17 3.2M15.7 12l3.7-.6"/>',
   lantern: '<path fill="currentColor" fill-rule="evenodd" d="M10 1.5h4v2h-4zM8.5 4.5h7l1.5 3H7zM7.5 8.5h9v10h-9zM10 10.5v6h4v-6zM6.5 19.5h11v2.5h-11z"/>',
@@ -2799,6 +2806,8 @@ var PIPSW = [['#6a1420', 'Oxblood'], ['#111111', 'Black'], ['#ffffff', 'White'],
 function mkDie(body, finish, pip, glow, sigil) { return { body: body, finish: finish, pip: pip, glow: !!glow, sigil: sigil || '' }; }
 function mkSet(name, die, tray) { return { name: name, a: die, b: die, tray: tray }; }
 var DEFSET = mkSet('Bone and Oxblood', die0(), 'leather');
+/* sets that belong to the campaign rather than a playbook */
+var XSETS = { tank: mkSet('Last Tank', mkDie('#b8650f', 'fuel', '#fff4d6', false, ''), 'slate') };
 /* one starter set per playbook, keyed by pbSlug(). Each passes the 3:1 pip readability rule (tested). */
 var DICESETS = {
   chosen: mkSet('Destiny\'s Edge', mkDie('#a8842c', 'metal', '#ffffff', true, 'cross'), 'slate'),
@@ -2906,6 +2915,7 @@ function renderDice() {
   if (!D.linked) h += '<div class="chips" role="group" aria-label="Which die to change">' + dpBtn('data-dp-tab="0"', !dpTab, 'Die 1') + dpBtn('data-dp-tab="1"', dpTab === 1, 'Die 2') + '</div>';
   h += '<span class="lbl">Body</span>' + dpSwatches('body', BODYSW, d.body);
   h += '<span class="lbl">Finish</span><div class="chips">' + FINISHES.map(function (f) { return dpBtn('data-dp-set="finish" data-v="' + f + '"', d.finish === f, cap(f)); }).join('') + '</div>';
+  if (d.finish === 'fuel' && !d3Want()) h += '<p class="small muted" style="margin:6px 0 0">Fuel dice show their liquid with 3D dice on. <button type="button" class="linkbtn" data-dp-3d="1">Turn on 3D dice</button></p>';
   h += '<span class="lbl">Pips</span>' + dpSwatches('pip', PIPSW, d.pip);
   h += '<label class="switch" style="margin-top:12px"><input type="checkbox" id="dp-glow"' + (d.glow ? ' checked' : '') + '><span>Glowing pips</span></label>';
   h += '<span class="lbl">Sigil on the 6</span><div class="chips">' + SIGNAMES.map(function (n) { return dpBtn('data-dp-set="sigil" data-v="' + n + '"', d.sigil === n, n ? '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + SIGILS[n] + '</svg>' + cap(n) : 'None'); }).join('') + '</div>';
@@ -2913,7 +2923,7 @@ function renderDice() {
   $('#dp-opts').innerHTML = h;
   keys = Object.keys(DICESETS);
   if (DICESETS[own]) keys = [own].concat(keys.filter(function (k) { return k !== own; }));
-  h = '<div class="chips">' + dpBtn('data-dp-use="default"', setIsOn(DEFSET), DEFSET.name) + keys.map(function (k) {
+  h = '<div class="chips">' + dpBtn('data-dp-use="default"', setIsOn(DEFSET), DEFSET.name) + Object.keys(XSETS).map(function (k) { return dpBtn('data-dp-use="x:' + k + '"', setIsOn(XSETS[k]), esc(XSETS[k].name)); }).join('') + keys.map(function (k) {
     return dpBtn('data-dp-use="pb:' + k + '"', setIsOn(DICESETS[k]), esc(DICESETS[k].name) + (k === own ? ' <span class="for">Made for ' + esc(S.sheet.playbook) + '</span>' : ''));
   }).join('') + '</div>';
   mine = mySets();
@@ -2956,9 +2966,10 @@ $('#dicepanel').addEventListener('click', function (e) {
     dpTab = D.linked ? 0 : +a; st = curDie(dpTab);
     dpEdit('pip', contrast(st.body, '#111111') >= contrast(st.body, '#f5f5f5') ? '#111111' : '#f5f5f5');
   }
+  else if (t.getAttribute('data-dp-3d') !== null) { S.settings.dice3d = true; $('#set-3d').checked = true; d3Apply(); }
   else if ((a = t.getAttribute('data-dp-del')) !== null) { D.sets = mySets(); D.sets.splice(+a, 1); dpMsg('Set removed.'); }
   else if ((a = t.getAttribute('data-dp-use')) !== null) {
-    st = a === 'default' ? DEFSET : a.indexOf('pb:') === 0 ? DICESETS[a.slice(3)] : mySets()[+a.slice(3)];
+    st = a === 'default' ? DEFSET : a.indexOf('pb:') === 0 ? DICESETS[a.slice(3)] : a.indexOf('x:') === 0 ? XSETS[a.slice(2)] : mySets()[+a.slice(3)];
     if (st) { useSet(st); dpMsg(''); }
   }
   scheduleSave(); renderDice();
@@ -3048,6 +3059,7 @@ function throwDice(d1, d2) {
   });
   var thump = tray.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(2px)' }, { transform: 'translateY(0)' }], { duration: 140, delay: THROW_MS * .34, easing: 'ease-out' });
   anims.push(thump);
+  d3Throw(d1, d2, THROW_MS);
   return anims;
 }
 function clack(v) {
@@ -3061,6 +3073,211 @@ function clack(v) {
     var g = ac.createGain(); g.gain.value = v * 0.6;
     src.connect(hp); hp.connect(g); g.connect(ac.destination); src.start(t);
   } catch (e) {}
+}
+/* ---------- 3D dice (optional) ----------
+   Off by default. When the player turns it on, three.js is fetched from vendor/ and a canvas is laid over the tray.
+   The regular dice stay in the page underneath (hidden), so labels, the fallback and everything that reads them keep working.
+   Nothing is simulated: the roll is decided first, then the dice are flown along a set path and land on it. */
+var D3 = window.__d3 = { T: null, state: '', dice: [], tiles: {}, raf: 0, anim: null, sig: '', until: 0 }; /* on window so tests can look in */
+var D3FACE = [2, 5, 1, 6, 3, 4]; /* value on each side of a box, in three's order: +x -x +y -y +z -z */
+var D3UP = { 1: [0, 1, 0], 6: [0, -1, 0], 2: [1, 0, 0], 5: [-1, 0, 0], 3: [0, 0, 1], 4: [0, 0, -1] };
+D3.UP = D3UP;
+var D3REST = [{ x: -.98, z: -.06, yaw: -.38 }, { x: .98, z: .1, yaw: .3 }];
+var D3MAT = { bone: { roughness: .62 }, resin: { roughness: .16, clearcoat: 1, clearcoatRoughness: .1 }, metal: { roughness: .3, metalness: 1 }, stone: { roughness: .95 } };
+var D3BOUNCE = [[0, .34, 3.2], [.34, .64, .9], [.64, .82, .32], [.82, .93, .1]]; /* from, to, height: same beats as the flat dice so sounds line up */
+function d3Want() { return !!S.settings.dice3d; }
+function d3Msg(t) { var m = $('#d3msg'); if (m) m.textContent = t || ''; }
+function d3Apply() {
+  if (!d3Want()) { d3Hide(); d3Msg(''); return; }
+  if (D3.renderer) { D3.state = 'on'; D3.canvas.hidden = false; $('#tray').classList.add('d3on'); D3.sig = ''; d3Size(); d3Sync(); return; }
+  if (D3.state === 'loading') return;
+  D3.state = 'loading'; d3Msg('Loading 3D dice.');
+  var p = null;
+  try { p = new Function('u', 'return import(u)')('./vendor/three.module.min.js'); } catch (e) {}
+  if (!p) { d3Fail(); return; }
+  p.then(function (m) {
+    D3.T = m; D3.state = '';
+    if (!d3Want()) return;
+    try { d3Init(); d3Msg(''); } catch (e) { d3Fail(); }
+  }, d3Fail);
+}
+function d3Fail() { D3.state = ''; d3Hide(); d3Msg('3D dice could not start here, so the regular dice are showing.'); }
+function d3Hide() {
+  if (D3.state === 'on') D3.state = '';
+  D3.anim = null; if (D3.raf) { cancelAnimationFrame(D3.raf); D3.raf = 0; }
+  $('#tray').classList.remove('d3on'); if (D3.canvas) D3.canvas.hidden = true;
+}
+function d3Init() {
+  var T = D3.T, tray = $('#tray'), cv = document.createElement('canvas');
+  cv.className = 'd3cv'; cv.setAttribute('aria-hidden', 'true');
+  var r = new T.WebGLRenderer({ canvas: cv, alpha: true, antialias: true });
+  r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  r.shadowMap.enabled = true; r.shadowMap.type = T.PCFSoftShadowMap; r.localClippingEnabled = true; r.toneMapping = T.ACESFilmicToneMapping;
+  tray.insertBefore(cv, tray.firstChild);
+  D3.canvas = cv; D3.renderer = r; D3.scene = new T.Scene();
+  D3.cam = new T.PerspectiveCamera(21, 1, .1, 60); D3.cam.position.set(0, 7.4, 5); D3.cam.lookAt(0, .3, .1);
+  D3.scene.add(new T.HemisphereLight(0xfff1dd, 0x2a2020, 1.1));
+  var sun = new T.DirectionalLight(0xffffff, 2.4); sun.position.set(-3, 8, 4); sun.castShadow = true;
+  sun.shadow.mapSize.set(1024, 1024); sun.shadow.camera.left = -6; sun.shadow.camera.right = 6; sun.shadow.camera.top = 6; sun.shadow.camera.bottom = -6; sun.shadow.radius = 4; sun.shadow.bias = -.0005;
+  D3.scene.add(sun);
+  var floor = new T.Mesh(new T.PlaneGeometry(40, 40), new T.ShadowMaterial({ opacity: .5 })); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; D3.scene.add(floor);
+  /* something for shiny dice to reflect: a soft sky with two bright windows */
+  var ec = document.createElement('canvas'); ec.width = 256; ec.height = 128;
+  var x = ec.getContext('2d'), gr = x.createLinearGradient(0, 0, 0, 128);
+  gr.addColorStop(0, '#fff6e6'); gr.addColorStop(.45, '#8d8378'); gr.addColorStop(.55, '#3a3230'); gr.addColorStop(1, '#0e0b0b');
+  x.fillStyle = gr; x.fillRect(0, 0, 256, 128); x.fillStyle = '#ffffff'; x.fillRect(30, 14, 46, 26); x.fillRect(150, 20, 60, 18);
+  var et = new T.CanvasTexture(ec); et.mapping = T.EquirectangularReflectionMapping; et.colorSpace = T.SRGBColorSpace;
+  var pm = new T.PMREMGenerator(r); D3.scene.environment = pm.fromEquirectangular(et).texture; pm.dispose(); et.dispose();
+  D3.v1 = new T.Vector3(); D3.v2 = new T.Vector3(); D3.q1 = new T.Quaternion(); D3.q2 = new T.Quaternion();
+  D3.state = 'on'; tray.classList.add('d3on');
+  if (window.MutationObserver) new MutationObserver(function () { d3Sync(); }).observe($('#dice'), { childList: true, attributes: true, attributeFilter: ['class'] });
+  if (window.ResizeObserver) new ResizeObserver(function () { d3Size(); }).observe(tray); else window.addEventListener('resize', d3Size);
+  d3Size(); d3Sync();
+}
+function d3Size() {
+  if (D3.state !== 'on') return;
+  var t = $('#tray'), w = t.clientWidth, h = t.clientHeight;
+  if (!w || !h) return;
+  D3.renderer.setSize(w, h, false); D3.cam.aspect = w / h; D3.cam.updateProjectionMatrix(); d3Kick(0);
+}
+/* a box with rounded edges: pull every point of a finely cut box onto a smaller box plus a radius */
+function d3Box(size, rad, seg) {
+  var T = D3.T, g = new T.BoxGeometry(size, size, size, seg, seg, seg), p = g.attributes.position, n = g.attributes.normal, h = size / 2 - rad, v = new T.Vector3(), c = new T.Vector3();
+  for (var i = 0; i < p.count; i++) {
+    v.fromBufferAttribute(p, i); c.set(clamp(v.x, -h, h), clamp(v.y, -h, h), clamp(v.z, -h, h)); v.sub(c);
+    if (v.lengthSq() < 1e-9) v.fromBufferAttribute(n, i);
+    v.normalize(); n.setXYZ(i, v.x, v.y, v.z); p.setXYZ(i, c.x + v.x * rad, c.y + v.y * rad, c.z + v.z * rad);
+  }
+  return g;
+}
+/* one face as a picture: body color, grain if the art is there, then pips (or the sigil on the 6). Clear dice get pips only. */
+function d3Face(v, die, clear) {
+  var T = D3.T, c = document.createElement('canvas'), x, g, i, tile = D3.tiles[die.finish];
+  c.width = c.height = 256; x = c.getContext('2d');
+  var tex = new T.CanvasTexture(c); tex.colorSpace = T.SRGBColorSpace; tex.anisotropy = 4;
+  if (!clear) {
+    g = x.createLinearGradient(0, 0, 256, 256); g.addColorStop(0, mixHex(die.body, 255, .12)); g.addColorStop(1, mixHex(die.body, 0, .1));
+    x.fillStyle = g; x.fillRect(0, 0, 256, 256);
+    if (tile) { x.globalCompositeOperation = 'overlay'; x.globalAlpha = .7; x.drawImage(tile, 0, 0, 256, 256); x.globalCompositeOperation = 'source-over'; x.globalAlpha = 1; }
+  }
+  if (die.glow) { x.shadowColor = die.pip; x.shadowBlur = 22; }
+  if (v === 6 && SIGILS[die.sigil]) {
+    var im = new Image();
+    im.onload = function () { x.drawImage(im, 44, 44, 168, 168); tex.needsUpdate = true; d3Kick(0); };
+    im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="168" height="168" style="color:' + die.pip + '">' + SIGILS[die.sigil] + '</svg>');
+    return tex;
+  }
+  for (i = 0; i < 9; i++) {
+    if (PIPS[v].indexOf(i) < 0) continue;
+    var px = 256 * (.24 + (i % 3) * .26), py = 256 * (.24 + Math.floor(i / 3) * .26), pr = 256 * .088 * (v === 1 ? 1.5 : 1);
+    g = x.createRadialGradient(px - pr * .3, py - pr * .35, pr * .1, px, py, pr); g.addColorStop(0, mixHex(die.pip, 255, .25)); g.addColorStop(1, mixHex(die.pip, 0, .22));
+    x.fillStyle = g; x.beginPath(); x.arc(px, py, pr, 0, Math.PI * 2); x.fill();
+  }
+  return tex;
+}
+function d3Build(die) {
+  var T = D3.T, grp = new T.Group(), geo = d3Box(1, .1, 8), glass = die.finish === 'gem' || die.finish === 'fuel', mats, m;
+  var d = { g: grp, die: die, val: 1, plane: null, sl: { x: 0, z: 0, vx: 0, vz: 0 }, px: 0, pz: 0, pvx: 0, pvz: 0, fresh: true };
+  function add(mesh, order, shadow) { mesh.renderOrder = order; mesh.castShadow = !!shadow; grp.add(mesh); return mesh; }
+  if (!glass) {
+    mats = D3FACE.map(function (v) { var o = { map: d3Face(v, die, false), roughness: .6, metalness: 0 }, k = D3MAT[die.finish] || {}; for (var n in k) o[n] = k[n]; return new T.MeshPhysicalMaterial(o); });
+    add(new T.Mesh(geo, mats), 0, true);
+  } else {
+    if (die.finish === 'fuel') {
+      /* the liquid is a smaller box cut off by a level plane that stays flat while the die turns. Its inside faces, drawn in a lighter color, read as the surface. */
+      d.plane = new T.Plane(new T.Vector3(0, -1, 0), 0);
+      var lg = d3Box(.9, .08, 4);
+      add(new T.Mesh(lg, new T.MeshBasicMaterial({ color: mixHex(die.body, 255, .1), side: T.BackSide, clippingPlanes: [d.plane] })), 1, false);
+      m = new T.MeshPhysicalMaterial({ color: die.body, emissive: die.body, emissiveIntensity: .22, roughness: .12, clearcoat: 1, transparent: true, opacity: .84, clippingPlanes: [d.plane], clipShadows: true });
+      add(new T.Mesh(lg, m), 2, true);
+    }
+    var tint = die.finish === 'gem' ? die.body : '#ffffff', op = die.finish === 'gem' ? .42 : .16;
+    add(new T.Mesh(geo, new T.MeshPhysicalMaterial({ color: tint, roughness: .08, transparent: true, opacity: op * .8, side: T.BackSide, depthWrite: false })), 3, die.finish === 'gem');
+    add(new T.Mesh(geo, new T.MeshPhysicalMaterial({ color: tint, roughness: .08, transparent: true, opacity: op, depthWrite: false })), 4, false);
+    mats = D3FACE.map(function (v) { return new T.MeshStandardMaterial({ map: d3Face(v, die, true), transparent: true, roughness: .4, depthWrite: false }); });
+    add(new T.Mesh(geo, mats), 5, false);
+    /* reflections only, added on top, so the shell still looks like glass where it is see-through */
+    add(new T.Mesh(geo, new T.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: .06, transparent: true, opacity: .22, blending: T.AdditiveBlending, depthWrite: false })), 6, false);
+  }
+  D3.scene.add(grp);
+  return d;
+}
+function d3Drop(d) {
+  D3.scene.remove(d.g);
+  d.g.traverse(function (o) {
+    if (!o.isMesh) return;
+    o.geometry.dispose();
+    (Array.isArray(o.material) ? o.material : [o.material]).forEach(function (m) { if (m.map) m.map.dispose(); m.dispose(); });
+  });
+}
+function d3RestQ(i, v, out) {
+  var u = D3UP[v];
+  D3.q1.setFromUnitVectors(D3.v1.set(u[0], u[1], u[2]), D3.v2.set(0, 1, 0));
+  return out.setFromAxisAngle(D3.v2.set(0, 1, 0), D3REST[i].yaw).multiply(D3.q1);
+}
+function d3Pose(d, i) { d.g.position.set(D3REST[i].x, .5, D3REST[i].z); d3RestQ(i, d.val, d.g.quaternion); d.fresh = true; }
+/* read the regular dice (values, styles, blank or not) and make the 3D ones match */
+function d3Sync() {
+  if (D3.state !== 'on') return;
+  var slots = $$('#dice .slot'), vals = [], i, sig;
+  for (i = 0; i < 2; i++) vals.push(slots[i] ? +(/(\d)\s*$/.exec(slots[i].getAttribute('aria-label') || '') || [0, 1])[1] : 1);
+  D3.canvas.style.opacity = $('#dice').classList.contains('blank') ? '.6' : '';
+  sig = JSON.stringify([curDie(0), curDie(1)]);
+  if (sig !== D3.sig) {
+    D3.sig = sig; D3.dice.forEach(d3Drop);
+    D3.dice = [d3Build(curDie(0)), d3Build(curDie(1))];
+    if (D3.anim) { D3.dice.forEach(function (d, k) { d.val = D3.anim.vals[k]; }); d3Kick(0); return; }
+  }
+  if (D3.anim) return;
+  D3.dice.forEach(function (d, k) { d.val = vals[k]; d3Pose(d, k); });
+  d3Kick(0);
+}
+function d3Throw(d1, d2, ms) {
+  if (D3.state !== 'on' || D3.dice.length < 2) return;
+  function rnd(a, b) { return a + Math.random() * (b - a); }
+  var T = D3.T, a = { t0: performance.now(), ms: ms, vals: [d1, d2], per: [] };
+  D3.dice.forEach(function (d, i) {
+    d.val = a.vals[i]; d.fresh = true;
+    var ax = new T.Vector3(rnd(-1, 1), rnd(-.4, .4), rnd(-1, 1)).normalize();
+    a.per.push({ delay: i * 70, dur: ms - i * 40, sx: D3REST[i].x - rnd(5.2, 6.2), sz: D3REST[i].z + rnd(-.5, .5), axis: ax, turns: Math.PI * 2 * rnd(2.6, 4.2), end: d3RestQ(i, d.val, new T.Quaternion()) });
+  });
+  D3.anim = a; D3.canvas.style.opacity = ''; d3Kick(ms + 1600);
+}
+function d3Skip() { if (D3.anim) D3.anim.t0 = -1e9; }
+function d3Kick(extra) { D3.until = Math.max(D3.until, performance.now() + (extra || 0)); if (!D3.raf && D3.state === 'on') D3.raf = requestAnimationFrame(d3Frame); }
+function d3Frame(now) {
+  D3.raf = 0;
+  if (D3.state !== 'on') return;
+  var a = D3.anim, busy = false, dt = Math.min(.05, (now - (D3.last || now)) / 1000) || .016;
+  D3.last = now;
+  D3.dice.forEach(function (d, i) {
+    if (a) {
+      var p = a.per[i], u = clamp((now - a.t0 - p.delay) / p.dur, 0, 1), y = 0, k, b, s;
+      for (k = 0; k < D3BOUNCE.length; k++) {
+        b = D3BOUNCE[k];
+        if (u >= b[0] && u < b[1]) { s = (u - b[0]) / (b[1] - b[0]); y = k ? b[2] * 4 * s * (1 - s) : b[2] * (1 - s * s); }
+      }
+      var e = 1 - Math.pow(1 - Math.min(1, u / .9), 3), er = 1 - Math.pow(1 - Math.min(1, u / .95), 3);
+      d.g.position.set(p.sx + (D3REST[i].x - p.sx) * e, .5 + y, p.sz + (D3REST[i].z - p.sz) * e);
+      d.g.quaternion.copy(p.end).multiply(D3.q2.setFromAxisAngle(p.axis, p.turns * (1 - er)));
+      if (u < 1) busy = true;
+    }
+    if (d.plane) {
+      /* slosh: the surface leans against the die's sideways acceleration and springs back */
+      var vx = (d.g.position.x - d.px) / dt, vz = (d.g.position.z - d.pz) / dt, ax2 = clamp((vx - d.pvx) / dt, -60, 60), az = clamp((vz - d.pvz) / dt, -60, 60), sl = d.sl;
+      if (d.fresh) { ax2 = az = vx = vz = 0; d.fresh = false; }
+      d.px = d.g.position.x; d.pz = d.g.position.z; d.pvx = vx; d.pvz = vz;
+      sl.vx += (-70 * sl.x - 5 * sl.vx + ax2 * .9) * dt; sl.vz += (-70 * sl.z - 5 * sl.vz + az * .9) * dt;
+      sl.x = clamp(sl.x + sl.vx * dt, -.7, .7); sl.z = clamp(sl.z + sl.vz * dt, -.7, .7);
+      if (Math.abs(sl.x) + Math.abs(sl.z) + Math.abs(sl.vx) + Math.abs(sl.vz) > .02) busy = true;
+      d.g.updateMatrixWorld();
+      var m = d.g.matrixWorld.elements, ext = .45 * (Math.abs(m[1]) + Math.abs(m[5]) + Math.abs(m[9]));
+      d.plane.setFromNormalAndCoplanarPoint(D3.v1.set(sl.x, -1, sl.z).normalize(), D3.v2.set(d.g.position.x, d.g.position.y + ext * .22, d.g.position.z));
+    }
+  });
+  if (a && (!busy || now - a.t0 > a.ms + 2600)) D3.anim = null;
+  D3.renderer.render(D3.scene, D3.cam);
+  if (busy || now < D3.until) D3.raf = requestAnimationFrame(d3Frame); else D3.last = 0;
 }
 var skipAnims = null;
 function popSum() { var s = $('#sum'); if (!s) return; s.classList.remove('pop'); void s.offsetWidth; s.classList.add('pop'); }
@@ -3095,11 +3312,12 @@ function doRoll() {
 document.addEventListener('click', function (e) {
   if (!rolling || !skipAnims || !e.target.closest('#tray')) return;
   skipAnims.forEach(function (a) { try { a.finish(); } catch (er) {} });
+  d3Skip();
 });
 
 /* ---------- boot ---------- */
 function renderAll() {
-  renderGuide(); renderBuild(); renderSheet(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderDice(); renderCases(); renderBeasts(); renderSettings(); renderParty(); setHV(S.hv);
+  renderGuide(); renderBuild(); renderSheet(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderDice(); renderCases(); renderBeasts(); renderSettings(); renderParty(); setHV(S.hv); d3Apply();
 }
 renderAll();
 var h0 = location.hash.replace('#', '');

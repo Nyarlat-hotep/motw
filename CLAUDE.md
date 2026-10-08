@@ -3,7 +3,7 @@
 Single-file vanilla JS app for a Monster of the Week campaign. Owner: Jacob, a first-time player. Audience: him and his table. Tone: plain English, gothic Appalachian field journal.
 
 ## Rules for working here
-- `index.html` is the source of truth. Edit it directly. ES5 style (var, function, no modules, no build step). Keep it one file.
+- `index.html` is the source of truth. Edit it directly. ES5 style (var, function, no modules, no build step). Keep it one file. The one exception is `vendor/`, which holds three.js for the optional 3D dice.
 - Playbook content lives in `data/*.json` (schema in `data/SCHEMA.md`). After editing, run `python3 tools/embed_data.py`.
 - Playbook moves and descriptions are plain-English paraphrase on purpose. Do not paste text from the official playbooks. Mechanical facts stay exact: ratings lines, harm/armor numbers, tags, thresholds, pick counts.
 - No emoji. Avoid em dashes in user-facing copy. Keep copy friendly and beginner-oriented.
@@ -26,6 +26,7 @@ Single-file vanilla JS app for a Monster of the Week campaign. Owner: Jacob, a f
 - Name generator: block between `/*NAMEGEN*/` and `/*END NAMEGEN*/` (Appalachian names, 1600s-1800s, with Soulsborne-style titles).
 - History: builder step 7 and the "History and bonds" card on My sheet both edit `S.sheet.bonds` ({who, tie, note, theirs}). `note` is the history you picked for them, `theirs` is what they picked for you. Each playbook's list is `history` in its data file.
 - Party card: `partyBody()` builds what is shared.
+- 3D dice: optional and off by default (`S.settings.dice3d`). `d3Apply()` loads `vendor/three.module.min.js` (three.js 0.170, the last single-file build) with a dynamic import, so it only works over http, not from a file. A canvas sits over `#tray` and `d3Sync()` copies whatever the regular dice in `#dice` show, so the flat dice stay the source of truth and the fallback. `d3Throw()` flies the dice along a set path to the numbers already rolled; there is no physics. The `fuel` finish is a clear shell with a liquid box cut by a level clipping plane. `tests/t11.js` serves the repo over http to test it.
 - Dice maker: `S.dice` (two dice, tray, saved sets), starter sets in `DICESETS` keyed by `pbSlug()`. `cubeHTML` styles each die through `curDie()` and `dieVars()`. Saved dice go through `cleanDie()` and dice codes (`HJD1.`) through the stricter `strictDie()` before anything reaches HTML or CSS; keep it that way.
 
 ## Tests
