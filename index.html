@@ -1208,7 +1208,7 @@ function exampleCase() {
 }
 function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.hook = c.threats = c.weakness = c.npcs = c.loose = c.log = ''; c.clock = 0; c.eos = [false, false, false, false]; c.date = new Date().toISOString().slice(0, 10); return c; }
 function defaults() {
-  return { v: 1, tab: 'guide', hv: 'build', steps: {}, wiz: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false }, hold: { n: 0, move: '', asked: [] }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
+  return { v: 1, tab: 'guide', hv: 'build', steps: {}, wiz: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage' }, hold: { n: 0, move: '', asked: [] }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0, adv: false },
     sheet: { name: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, moves: '', gear: '' } };
 }
@@ -2809,7 +2809,7 @@ function initArt() {
   probe('img/texture2.jpg', function () { $('.texture.t2').style.backgroundImage = 'url(img/texture2.jpg)'; ART.tex2 = true; applyTex(); });
   probe('img/tray.jpg', function () { ART.tray = true; applyTray(); });
   probe('img/die-glass.jpg', function (im) { D3.scuffImg = im; D3.sig = ''; d3Sync(); });
-  probe('img/env.jpg', function (im) { D3.envImg = im; if (D3.renderer) { d3Env(); d3Kick(0); } });
+  probe('img/env.jpg', function (im) { D3.envImg = im; if (D3.renderer) { d3Env(); d3Mood(); } });
   ['felt', 'wood', 'slate'].forEach(function (t) { probe('img/tray-' + t + '.jpg', function () { ART.trays[t] = true; applyTray(); }); });
   FINISHES.forEach(function (fn) { if (fn !== 'fuel') probe('img/die-' + fn + '.jpg', function (im) { D3.tiles[fn] = im; D3.sig = ''; d3Sync(); document.documentElement.classList.add('tx-' + fn); }); });
   ['tier-full', 'tier-part', 'tier-miss', 'levelup', 'empty-bestiary', 'empty-cases', 'empty-party'].forEach(function (n) {
@@ -2980,6 +2980,7 @@ function renderDice() {
   h += '<label class="switch" style="margin-top:12px"><input type="checkbox" id="dp-glow"' + (d.glow ? ' checked' : '') + '><span>Glowing pips</span></label>';
   h += '<span class="lbl">Sigil on the 6</span><div class="chips">' + SIGNAMES.map(function (n) { return dpBtn('data-dp-set="sigil" data-v="' + n + '"', d.sigil === n, n ? '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + SIGILS[n] + '</svg>' + cap(n) : 'None'); }).join('') + '</div>';
   h += '<span class="lbl">Tray</span><div class="chips">' + TRAYS.map(function (t) { return dpBtn('data-dp-tray="' + t + '"', curTray() === t, cap(t)); }).join('') + '</div>';
+  if (d3Want()) h += '<span class="lbl">Lighting</span><div class="chips">' + Object.keys(D3MOODS).map(function (k) { return dpBtn('data-dp-light="' + k + '"', d3MoodName() === k, D3MOODS[k].name); }).join('') + '</div>';
   if (S.settings.sound) h += '<div class="actions" style="margin-top:12px"><button type="button" class="btn ghost sm" data-dp-hear="1">Hear these dice</button></div>';
   $('#dp-opts').innerHTML = h;
   keys = Object.keys(DICESETS);
@@ -3028,6 +3029,7 @@ $('#dicepanel').addEventListener('click', function (e) {
     dpEdit('pip', contrast(st.body, '#111111') >= contrast(st.body, '#f5f5f5') ? '#111111' : '#f5f5f5');
   }
   else if (t.getAttribute('data-dp-hear') !== null) hearDice();
+  else if ((a = t.getAttribute('data-dp-light')) !== null) { if (D3MOODS[a]) { S.settings.light = a; d3Mood(); } }
   else if (t.getAttribute('data-dp-3d') !== null) { S.settings.dice3d = true; $('#set-3d').checked = true; d3Apply(); }
   else if ((a = t.getAttribute('data-dp-del')) !== null) { D.sets = mySets(); D.sets.splice(+a, 1); dpMsg('Set removed.'); }
   else if ((a = t.getAttribute('data-dp-use')) !== null) {
@@ -3293,7 +3295,17 @@ var D3MAT = {
 };
 var D3TRAY = { leather: { rough: .5, tint: '#8f8386' }, felt: { rough: 1, tint: '#d9d9d9' }, wood: { rough: .45, tint: '#dedede' }, slate: { rough: .7, tint: '#e2e2e2' } };
 var D3BOUNCE = [[0, .34, 3.2], [.34, .64, .9], [.64, .82, .32], [.82, .93, .1]]; /* from, to, height: same beats as the flat dice so sounds line up */
-var D3SUN = [-3, 8, 4];
+/* Lighting moods. Each is a real photographed surrounding (img/env-*.hdr, from Poly Haven, CC0) plus a lamp of our own placed where its
+   brightest light is, so shadows and reflections agree. az is where that bright spot sits in the photo, in degrees (tools/make_env.py
+   prints it); the photo is turned to bring it round to the lamp. sun is where our lamp stands, lamp is a second, close light for the lantern,
+   and glow is how strongly glowing pips shine. */
+var D3MOODS = {
+  garage: { name: 'Garage', env: 'img/env-garage.hdr', az: 51.7, envI: 1.15, sun: [-3, 8, 4], sunC: '#fff3e2', sunI: 2.4, hemi: .3, fill: .35, lamp: 0, exp: 1, glow: 1.3 },
+  dusk: { name: 'Dusk', env: 'img/env-dusk.hdr', az: 36.2, envI: 1.6, sun: [-7, 3, 2.2], sunC: '#ff9d52', sunI: 3.2, hemi: .12, fill: .3, lamp: 0, exp: 1, glow: 2 },
+  lantern: { name: 'Lantern', env: 'img/env-night.hdr', az: -10.9, envI: .5, sun: [-4, 3.4, 2.6], sunC: '#ffb066', sunI: .9, hemi: .04, fill: .1, lamp: 14, exp: 1.05, glow: 3 }
+};
+var D3SUN = D3MOODS.garage.sun;
+function d3MoodName() { return D3MOODS[S.settings.light] ? S.settings.light : 'garage'; }
 function d3Want() { return !!S.settings.dice3d; }
 function d3Msg(t) { var m = $('#d3msg'); if (m) m.textContent = t || ''; }
 function d3Apply() {
@@ -3325,11 +3337,12 @@ function d3Init() {
   tray.insertBefore(cv, tray.firstChild);
   D3.canvas = cv; D3.renderer = r; D3.scene = new T.Scene();
   D3.cam = new T.PerspectiveCamera(21, 1, .1, 60); D3.cam.position.set(0, 7.4, 5); D3.cam.lookAt(0, .3, .1);
-  D3.scene.add(new T.HemisphereLight(0xfff0de, 0x1c1615, .55));
+  D3.hemi = new T.HemisphereLight(0xfff0de, 0x1c1615, .3); D3.scene.add(D3.hemi);
   var sun = new T.DirectionalLight(0xfff3e2, 2.7); sun.position.set(D3SUN[0], D3SUN[1], D3SUN[2]); sun.castShadow = true;
   sun.shadow.mapSize.set(1024, 1024); sun.shadow.camera.left = -4; sun.shadow.camera.right = 4; sun.shadow.camera.top = 4; sun.shadow.camera.bottom = -4; sun.shadow.radius = 5; sun.shadow.bias = -.0006; sun.shadow.normalBias = .02;
-  D3.scene.add(sun);
-  var fill = new T.DirectionalLight(0x9db4d6, .5); fill.position.set(5, 3, -4); D3.scene.add(fill);
+  D3.scene.add(sun); D3.sun = sun;
+  D3.fill = new T.DirectionalLight(0x9db4d6, .35); D3.fill.position.set(5, 3, -4); D3.scene.add(D3.fill);
+  D3.lamp = new T.PointLight(0xffa552, 0, 0, 2); D3.lamp.position.set(-3.6, 1.6, 2); D3.scene.add(D3.lamp);
   /* two floors: the tray photo when there is one, otherwise a see-through sheet that only catches shadows */
   var pg = new T.PlaneGeometry(1, 1); pg.rotateX(-Math.PI / 2);
   D3.floor = new T.Mesh(pg, new T.MeshStandardMaterial({ roughness: .7, metalness: 0 })); D3.floor.receiveShadow = true; D3.floor.visible = false; D3.scene.add(D3.floor);
@@ -3342,12 +3355,12 @@ function d3Init() {
   D3.blob = new T.CanvasTexture(bc);
   D3.v1 = new T.Vector3(); D3.v2 = new T.Vector3(); D3.v3 = new T.Vector3(); D3.q1 = new T.Quaternion(); D3.q2 = new T.Quaternion();
   d3Env();
-  D3.state = 'on'; tray.classList.add('d3on');
+  D3.state = 'on'; tray.classList.add('d3on'); d3Mood();
   if (window.MutationObserver) new MutationObserver(function () { d3Sync(); }).observe($('#dice'), { childList: true, attributes: true, attributeFilter: ['class'] });
   if (window.ResizeObserver) new ResizeObserver(function () { d3Size(); }).observe(tray); else window.addEventListener('resize', d3Size);
   d3Size(); d3Tray(); d3Sync();
 }
-/* what shiny dice reflect: img/env.jpg (a 2:1 panorama) if it is there, otherwise a dim room with a warm window and a cool one */
+/* stand-in surroundings, used until a mood's own photo has loaded and if it never does: img/env.jpg (a 2:1 panorama) if it is there, otherwise a drawn dim room with a warm window and a cool one */
 function d3Env() {
   var T = D3.T, tex;
   if (D3.envImg) { tex = new T.Texture(D3.envImg); tex.needsUpdate = true; }
@@ -3364,9 +3377,35 @@ function d3Env() {
     tex = new T.CanvasTexture(c);
   }
   tex.mapping = T.EquirectangularReflectionMapping; tex.colorSpace = T.SRGBColorSpace;
-  var pm = new T.PMREMGenerator(D3.renderer), old = D3.scene.environment;
-  D3.scene.environment = pm.fromEquirectangular(tex).texture; D3.scene.environmentIntensity = 1.5;
+  var pm = new T.PMREMGenerator(D3.renderer), old = D3.plain;
+  D3.plain = pm.fromEquirectangular(tex).texture;
   pm.dispose(); tex.dispose(); if (old) old.dispose();
+}
+/* load one mood's photographed surroundings. It keeps real brightness (a window far brighter than a wall), which needs a loader of its own. */
+function d3Hdr(url, cb) {
+  if (!D3.rgbe) { try { D3.rgbe = new Function('u', 'return import(u)')('./vendor/RGBELoader.js'); } catch (e) { return; } }
+  D3.rgbe.then(function (L) {
+    new L.RGBELoader().load(url, function (tex) {
+      var T = D3.T, pm = new T.PMREMGenerator(D3.renderer), out;
+      tex.mapping = T.EquirectangularReflectionMapping; out = pm.fromEquirectangular(tex).texture; pm.dispose(); tex.dispose(); cb(out);
+    }, undefined, function () {});
+  }, function () {});
+}
+/* apply the chosen lighting mood: lamps, exposure and surroundings */
+function d3Mood() {
+  if (!D3.renderer) return;
+  var k = d3MoodName(), m = D3MOODS[k];
+  D3SUN = m.sun; D3.envs = D3.envs || {};
+  D3.sun.position.set(m.sun[0], m.sun[1], m.sun[2]); D3.sun.color.set(m.sunC); D3.sun.intensity = m.sunI;
+  D3.hemi.intensity = m.hemi; D3.fill.intensity = m.fill; D3.lamp.intensity = m.lamp; D3.renderer.toneMappingExposure = m.exp;
+  function use(tex) {
+    if (d3MoodName() !== k) return;
+    var own = tex !== D3.plain;
+    D3.scene.environment = tex; D3.scene.environmentIntensity = own ? m.envI : 1.5 * (m.lamp ? .25 : 1);
+    D3.scene.environmentRotation.set(0, own ? m.az * Math.PI / 180 - Math.atan2(m.sun[2], m.sun[0]) : 0, 0); d3Kick(0);
+  }
+  if (D3.envs[k]) use(D3.envs[k]); else { use(D3.plain); d3Hdr(m.env, function (tex) { D3.envs[k] = tex; use(tex); }); }
+  D3.sig = ''; d3Sync();
 }
 function d3Size() {
   if (D3.state !== 'on') return;
@@ -3413,8 +3452,14 @@ function d3Box(size, rad, seg) {
 function d3Face(v, die, clear) {
   var T = D3.T, k = D3MAT[die.finish] || D3MAT.bone, tile = D3.tiles[die.finish], c = document.createElement('canvas'), b = document.createElement('canvas'), x, y, g, i;
   c.width = c.height = b.width = b.height = 256; x = c.getContext('2d'); y = b.getContext('2d');
-  var out = { map: new T.CanvasTexture(c), bump: clear ? null : new T.CanvasTexture(b) };
+  var out = { map: new T.CanvasTexture(c), bump: clear ? null : new T.CanvasTexture(b), glow: null }, e = null, z = null;
   out.map.colorSpace = T.SRGBColorSpace; out.map.anisotropy = 4;
+  if (die.glow) {
+    /* glowing pips really give off light: a black picture with the pips and a soft halo in white, used as the face's own light */
+    e = document.createElement('canvas'); e.width = e.height = 256; z = e.getContext('2d'); z.fillStyle = '#000'; z.fillRect(0, 0, 256, 256);
+    z.shadowColor = '#fff'; z.shadowBlur = 26; z.fillStyle = '#fff';
+    out.glow = new T.CanvasTexture(e); out.glow.colorSpace = T.SRGBColorSpace;
+  }
   if (!clear) {
     x.fillStyle = die.body; x.fillRect(0, 0, 256, 256);
     y.fillStyle = '#808080'; y.fillRect(0, 0, 256, 256);
@@ -3438,6 +3483,11 @@ function d3Face(v, die, clear) {
       if (die.glow) { x.shadowColor = die.pip; x.shadowBlur = 22; }
       x.drawImage(im, 44, 44, 168, 168); out.map.needsUpdate = true; d3Kick(0);
     };
+    if (z) {
+      var gi = new Image();
+      gi.onload = function () { z.drawImage(gi, 44, 44, 168, 168); out.glow.needsUpdate = true; d3Kick(0); };
+      gi.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="168" height="168" style="color:#fff">' + SIGILS[die.sigil] + '</svg>');
+    }
     im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="168" height="168" style="color:' + die.pip + '">' + SIGILS[die.sigil] + '</svg>');
     return out;
   }
@@ -3450,6 +3500,7 @@ function d3Face(v, die, clear) {
     else { g = x.createLinearGradient(px - pr * .7, py - pr * .7, px + pr * .7, py + pr * .7); g.addColorStop(0, mixHex(die.pip, 0, .55)); g.addColorStop(.55, die.pip); g.addColorStop(1, mixHex(die.pip, 255, .22)); }
     x.fillStyle = g; x.beginPath(); x.arc(px, py, pr, 0, Math.PI * 2); x.fill();
     x.restore();
+    if (z) { z.beginPath(); z.arc(px, py, pr, 0, Math.PI * 2); z.fill(); }
     if (!clear) {
       x.strokeStyle = 'rgba(0,0,0,.28)'; x.lineWidth = 2; x.beginPath(); x.arc(px, py, pr + 1, 0, Math.PI * 2); x.stroke();
       g = y.createRadialGradient(px, py, pr * .2, px, py, pr * 1.12); g.addColorStop(0, '#1c1c1c'); g.addColorStop(.75, '#3a3a3a'); g.addColorStop(1, 'rgba(128,128,128,0)');
@@ -3459,7 +3510,8 @@ function d3Face(v, die, clear) {
   return out;
 }
 function d3Build(die) {
-  var T = D3.T, grp = new T.Group(), geo = d3Box(1, .075, 10), fuel = die.finish === 'fuel', glass = fuel || die.finish === 'gem', real = D3.floorOn, mats, m;
+  var T = D3.T, grp = new T.Group(), geo = d3Box(1, .075, 10), fuel = die.finish === 'fuel', glass = fuel || die.finish === 'gem', real = D3.floorOn, mood = D3MOODS[d3MoodName()], mats, m;
+  function lit(o, f) { if (f.glow) { o.emissiveMap = f.glow; o.emissive = die.pip; o.emissiveIntensity = mood.glow; } return o; }
   var d = { g: grp, die: die, val: 1, plane: null, extra: [], sl: { x: 0, z: 0, vx: 0, vz: 0, y: 0, vy: 0 }, px: 0, pz: 0, pvx: 0, pvz: 0, fresh: true, seg: -1, ang: 0 };
   function add(mesh, order, shadow) { mesh.renderOrder = order; mesh.castShadow = !!shadow; grp.add(mesh); return mesh; }
   function spot(color, blend, size) {
@@ -3467,10 +3519,11 @@ function d3Build(die) {
     s.rotation.x = -Math.PI / 2; s.renderOrder = -1; D3.scene.add(s); d.extra.push(s); return s;
   }
   d.ao = spot('#000000', T.NormalBlending, 1.9);
+  if (die.glow) { d.halo = spot(die.pip, T.AdditiveBlending, 2.8); d.haloI = Math.min(.5, mood.glow * .13); }
   if (!glass) {
     var k = D3MAT[die.finish] || D3MAT.bone;
     mats = D3FACE.map(function (v) {
-      var f = d3Face(v, die, false), o = { map: f.map, bumpMap: f.bump, bumpScale: 2.4, roughnessMap: f.bump, roughness: Math.min(1, k.rough * 2), metalness: 0 };
+      var f = d3Face(v, die, false), o = lit({ map: f.map, bumpMap: f.bump, bumpScale: 2.4, roughnessMap: f.bump, roughness: Math.min(1, k.rough * 2), metalness: 0 }, f);
       for (var n in k.o) o[n] = k.o[n];
       return new T.MeshPhysicalMaterial(o);
     });
@@ -3494,7 +3547,7 @@ function d3Build(die) {
     } else {
       add(new T.Mesh(geo, new T.MeshPhysicalMaterial(see)), 1, false);
     }
-    mats = D3FACE.map(function (v) { return new T.MeshStandardMaterial({ map: d3Face(v, die, true).map, transparent: true, roughness: .45, depthWrite: false }); });
+    mats = D3FACE.map(function (v) { var f = d3Face(v, die, true); return new T.MeshStandardMaterial(lit({ map: f.map, transparent: true, roughness: .45, depthWrite: false }, f)); });
     add(new T.Mesh(geo, mats), 5, false);
     /* the shine of the glass itself: a black, glossy coat drawn additively adds reflections and nothing else, strongest at glancing angles as on real glass */
     /* scratches and grime on the shell (img/die-glass.jpg, light marks on black), turned a different way on each side and lit like any other surface */
@@ -3520,6 +3573,7 @@ function d3Drop(d) {
     (Array.isArray(o.material) ? o.material : [o.material]).forEach(function (m) {
       if (m.map && m.map !== D3.blob) m.map.dispose();
       if (m.bumpMap) m.bumpMap.dispose();
+      if (m.emissiveMap) m.emissiveMap.dispose();
       m.dispose();
     });
   }
@@ -3538,7 +3592,7 @@ function d3Sync() {
   var slots = $$('#dice .slot'), vals = [], i, sig;
   for (i = 0; i < 2; i++) vals.push(slots[i] ? +(/(\d)\s*$/.exec(slots[i].getAttribute('aria-label') || '') || [0, 1])[1] : 1);
   D3.canvas.style.opacity = $('#dice').classList.contains('blank') && !D3.floorOn ? '.6' : '';
-  sig = JSON.stringify([curDie(0), curDie(1), D3.floorOn]);
+  sig = JSON.stringify([curDie(0), curDie(1), D3.floorOn, d3MoodName()]);
   if (sig !== D3.sig) {
     D3.sig = sig; D3.dice.forEach(d3Drop);
     D3.dice = [d3Build(curDie(0)), d3Build(curDie(1))];
@@ -3629,8 +3683,9 @@ function d3Frame(now) {
       if (Math.abs(sl.x) + Math.abs(sl.z) + Math.abs(sl.y) * 4 + (Math.abs(sl.vx) + Math.abs(sl.vz)) * .15 > .012) busy = true;
     }
     /* contact shadow and glow slide away from the light and fade as the die lifts */
-    var lift = d.g.position.y - .5, fade = 1 / (1 + lift * 1.6), ox = -D3SUN[0] / D3SUN[1], oz = -D3SUN[2] / D3SUN[1];
+    var lift = d.g.position.y - .5, fade = 1 / (1 + lift * 1.6), ox = clamp(-D3SUN[0] / D3SUN[1], -1.1, 1.1), oz = clamp(-D3SUN[2] / D3SUN[1], -1.1, 1.1);
     d.ao.position.set(d.g.position.x + ox * lift, .004, d.g.position.z + oz * lift); d.ao.material.opacity = (d.glow ? .5 : .42) * fade; d.ao.scale.setScalar(1 + lift * .35);
+    if (d.halo) { d.halo.position.set(d.g.position.x, .008, d.g.position.z); d.halo.material.opacity = d.haloI * fade; }
     if (d.glow) { d.glow.position.set(d.g.position.x + ox * (lift + .45), .006, d.g.position.z + oz * (lift + .45)); d.glow.material.opacity = .34 * fade; d.glow.scale.setScalar(1 + lift * .35); }
   });
   if (a && !flying) D3.anim = null;

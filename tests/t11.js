@@ -8,9 +8,10 @@ const TYPES = { '.html':'text/html', '.js':'text/javascript', '.jpg':'image/jpeg
 const results = []; const errs = [];
 function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===undefined?'':String(extra)]); }
 (async () => {
+  let noHdr = false;
   const srv = http.createServer((q, r) => {
     const f = path.join(ROOT, decodeURIComponent(q.url.split('?')[0].split('#')[0]).replace(/^\/$/, '/index.html'));
-    if (f.indexOf(ROOT) !== 0 || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); r.end(); return; }
+    if ((noHdr && /[.]hdr$/.test(f)) || f.indexOf(ROOT) !== 0 || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); r.end(); return; }
     r.writeHead(200, { 'content-type': TYPES[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(r);
   });
   await new Promise(ok => srv.listen(0, '127.0.0.1', ok));
@@ -79,6 +80,18 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await p.click('[data-dp-set="sigil"][data-v="skull"]'); await p.waitForTimeout(200);
   check('a sigil does not break the 3D dice', (await d3(p)).n===2);
 
+  // ---- lighting moods, and pips that give off light ----
+  check('lighting: three moods offered, Garage chosen, its surroundings loaded', (await p.locator('[data-dp-light]').count())===3 && (await p.getAttribute('[data-dp-light="garage"]','aria-pressed'))==='true' && await p.waitForFunction(()=>__d3.envs && __d3.envs.garage && __d3.scene.environment===__d3.envs.garage, null, { timeout: 15000 }).then(()=>true, ()=>false));
+  check('only the chosen mood is fetched', p.reqs.filter(u=>/env-garage[.]hdr/.test(u)).length===1 && !p.reqs.some(u=>/env-(dusk|night)[.]hdr/.test(u)));
+  await p.click('[data-dp-light="lantern"]');
+  await p.waitForFunction(()=>__d3.envs.lantern && __d3.scene.environment===__d3.envs.lantern, null, { timeout: 15000 });
+  check('Lantern: a lamp is lit, the main light dims, and the choice is saved', await p.evaluate(()=>{ window.dispatchEvent(new Event('pagehide')); return __d3.lamp.intensity>0 && __d3.sun.intensity<1.5 && JSON.parse(localStorage.getItem('hunters-journal-v1')).settings.light==='lantern'; }));
+  check('a mood changes the light only: same dice, same numbers', String((await d3(p)).vals)===String(await labels(p)) && (await d3(p)).n===2);
+  await p.evaluate(()=>document.getElementById('dp-glow').click()); await p.waitForTimeout(200);
+  check('glowing pips give off light of their own, and a halo on the tray', await p.evaluate(()=>{ const d = __d3.dice[0], m = d.g.children.find(c=>Array.isArray(c.material)).material[0]; return !!m.emissiveMap && m.emissiveIntensity>2 && !!d.halo; }));
+  await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-lantern-glow.png') });
+  check('still drawing', (await lit(p)) > 300);
+
   // ---- off again, and reload with it on ----
   await p.evaluate(() => document.getElementById('set-3d').click()); await p.waitForTimeout(100);
   check('switching off brings the regular dice back', (await p.evaluate(() => getComputedStyle(document.getElementById('dice')).visibility))==='visible' && !(await d3(p)).on);
@@ -99,6 +112,13 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await r.click('#roll'); await r.waitForTimeout(200);
   s = await d3(r);
   check('reduced motion: the dice just show the result', !s.anim && String(s.vals)===String(await labels(r)) && s.y.every(v => v === .5), JSON.stringify(s));
+
+  // ---- a mood whose photo is missing falls back to the stand-in surroundings ----
+  noHdr = true;
+  const nh = await open({}, { v: 1, settings: { fx: true, sound: false, dice3d: true, light: 'dusk' } });
+  await nh.waitForFunction(() => __d3.state === 'on', null, { timeout: 15000 }); await nh.waitForTimeout(600);
+  check('missing lighting photo: 3D still runs on the stand-in, with the mood\'s lamps', await nh.evaluate(()=>__d3.scene.environment===__d3.plain && !__d3.envs.dusk && __d3.sun.intensity>3) && (await lit(nh)) > 300);
+  noHdr = false;
 
   // ---- cannot load: fall back ----
   const fb = await open({}, { v: 1, settings: { fx: true, sound: false, dice3d: true } }, 'file://' + path.join(ROOT, 'index.html'));
