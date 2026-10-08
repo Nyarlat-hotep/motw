@@ -53,6 +53,15 @@ The first pass was made entirely in code. Real recordings, sorted by die and by 
 - [x] Lantern, eye and a new pupil sigil traced from a second batch (2026-10-08), after comparing every eye and lantern photo side by side. The cross stays hand-drawn.
 - [ ] The gold seal and ice compass were too fine to read at die size. Redo as a flat white symbol on pure black with thick strokes if they are still wanted, then trace with `python tools/make_sigils.py <folder>`.
 
+### Where more sigils could come from
+
+Researched 2026-10-08. Nothing from these is in the app yet; `tests/out/sigil-research.png` shows a sample of each as stamps.
+
+- [game-icons.net](https://game-icons.net) ([github.com/game-icons/icons](https://github.com/game-icons/icons)): 4,239 one-color SVG icons made for games. Already the right shape for a sigil, so no tracing needed. It has the wasteland ones (gas mask, jerrycan, oil drum, biohazard, radioactive, hazard sign, scorpion, vulture, cactus, tire tracks, cog, wrench) and the occult ones (pentacle, triquetra, ankh, all-seeing eye, raven, wolf head, rune stone, crossed bones). License is CC BY 3.0: free to use, but the credits must say "Icons made by" and the author's name. Two authors (Viscious Speed, Zeromancer) are CC0. Needs a credits line somewhere in the journal.
+- Runes: the [Noto Sans Runic](https://fontsource.org/fonts/noto-sans-runic/about) font has all 93 Unicode runes (the Elder Futhark among them). Alchemical signs: [Noto Sans Symbols](https://fontsource.org/fonts/noto-sans-symbols/about). Both are under the SIL Open Font License, which allows this use; keep the license text with them. A letter is turned into an outline with fontTools, then it is a sigil like any other.
+- Not suitable as found: the itch.io rune and alchemy packs seen were pixel art, no-derivatives, or non-commercial.
+- **Jacob:** pick which symbols to add. Each one costs about 1 to 3 KB in the page.
+
 ## Gaps for new players
 
 From the review on 2026-10-07. Small, and they help most on the first night.
