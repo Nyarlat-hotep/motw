@@ -73,9 +73,10 @@ const pmin=(p,o)=>o?0:(Array.isArray(p)?p[0]:(p|0)), pmax=p=>Array.isArray(p)?p[
   await p.click('.wnav .btn:has-text("Next")'); await p.waitForTimeout(100);
   // step 7 bonds
   check(T+'history prompts', await p.locator('[data-whist]').count()===d.history.length, await p.locator('[data-whist]').count());
-  await p.locator('[data-whist]').first().click(); await p.fill('#w-bwho','Sam'); await p.click('#wbondform .btn');
+  await p.locator('[data-whist]').first().click(); await p.fill('#w-bwho','Sam'); await p.fill('#w-btheirs','We grew up on the same street'); await p.click('#wbondform .btn');
   check(T+'bond added', await p.locator('#wbondlist li:not(.empty)').count()===1);
   check(T+'bond note from prompt', (await st()).sheet.bonds[0].note.length>5);
+  check(T+'what they picked for you is saved and shown', (await st()).sheet.bonds[0].theirs==='We grew up on the same street' && /They picked:/.test(await p.textContent('#wbondlist')));
   await p.click('.wnav .btn:has-text("Next")'); await p.waitForTimeout(100);
   const rev=await p.textContent('#wbody');
   check(T+'review complete', rev.includes('Everything is filled in'), rev.slice(0,600));

@@ -24,6 +24,7 @@ Single-file vanilla JS app for a Monster of the Week campaign. Owner: Jacob, a f
 - Roller: `BYID` holds basic and custom moves; `renderStage` shows the result tier and the move `note`.
 - Level up: `levelPanel` / `levelDone` use the playbook's `improvements` and `advanced` lists.
 - Name generator: block between `/*NAMEGEN*/` and `/*END NAMEGEN*/` (Appalachian names, 1600s-1800s, with Soulsborne-style titles).
+- History: builder step 7 and the "History and bonds" card on My sheet both edit `S.sheet.bonds` ({who, tie, note, theirs}). `note` is the history you picked for them, `theirs` is what they picked for you. Each playbook's list is `history` in its data file.
 - Party card: `partyBody()` builds what is shared.
 - Dice maker: `S.dice` (two dice, tray, saved sets), starter sets in `DICESETS` keyed by `pbSlug()`. `cubeHTML` styles each die through `curDie()` and `dieVars()`. Saved dice go through `cleanDie()` and dice codes (`HJD1.`) through the stricter `strictDie()` before anything reaches HTML or CSS; keep it that way.
 
