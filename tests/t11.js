@@ -41,13 +41,14 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   check('Last Tank passes the pip readability rule', !(await p.locator('.dp-warn').count()));
 
   // ---- turn on from the hint ----
-  await p.click('[data-dp-3d]'); await p.waitForFunction(() => __d3.state === 'on', null, { timeout: 15000 });
+  await p.click('[data-dp-3d]'); await p.waitForFunction(() => __d3.state === 'on' && __d3.floorOn, null, { timeout: 15000 });
   let s = await d3(p);
   check('3D on: three.js fetched once, canvas over the tray, regular dice hidden', p.reqs.filter(u => /vendor\/three/.test(u)).length===1 && s.cv && s.on && (await p.evaluate(() => getComputedStyle(document.getElementById('dice')).visibility))==='hidden');
   check('the setting is saved and the switch shows it', await p.evaluate(() => { window.dispatchEvent(new Event('pagehide')); return JSON.parse(localStorage.getItem('hunters-journal-v1')).settings.dice3d === true && document.getElementById('set-3d').checked; }));
   check('two dice at rest showing what the page says', s.n===2 && String(s.vals)===String(await labels(p)) && s.up.every(v => v > .99) && s.y.every(v => v === .5), JSON.stringify(s));
   check('something is drawn', (await lit(p)) > 300, await lit(p));
-  check('fuel dice have a liquid level', await p.evaluate(() => __d3.dice.every(d => !!d.plane)));
+  check('fuel dice have a liquid level with a lid on it', await p.evaluate(() => __d3.dice.every(d => !!d.plane && d.cap.geometry.drawRange.count >= 9)));
+  check('the tray photo is the floor of the scene', await p.evaluate(() => __d3.floorOn && __d3.floor.visible && __d3.traySrc === 'img/tray-slate.jpg' && !__d3.sheet.visible));
   await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-fuel-rest.png') });
 
   // ---- a roll ----
@@ -60,7 +61,8 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   check('roll lands on the rolled numbers, face up, on the tray', String(s.vals)===String(lab) && s.up.every(v => v > .99) && s.y.every(v => v === .5), JSON.stringify(s)+' '+lab);
   check('total matches the 3D dice', (await p.evaluate(() => { window.dispatchEvent(new Event('pagehide')); const r = JSON.parse(localStorage.getItem('hunters-journal-v1')).rolls[0]; return r.d1 + ',' + r.d2; }))===String(s.vals));
   check('one roll was logged', (await p.evaluate(() => { window.dispatchEvent(new Event('pagehide')); return JSON.parse(localStorage.getItem('hunters-journal-v1')).rolls.length; }))===1);
-  await p.waitForTimeout(3200);
+  check('the liquid is still swishing just after the dice land', await p.evaluate(() => __d3.dice.some(d => Math.abs(d.sl.x) + Math.abs(d.sl.z) + Math.abs(d.sl.vx) + Math.abs(d.sl.vz) > .1)));
+  await p.waitForFunction(() => !__d3.raf, null, { timeout: 30000 });
   check('the liquid settles and drawing stops', await p.evaluate(() => !__d3.anim && !__d3.raf && __d3.dice.every(d => Math.abs(d.sl.x) + Math.abs(d.sl.z) < .05)));
 
   // ---- skip ----
@@ -70,7 +72,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
 
   // ---- other finishes, sigil, restyle ----
   await p.click('[data-dp-use="default"]'); await p.waitForTimeout(150);
-  check('changing the set rebuilds the 3D dice (bone has no liquid)', await p.evaluate(() => __d3.dice.length === 2 && __d3.dice.every(d => !d.plane && d.die.finish === 'bone')));
+  check('changing the set rebuilds the 3D dice (bone has no liquid) and swaps the tray photo', await p.evaluate(() => __d3.dice.length === 2 && __d3.dice.every(d => !d.plane && d.die.finish === 'bone')) && await p.waitForFunction(() => __d3.traySrc === 'img/tray.jpg' && __d3.floorOn, null, { timeout: 8000 }).then(() => true, () => false));
   await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-bone.png') });
   for (const f of ['resin','metal','stone','gem']) { await p.click('[data-dp-set="finish"][data-v="'+f+'"]'); await p.waitForTimeout(120); await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-'+f+'.png') }); }
   check('each finish draws', (await lit(p)) > 300);
