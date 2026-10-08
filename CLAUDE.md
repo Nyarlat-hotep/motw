@@ -32,5 +32,5 @@ Single-file vanilla JS app for a Monster of the Week campaign. Owner: Jacob, a f
 ## Tests
 `npm install`, then `npm test`. `tests/t7.js` drives all 12 playbooks through the builder, gear, details, bonds, level-up and phone-width overflow in both themes (`node tests/t7.js chosen` runs one). `tests/t5.js` is the broader regression suite. `tests/t8.js` covers the dice maker. All three open `index.html` with Playwright and write screenshots to `tests/out/`.
 
-## Next big task
-Build from docs/SPEC.md, in its suggested order. The dice maker (feature 1) is built; next are dice sounds, Luck candles and the hunter card image. The shared table (docs/ROADMAP.md) comes after, and its backend choice is still open: see feature 8 in the spec.
+## What is next
+See docs/TODO.md for the running list: what is waiting on review, what is left to build, and what is waiting on Jacob. Feature details are in docs/SPEC.md. The shared table (docs/ROADMAP.md) comes last, and its backend choice is still open: see feature 8 in the spec.
