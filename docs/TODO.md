@@ -27,7 +27,12 @@ The first pass was made entirely in code. Real recordings, sorted by die and by 
 - [2 dice roll, 29 throws](https://lpc.opengameart.org/content/2-dice-roll-29-throws): CC0, two dice, 29 takes.
 - [Freesound](https://freesound.org): single clips, license varies by clip, so filter for CC0. Useful ones seen: metal dice on wood (LoafDV), dice on a wood table with many variations (eduardvlog), plastic dice on hard wood (dermotte).
 - [Rogue Waves, Cards and Dice](https://rogue-waves.itch.io/cardanddice): not free (24 euros), but the only pack found that records the same dice on felt, wood and cork. Worth it only if the free ones fall short.
-- Nothing found for glass or gem dice, or for leather or slate. Those would be recorded at home or shaped from the nearest match.
+- Nothing found that is labelled glass or gem dice, after several searches. Leads for glass, gem, leather and slate (2026-10-08, none downloaded or heard yet):
+  - [Kenney Impact Sounds](https://kenney.nl/assets/impact-sounds): 130 files, CC0 (both confirmed on the page). The page does not list the contents. If it has glass, soft and plate impacts in light, medium and heavy, as Claude recalls but could not confirm, it would cover gem and fuel dice, leather and slate in one pack with one recording style. First thing to check.
+  - Glass marbles are the nearest real thing to a glass die. On Freesound: [D43thsilence's Marble Sounds Pack](https://freesound.org/people/D43thsilence/packs/41780/) (two marbles colliding, a marble hitting wood, falling on a wooden floor) and [Anthousai's glass marbles in a ceramic bowl](https://freesound.org/people/Anthousai/packs/25344/). Neither pack page shows its license; check each clip.
+  - [100 CC0 SFX](https://opengameart.org/content/100-cc0-sfx) and [100 CC0 SFX 2](https://opengameart.org/content/100-cc0-sfx-2) by rubberduck: CC0, a handful of glass, stone and metal hits each.
+  - For a softer leather landing: [two dice clacked in the hand and rolled into a soft tray](https://freesound.org/people/WallyDM/sounds/815672/), CC0, 2.4 seconds.
+  - Recording at home: a glass bead or marble dropped on a belt, a floor tile and a wooden board, a few takes each, would settle it.
 
 ## 3D dice follow-ups
 
