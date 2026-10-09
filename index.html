@@ -807,6 +807,21 @@ div.wcard { cursor: default; border-color: var(--good); }
 .ppass p { margin: 4px 0 0; font-size: 16px; }
 .psel h3 { font-family: var(--display); font-size: 23px; }
 .psel p { margin: 4px 0 0; }
+/* a sign inside a value sits on the text baseline and is cut to the size of a
+   typeset + or -, so it reads as punctuation next to the number, not as a button. */
+.i.sgn { width: var(--sgn-size, .74em); height: var(--sgn-size, .74em); vertical-align: var(--sgn-rise, .015em); }
+/* the tiles and stepper outputs set lining figures, which stand at cap height; these
+   badges leave the figures at x-height, so the sign shrinks and drops to match them. */
+.chip, .pmove small, .move .stat, .rc b, .wctl output { --sgn-size: .58em; --sgn-rise: -.07em; }
+/* the sign itself, kept in the markup at no size: it stays on the same line, so the
+   value still reads and copies as "+0", while only the icon is seen. */
+.sgnt { display: inline-block; width: 0; overflow: hidden; vertical-align: baseline; }
+/* where an icon is the whole of a control, centre it on the box rather than on the
+   baseline: a baseline nudge leaves it a pixel high and off to one side. */
+.step .ctl button, .prow .ctl button, .item .qty button, .wctl button, .hist .evx,
+.wpills button, .chip.del { display: inline-flex; align-items: center; justify-content: center; }
+.step .ctl button, .prow .ctl button, .item .qty button, .wctl button, .wpills button { padding: 0; }
+
 /* ---- corners: every card, accordion, panel and dialog shares one radius ----
    Nested art (thumbnails, portraits in a card) keeps its smaller radius, and
    pills, pips, badges, inputs and the dice keep their own shapes. */
@@ -1537,6 +1552,14 @@ function $$(s, r) { return Array.prototype.slice.call((r || document).querySelec
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
 function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
 function fmt(n) { return (n >= 0 ? '+' : '−') + Math.abs(n); }
+/* The same rating, with its sign drawn as the Phosphor glyph the stepper buttons
+   beside it use, so the two plus signs match. The literal sign stays in the markup,
+   at no size, so the value still selects and copies as "+0" while the icon carries
+   the sign for a screen reader.
+   fmt() keeps the plain text for prose, the roll breakdown and the canvas card. */
+function sgnI(c) { var n = c === '+' ? 'plus' : 'minus'; return '<span class="i sgn i-' + n + '" role="img" aria-label="' + n + '"></span><span class="sgnt" aria-hidden="true">' + c + '</span>'; }
+function fmtI(n) { return sgnI(fmt(n).charAt(0)) + Math.abs(n); }
+var ROLLP = 'Roll ' + sgnI('+');
 function getPath(o, p) { return p.split('.').reduce(function (a, k) { return a == null ? a : a[k]; }, o); }
 function setPath(o, p, v) { var ks = p.split('.'), last = ks.pop(); var t = ks.reduce(function (a, k) { return a[k]; }, o); t[last] = v; }
 
@@ -1682,7 +1705,7 @@ function moveCard(m) {
   var li = '<dt>10+</dt><dd>' + esc(m.full) + '</dd><dt>7-9</dt><dd>' + esc(m.part) + '</dd><dt>Miss</dt><dd>' + esc(m.miss) + '</dd>';
   if (m.adv) li += '<dt>12+</dt><dd>' + esc(m.adv) + '</dd>';
   var chips = m.chips ? '<ul class="chips">' + m.chips.map(function (c) { return '<li class="chip">' + esc(c) + '</li>'; }).join('') + '</ul>' : '';
-  return '<article class="move"><div class="stat">Roll +' + STATNAME[m.stat] + '</div><h4>' + esc(m.name) + '</h4><p class="trig">' + esc(m.trig) + '</p><dl>' + li + '</dl>' + (m.note ? '<p class="small muted">' + esc(m.note) + '</p>' : '') + chips + '<button class="btn sm" type="button" data-roll="' + m.id + '">Roll it</button></article>';
+  return '<article class="move"><div class="stat">' + ROLLP + STATNAME[m.stat] + '</div><h4>' + esc(m.name) + '</h4><p class="trig">' + esc(m.trig) + '</p><dl>' + li + '</dl>' + (m.note ? '<p class="small muted">' + esc(m.note) + '</p>' : '') + chips + '<button class="btn sm" type="button" data-roll="' + m.id + '">Roll it</button></article>';
 }
 function renderGuide() {
   $('#basic-moves').innerHTML = MOVES.filter(function (m) { return m.g === 'basic'; }).map(moveCard).join('');
@@ -1718,10 +1741,10 @@ function renderRoller() {
   }
   if (!BYID[R.move]) R.move = 'kick';
   sel.value = R.move;
-  $('#statrow').innerHTML = STATS.map(function (s) { return '<button type="button" class="statbtn" data-stat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmt(S.sheet.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('');
-  $('#o-forward').textContent = fmt(R.forward);
-  $('#o-ongoing').textContent = fmt(R.ongoing);
-  $('#o-other').textContent = fmt(R.other);
+  $('#statrow').innerHTML = STATS.map(function (s) { return '<button type="button" class="statbtn" data-stat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmtI(S.sheet.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('');
+  $('#o-forward').innerHTML = fmtI(R.forward);
+  $('#o-ongoing').innerHTML = fmtI(R.ongoing);
+  $('#o-other').innerHTML = fmtI(R.other);
   $('#adv').checked = !!S.sheet.adv[R.move];
   var m = bonus(), f = 0, p = 0, x = 0;
   for (var a = 1; a <= 6; a++) for (var b = 1; b <= 6; b++) { var t = a + b + m; if (t >= 10) f++; else if (t >= 7) p++; else x++; }
@@ -2230,13 +2253,13 @@ function wizRatings() {
   if (d) {
     var st = pbState();
     lines = '<span class="lbl">Pick one line</span><div class="wopts" role="group" aria-label="Rating lines">' + d.ratings.map(function (r, i) {
-      return '<button type="button" class="wopt" data-wrate="' + i + '" aria-pressed="' + (st.rating === i) + '"' + (lock ? ' disabled' : '') + '>' + STATS.map(function (s) { return '<span class="rc' + (r[s] >= 2 ? ' hi' : '') + '"><small>' + STATNAME[s] + '</small><b>' + fmt(r[s]) + '</b></span>'; }).join('') + '</button>';
+      return '<button type="button" class="wopt" data-wrate="' + i + '" aria-pressed="' + (st.rating === i) + '"' + (lock ? ' disabled' : '') + '>' + STATS.map(function (s) { return '<span class="rc' + (r[s] >= 2 ? ' hi' : '') + '"><small>' + STATNAME[s] + '</small><b>' + fmtI(r[s]) + '</b></span>'; }).join('') + '</button>';
     }).join('') + '</div>' + (lock ? '<p class="note" style="margin-top:12px">Your ratings only change when you level up, so the lines are locked.</p>' : '');
   }
   var rows = STATS.map(function (s) {
     var used = MOVES.filter(function (m) { return m.g === 'basic' && m.stat === s; }).map(function (m) { return m.name; });
     return '<div class="wstat"><div><b>' + STATNAME[s] + '</b><p class="small muted" style="margin:2px 0">' + STATDESC[s] + '</p>' + (used.length ? '<p class="small" style="margin:2px 0">Basic moves: ' + used.map(esc).join(', ') + '</p>' : '') + '</div>' +
-      '<div class="wctl"><output data-wout="' + s + '" aria-label="' + STATNAME[s] + ' now">' + fmt(sh.stats[s]) + '</output></div></div>';
+      '<div class="wctl"><output data-wout="' + s + '" aria-label="' + STATNAME[s] + ' now">' + fmtI(sh.stats[s]) + '</output></div></div>';
   }).join('');
   return '<h2 class="sectitle" tabindex="-1">Set your ratings</h2>' +
     '<p>Ratings are the five numbers you add to your 2d6 when you roll. A +1 means roll two dice and add 1. Your playbook gives you a few ready-made lines. Pick the one that fits the hunter you imagine: highlighted numbers are the strong ones.</p>' +
@@ -2246,7 +2269,7 @@ function wizRatings() {
 
 /* ----- step 5: moves ----- */
 function wizMoveCard(m, auto, picked) {
-  var head = '<h4>' + esc(m.name) + '</h4>' + (m.kind === 'roll' ? '<span class="chip">Roll +' + STATNAME[m.stat] + '</span>' : '<span class="chip">No roll</span>') + (auto ? '<span class="chip ok">You get this</span>' : '');
+  var head = '<h4>' + esc(m.name) + '</h4>' + (m.kind === 'roll' ? '<span class="chip">' + ROLLP + STATNAME[m.stat] + '</span>' : '<span class="chip">No roll</span>') + (auto ? '<span class="chip ok">You get this</span>' : '');
   var body = m.kind === 'roll' ?
     '<p class="trig">' + esc(m.trig) + '</p><dl class="wdl">' + (m.full ? '<dt>10+</dt><dd>' + esc(m.full) + '</dd>' : '') + (m.part ? '<dt>7-9</dt><dd>' + esc(m.part) + '</dd>' : '') + (m.miss ? '<dt>Miss</dt><dd>' + esc(m.miss) + '</dd>' : '') + '</dl>' + (m.note ? '<p class="small muted">' + esc(m.note) + '</p>' : '') :
     '<p>' + esc(m.summary) + '</p>';
@@ -2364,7 +2387,7 @@ function extrasSummary(d, st) {
 }
 function wizReview() {
   var sh = S.sheet, d = curPB(), st = d ? pbState() : null, dn = wizDone(), img = sh.photo || artFor(sh.playbook);
-  var stats = STATS.map(function (s) { return '<li class="chip">' + STATNAME[s] + ' ' + fmt(sh.stats[s]) + '</li>'; }).join('');
+  var stats = STATS.map(function (s) { return '<li class="chip">' + STATNAME[s] + ' ' + fmtI(sh.stats[s]) + '</li>'; }).join('');
   var gear = sh.inventory.length ? sh.inventory.map(function (i) { return '<li class="chip">' + esc(i.name || 'Item') + (i.type === 'Weapon' ? ' (' + (+i.val || 0) + '-harm)' : i.type === 'Armor' ? ' (armor ' + (+i.val || 0) + ')' : '') + '</li>'; }).join('') : '<li class="muted small">None yet</li>';
   var moves = d ? pbPicked().map(function (m) { return esc(m.name); }).concat(sh.custom.filter(function (c) { return !c.pbk; }).map(function (c) { return esc(c.name || 'Untitled move'); })).join(', ') : '';
   var ex = d ? extrasSummary(d, st).map(function (e) { return '<p style="margin:2px 0"><b>' + esc(e[0]) + ':</b> ' + esc(e[1]) + '</p>'; }).join('') : '';
@@ -2693,7 +2716,7 @@ function renderSheet() {
   if (!sel.options.length) sel.innerHTML = '<option value="">Not chosen yet</option>' + PLAYBOOKS.map(function (p) { return '<option>' + esc(p[0]) + '</option>'; }).join('');
   $$('[data-bind]').forEach(function (el) { var v = getPath(S, el.dataset.bind); if (el.value !== v && document.activeElement !== el) el.value = v == null ? '' : v; });
   $('#sheetstats').innerHTML = STATS.map(function (s) {
-    return '<div class="sstat"><span class="lbl" style="margin:0">' + STATNAME[s] + '</span><output>' + fmt(sh.stats[s]) + '</output></div>';
+    return '<div class="sstat"><span class="lbl" style="margin:0">' + STATNAME[s] + '</span><output>' + fmtI(sh.stats[s]) + '</output></div>';
   }).join('');
   $('#luck').innerHTML = luckPips(sh.luck); $('#luck').className = 'pips candles' + (sh.luck < 3 ? ' low' : '');
   $('#lucktxt').textContent = luckNote(sh.luck); $('#lucktxt').className = 'lucknote' + (sh.luck < 3 ? ' low' : '');
@@ -2797,7 +2820,7 @@ function stepStr(label, key, val, hint) {
   return '<div class="prow"><span>' + label + (hint ? ' <span class="muted small">' + hint + '</span>' : '') + '</span><span class="ctl"><button type="button" data-padj="' + key + '" data-d="-1" aria-label="Lower ' + label + '"><span class="i i-minus" aria-hidden="true"></span></button><output>' + val + '</output><button type="button" data-padj="' + key + '" data-d="1" aria-label="Raise ' + label + '"><span class="i i-plus" aria-hidden="true"></span></button></span></div>';
 }
 function pmoveBtn(m) {
-  return '<button type="button" class="pmove" data-pmove="' + esc(m.id) + '" aria-pressed="' + (S.roller.move === m.id) + '"><span>' + esc(m.name) + '</span><small>' + STATNAME[m.stat] + ' ' + fmt(S.sheet.stats[m.stat]) + (S.sheet.adv[m.id] ? ' &middot; advanced' : '') + '</small></button>';
+  return '<button type="button" class="pmove" data-pmove="' + esc(m.id) + '" aria-pressed="' + (S.roller.move === m.id) + '"><span>' + esc(m.name) + '</span><small>' + STATNAME[m.stat] + ' ' + fmtI(S.sheet.stats[m.stat]) + (S.sheet.adv[m.id] ? ' &middot; advanced' : '') + '</small></button>';
 }
 function renderPlay() {
   var host = $('#play-status'); if (!host) return;
@@ -2808,7 +2831,7 @@ function renderPlay() {
   host.innerHTML =
     '<div><div class="pwho">' + av + '<span><b>' + esc(sh.name || 'Your hunter') + '</b><span class="muted small">' + esc(sh.playbook || 'No playbook yet') + ' &middot; Level ' + sh.level + '</span></span></div>' +
     (fresh ? '<p class="note" style="margin:10px 0 0">No hunter yet. You can still roll the basic moves. <button type="button" class="linkbtn" data-pgo="build">Build a hunter</button></p>' : '') +
-    '<div class="pblock"><span class="lbl">Ratings</span><div class="statrow" role="group" aria-label="Stat to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmt(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div></div>' +
+    '<div class="pblock"><span class="lbl">Ratings</span><div class="statrow" role="group" aria-label="Stat to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmtI(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div></div>' +
     '<div class="pblock"><span class="lbl">Harm</span>' + pipStr('pl-harm', 'harm', 8, sh.harm, 'Harm') + '<p class="small' + (sh.harm >= 4 ? '' : ' muted') + '" style="margin:6px 0 0">' + (sh.unstable ? '<b style="color:var(--bad)">Unstable.</b> ' : '') + esc(harmText(sh.harm)) + '</p>' +
       '<div class="prow"><span>Take harm</span><span class="ctl"><button type="button" data-ph="-1" aria-label="Less harm"><span class="i i-minus" aria-hidden="true"></span></button><output>' + play.harm + '</output><button type="button" data-ph="1" aria-label="More harm"><span class="i i-plus" aria-hidden="true"></span></button></span><button type="button" class="btn sm" id="pl-take">Apply</button></div>' +
       '<div class="prow"><label><input type="checkbox" id="pl-ign"' + (play.ignore ? ' checked' : '') + '> Ignores armor</label><button type="button" class="btn ghost sm" id="pl-heal1"' + (sh.harm < 1 ? ' disabled' : '') + '>Heal 1</button></div>' +
@@ -2816,7 +2839,7 @@ function renderPlay() {
       (play.wound > 0 && sh.luck > 0 ? '<button type="button" class="btn ghost sm" id="pl-undo">Spend Luck: cancel that wound</button>' : '') + '</div>' +
     '<div class="pblock"><span class="lbl">Luck</span>' + '<div class="pips candles' + (sh.luck < 3 ? ' low' : '') + '" id="pl-luck" role="group" aria-label="Luck">' + luckPips(sh.luck) + '</div><p class="lucknote' + (sh.luck < 3 ? ' low' : '') + '">' + luckNote(sh.luck) + '</p>' + (d ? '<p class="small muted" style="margin:6px 0 0"><b>When you spend Luck:</b> ' + esc(d.luckSpecial) + '</p>' : '') + '</div>' +
     '<div class="pblock"><span class="lbl">Experience</span>' + pipStr('pl-xp', '', 5, Math.min(sh.xp, 5), 'XP') + (sh.xp >= 5 ? '<div class="prow"><b>Level up ready.</b><button type="button" class="btn sm" data-pgo="sheet">Pick an improvement</button></div>' : '') + '</div>' +
-    '<div class="pblock"><span class="lbl">This roll</span>' + stepStr('+1 forward', 'forward', fmt(R.forward), '(clears)') + stepStr('+1 ongoing', 'ongoing', fmt(R.ongoing)) + stepStr('Other', 'other', fmt(R.other), '(clears)') + stepStr('Hold', 'hold', S.hold.n) + '</div>' +
+    '<div class="pblock"><span class="lbl">This roll</span>' + stepStr('+1 forward', 'forward', fmtI(R.forward), '(clears)') + stepStr('+1 ongoing', 'ongoing', fmtI(R.ongoing)) + stepStr('Other', 'other', fmtI(R.other), '(clears)') + stepStr('Hold', 'hold', S.hold.n) + '</div>' +
     (gear ? '<div class="pblock"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '') +
     '<div class="pblock"><button type="button" class="btn ghost sm" data-rit="open">End the session</button></div>';
 
@@ -2832,7 +2855,7 @@ function renderPlay() {
       pass.map(function (m) { return '<details class="ppass"><summary><b>' + esc(m.name) + '</b> <span class="muted small">no roll</span></summary><p>' + esc(m.summary) + '</p></details>'; }).join('') +
       (!mine.length && !pass.length ? '<p class="small muted" style="margin:0">Moves you pick in Build a hunter show up here.</p>' : '') + '</div>' +
     '<div class="card" style="margin-top:16px"><details' + (weirdOpen ? ' open' : '') + ' id="pl-weird"><summary class="lbl" style="cursor:pointer;margin:0">Weird moves and plain rolls</summary><div class="pmoves" style="margin-top:10px">' + weird.map(pmoveBtn).join('') +
-      '<button type="button" class="pmove" data-pmove="plain" aria-pressed="' + (R.move === 'plain') + '"><span>Plain roll</span><small>' + STATNAME[R.stat] + ' ' + fmt(sh.stats[R.stat]) + '</small></button></div></details></div>';
+      '<button type="button" class="pmove" data-pmove="plain" aria-pressed="' + (R.move === 'plain') + '"><span>Plain roll</span><small>' + STATNAME[R.stat] + ' ' + fmtI(sh.stats[R.stat]) + '</small></button></div></details></div>';
   if (rit.open) $('#play-moves').innerHTML = ritualHTML();
 
   var mv = BYID[R.move] || PLAIN, m = bonus(), f = 0, p = 0, x = 0;
@@ -3457,7 +3480,7 @@ function partyCard(d) {
   var you = d.id === myId(), st = d.stats || {};
   var img = d.photo ? '<img src="' + esc(d.photo) + '" alt="Portrait of ' + esc(d.name || 'a hunter') + '">' : '<div class="ph">No photo</div>';
   var by = you ? 'You' : (party.names[d.id] || '');
-  var stats = STATS.map(function (s) { return '<li class="chip">' + STATNAME[s] + ' ' + fmt(+st[s] || 0) + '</li>'; }).join('');
+  var stats = STATS.map(function (s) { return '<li class="chip">' + STATNAME[s] + ' ' + fmtI(+st[s] || 0) + '</li>'; }).join('');
   var flags = (d.unstable ? '<li class="chip" style="color:var(--bad);border-color:var(--bad)">Unstable</li>' : '') + (d.armor ? '<li class="chip">Armor ' + (+d.armor) + '</li>' : '') + (d.weapons || []).map(function (w) { return '<li class="chip">' + esc(w) + '</li>'; }).join('');
   var mv = (d.moves || []).length ? '<ul class="chips">' + d.moves.map(function (m) { return '<li class="chip">' + esc(m) + '</li>'; }).join('') + '</ul>' : '';
   return '<article class="pcard' + (you ? ' you' : '') + '"><div class="pimg">' + img + '</div><div class="pinfo"><h3>' + esc(d.name || 'Unnamed hunter') + (you ? '<span class="chip">You</span>' : '') + (d.online === false ? '<span class="chip tag">Away</span>' : '') + '</h3>' +
