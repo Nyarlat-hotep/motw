@@ -124,8 +124,6 @@ th { font-family: var(--type); font-weight: 400; font-size: 13px; letter-spacing
 details.sect { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; margin-bottom: 12px; }
 details.sect > summary { list-style: none; cursor: pointer; padding: 14px 16px; font-family: var(--display); font-size: 24px; letter-spacing: .03em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 52px; }
 details.sect > summary::-webkit-details-marker { display: none; }
-details.sect > summary::after { content: "+"; font-family: var(--type); color: var(--accent); font-size: 26px; }
-details.sect[open] > summary::after { content: "\2212"; }
 details.sect > .body { padding: 0 16px 16px; }
 .body h3 { font-family: var(--display); font-size: 19px; letter-spacing: .04em; text-transform: uppercase; margin: 18px 0 6px; color: var(--accent); }
 .body ul { margin: 0 0 .9em; padding-left: 1.2em; }
@@ -561,7 +559,6 @@ th { font-size: 15px; letter-spacing: .08em; text-transform: none; }
 .pcard.you { box-shadow: 0 0 0 1px var(--accent), inset 0 0 0 4px var(--surface), inset 0 0 0 5px var(--accent); }
 details.sect > .body > p:first-child::first-letter, .dropcap::first-letter { font-family: var(--black); font-weight: 700; float: left; font-size: 3.5em; line-height: .78; padding: .07em .1em 0 0; color: var(--accent); }
 details.sect > .body > p:first-child { text-align: left; }
-details.sect > summary::after { font-family: var(--display); }
 .note { font-style: italic; border-left-width: 3px; }
 .foot { font-style: italic; text-align: center; border-top: 1px solid var(--line); padding-top: 16px; }
 .foot::before { content: "\2766"; display: block; font-size: 26px; color: var(--accent); margin-bottom: 4px; font-style: normal; }
@@ -820,6 +817,27 @@ div.wcard { cursor: default; border-color: var(--good); }
 .wopt, .wmove, .wcard, .levelpick, .pmove { border-radius: var(--radius); }
 .note { border-radius: 0 var(--radius) var(--radius) 0; }
 .item .note { border-radius: 0; }
+/* ---- icons: Phosphor (MIT), bold weight ----
+   Each one is inlined as a mask rather than loaded from a CDN or an icon font,
+   so they work offline like the rest of the page and take their colour from the
+   text around them. A span.i sizes itself to the current font. Changing weight
+   means regenerating the four --i-* values from the Phosphor assets. */
+:root {
+  --i-plus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M228,128a12,12,0,0,1-12,12H140v76a12,12,0,0,1-24,0V140H40a12,12,0,0,1,0-24h76V40a12,12,0,0,1,24,0v76h76A12,12,0,0,1,228,128Z'/%3E%3C/svg%3E");
+  --i-minus: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M228,128a12,12,0,0,1-12,12H40a12,12,0,0,1,0-24H216A12,12,0,0,1,228,128Z'/%3E%3C/svg%3E");
+  --i-x: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M208.49,191.51a12,12,0,0,1-17,17L128,145,64.49,208.49a12,12,0,0,1-17-17L111,128,47.51,64.49a12,12,0,0,1,17-17L128,111l63.51-63.52a12,12,0,0,1,17,17L145,128Z'/%3E%3C/svg%3E");
+  --i-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M232.49,80.49l-128,128a12,12,0,0,1-17,0l-56-56a12,12,0,1,1,17-17L96,183,215.51,63.51a12,12,0,0,1,17,17Z'/%3E%3C/svg%3E");
+}
+.i { display: inline-block; width: 1em; height: 1em; flex: none; vertical-align: -.125em; background: currentColor;
+  -webkit-mask: var(--i) center / contain no-repeat; mask: var(--i) center / contain no-repeat; }
+.i-plus { --i: var(--i-plus); }
+.i-minus { --i: var(--i-minus); }
+.i-x { --i: var(--i-x); }
+.i-check { --i: var(--i-check); }
+/* the accordion marker is a pseudo-element, so it masks the same icon directly */
+details.sect > summary::after { content: ""; display: block; width: 20px; height: 20px; flex: none; background: var(--accent);
+  --i: var(--i-plus); -webkit-mask: var(--i) center / contain no-repeat; mask: var(--i) center / contain no-repeat; }
+details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
 </style>
 
 <svg class="cdefs" aria-hidden="true" focusable="false"><defs>
@@ -1101,9 +1119,9 @@ div.wcard { cursor: default; border-color: var(--good); }
         <p class="small muted" style="margin:8px 0 0">Ratings come from the line you picked on your Hunter sheet, and go up when you level up.</p>
 
         <div class="steppers">
-          <div class="step"><span>+1 forward <span class="muted small">(clears after the roll)</span></span><span class="ctl"><button type="button" data-adj="forward" data-d="-1" aria-label="Lower forward">&minus;</button><output id="o-forward">0</output><button type="button" data-adj="forward" data-d="1" aria-label="Raise forward">+</button></span></div>
-          <div class="step"><span>+1 ongoing</span><span class="ctl"><button type="button" data-adj="ongoing" data-d="-1" aria-label="Lower ongoing">&minus;</button><output id="o-ongoing">0</output><button type="button" data-adj="ongoing" data-d="1" aria-label="Raise ongoing">+</button></span></div>
-          <div class="step"><span>Other <span class="muted small">(help, harm, gear; clears)</span></span><span class="ctl"><button type="button" data-adj="other" data-d="-1" aria-label="Lower other">&minus;</button><output id="o-other">0</output><button type="button" data-adj="other" data-d="1" aria-label="Raise other">+</button></span></div>
+          <div class="step"><span>+1 forward <span class="muted small">(clears after the roll)</span></span><span class="ctl"><button type="button" data-adj="forward" data-d="-1" aria-label="Lower forward"><span class="i i-minus" aria-hidden="true"></span></button><output id="o-forward">0</output><button type="button" data-adj="forward" data-d="1" aria-label="Raise forward"><span class="i i-plus" aria-hidden="true"></span></button></span></div>
+          <div class="step"><span>+1 ongoing</span><span class="ctl"><button type="button" data-adj="ongoing" data-d="-1" aria-label="Lower ongoing"><span class="i i-minus" aria-hidden="true"></span></button><output id="o-ongoing">0</output><button type="button" data-adj="ongoing" data-d="1" aria-label="Raise ongoing"><span class="i i-plus" aria-hidden="true"></span></button></span></div>
+          <div class="step"><span>Other <span class="muted small">(help, harm, gear; clears)</span></span><span class="ctl"><button type="button" data-adj="other" data-d="-1" aria-label="Lower other"><span class="i i-minus" aria-hidden="true"></span></button><output id="o-other">0</output><button type="button" data-adj="other" data-d="1" aria-label="Raise other"><span class="i i-plus" aria-hidden="true"></span></button></span></div>
         </div>
         <label class="step" style="margin-top:12px"><span>My hunter has the Advanced version of this move</span><input type="checkbox" id="adv" style="width:22px;height:22px;accent-color:var(--accent)"></label>
 
@@ -1622,7 +1640,7 @@ function evRemove(id) {
   renderHist(); scheduleSave();
 }
 function evLine(ev) {
-  var act = (evCanUndo(ev) ? '<button type="button" class="btn ghost sm" data-evundo="' + esc(ev.id) + '">Undo</button>' : '') + '<button type="button" class="evx" data-evrm="' + esc(ev.id) + '" aria-label="Remove this line from the list">&times;</button>';
+  var act = (evCanUndo(ev) ? '<button type="button" class="btn ghost sm" data-evundo="' + esc(ev.id) + '">Undo</button>' : '') + '<button type="button" class="evx" data-evrm="' + esc(ev.id) + '" aria-label="Remove this line from the list"><span class="i i-x" aria-hidden="true"></span></button>';
   if (ev.kind === 'roll' && ev.r) {
     var r = ev.r, tier = TIERNAME[r.tier] ? r.tier : 'miss';
     return '<li><b>' + (+r.total || 0) + '</b><span>' + esc(r.name) + ' <span class="muted">(' + (+r.d1 || 0) + '+' + (+r.d2 || 0) + ' ' + fmt(+r.mod || 0) + ')</span></span><span class="evend"><span class="tag ' + tier + '">' + TIERNAME[tier] + '</span>' + act + '</span></li>';
@@ -2146,7 +2164,7 @@ function wizPillsHTML() {
   var d = wizDone(), cur = clamp(S.wiz | 0, 0, WSTEPS.length - 1);
   return WSTEPS.map(function (n, i) {
     var cls = d[i] ? 'done' : '';
-    return '<li><button type="button" class="' + cls + '" data-wgo="' + i + '"' + (i === cur ? ' aria-current="step"' : '') + ' aria-label="Step ' + (i + 1) + ': ' + n + (d[i] ? ', done' : '') + '">' + (d[i] && i !== cur ? '&#10003;' : (i + 1)) + '</button></li>';
+    return '<li><button type="button" class="' + cls + '" data-wgo="' + i + '"' + (i === cur ? ' aria-current="step"' : '') + ' aria-label="Step ' + (i + 1) + ': ' + n + (d[i] ? ', done' : '') + '">' + (d[i] && i !== cur ? '<span class="i i-check" aria-hidden="true"></span>' : (i + 1)) + '</button></li>';
   }).join('');
 }
 function wizPills() { var p = $('#wpills'); if (p) p.innerHTML = wizPillsHTML(); }
@@ -2776,7 +2794,7 @@ function pipStr(id, cls, n, val, label) {
   return '<div class="pips ' + cls + '" id="' + id + '" role="group" aria-label="' + label + '">' + h + '</div>';
 }
 function stepStr(label, key, val, hint) {
-  return '<div class="prow"><span>' + label + (hint ? ' <span class="muted small">' + hint + '</span>' : '') + '</span><span class="ctl"><button type="button" data-padj="' + key + '" data-d="-1" aria-label="Lower ' + label + '">&minus;</button><output>' + val + '</output><button type="button" data-padj="' + key + '" data-d="1" aria-label="Raise ' + label + '">+</button></span></div>';
+  return '<div class="prow"><span>' + label + (hint ? ' <span class="muted small">' + hint + '</span>' : '') + '</span><span class="ctl"><button type="button" data-padj="' + key + '" data-d="-1" aria-label="Lower ' + label + '"><span class="i i-minus" aria-hidden="true"></span></button><output>' + val + '</output><button type="button" data-padj="' + key + '" data-d="1" aria-label="Raise ' + label + '"><span class="i i-plus" aria-hidden="true"></span></button></span></div>';
 }
 function pmoveBtn(m) {
   return '<button type="button" class="pmove" data-pmove="' + esc(m.id) + '" aria-pressed="' + (S.roller.move === m.id) + '"><span>' + esc(m.name) + '</span><small>' + STATNAME[m.stat] + ' ' + fmt(S.sheet.stats[m.stat]) + (S.sheet.adv[m.id] ? ' &middot; advanced' : '') + '</small></button>';
@@ -2792,7 +2810,7 @@ function renderPlay() {
     (fresh ? '<p class="note" style="margin:10px 0 0">No hunter yet. You can still roll the basic moves. <button type="button" class="linkbtn" data-pgo="build">Build a hunter</button></p>' : '') +
     '<div class="pblock"><span class="lbl">Ratings</span><div class="statrow" role="group" aria-label="Stat to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmt(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div></div>' +
     '<div class="pblock"><span class="lbl">Harm</span>' + pipStr('pl-harm', 'harm', 8, sh.harm, 'Harm') + '<p class="small' + (sh.harm >= 4 ? '' : ' muted') + '" style="margin:6px 0 0">' + (sh.unstable ? '<b style="color:var(--bad)">Unstable.</b> ' : '') + esc(harmText(sh.harm)) + '</p>' +
-      '<div class="prow"><span>Take harm</span><span class="ctl"><button type="button" data-ph="-1" aria-label="Less harm">&minus;</button><output>' + play.harm + '</output><button type="button" data-ph="1" aria-label="More harm">+</button></span><button type="button" class="btn sm" id="pl-take">Apply</button></div>' +
+      '<div class="prow"><span>Take harm</span><span class="ctl"><button type="button" data-ph="-1" aria-label="Less harm"><span class="i i-minus" aria-hidden="true"></span></button><output>' + play.harm + '</output><button type="button" data-ph="1" aria-label="More harm"><span class="i i-plus" aria-hidden="true"></span></button></span><button type="button" class="btn sm" id="pl-take">Apply</button></div>' +
       '<div class="prow"><label><input type="checkbox" id="pl-ign"' + (play.ignore ? ' checked' : '') + '> Ignores armor</label><button type="button" class="btn ghost sm" id="pl-heal1"' + (sh.harm < 1 ? ' disabled' : '') + '>Heal 1</button></div>' +
       '<p class="pmsg" role="status">' + esc(play.msg) + '</p>' +
       (play.wound > 0 && sh.luck > 0 ? '<button type="button" class="btn ghost sm" id="pl-undo">Spend Luck: cancel that wound</button>' : '') + '</div>' +
@@ -3078,7 +3096,7 @@ function itemHTML(i) {
   var val = gearType ? '<label class="val"><span>' + (i.type === 'Weapon' ? 'Harm' : 'Armor') + '</span><input type="number" data-i="val" min="0" max="9" value="' + esc(i.val) + '" inputmode="numeric"></label>' : '<span></span>';
   return '<li class="item" data-iid="' + i.id + '"><div style="display:flex;gap:10px;align-items:center;min-width:0">' + eq + '<input type="text" data-i="name" value="' + esc(i.name) + '" aria-label="Item name" style="min-width:0"></div>' +
     '<select data-i="type" aria-label="Type">' + opts + '</select>' + val +
-    '<span class="qty"><button type="button" data-q="-1" aria-label="Fewer">&minus;</button><output>' + i.qty + '</output><button type="button" data-q="1" aria-label="More">+</button></span>' +
+    '<span class="qty"><button type="button" data-q="-1" aria-label="Fewer"><span class="i i-minus" aria-hidden="true"></span></button><output>' + i.qty + '</output><button type="button" data-q="1" aria-label="More"><span class="i i-plus" aria-hidden="true"></span></button></span>' +
     '<button class="btn ghost sm" type="button" data-rm aria-label="Remove ' + esc(i.name || 'item') + '">Remove</button>' +
     '<div class="note"><input type="text" data-i="note" value="' + esc(i.note) + '" placeholder="Notes or tags, like silver, close, loud" aria-label="Notes"></div></li>';
 }
@@ -3320,7 +3338,7 @@ function beastHTML(b) {
   var caseOpts = '<option value="">No case</option>' + S.cases.map(function (c) { var id = c.example ? 'example' : c.id; return '<option value="' + c.id + '"' + (cs === c ? ' selected' : '') + '>' + esc(c.title || 'Untitled mystery') + '</option>'; }).join('');
   var pw = { Monster: ['Powers', 'What can it do? Abilities, tells, what it leaves behind'], Minion: ['What they do', 'Who they serve, how they act'], Bystander: ['What they know and want', 'Their angle on the mystery'], Location: ['What it does', 'What happens here, what the place wants'] }[b.kind];
   var pct = b.cap > 0 ? Math.min(100, Math.round(b.taken / b.cap * 100)) : 0;
-  var cb = combat ? '<div><div class="combat"><div><label class="lbl">Attack harm</label><input type="number" data-bf="attack" min="0" max="30" value="' + esc(b.attack) + '" inputmode="numeric"></div><div><label class="lbl">Armor</label><input type="number" data-bf="armor" min="0" max="30" value="' + esc(b.armor) + '" inputmode="numeric"></div><div><label class="lbl">Harm capacity</label><input type="number" data-bf="cap" min="0" max="60" value="' + esc(b.cap) + '" inputmode="numeric"></div><div><span class="lbl">Harm taken</span><span class="step"><span class="ctl"><button type="button" data-taken="-1" aria-label="Less harm taken">&minus;</button><output>' + b.taken + '</output><button type="button" data-taken="1" aria-label="More harm taken">+</button></span></span></div></div><div class="hbar" style="margin-top:10px" role="img" aria-label="Harm taken ' + b.taken + ' of ' + b.cap + '"><span style="width:' + pct + '%"></span></div><p class="hint" style="margin-top:6px">' + TYPICAL[b.kind] + ' Armor lowers the harm each hit does. It cannot be defeated until you use its weakness.</p></div>' : '';
+  var cb = combat ? '<div><div class="combat"><div><label class="lbl">Attack harm</label><input type="number" data-bf="attack" min="0" max="30" value="' + esc(b.attack) + '" inputmode="numeric"></div><div><label class="lbl">Armor</label><input type="number" data-bf="armor" min="0" max="30" value="' + esc(b.armor) + '" inputmode="numeric"></div><div><label class="lbl">Harm capacity</label><input type="number" data-bf="cap" min="0" max="60" value="' + esc(b.cap) + '" inputmode="numeric"></div><div><span class="lbl">Harm taken</span><span class="step"><span class="ctl"><button type="button" data-taken="-1" aria-label="Less harm taken"><span class="i i-minus" aria-hidden="true"></span></button><output>' + b.taken + '</output><button type="button" data-taken="1" aria-label="More harm taken"><span class="i i-plus" aria-hidden="true"></span></button></span></span></div></div><div class="hbar" style="margin-top:10px" role="img" aria-label="Harm taken ' + b.taken + ' of ' + b.cap + '"><span style="width:' + pct + '%"></span></div><p class="hint" style="margin-top:6px">' + TYPICAL[b.kind] + ' Armor lowers the harm each hit does. It cannot be defeated until you use its weakness.</p></div>' : '';
   var wk = b.kind === 'Monster' ? '<div><label class="lbl" for="' + b.id + 'w">Weakness</label><input type="text" id="' + b.id + 'w" data-bf="weak" value="' + esc(b.weak) + '" placeholder="What hurts it? Guesses count" autocomplete="off"></div>' : '';
   return '<details class="beast" data-bid2="' + b.id + '"' + (b.open ? ' open' : '') + '><summary><span class="no">' + esc(b.kind) + '</span><span class="ttl">' + esc(b.name || 'Unnamed') + '</span>' + (b.example ? '<span class="example">Example</span>' : '') + '<span class="st s-' + esc(b.status.split(' ')[0]) + '">' + esc(b.status) + '</span><span class="meta">' + esc(b.motiv || '') + (cs ? (b.motiv ? ' · ' : '') + esc(cs.title || 'Untitled mystery') : '') + '</span></summary><div class="cbody">' +
     '<div class="cols"><div><label class="lbl" for="' + b.id + 'n">Name</label><input type="text" id="' + b.id + 'n" data-bf="name" value="' + esc(b.name) + '" placeholder="What are people calling it?" autocomplete="off"></div><div><label class="lbl">Kind</label><select data-bf="kind">' + kindOpts + '</select></div></div>' +
@@ -4269,7 +4287,7 @@ function renderDice() {
   mine = mySets();
   if (mine.length) h += '<div class="chips">' + mine.map(function (st, i) {
     var nm = esc(String(st.name || 'My set').slice(0, 40));
-    return '<span class="myset">' + dpBtn('data-dp-use="my:' + i + '"', setIsOn(st), nm) + '<button class="chip del" type="button" data-dp-del="' + i + '" aria-label="Remove ' + nm + '" title="Remove">&times;</button></span>';
+    return '<span class="myset">' + dpBtn('data-dp-use="my:' + i + '"', setIsOn(st), nm) + '<button class="chip del" type="button" data-dp-del="' + i + '" aria-label="Remove ' + nm + '" title="Remove"><span class="i i-x" aria-hidden="true"></span></button></span>';
   }).join('') + '</div>';
   $('#dp-sets').innerHTML = h;
   diceLive();
@@ -5251,7 +5269,7 @@ function renderStart() {
   var all = steps.every(function (s) { return s[0]; });
   el.innerHTML = '<div class="card start"><h2>Start here</h2>' +
     '<p style="margin:0">' + (all ? 'You are ready for the first session. On the night, keep <b>Play</b> open: your moves, harm, Luck and dice are all on that one screen.' : 'New to this? Three steps and you are ready for the first session.') + '</p>' +
-    '<ol class="startlist">' + steps.map(function (s, i) { return '<li' + (s[0] ? ' class="done"' : '') + '><span class="tick" aria-hidden="true">' + (s[0] ? '&#10003;' : i + 1) + '</span><p><b>' + s[1] + (s[0] ? ' <span class="small muted">(done)</span>' : '') + '</b><br><span class="small">' + esc(s[2]) + '</span></p>' + s[3] + '</li>'; }).join('') + '</ol>' +
+    '<ol class="startlist">' + steps.map(function (s, i) { return '<li' + (s[0] ? ' class="done"' : '') + '><span class="tick" aria-hidden="true">' + (s[0] ? '<span class="i i-check" aria-hidden="true"></span>' : i + 1) + '</span><p><b>' + s[1] + (s[0] ? ' <span class="small muted">(done)</span>' : '') + '</b><br><span class="small">' + esc(s[2]) + '</span></p>' + s[3] + '</li>'; }).join('') + '</ol>' +
     '<p class="small" style="margin:12px 0 0" data-bkmsg role="status"></p>' +
     '<div class="actions"><button class="btn ghost sm" type="button" data-shide>' + (all ? 'Hide this' : 'I know my way around, hide this') + '</button></div></div>';
 }

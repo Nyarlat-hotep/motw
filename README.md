@@ -45,3 +45,4 @@ The playbook summaries are plain-English paraphrase written for this table. Rati
 - 3D lighting, trays and die materials: [Poly Haven](https://polyhaven.com) and [ambientCG](https://ambientcg.com), CC0.
 - Dice sounds: [Kenney](https://kenney.nl) (CC0) and the dice-box-threejs project (see `snd/README.md`).
 - 3D dice are drawn with [three.js](https://threejs.org), MIT (`vendor/three.LICENSE`).
+- Interface icons are [Phosphor](https://phosphoricons.com), MIT (`vendor/phosphor.LICENSE`), inlined in `index.html`.
