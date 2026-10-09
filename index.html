@@ -22,6 +22,7 @@
   --accent: #8c1d2b; --accent-ink: #fff8f0; --brass: #85601a;
   --good: #0b6b57; --good-bg: #d3eadf; --warn: #855200; --warn-bg: #f2dfb4; --bad: #a82424; --bad-bg: #f3d3cf;
   --die: #f6efe1; --pip: #22171a;
+  --radius: 16px; --page: 1280px;
   --cw-a: #b09a70; --cw-b: #f7ecd0; --cw-c: #dccba3; --cw-d: #c4b189; --cw-pd: #dccba3; --cw-rim: #f3e6c6; --cw-pool: #cdbb92; --cw-smoke: #6d625c; --cw-dk: 0; --cw-sh: .16; --cw-ledge: .2;
   --cw-out: saturate(.35) brightness(.96); --cw-outo: .6; --cw-edge: drop-shadow(0 0 .5px #c25600) drop-shadow(0 0 1.6px rgba(232, 120, 20, .55)); --cw-tint: brightness(.35);
   --display: 'IM Fell English SC', 'IM Fell English', 'Palatino Linotype', Georgia, serif;
@@ -73,7 +74,7 @@
 :root[data-theme="dark"] .inkbtn i { background: var(--sd); }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); padding-inline: 16px; margin: 0; }
-.wrap { max-width: 980px; margin: 0 auto; padding-block: 20px 72px; }
+.wrap { max-width: var(--page); margin: 0 auto; padding-block: 20px 72px; }
 h1, h2, h3, h4 { font-weight: 400; margin: 0; text-wrap: balance; }
 p { margin: 0 0 .8em; }
 a { color: var(--accent); }
@@ -778,7 +779,6 @@ div.wcard { cursor: default; border-color: var(--good); }
 @media (max-width: 560px) { .wopts, .wmoves, .wgrid { grid-template-columns: minmax(0, 1fr); } }
 
 /* ---- play screen: status | moves | dice, built for a laptop window beside a call ---- */
-.wrap.wide { max-width: 1280px; }
 .play { display: grid; grid-template-columns: 296px minmax(0, 1fr) minmax(330px, 400px); gap: 16px; align-items: start; }
 @media (max-width: 1060px) { .play { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } #play-status { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 4px 20px; } }
 @media (max-width: 700px) { .play { grid-template-columns: minmax(0, 1fr); } }
@@ -810,6 +810,16 @@ div.wcard { cursor: default; border-color: var(--good); }
 .ppass p { margin: 4px 0 0; font-size: 16px; }
 .psel h3 { font-family: var(--display); font-size: 23px; }
 .psel p { margin: 4px 0 0; }
+/* ---- corners: every card, accordion, panel and dialog shares one radius ----
+   Nested art (thumbnails, portraits in a card) keeps its smaller radius, and
+   pills, pips, badges, inputs and the dice keep their own shapes. */
+.card, details.sect, details.case, details.beast, .pcard, .move, .pb, .tip, .cm,
+.item, .strip li, .sstat, .statbtn, .tier, .empty, .confirm, .levelup,
+.ho, .kho, .kov li, .kpic, .mast.has-banner, .hcdlg, .hero, .portrait,
+.wgroup, .wstat, .witem, .wlist > li:not(.witem):not(.empty),
+.wopt, .wmove, .wcard, .levelpick, .pmove { border-radius: var(--radius); }
+.note { border-radius: 0 var(--radius) var(--radius) 0; }
+.item .note { border-radius: 0; }
 </style>
 
 <svg class="cdefs" aria-hidden="true" focusable="false"><defs>
@@ -1640,7 +1650,6 @@ function showTab(name, fromHash) {
   var kit = $('#rollkit'), home = $(name === 'play' ? '#play-stage' : '#roll-home');
   if (kit && home && kit.parentElement !== home) home.appendChild(kit);
   if (name === 'play' || name === 'roll') renderHist();
-  $('.wrap').classList.toggle('wide', name === 'play');
   if (name === 'party') { if (tblUnseen()) tbl.view = 'board'; renderParty(); }
   if (name === 'guide') renderStart();
   if (name === 'hunter' && S.hv === 'build') renderBuild();
