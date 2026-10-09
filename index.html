@@ -18,7 +18,7 @@
    Mood: gothic Appalachian field journal. Oxblood and aged brass on bone paper by day, near-black by night.
    Typeset like an old book: blackletter title, Fell small caps for headings, Garamond for reading. */
 :root {
-  --bg: #efe8dc; --surface: #f8f3ea; --surface2: #e6dccb; --ink: #22171a; --muted: #65564f; --line: #cdbda8;
+  --bg: #e8d9b8; --surface: #f8f3ea; --surface2: #dfd0ae; --ink: #22171a; --muted: #65564f; --line: #cdbda8;
   --accent: #8c1d2b; --accent-ink: #fff8f0; --brass: #85601a;
   --good: #0b6b57; --good-bg: #d3eadf; --warn: #855200; --warn-bg: #f2dfb4; --bad: #a82424; --bad-bg: #f3d3cf;
   --die: #f6efe1; --pip: #22171a;
@@ -51,16 +51,16 @@
 }
 /* Inks: each changes only the accent and the text on it. Like the tokens above, an ink needs a rule for light, one for dark by device, and one for dark by choice.
    Every pair is checked at 4.5:1 or better in tests/t18.js. The swatches in Settings read --sl (light) and --sd (dark). */
-:root[data-ink="moss"] { --accent: #2f6b3a; --accent-ink: #f4fbf4; }
+:root[data-ink="moss"] { --accent: #2c6537; --accent-ink: #f4fbf4; }
 @media (prefers-color-scheme: dark) { :root[data-ink="moss"]:not([data-theme="light"]) { --accent: #7fcf8e; --accent-ink: #0a170c; } }
 :root[data-ink="moss"][data-theme="dark"] { --accent: #7fcf8e; --accent-ink: #0a170c; }
 :root[data-ink="midnight"] { --accent: #28509a; --accent-ink: #f2f6ff; }
 @media (prefers-color-scheme: dark) { :root[data-ink="midnight"]:not([data-theme="light"]) { --accent: #86abf2; --accent-ink: #0b1226; } }
 :root[data-ink="midnight"][data-theme="dark"] { --accent: #86abf2; --accent-ink: #0b1226; }
-:root[data-ink="brass"] { --accent: #7a5a0e; --accent-ink: #fff8e6; }
+:root[data-ink="brass"] { --accent: #72540d; --accent-ink: #fff8e6; }
 @media (prefers-color-scheme: dark) { :root[data-ink="brass"]:not([data-theme="light"]) { --accent: #e2b955; --accent-ink: #1e1606; } }
 :root[data-ink="brass"][data-theme="dark"] { --accent: #e2b955; --accent-ink: #1e1606; }
-:root[data-ink="rust"] { --accent: #a3410d; --accent-ink: #fff5ec; }
+:root[data-ink="rust"] { --accent: #983d0c; --accent-ink: #fff5ec; }
 @media (prefers-color-scheme: dark) { :root[data-ink="rust"]:not([data-theme="light"]) { --accent: #f0894a; --accent-ink: #1f0e04; } }
 :root[data-ink="rust"][data-theme="dark"] { --accent: #f0894a; --accent-ink: #1f0e04; }
 :root[data-ink="dust"] { --accent: #6b5630; --accent-ink: #fbf5e8; }
@@ -3966,8 +3966,8 @@ function backupText() { return JSON.stringify({ app: 'hunters-journal', v: 1, ex
 /* Look: light or dark, and an ink. The colors themselves are CSS (see the inks near the top); this only sets two attributes on the page.
    l and d are the swatch colors and must match each ink's accent in the CSS: tests/t18.js checks that they do. */
 var INKS = [
-  { id: '', name: 'Oxblood', l: '#8c1d2b', d: '#e0675b' }, { id: 'moss', name: 'Graveyard moss', l: '#2f6b3a', d: '#7fcf8e' }, { id: 'midnight', name: 'Midnight blue', l: '#28509a', d: '#86abf2' },
-  { id: 'brass', name: 'Brass', l: '#7a5a0e', d: '#e2b955' }, { id: 'rust', name: 'Rust', l: '#a3410d', d: '#f0894a' }, { id: 'dust', name: 'Dust', l: '#6b5630', d: '#d9bf8f' }
+  { id: '', name: 'Oxblood', l: '#8c1d2b', d: '#e0675b' }, { id: 'moss', name: 'Graveyard moss', l: '#2c6537', d: '#7fcf8e' }, { id: 'midnight', name: 'Midnight blue', l: '#28509a', d: '#86abf2' },
+  { id: 'brass', name: 'Brass', l: '#72540d', d: '#e2b955' }, { id: 'rust', name: 'Rust', l: '#983d0c', d: '#f0894a' }, { id: 'dust', name: 'Dust', l: '#6b5630', d: '#d9bf8f' }
 ];
 function applyLook() {
   var st = S.settings, root = document.documentElement, th = st.theme === 'light' || st.theme === 'dark' ? st.theme : 'auto';

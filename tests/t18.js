@@ -35,12 +35,12 @@ const INKS = ['', 'moss', 'midnight', 'brass', 'rust', 'dust'];
 
   // ---- light and dark ----
   await look(p, 'light'); t = await tok(p);
-  check('Light on a dark device gives the light colors', t.bg === '#efe8dc' && t.attrs[0] === 'light', t.bg);
+  check('Light on a dark device gives the light colors', t.bg === '#e8d9b8' && t.attrs[0] === 'light', t.bg);
   await look(p, 'auto'); t = await tok(p);
   check('My device goes back to following the device', t.bg === '#110c0e' && t.attrs[0] === null);
   p = await open('light');
   t = await tok(p);
-  check('default on a light device: the light colors', t.bg === '#efe8dc' && t.accent === '#8c1d2b', t.bg);
+  check('default on a light device: the light colors', t.bg === '#e8d9b8' && t.accent === '#8c1d2b', t.bg);
   await look(p, 'dark'); t = await tok(p);
   check('Dark on a light device gives the dark colors', t.bg === '#110c0e' && t.attrs[0] === 'dark', t.bg);
 
@@ -62,7 +62,7 @@ const INKS = ['', 'moss', 'midnight', 'brass', 'rust', 'dust'];
   await ink(p, 'rust');
   check('dark device + Rust: the dark Rust', (await tok(p)).accent === '#f0894a');
   await look(p, 'light');
-  check('then Light: the light Rust', (await tok(p)).accent === '#a3410d');
+  check('then Light: the light Rust', (await tok(p)).accent === '#983d0c');
   await look(p, 'auto');
   check('then My device: the dark Rust again', (await tok(p)).accent === '#f0894a');
 
@@ -70,7 +70,7 @@ const INKS = ['', 'moss', 'midnight', 'brass', 'rust', 'dust'];
   await look(p, 'light'); await ink(p, 'moss'); await p.waitForTimeout(800);
   await p.reload(); await p.waitForTimeout(600);
   t = await tok(p);
-  check('a reload keeps the choice', t.attrs[0] === 'light' && t.attrs[1] === 'moss' && t.accent === '#2f6b3a', t.attrs.join(',') + ' ' + t.accent);
+  check('a reload keeps the choice', t.attrs[0] === 'light' && t.attrs[1] === 'moss' && t.accent === '#2c6537', t.attrs.join(',') + ' ' + t.accent);
   await p.evaluate(() => { document.querySelector('#settings').open = true; });
   check('and the buttons show it', (await p.getAttribute('[data-look="light"]', 'aria-pressed')) === 'true' && (await p.getAttribute('.inkbtn[data-ink="moss"]', 'aria-pressed')) === 'true');
   const saved = await p.evaluate(() => JSON.parse(localStorage.getItem('hunters-journal-v1')).settings);
