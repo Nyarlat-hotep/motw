@@ -2,12 +2,22 @@
 
 Last tidied 2026-10-08. Next session is around 2026-10-19. Feature details are in [SPEC.md](SPEC.md); this is the running list of what is left and who it is waiting on. Finished work is not listed here: it is in the git history.
 
+## Start here next time
+
+Written 2026-10-08, after the candles, the rules check, the first-night pieces and the hunter card all went live.
+
+1. **Hear what Jacob found.** He is trying the live site: the candles, the hunter card, the Start here card and the "I want to..." list on Play are all new and none has had a second look. Fix what he reports first.
+2. **Build the end-of-session ritual and the session timeline together** (features 5 and 6 in SPEC.md). The ritual writes the timeline into the case log, so they share their data. The backup nudge that now sits in the case file should move into the ritual's last step.
+3. **Then settle the backend for the shared roll feed** (feature 8): half a day trying Supabase, half a day trying a Cloudflare Durable Object, then choose. It is the biggest win for a group that plays online, and too big to start before the 19th without that choice made.
+
+Still blocking the first session: the other players cannot open the site until their emails are on the Cloudflare Access list (below).
+
 ## Where the work is
 
 | Branch | What it holds | State |
 |---|---|---|
-| `main` | The site: all the dice work (3D dice, lighting, 14 finishes, 7 trays, the sigil library, recorded dice sounds), the Luck candles, and the builder and rules matched to the official sheets | Dice work deployed 2026-10-08. The candles and the rules fixes were merged the same day and go live with the next push. |
-| `luck-candles-v2`, `luck-candles` | The candle work, and the first candles it replaced | Both merged or replaced. Safe to delete. |
+| `main` | The live site: the dice work, the Luck candles, the builder and rules matched to the official sheets, the first-night pieces and the hunter card | Deployed 2026-10-08 |
+| `first-night`, `luck-candles-v2`, `luck-candles` | Work that is now in `main`, and the first candles it replaced | Merged or replaced. Safe to delete. |
 
 Pushing `main` deploys. Pushing any other branch does not.
 
@@ -19,10 +29,14 @@ Pushing `main` deploys. Pushing any other branch does not.
 
 ## Waiting on Jacob's eye and ear
 
-The dice work below is live, but none of it has had his review yet. 3D dice and sound are both off until a player turns them on.
+All of this is live and none of it has had his review yet. 3D dice and sound are both off until a player turns them on.
 
 - [ ] **3D dice.** Judge them in motion: the fuel swish, the three lighting moods, the finishes. Try them on a phone.
 - [ ] **Dice sounds.** Nothing has been tuned by ear. Turn sound on and use "Hear these dice" in the dice maker to try each die on each tray, and note which pairs are wrong. From the first, made-up pass: gem was the only die sound he liked, and leather and felt should land as more of a thud.
+- [ ] **Luck candles.** He saw them before they went live and asked for a flame with more frames, which they now have. Check the flame in motion, and what happens at 2 Luck or fewer.
+- [ ] **Hunter card.** Open Save hunter card on My sheet with a real hunter and a photo, and drop the picture in the group chat to see how it reads there.
+- [ ] **Start here and the Play lookup.** Read the wording as a first-time player would: the three steps on the Guide, and the "I want to..." list on Play.
+
 ## Dice maker
 
 - [ ] Let the preview dice be turned by dragging, to look at every face.
@@ -54,16 +68,6 @@ The dice work below is live, but none of it has had his review yet. 3D dice and 
   - [Rogue Waves, Cards and Dice](https://rogue-waves.itch.io/cardanddice): not free (24 euros), but the only pack found that records the same dice on felt, wood and cork.
   - Recording at home: a glass bead or marble dropped on a belt, a floor tile and a board, a few takes each, would settle it.
 
-## Gaps for new players
-
-From the review on 2026-10-07. Small, and they help most on the first night.
-
-- [ ] A first-run "start here" path: build a hunter, then go to Play.
-- [ ] A nudge to download a backup after building a hunter and at the end of a session. Saves live in one browser on one device.
-- [ ] An "I want to..." lookup on Play that points to the right move.
-- [ ] Check: changing playbook halfway through the builder says clearly what will be lost.
-- [ ] Check: a move marked advanced at level-up shows its 12+ result in the Roller.
-
 ## Look and setting: The Long Dry
 
 The campaign is a post-apocalyptic wasteland, and the journal was styled as a gothic Appalachian field journal before that was known. The dice maker now has wasteland trays, finishes, sigils and sets; nothing else has been rethemed.
@@ -72,7 +76,6 @@ The campaign is a post-apocalyptic wasteland, and the journal was styled as a go
 
 ## Features still to build (SPEC.md)
 
-- [ ] 4. Hunter card image
 - [ ] 5. End-of-session ritual
 - [ ] 6. Session timeline
 - [ ] 7. Ink themes and ambient sound

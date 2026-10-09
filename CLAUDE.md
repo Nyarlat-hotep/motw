@@ -29,7 +29,9 @@ A vanilla JS companion app for a Monster of the Week campaign, almost all of it 
 - Wizard: `WSTEPS` (8 steps), `renderWiz`, per-playbook picks in `S.sheet.pbs[playbookName]` = {rating, look, moves, gear, build, extras, imp}.
 - Picked roll moves sync into `S.sheet.custom` and picked gear into `S.sheet.inventory`, each tagged with a `pbk` field so removal cleans up. See `syncPbMoves`, `syncPbGear`, `onPlaybookChange`.
 - Roller: `BYID` holds basic and custom moves; `renderStage` shows the result tier and the move `note`.
-- Level up: `levelPanel` / `levelDone` use the playbook's `improvements` and `advanced` lists.
+- Level up: `levelPanel` / `levelDone` use the playbook's `improvements` and `advanced` lists. An improvement of kind `advance` opens `advPanel()`, which asks which two moves become advanced and records them in `S.sheet.adv` (by move id). The Roller's Advanced box and the 12+ result in `renderStage` read the same map.
+- First night: `renderStart()` draws the "Start here" card at the top of the Guide (build a hunter, try a roll, download a backup) until it is hidden (`S.start`). `bkNudge()` is the "download a backup" line shown on the builder's Review step and after a case's session XP is added; every backup goes through `bkSave()`, which stamps `S.bkAt`. On Play, the "I want to..." lookup (`WANTS`, `wantList()`) picks the move for a plain-English aim.
+- Hunter card: `hcOpen()` shows a 1200 x 630 picture of the hunter in the `#hcdlg` dialog and `hcDraw()` paints it on a canvas, always in the dark colors, from `partyBody()`. Text goes through `hcT()`, which records each piece and the width it was allowed in `window.__card.boxes` so tests can check nothing spills.
 - Name generator: block between `/*NAMEGEN*/` and `/*END NAMEGEN*/` (Appalachian names, 1600s-1800s, with Soulsborne-style titles).
 - History: builder step 7 and the "History and bonds" card on My sheet both edit `S.sheet.bonds` ({who, tie, note, theirs}). `note` is the history you picked for them, `theirs` is what they picked for you. Each playbook's list is `history` in its data file.
 - Party card: `partyBody()` builds what is shared.
@@ -82,8 +84,8 @@ A vanilla JS companion app for a Monster of the Week campaign, almost all of it 
 `npm install`, then `npm test`. All of them drive the page with Playwright and write screenshots to `tests/out/` (not in git).
 - `tests/t7.js`: all 12 playbooks through the builder, gear, details, history, level-up and phone-width overflow in both themes (`node tests/t7.js chosen` runs one).
 - `tests/t5.js`: the broad regression suite. One of its checks depends on luck and fails about one run in ten (docs/TODO.md).
-- `tests/t8.js`: the dice maker and sigils. `tests/t9.js`: dice sounds, with a counting stand-in for AudioContext. `tests/t10.js`: the Luck candles.
+- `tests/t8.js`: the dice maker and sigils. `tests/t9.js`: dice sounds, with a counting stand-in for AudioContext. `tests/t10.js`: the Luck candles. `tests/t13.js`: the first-night pieces (start card, backup nudges, the Play lookup, switching playbook, advanced moves). `tests/t14.js`: the hunter card.
 - `tests/t11.js`: 3D dice. `tests/t12.js`: recorded sounds. These two serve the repo over http themselves.
 
 ## What is next
-See docs/TODO.md for the running list: which branch holds what, what is waiting on Jacob, and what is left to build. Feature details are in docs/SPEC.md. The shared table (docs/ROADMAP.md) comes last, and its backend choice is still open: see feature 8 in the spec.
+See docs/TODO.md for the running list. It opens with where to start next time, then which branch holds what, what is waiting on Jacob, and what is left to build. Feature details are in docs/SPEC.md. The shared table (docs/ROADMAP.md) comes last, and its backend choice is still open: see feature 8 in the spec.
