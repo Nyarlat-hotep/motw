@@ -1,23 +1,30 @@
 # Hunter's Journal: notes for Claude Code
 
-Single-file vanilla JS app for a Monster of the Week campaign. Owner: Jacob, a first-time player. Audience: him and his table. Tone: plain English, gothic Appalachian field journal.
+A vanilla JS companion app for a Monster of the Week campaign, almost all of it in one file. Owner: Jacob, a first-time player. Audience: him and his table, who play online. Tone: plain English. The app is styled as a gothic Appalachian field journal; the campaign itself ("The Long Dry") is a post-apocalyptic wasteland, and how far to retheme is Jacob's open decision (docs/TODO.md).
 
 ## Rules for working here
-- `index.html` is the source of truth. Edit it directly. ES5 style (var, function, no modules, no build step). Keep it one file. The exceptions are `vendor/` (three.js for the optional 3D dice) and `sigils.js` (the generated sigil library, loaded by a plain script tag before the page's own script; the page works without it).
+- `index.html` is the source of truth. Edit it directly. ES5 style (var, function, no modules, no build step). Keep it one file.
 - Playbook content lives in `data/*.json` (schema in `data/SCHEMA.md`). After editing, run `python3 tools/embed_data.py`.
 - Playbook moves and descriptions are plain-English paraphrase on purpose. Do not paste text from the official playbooks. Mechanical facts stay exact: ratings lines, harm/armor numbers, tags, thresholds, pick counts.
 - No emoji. Avoid em dashes in user-facing copy. Keep copy friendly and beginner-oriented.
 - Support light and dark themes (CSS tokens in `:root`, dark overrides under `prefers-color-scheme` and `[data-theme]`). Check 390px width: no horizontal page scroll.
-- All images are optional; the page probes each one on load and works without them. Die grain (`img/die-<finish>.jpg`) and tray photos (`img/tray-<tray>.jpg`, leather is `img/tray.jpg`) are made from source photos by `python tools/make_textures.py <folder> [<Poly Haven folder>]`; the crop boxes live in that script. Metal, stone, wood and rust dice are made from material sets instead (ambientCG and Poly Haven, CC0), which give separate tiles for color detail, relief (`-h`) and shine (`-r`); `DIEART` in the page says which finish has which; rust also has a see-through layer of the rust itself (`die-rust-c.png`) and magma a glow tile (`-e`). A newer finish names an older one in `FINLIKE` and borrows its flat look and its sound, so adding a finish means: `FINISHES`, `FINLIKE`, a `D3MAT` entry, and tiles if it has any. It also makes each tray's relief map (`-n.jpg`, used by the 3D dice) and builds the rust, dust and concrete trays whole from Poly Haven materials (CC0).
-- `sw.js` and `manifest.webmanifest` are the only other shipped files (offline copy and install). The page is fetched network-first, so a deploy shows up on the next online load. Bump `CACHE` in `sw.js` only to throw away old cached art.
+- Everything outside `index.html` is optional at run time. The page probes each image, sound and script it wants and works without any of them. Keep it that way.
 - Ratings are parked per playbook (`S.sheet.pbs[name].stats`) by `setPlaybook()`; always change playbook through it.
+- Pushing `main` deploys the site. Other branches do not. docs/TODO.md says which branch holds what.
+
+## Files besides index.html
+- `sw.js`, `manifest.webmanifest`: offline copy and install. The page is fetched network-first, so a deploy shows up on the next online load. Bump `CACHE` in `sw.js` only to throw away old cached art.
+- `sigils.js`: the generated sigil library, loaded by a plain script tag before the page's own script.
+- `vendor/`: three.js 0.170 (the last single-file build) and its HDR loader for the optional 3D dice, with their licenses and the Noto font license.
+- `img/`: art, die and tray textures, lighting environments. `snd/`: dice recordings (read `snd/README.md`).
+- `tools/`: scripts that make the generated files. `tests/`: Playwright checks. `docs/`: SPEC, ROADMAP, TODO.
+- Hosting: `npm run build` copies what the site needs into `dist/`. Deploy that folder, not the repo root.
 
 ## Architecture (all in index.html)
-- State `S` (defaults in `defaults()`), merged with saved data by `merge(defaults(), saved)`. An empty-object base field takes the saved value wholesale. Saved to localStorage key `hunters-journal-v1` via `scheduleSave()` / `flush()`.
-- `initStore()` also tries `window.claude` (db, user) for the claude.ai-hosted version. Outside claude.ai it falls back to localStorage. See docs/ROADMAP.md for replacing that with Supabase.
+- State `S` (defaults in `defaults()`), merged with saved data by `merge(defaults(), saved)`, which keeps only keys that `defaults()` has. An empty-object base field takes the saved value wholesale. Saved to localStorage key `hunters-journal-v1` via `scheduleSave()` / `flush()`.
+- `initStore()` also tries `window.claude` (db, user) for a claude.ai-hosted copy. Elsewhere it falls back to localStorage. See docs/ROADMAP.md for replacing that with a shared backend.
 - Helpers: `$`, `$$`, `esc`, `clamp`, `fmt`, `getPath`/`setPath`, `uid`.
 - Tabs: guide, play, roll, hunter, party, bestiary, tips, notes. Play (`renderPlay`) is the mid-session screen; the dice card `#rollkit` is moved between `#roll-home` and `#play-stage` by `showTab`, so roller ids stay unique. Hold from Investigate and Read a Bad Situation lives in `S.hold`.
-- Hosting: `npm run build` writes `dist/` (page, worker, manifest, art). Deploy that folder, not the repo root.
 - Hunter has two views: Build (the wizard) and My sheet.
 - Wizard: `WSTEPS` (8 steps), `renderWiz`, per-playbook picks in `S.sheet.pbs[playbookName]` = {rating, look, moves, gear, build, extras, imp}.
 - Picked roll moves sync into `S.sheet.custom` and picked gear into `S.sheet.inventory`, each tagged with a `pbk` field so removal cleans up. See `syncPbMoves`, `syncPbGear`, `onPlaybookChange`.
@@ -26,13 +33,55 @@ Single-file vanilla JS app for a Monster of the Week campaign. Owner: Jacob, a f
 - Name generator: block between `/*NAMEGEN*/` and `/*END NAMEGEN*/` (Appalachian names, 1600s-1800s, with Soulsborne-style titles).
 - History: builder step 7 and the "History and bonds" card on My sheet both edit `S.sheet.bonds` ({who, tie, note, theirs}). `note` is the history you picked for them, `theirs` is what they picked for you. Each playbook's list is `history` in its data file.
 - Party card: `partyBody()` builds what is shared.
-- Sound: everything goes through `audio()`, which returns null while `S.settings.sound` is off, so no audio nodes exist until the player turns sound on. `hit(die, v)` is one bounce (tables `SFX` by finish, `TRAYSFX` by tray); `stinger(total)` is the end-of-roll sound. A bounce is two halves, the die and the tray. Each half plays a recording from `snd/` when its set has loaded (`DIESND`, `TRAYSND`, `sndLoad`, `sndPlay`) and the made-up sound otherwise. `python tools/make_sounds.py` remakes the ones that come from Kenney's CC0 pack. Recordings are fetched only with sound on, only the sets in use, and only over http. The license of the ones copied from dice-box-threejs is unsettled: read `snd/README.md` before making the site public. Holding Roll shakes (`shakeStart`/`shakeEnd`).
-- 3D dice: optional and off by default (`S.settings.dice3d`). `d3Apply()` loads `vendor/three.module.min.js` (three.js 0.170, the last single-file build) with a dynamic import, so it only works over http, not from a file. A canvas sits over `#tray` and `d3Sync()` copies whatever the regular dice in `#dice` show, so the flat dice stay the source of truth and the fallback. `d3Throw()` flies the dice along a set path to the numbers already rolled; there is no physics. The dice maker's preview (`d3Preview()`) is the same scene drawn from a second camera with both dice six up, copied onto a 2D canvas in `#dp-tray`; it redraws only when `d3Kick()` has marked it dirty. The tray photo is the floor of the scene (`d3Tray()`, fed by `applyTray()`), which is what lets clear dice refract it; without a photo the floor is a transparent shadow catcher and clear dice use a tinted stand-in. The `fuel` finish is a clear shell around a see-through liquid box cut by a clipping plane; `d3Liquid()` tilts and swirls that plane and rebuilds the lid on the cut each frame. Lighting is one of three moods (`D3MOODS`, chosen in the dice maker, saved as `S.settings.light`): each is a photographed HDR surrounding from Poly Haven (`img/env-*.hdr`, CC0, shrunk by `python tools/make_env.py <folder>`) plus our own lamp lined up with its brightest light. They load through `vendor/RGBELoader.js`, which is three.js's own loader with its import pointed at the vendored build. `img/env.jpg` (a 2:1 panorama) is the stand-in until a mood's photo arrives. Glowing pips carry an emissive map, so they give off light. `img/die-glass.jpg` (light scratches on black) is added over the Fuel shell if present. `tests/t11.js` serves the repo over http to test it.
-- Sigils: `SIGILS` holds inline SVG drawn in the pip color. The hand-drawn ones are in the table; the ones traced from artwork (skull, antler, crescent, lantern, eye, pupil, pentagram, pentacle) are generated into the `/*SIGILART*/` block by `python tools/make_sigils.py <folder>` and override it. A third lot, the pack (game-icons.net icons, runes and alchemical signs from the Noto fonts), is generated into `sigils.js` by `python tools/make_sigil_pack.py <download folder>`: add an entry to `PICKS` and rerun. A key is saved with the die, so never rename one. `SIGGROUPS` lays them out in the dice maker, `SIGLABEL` names them, and `SIGNAMES` (every key a die may carry) is built from the table. The game-icons ones are CC BY 3.0: the Credits section in the page lists their authors from `SIGILCREDIT`, so never drop that section. The font license is `vendor/OFL-Noto.txt`.
-- Dice maker: `S.dice` (two dice, tray, saved sets), starter sets in `DICESETS` keyed by `pbSlug()`. `cubeHTML` styles each die through `curDie()` and `dieVars()`. Saved dice go through `cleanDie()` and dice codes (`HJD1.`) through the stricter `strictDie()` before anything reaches HTML or CSS; keep it that way.
+
+## Dice
+
+### Dice maker
+- `S.dice` holds two dice, the tray and saved sets. A die is {body, finish, pip, glow, sigil}. Starter sets: `DICESETS` (one per playbook, keyed by `pbSlug()`) and `XSETS` (campaign sets).
+- `cubeHTML` draws the flat dice, styling each through `curDie()` and `dieVars()`.
+- Saved dice go through `cleanDie()` and dice codes (`HJD1.`) through the stricter `strictDie()` before anything reaches HTML or CSS. Keep it that way: codes come from other people.
+- Finishes are listed in `FINISHES`. A newer finish names an older one in `FINLIKE` and borrows its flat look and its sound. Adding a finish means: `FINISHES`, `FINLIKE`, a `D3MAT` entry, flat CSS if it needs its own, and tiles if it has any.
+- Trays are listed in `TRAYS`, with flat CSS per tray, `D3TRAY` for the 3D floor, and `TRAYSFX` / `TRAYSND` for sound.
+
+### 3D dice
+- Optional and off by default (`S.settings.dice3d`). `d3Apply()` loads three.js with a dynamic import, so it only works over http, not from a file.
+- A canvas sits over `#tray`, and `d3Sync()` copies whatever the flat dice in `#dice` show. The flat dice stay the source of truth and the fallback.
+- `d3Throw()` flies the dice along a set path to the numbers already rolled. There is no physics.
+- The tray photo is the floor of the scene (`d3Tray()`, fed by `applyTray()`), which is what lets clear dice refract it. Without a photo the floor is a transparent shadow catcher and clear dice use a tinted stand-in.
+- `fuel` is a clear shell around a see-through liquid box cut by a clipping plane. `d3Liquid()` moves the surface and `d3Cut()` cuts the liquid there and rebuilds the lid.
+- Lighting is one of three moods (`D3MOODS`, saved as `S.settings.light`): a photographed HDR surrounding (`img/env-*.hdr`) plus our own lamp lined up with its brightest light. `img/env.jpg` is the stand-in until a mood's photo arrives.
+- Glowing pips, and magma's flows, carry an emissive map, so they give off light.
+- The dice maker's preview (`d3Preview()`) is the same scene drawn from a second camera with both dice six up, copied onto a 2D canvas in `#dp-tray`. It redraws only when `d3Kick()` has marked it dirty.
+
+### Sound
+- Everything goes through `audio()`, which returns null while `S.settings.sound` is off, so no audio nodes exist until the player turns sound on.
+- `hit(die, v)` is one bounce, in two halves: the die and the tray. Each half plays a recording from `snd/` when its set has loaded (`DIESND`, `TRAYSND`, `sndLoad`, `sndPlay`) and a made-up sound otherwise (`SFX`, `TRAYSFX`).
+- Recordings are fetched only with sound on, only the sets in use, and only over http.
+- `stinger(total)` is the end-of-roll sound. Holding Roll shakes (`shakeStart` / `shakeEnd`). `hearDice()` plays one throw without rolling.
+- The license of the recordings copied from dice-box-threejs is unsettled: read `snd/README.md` before making the site public.
+
+### Sigils
+- `SIGILS` holds inline SVG drawn in the pip color; only the 6 face carries one. Three lots: hand-drawn (in the table), traced from Jacob's artwork (the `/*SIGILART*/` block), and the library in `sigils.js`.
+- `SIGGROUPS` lays them out in the dice maker, `SIGLABEL` names them, and `SIGNAMES` (every key a die may carry) is built from the table.
+- A key is saved with the die, so never rename one.
+- The game-icons ones are CC BY 3.0: the Credits section in the page lists their authors from `SIGILCREDIT`. Never drop that section.
+
+### Where the generated files come from
+| Made | By | From |
+|---|---|---|
+| `img/die-*.jpg`, `img/tray*.jpg` and their `-n` relief, `-r` shine, `-h`, `-e`, `-c` tiles | `python tools/make_textures.py <photos> [<Poly Haven folder> [<ambientCG folder>]]` | Jacob's Qwen photos; Poly Haven and ambientCG material sets (CC0). Crop boxes and the list of materials are in the script. `DIEART` in the page says which finish has which tiles. |
+| `img/env-*.hdr` | `python tools/make_env.py <folder>` | Poly Haven HDRIs (CC0) |
+| `/*SIGILART*/` in the page | `python tools/make_sigils.py <folder>` | Jacob's sigil artwork, isolated and traced |
+| `sigils.js` | `python tools/make_sigil_pack.py <download folder>` | game-icons.net (CC BY 3.0) and the Noto fonts (OFL). Add an entry to `PICKS` and rerun. |
+| `snd/dicehit_glass*`, `snd/surface_soft*` | `python tools/make_sounds.py <pack's Audio folder>` | Kenney's Impact Sounds (CC0). The other recordings were copied as they are. |
+| the embedded playbooks | `python3 tools/embed_data.py` | `data/*.json` |
 
 ## Tests
-`npm install`, then `npm test`. `tests/t7.js` drives all 12 playbooks through the builder, gear, details, bonds, level-up and phone-width overflow in both themes (`node tests/t7.js chosen` runs one). `tests/t5.js` is the broader regression suite. `tests/t8.js` covers the dice maker and `tests/t9.js` the dice sounds (with a counting stand-in for AudioContext), `tests/t11.js` the 3D dice and `tests/t12.js` the recorded sounds (those two serve the repo over http themselves). All of them open `index.html` with Playwright and write screenshots to `tests/out/`.
+`npm install`, then `npm test`. All of them drive the page with Playwright and write screenshots to `tests/out/` (not in git).
+- `tests/t7.js`: all 12 playbooks through the builder, gear, details, history, level-up and phone-width overflow in both themes (`node tests/t7.js chosen` runs one).
+- `tests/t5.js`: the broad regression suite. One of its checks depends on luck and fails about one run in ten (docs/TODO.md).
+- `tests/t8.js`: the dice maker and sigils. `tests/t9.js`: dice sounds, with a counting stand-in for AudioContext.
+- `tests/t11.js`: 3D dice. `tests/t12.js`: recorded sounds. These two serve the repo over http themselves.
 
 ## What is next
-See docs/TODO.md for the running list: what is waiting on review, what is left to build, and what is waiting on Jacob. Feature details are in docs/SPEC.md. The shared table (docs/ROADMAP.md) comes last, and its backend choice is still open: see feature 8 in the spec.
+See docs/TODO.md for the running list: which branch holds what, what is waiting on Jacob, and what is left to build. Feature details are in docs/SPEC.md. The shared table (docs/ROADMAP.md) comes last, and its backend choice is still open: see feature 8 in the spec.

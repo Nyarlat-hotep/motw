@@ -21,6 +21,8 @@ Rules that apply to all of it (from CLAUDE.md): one file, ES5, no build step for
 
 ## 1. Custom dice maker
 
+Since then the dice maker has grown well past this spec: optional 3D dice with lighting moods, fourteen finishes, seven trays and a library of over 250 sigils. CLAUDE.md describes how those work and TODO.md what is left.
+
 Status: built 2026-10-06. Two starter sets moved off the colours in the table to pass the readability rule: The Chosen is old gold rather than pale gold (white pips), and The Monstrous is blood red rather than deep red (black pips). The Divine's gold pips are a dark gold for the same reason.
 
 ### What the player gets
@@ -115,6 +117,8 @@ No audio nodes are created while sound is off. With sound on, a roll makes one h
 ---
 
 ## 3. Luck as seven candles
+
+Status: built 2026-10-07 on the `luck-candles` branch and not merged. Jacob wants the look improved first.
 
 ### What the player gets
 On Play and My sheet, the seven Luck pips become seven small candles. A lit candle is a Luck point you still have. Spending one snuffs it: the flame shrinks, a wisp of smoke rises, and the wick glows for a moment. The Roller's "Spend Luck" button and Play's "cancel that wound" trigger the same animation.

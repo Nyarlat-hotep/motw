@@ -123,13 +123,6 @@ details.sect > .body { padding: 0 16px 16px; }
 .step .ctl button:hover { border-color: var(--accent); }
 .step .ctl output { min-width: 3ch; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
 .stage { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
-.dice { display: flex; gap: 12px; }
-.die { width: 76px; height: 76px; background: var(--die); border-radius: 14px; display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 12px; box-shadow: inset 0 -5px 0 rgba(0,0,0,.16), 0 3px 0 var(--line); }
-.die i { border-radius: 50%; aspect-ratio: 1; align-self: center; justify-self: center; width: 100%; }
-.die i.on { background: var(--pip); }
-.die.blank { opacity: .55; }
-.die.tumble { animation: tumble .18s linear infinite; }
-@keyframes tumble { 0% { transform: rotate(-7deg) translateY(0); } 50% { transform: rotate(7deg) translateY(-6px); } 100% { transform: rotate(-7deg) translateY(0); } }
 .sum { font-family: var(--display); font-size: 64px; line-height: 1; font-variant-numeric: tabular-nums; min-width: 2ch; }
 .sum small { display: block; font-family: var(--type); font-size: 13px; letter-spacing: .08em; color: var(--muted); }
 .rollbtn { font-family: var(--display); font-size: 26px; letter-spacing: .08em; text-transform: uppercase; width: 100%; min-height: 60px; margin-top: 14px; }
@@ -236,7 +229,7 @@ details.case .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 .item .qty output { min-width: 2.4ch; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
 @media (max-width: 640px) { .item { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .item .note { grid-column: 1 / -1; } }
 .gear { margin: 8px 0 0; font-size: 14px; }
-@media (prefers-reduced-motion: reduce) { .die.tumble { animation: none; } * { scroll-behavior: auto !important; } }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 
 /* gothic type scale (Cinzel runs wide, so sizes come down from the poster version) */
 h1, h2, h3, h4, .tabs button, .rollbtn, .sum, .rollas .who, details.case .ttl, details.sect > summary, .sstat output { font-weight: 700; }
@@ -401,7 +394,7 @@ details.case .ttl, details.beast .ttl { font-size: 21px; text-transform: none; }
 input[type=text], input[type=date], input[type=search], input[type=number], select, textarea { border-radius: 3px; font-size: 18px; }
 .lbl { font-size: 16px; letter-spacing: .08em; text-transform: none; color: var(--accent); }
 th { font-size: 15px; letter-spacing: .08em; text-transform: none; }
-.move .stat, .move dt, details.case .no, details.beast .no, .st, .example, .tag, .clock button, .item .val span, .statbtn span, .pips button, .portrait.ph, .pimg .ph, .die-label { font-family: var(--display); text-transform: none; }
+.move .stat, .move dt, details.case .no, details.beast .no, .st, .example, .tag, .clock button, .item .val span, .statbtn span, .pips button, .portrait.ph, .pimg .ph { font-family: var(--display); text-transform: none; }
 .move .stat, details.case .no, details.beast .no { font-size: 16px; letter-spacing: .08em; }
 .move dt { font-size: 17px; }
 .st, .example, .tag { font-size: 14px; }
@@ -1177,14 +1170,6 @@ var VIBES = [
   ['A chaos goblin who turns out to be right', 'The Flake, The Crooked'],
   ['Keep it simple for my first game', 'The Mundane, The Professional']
 ];
-var STEPS = [
-  ['Choose a playbook', 'Your archetype. Read the options and pick the one you would enjoy playing.'],
-  ['Name and look', 'A name, and a few details the Keeper can describe back to you.'],
-  ['Choose your ratings', 'Your playbook offers a few arrays of Charm, Cool, Sharp, Tough and Weird. Pick one.'],
-  ['Choose your moves', 'Your playbook gives you special moves. Pick the ones it allows.'],
-  ['Choose your gear', 'Weapons, armor and items from the lists on your playbook.'],
-  ['Your history', 'Answer the history questions about the other hunters. They tie the group together.']
-];
 var TIPS = [
   ['Say what you do', 'Describe your hunter\'s action in plain words. The Keeper tells you when a move triggers and which stat to roll.'],
   ['Ask questions', 'Investigate a Mystery and Read a Bad Situation turn rolls into answers. Learn the weakness first: monsters cannot be defeated without it.'],
@@ -1237,7 +1222,7 @@ function exampleCase() {
 }
 function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.hook = c.threats = c.weakness = c.npcs = c.loose = c.log = ''; c.clock = 0; c.eos = [false, false, false, false]; c.date = new Date().toISOString().slice(0, 10); return c; }
 function defaults() {
-  return { v: 1, tab: 'guide', hv: 'build', steps: {}, wiz: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage' }, hold: { n: 0, move: '', asked: [] }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
+  return { v: 1, tab: 'guide', hv: 'build', wiz: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage' }, hold: { n: 0, move: '', asked: [] }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0, adv: false },
     sheet: { name: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, moves: '', gear: '' } };
 }
@@ -1359,11 +1344,6 @@ document.addEventListener('click', function (e) {
 
 /* ---------- roller ---------- */
 var PIPS = { 1: [4], 2: [0, 8], 3: [0, 4, 8], 4: [0, 2, 6, 8], 5: [0, 2, 4, 6, 8], 6: [0, 2, 3, 5, 6, 8] };
-function dieHTML(v, cls) {
-  var h = '';
-  for (var i = 0; i < 9; i++) h += '<i class="' + (v && PIPS[v].indexOf(i) >= 0 ? 'on' : '') + '"></i>';
-  return '<div class="die ' + (cls || '') + '" role="img" aria-label="' + (v ? 'Die showing ' + v : 'Die not rolled') + '">' + h + '</div>';
-}
 var rolling = false, last = null;
 function rnd6() { var b = new Uint8Array(1); do { crypto.getRandomValues(b); } while (b[0] >= 252); return (b[0] % 6) + 1; }
 function bonus() { var R = S.roller; return S.sheet.stats[R.stat] + R.forward + R.ongoing + R.other; }
@@ -2340,7 +2320,6 @@ $('#invundo').addEventListener('click', function (e) {
 });
 
 /* ---------- case files ---------- */
-var openOnce = false;
 function eosXp(c) { var n = c.eos.filter(Boolean).length; return n >= 3 ? 2 : n >= 1 ? 1 : 0; }
 function caseHTML(c, idx, total) {
   var no = 'Case ' + (total - idx);
