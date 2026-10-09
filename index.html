@@ -553,10 +553,9 @@ th { font-size: 15px; letter-spacing: .08em; text-transform: none; }
 .statbtn b { font-size: 26px; }
 .sstat output { font-size: 32px; }
 
-/* pages: ruled double borders, square corners, a dropped red initial */
+/* pages: a dropped red initial */
 .card, details.sect, details.case, details.beast, .pcard, .move, .pb, .tip, .cm, .item, .strip li, .sstat, .statbtn, .tier, .empty, .confirm, .levelup { border-radius: 3px; }
-.card, details.sect, details.case, details.beast, .pcard { box-shadow: inset 0 0 0 4px var(--surface), inset 0 0 0 5px var(--line); }
-.pcard.you { box-shadow: 0 0 0 1px var(--accent), inset 0 0 0 4px var(--surface), inset 0 0 0 5px var(--accent); }
+.pcard.you { box-shadow: 0 0 0 1px var(--accent); }
 details.sect > .body > p:first-child::first-letter, .dropcap::first-letter { font-family: var(--black); font-weight: 700; float: left; font-size: 3.5em; line-height: .78; padding: .07em .1em 0 0; color: var(--accent); }
 details.sect > .body > p:first-child { text-align: left; }
 .note { font-style: italic; border-left-width: 3px; }
