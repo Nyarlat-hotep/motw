@@ -221,6 +221,11 @@ details.sect > .body { padding: 0 16px 16px; }
 .bknudge span { flex: 1 1 240px; }
 .want select { width: 100%; }
 .want p { margin: 8px 0 0; }
+/* hunter card: the picture is always dark, the box around it follows the theme */
+.hcdlg { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 6px; padding: 16px; width: min(960px, calc(100vw - 24px)); max-height: calc(100vh - 24px); }
+.hcdlg::backdrop { background: rgba(0, 0, 0, .65); }
+.hcdlg h2 { margin-top: 0; }
+.hcdlg canvas { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 4px; }
 .levelup { background: var(--good-bg); border: 1px solid var(--good); border-radius: 8px; padding: 12px 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-top: 10px; }
 
 /* tips */
@@ -736,6 +741,13 @@ div.wcard { cursor: default; border-color: var(--good); }
 <div class="texture" aria-hidden="true"></div>
 <div class="texture t2" aria-hidden="true"></div>
 <div id="fx" aria-hidden="true"></div>
+<dialog class="hcdlg" id="hcdlg" aria-labelledby="hc-title">
+  <h2 class="sectitle" id="hc-title">Hunter card</h2>
+  <p class="small muted" style="margin:0 0 10px">A picture of your hunter to drop in the group chat. It always uses the dark look, so it reads the same wherever you paste it.</p>
+  <canvas id="hc-canvas" width="1200" height="630" role="img" aria-label="Hunter card"></canvas>
+  <p class="small" id="hc-msg" role="status" style="margin:10px 0 0;min-height:1.4em"></p>
+  <div class="actions"><button class="btn" type="button" id="hc-save">Download picture</button><button class="btn ghost" type="button" id="hc-copy" hidden>Copy picture</button><button class="btn ghost" type="button" id="hc-close">Close</button></div>
+</dialog>
 <div class="wrap">
   <header class="mast">
     <div>
@@ -1013,6 +1025,7 @@ div.wcard { cursor: default; border-color: var(--good); }
             <button class="btn ghost sm" id="rmphoto" type="button" hidden>Remove</button>
           </div>
           <p class="small muted" id="photomsg" role="status" style="text-align:center;margin:8px 0 0"></p>
+          <div class="actions" style="justify-content:center"><button class="btn sm" type="button" data-hcard>Save hunter card</button></div>
         </div>
         <div class="hfields">
           <div class="cols">
@@ -1895,7 +1908,7 @@ function wizReview() {
     '<span class="lbl" style="margin-top:12px">Gear</span><ul class="chips" style="margin-top:0">' + gear + '</ul>' + (ex ? '<span class="lbl" style="margin-top:12px">Playbook details</span>' + ex : '') +
     '<span class="lbl" style="margin-top:12px">Bonds</span><p style="margin:0">' + (sh.bonds.length ? sh.bonds.map(function (b) { return esc(b.who || 'Someone') + ' (' + esc(b.tie) + ')'; }).join(', ') : '<span class="muted">None yet</span>') + '</p></div></div>' +
     todoH + (dn.slice(0, 6).every(Boolean) ? bkNudge('Your hunter is saved in this browser, on this device only.') : '') +
-    '<div class="actions"><button class="btn" type="button" id="wtoplay">Go to Play</button><button class="btn ghost" type="button" id="wtosheet">Open my sheet</button><button class="btn ghost" type="button" id="wtoroll">Try a test roll</button></div>' +
+    '<div class="actions"><button class="btn" type="button" id="wtoplay">Go to Play</button><button class="btn ghost" type="button" id="wtosheet">Open my sheet</button><button class="btn ghost" type="button" data-hcard>Save hunter card</button></div>' +
     '<h2 class="sectitle">Before session one, ask your Keeper</h2><ul><li>Are the playbooks and moves here the ones we are using?</li><li>Do the 12+ Advanced results apply from the start?</li><li>What tone are we playing: spooky, campy or all-out action?</li><li>How do you want to handle harm and armor numbers?</li></ul>';
 }
 
@@ -2028,7 +2041,6 @@ function wizToggle(map, key, limit, what) {
       var hp = curPB().history[+g.dataset.whist]; $('#w-bnote').value = hp.slice(0, 200); $('#w-bwho').focus(); return;
     }
     if (t.id === 'wtosheet') { setHV('sheet'); scheduleSave(); window.scrollTo(0, 0); return; }
-    if (t.id === 'wtoroll') { showTab('roll'); return; }
     if (t.id === 'wtoplay') { showTab('play'); window.scrollTo(0, 0); return; }
   });
   host.addEventListener('submit', function (e) {
@@ -4024,6 +4036,135 @@ document.addEventListener('click', function (e) {
   skipAnims.forEach(function (a) { try { a.finish(); } catch (er) {} });
   d3Skip();
 });
+
+/* ---------- hunter card: a 1200 x 630 picture of the hunter, to drop in chat ---------- */
+/* What it says comes from partyBody(), so the card and the Party tab never disagree. It is always drawn in the dark colors, whatever the page's theme.
+   HC is on window so tests can look in: boxes lists every piece of text drawn, with the width it was given. */
+var HC = window.__card = { W: 1200, H: 630, boxes: [], photo: false };
+var HCC = { bg: '#110c0e', panel: '#1a1215', well: '#26191d', line: '#3e2c31', ink: '#f0e7dc', muted: '#b3a496', accent: '#e0675b', brass: '#d1a954', bad: '#ff8a80' };
+var HCF = { display: '"IM Fell English SC", "Palatino Linotype", Georgia, serif', black: 'UnifrakturCook, "Old English Text MT", Georgia, serif', body: '"EB Garamond", Garamond, Georgia, serif' };
+function hcFont(c, style, px, fam) { c.font = (style ? style + ' ' : '') + px + 'px ' + HCF[fam]; }
+/* cut text to fit a width, ending in three dots */
+function hcClip(c, s, max) {
+  if (c.measureText(s).width <= max) return s;
+  while (s.length > 1 && c.measureText(s + '...').width > max) s = s.slice(0, -1);
+  return s.replace(/[\s,·]+$/, '') + '...';
+}
+/* wrap text to at most n lines of a width; whatever does not fit is cut from the last line */
+function hcLines(c, s, max) {
+  var lines = [], cur = '';
+  String(s).split(/\s+/).filter(Boolean).forEach(function (w) { var t = cur ? cur + ' ' + w : w; if (!cur || c.measureText(t).width <= max) cur = t; else { lines.push(cur); cur = w; } });
+  if (cur) lines.push(cur);
+  return lines;
+}
+function hcWrap(c, s, max, n) {
+  var lines = hcLines(c, s, max);
+  if (lines.length > n) { lines[n - 1] = lines.slice(n - 1).join(' '); lines.length = n; }
+  return lines.map(function (l) { return hcClip(c, l, max); });
+}
+/* a list of names in at most n lines: as many as fit (and no more than cap), then a count of the rest */
+function hcList(c, items, sep, max, n, cap) {
+  for (var k = Math.min(cap, items.length); k > 0; k--) {
+    var rest = items.length - k, lines = hcLines(c, items.slice(0, k).join(sep) + (rest ? sep + 'and ' + rest + ' more' : ''), max);
+    if (lines.length <= n && lines.every(function (l) { return c.measureText(l).width <= max; })) return lines;
+  }
+  var tail = items.length > 1 ? sep + 'and ' + (items.length - 1) + ' more' : '';   // even the first name is too long: cut it, and keep the count
+  return hcWrap(c, hcClip(c, items[0] || '', Math.max(60, max * (n > 1 ? n - .5 : 1) - c.measureText(tail).width)) + tail, max, n);
+}
+function hcT(c, s, x, y, max, align) {
+  var w = c.measureText(s).width;
+  HC.boxes.push({ t: s, x: align === 'center' ? x - w / 2 : align === 'right' ? x - w : x, y: y, w: w, max: max });
+  c.textAlign = align || 'left'; c.fillText(s, x, y);
+}
+function hcDraw(cv, img) {
+  var c = cv.getContext('2d'), d = partyBody(), W = HC.W, H = HC.H, x0 = 440, mw = 700, y, i, size;
+  HC.boxes = []; HC.photo = !!img; c.textBaseline = 'alphabetic';
+  /* the page: a panel with a double rule and a little lamplight in one corner */
+  c.fillStyle = HCC.bg; c.fillRect(0, 0, W, H);
+  c.fillStyle = HCC.panel; c.fillRect(24, 24, W - 48, H - 48);
+  var glow = c.createRadialGradient(1010, 40, 20, 1010, 40, 640); glow.addColorStop(0, 'rgba(224, 103, 91, .17)'); glow.addColorStop(1, 'rgba(224, 103, 91, 0)');
+  c.fillStyle = glow; c.fillRect(24, 24, W - 48, H - 48);
+  c.strokeStyle = HCC.line; c.lineWidth = 2; c.strokeRect(24, 24, W - 48, H - 48); c.lineWidth = 1; c.strokeRect(33.5, 33.5, W - 67, H - 67);
+  /* portrait: the photo, cropped to fill and kept towards the top where faces are, or the playbook's initial */
+  var px = 64, py = 64, pw = 330, ph = 502;
+  c.fillStyle = HCC.well; c.fillRect(px, py, pw, ph);
+  if (img) {
+    var k = Math.max(pw / img.naturalWidth, ph / img.naturalHeight), sw = pw / k, sh = ph / k;
+    c.drawImage(img, (img.naturalWidth - sw) / 2, (img.naturalHeight - sh) * .3, sw, sh, px, py, pw, ph);
+  } else {
+    var who = String(d.playbook || '').replace(/^The\s+/, '') || String(d.name || '').trim();
+    c.fillStyle = HCC.accent; hcFont(c, '700', 250, 'black'); hcT(c, (who.charAt(0) || '?').toUpperCase(), px + pw / 2, py + ph / 2 + 78, pw, 'center');
+    if (d.playbook) { c.fillStyle = HCC.muted; hcFont(c, '', 24, 'display'); hcT(c, hcClip(c, d.playbook, pw - 40), px + pw / 2, py + ph - 36, pw - 40, 'center'); }
+  }
+  c.strokeStyle = HCC.brass; c.lineWidth = 2; c.strokeRect(px, py, pw, ph); c.strokeStyle = HCC.line; c.lineWidth = 1; c.strokeRect(px + 6.5, py + 6.5, pw - 13, ph - 13);
+  /* who they are */
+  c.fillStyle = HCC.accent; hcFont(c, '', 20, 'display'); hcT(c, 'Monster of the Week', x0, 84, mw);
+  var name = String(d.name || '').trim() || 'Unnamed hunter';
+  for (size = 60; size > 36; size -= 2) { hcFont(c, '', size, 'display'); if (c.measureText(name).width <= mw) break; }
+  hcFont(c, '', size, 'display'); c.fillStyle = HCC.ink; hcT(c, hcClip(c, name, mw), x0, 140, mw);
+  hcFont(c, '', 26, 'body'); c.fillStyle = HCC.muted;
+  var dot = '  ·  ', pb = d.playbook || 'No playbook yet', lv = 'Level ' + d.level;   // long pronouns give way so the level stays in view
+  var pro = d.pronouns ? hcClip(c, d.pronouns, Math.max(60, mw - c.measureText(pb + dot + dot + lv).width)) : '';
+  hcT(c, hcClip(c, [pb, pro, lv].filter(Boolean).join(dot), mw), x0, 176, mw);
+  y = 176;
+  if (String(d.catchline || '').trim()) { hcFont(c, 'italic', 26, 'body'); c.fillStyle = HCC.ink; hcWrap(c, '“' + d.catchline.trim() + '”', mw, 2).forEach(function (l) { y += 32; hcT(c, l, x0, y, mw); }); }
+  /* ratings */
+  y += 20;
+  STATS.forEach(function (s, n) {
+    var bx = x0 + n * 143, bw = 128;
+    c.fillStyle = HCC.well; c.fillRect(bx, y, bw, 86); c.strokeStyle = HCC.line; c.lineWidth = 1; c.strokeRect(bx + .5, y + .5, bw - 1, 85);
+    c.fillStyle = HCC.ink; hcFont(c, '500', 42, 'body'); hcT(c, fmt(d.stats[s]), bx + bw / 2, y + 46, bw, 'center');
+    c.fillStyle = HCC.accent; hcFont(c, '', 18, 'display'); hcT(c, STATNAME[s], bx + bw / 2, y + 72, bw, 'center');
+  });
+  /* Luck left, harm taken, armor */
+  y += 86 + 40;
+  c.fillStyle = HCC.accent; hcFont(c, '', 18, 'display'); hcT(c, 'Luck', x0, y, 56);
+  for (i = 0; i < 7; i++) { c.beginPath(); c.arc(x0 + 66 + i * 25, y - 7, 8.5, 0, 6.2832); if (i < d.luck) { c.fillStyle = HCC.brass; c.fill(); } else { c.strokeStyle = HCC.line; c.lineWidth = 2; c.stroke(); } }
+  c.fillStyle = HCC.accent; hcT(c, 'Harm', x0 + 250, y, 56);
+  for (i = 0; i < 8; i++) { var hx = x0 + 310 + i * 23; if (i < d.harm) { c.fillStyle = HCC.bad; c.fillRect(hx, y - 15, 16, 16); } else { c.strokeStyle = HCC.line; c.lineWidth = 2; c.strokeRect(hx + 1, y - 14, 14, 14); } }
+  hcFont(c, '', 22, 'body'); c.fillStyle = d.unstable ? HCC.bad : HCC.muted;
+  hcT(c, hcClip(c, (d.unstable ? 'Unstable, armor ' : 'Armor ') + d.armor, 190), x0 + mw, y, 190, 'right');
+  /* moves: up to eight by name, then a count; and what they carry */
+  var names = allMoveNames(), carried = d.weapons;
+  y += 40; c.fillStyle = HCC.accent; hcFont(c, '', 18, 'display'); hcT(c, 'Moves', x0, y, mw);
+  hcFont(c, '', 24, 'body'); c.fillStyle = names.length ? HCC.ink : HCC.muted;
+  (names.length ? hcList(c, names, dot, mw, carried.length ? 2 : 3, 8) : ['None picked yet']).forEach(function (l) { y += 29; hcT(c, l, x0, y, mw); });
+  if (carried.length) {
+    y += 36; c.fillStyle = HCC.accent; hcFont(c, '', 18, 'display'); hcT(c, 'Carries', x0, y, mw);
+    y += 29; hcFont(c, '', 24, 'body'); c.fillStyle = HCC.ink; hcT(c, hcList(c, carried, ', ', mw, 1, 6)[0], x0, y, mw);
+  }
+  c.fillStyle = HCC.muted; hcFont(c, '700', 20, 'black'); hcT(c, "Hunter's Journal", W - 62, 586, 220, 'right');
+  c.textAlign = 'left';
+}
+function hcMsg(t) { $('#hc-msg').textContent = t || ''; }
+function hcOpen() {
+  var dlg = $('#hcdlg'), cv = $('#hc-canvas'), sh = S.sheet;
+  var src = sh.photo || (location.protocol === 'file:' ? '' : artFor(sh.playbook));   // a picture read from a file would lock the canvas, so the playbook art is only used over http
+  hcMsg(''); $('#hc-copy').hidden = !(window.ClipboardItem && navigator.clipboard && navigator.clipboard.write);
+  cv.setAttribute('aria-label', 'Hunter card for ' + (String(sh.name || '').trim() || 'your hunter'));
+  hcDraw(cv, null);   // something to look at straight away; the typefaces and the photo follow
+  if (!dlg.open) { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', ''); }
+  var faces = document.fonts && document.fonts.load ? Promise.all(['700 40px UnifrakturCook', '40px "IM Fell English SC"', '24px "EB Garamond"', 'italic 24px "EB Garamond"', '500 40px "EB Garamond"'].map(function (f) { return document.fonts.load(f); })).catch(function () {}) : Promise.resolve();
+  faces.then(function () {
+    hcDraw(cv, null);
+    if (!src) return;
+    var im = new Image(); im.onload = function () { hcDraw(cv, im); }; im.src = src;
+  });
+}
+function hcBlob() { return new Promise(function (ok, no) { try { $('#hc-canvas').toBlob(function (b) { if (b) ok(b); else no(); }, 'image/png'); } catch (e) { no(); } }); }
+$('#hc-save').addEventListener('click', function () {
+  hcBlob().then(function (b) {
+    var url = URL.createObjectURL(b), a = document.createElement('a'), who = String(S.sheet.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'hunter';
+    a.href = url; a.download = 'hunter-card-' + who + '.png'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000); hcMsg('Picture downloaded. Drop it in the chat.');
+  }, function () { hcMsg('Could not make the picture here.'); });
+});
+$('#hc-copy').addEventListener('click', function () {
+  try { navigator.clipboard.write([new ClipboardItem({ 'image/png': hcBlob() })]).then(function () { hcMsg('Picture copied. Paste it into the chat.'); }, function () { hcMsg('Copying was blocked here. Use Download picture instead.'); }); }
+  catch (e) { hcMsg('Copying was blocked here. Use Download picture instead.'); }
+});
+$('#hc-close').addEventListener('click', function () { var dlg = $('#hcdlg'); if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); });
+document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-hcard]')) hcOpen(); });
 
 /* ---------- first night: start here, and a backup that is easy to reach ---------- */
 function bkAgo() {

@@ -137,6 +137,8 @@ Luck reads correctly at a glance in both themes, clicking still sets Luck, spend
 
 ## 4. Hunter card image
 
+Status: built 2026-10-08. Three things differ from the plan below. The card opens in a box with Download picture and Copy picture, and Close. A list that does not fit shows as many names as it can and then a count ("and 5 more"), for gear as well as moves. And the playbook portrait is only used when the page is served over http, so a card made from a file on disk shows the playbook's initial unless you uploaded a photo. Pronouns are on the card too.
+
 ### What the player gets
 A "Save hunter card" button on My sheet and on the builder's Review step. It produces a 1200 x 630 PNG: portrait on the left, then name, playbook, catchphrase, the five ratings, Luck, Harm and level, move names, and equipped gear, in the journal's type and colours. Buttons: Download, and Copy image where the browser allows it.
 
