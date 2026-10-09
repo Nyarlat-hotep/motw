@@ -86,7 +86,7 @@
         "id": "crooked-deal-with-the-devil",
         "name": "Deal with the Devil",
         "kind": "passive",
-        "summary": "Your soul belongs to the Devil. Choose one or two perks: wealth, fame, youth, sensual gratification, or skill (+1 to two ratings). The bill arrives when you die; if you took two perks, it arrives after six months instead, and if you took one, after a year."
+        "summary": "Your soul belongs to the Devil. Choose one or two perks: wealth, fame, youth, sensual gratification, or skill (+1 to two ratings). The bill comes due when you die, or sooner: after six months if you took two perks, after a year if you took one."
       },
       {
         "id": "crooked-friends-on-the-force",

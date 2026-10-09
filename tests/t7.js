@@ -23,6 +23,7 @@ const pmin=(p,o)=>o?0:(Array.isArray(p)?p[0]:(p|0)), pmax=p=>Array.isArray(p)?p[
   check(T+'look groups', await p.locator('.wlook').count()===d.look.length, await p.locator('.wlook').count());
   for (let i=0;i<d.look.length;i++) await p.locator('.wlook').nth(i).locator('[data-wlk]').first().click();
   await p.fill('#w-name','Test '+d.id);
+  await p.fill('#w-pron','they/them');
   await p.click('.wnav .btn:has-text("Next")'); await p.waitForTimeout(100);
   // step 3 ratings
   check(T+'5 rating lines', await p.locator('.wopt').count()===d.ratings.length, await p.locator('.wopt').count());
@@ -30,7 +31,17 @@ const pmin=(p,o)=>o?0:(Array.isArray(p)?p[0]:(p|0)), pmax=p=>Array.isArray(p)?p[
   let s=await st(); const R=d.ratings[d.ratings.length-1];
   check(T+'stats applied', ['charm','cool','sharp','tough','weird'].every(k=>s.sheet.stats[k]===R[k]), JSON.stringify(s.sheet.stats)+JSON.stringify(R));
   await p.click('.wnav .btn:has-text("Next")'); await p.waitForTimeout(100);
-  // step 4 moves
+  // step 4 details: the playbook's own choices come before moves and gear, as on the sheets
+  check(T+'details is step 4', /Step 4 of 8/.test(await p.textContent('.wstep')) && /Details/.test(await p.textContent('.wstep')), await p.textContent('.wstep'));
+  for (const g of d.extras) {
+   if (g.text||!g.options) { await p.locator('[data-wext="'+g.id+'"]').fill('Test text'); continue; }
+   const need=pmin(g.pick,false); const cards=p.locator('[data-wxg^="'+g.id+'|"]');
+   for (let i=0;i<need;i++) await cards.nth(i).click();
+  }
+  check(T+'luck special shown', (await p.textContent('#wbody')).length>50 && await p.locator('#wbody .note').count()>=1);
+  await p.click('.wnav .btn:has-text("Next")'); await p.waitForTimeout(100);
+  // step 5 moves
+  check(T+'moves is step 5', /Step 5 of 8/.test(await p.textContent('.wstep')) && /Moves/.test(await p.textContent('.wstep')), await p.textContent('.wstep'));
   const nAuto=d.moves.auto.length;
   check(T+'auto moves shown', await p.locator('.wmove .chip.ok').count()===nAuto, await p.locator('.wmove .chip.ok').count());
   const pickBtns=p.locator('[data-wmv]');
@@ -44,7 +55,7 @@ const pmin=(p,o)=>o?0:(Array.isArray(p)?p[0]:(p|0)), pmax=p=>Array.isArray(p)?p[
   // undo one then redo
   await pickBtns.nth(0).click(); await pickBtns.nth(0).click();
   await p.click('.wnav .btn:has-text("Next")'); await p.waitForTimeout(100);
-  // step 5 gear
+  // step 6 gear
   const gears=d.gear;
   for (const g of gears) {
    if (g.kind==='builder') {
@@ -63,14 +74,6 @@ const pmin=(p,o)=>o?0:(Array.isArray(p)?p[0]:(p|0)), pmax=p=>Array.isArray(p)?p[
   const wpn=s.sheet.inventory.filter(i=>i.pbk && i.type==='Weapon'); check(T+'weapons equipped', wpn.every(w=>w.eq));
   await p.screenshot({path:require('path').join(__dirname,'out','pb-gear-'+d.id+'.png'),fullPage:true});
   await p.click('.wnav .btn:has-text("Next")'); await p.waitForTimeout(100);
-  // step 6 extras
-  for (const g of d.extras) {
-   if (g.text||!g.options) { await p.locator('[data-wext="'+g.id+'"]').fill('Test text'); continue; }
-   const need=pmin(g.pick,false); const cards=p.locator('[data-wxg^="'+g.id+'|"]');
-   for (let i=0;i<need;i++) await cards.nth(i).click();
-  }
-  check(T+'luck special shown', (await p.textContent('#wbody')).length>50 && await p.locator('#wbody .note').count()>=1);
-  await p.click('.wnav .btn:has-text("Next")'); await p.waitForTimeout(100);
   // step 7 bonds
   check(T+'history prompts', await p.locator('[data-whist]').count()===d.history.length, await p.locator('[data-whist]').count());
   await p.locator('[data-whist]').first().click(); await p.fill('#w-bwho','Sam'); await p.fill('#w-btheirs','We grew up on the same street'); await p.click('#wbondform .btn');
@@ -81,6 +84,7 @@ const pmin=(p,o)=>o?0:(Array.isArray(p)?p[0]:(p|0)), pmax=p=>Array.isArray(p)?p[
   const rev=await p.textContent('#wbody');
   check(T+'review complete', rev.includes('Everything is filled in'), rev.slice(0,600));
   check(T+'review shows name', rev.includes('Test '+d.id));
+  check(T+'pronouns saved and shown on review', rev.includes('they/them') && (await st()).sheet.pronouns==='they/them');
   await p.screenshot({path:require('path').join(__dirname,'out','pb-review-'+d.id+'.png'),fullPage:true});
   // sheet card
   await p.click('#wtosheet'); await p.waitForTimeout(150);

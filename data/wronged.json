@@ -161,7 +161,7 @@
     {
      "name": "Specialist weapons for destroying your foes (e.g. wooden stakes and mallet for vampires, silver dagger for werewolves)",
      "harm": 1,
-     "tags": "4-harm against the specific creatures it targets, 1-harm otherwise; other tags by agreement with the Keeper"
+     "tags": "4-harm against the creatures it is made for, 1-harm against anything else; other tags by agreement with the Keeper"
     },
     {
      "name": "Enchanted dagger",

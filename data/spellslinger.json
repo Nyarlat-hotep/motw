@@ -62,7 +62,7 @@
       "writeIn": true
     }
   ],
-  "luckSpecial": "Each time you spend a Luck point, the official council of wizards starts poking its nose into your business. (Spending Luck can also avoid all harm from one injury.)",
+  "luckSpecial": "Each time you spend a Luck point, the official council of wizards starts poking its nose into your business.",
   "moves": {
     "intro": "Take every basic move plus four Spell-Slinger moves. Tools and Techniques is free; pick three others from the list. Your attack spells are covered separately under Combat Magic.",
     "pick": 3,
@@ -270,7 +270,7 @@
     "They keep you grounded whenever your power gets to you. Ask about the most recent time that happened.",
     "You are related by blood but lost touch for years. Ask how they found their way back to you.",
     "They mentored you in a past life. Ask what they taught you.",
-    "You used magic to save them, which is how they first learned monsters exist. Ask them which creature was hunting them.",
+    "You used magic to save them, which is how they first learned monsters exist. Tell them which creature was after them.",
     "Your old rivalry became a close friendship. Tell them what the fight was about.",
     "You believed they had died, yet here they are. Ask what supposedly killed them.",
     "You keep drifting together and apart as a couple. Ask what separates you, and tell them what holds you together.",

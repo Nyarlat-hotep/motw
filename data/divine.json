@@ -89,8 +89,8 @@
         "trig": "At the beginning of each mystery",
         "full": "Your Superiors give you a simple task. You may also put one investigate a mystery question to the Keeper straight away.",
         "part": "Your Superiors give you a hard or tangled task. You may also put one investigate a mystery question to the Keeper straight away.",
-        "miss": "They order something awful. Until you make up for failing them, you lose access to this move if you refuse.",
-        "note": "Roll 10+ or 7-9 and you can also pose one of the investigate a mystery questions at once."
+        "miss": "They order you to do something terrible. If you do not carry out what they ordered, you cannot use this move again until you have made up for it.",
+        "note": "On a 10+ or a 7-9 you can also ask one of the investigate a mystery questions at once. Whatever they asked for, if you do not carry it out you cannot use this move again until you have made up for it."
       },
       {
         "id": "divine-angel-wings",

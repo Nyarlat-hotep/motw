@@ -7,8 +7,8 @@ ORDER = ['chosen','crooked','divine','expert','flake','initiate','monstrous','mu
 data = [json.load(open(os.path.join(root, 'data', i + '.json'), encoding='utf-8')) for i in ORDER]
 blob = json.dumps(data, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
 path = os.path.join(root, 'index.html')
-html = open(path, encoding='utf-8').read()
+html = open(path, encoding='utf-8', newline='').read()
 new, n = re.subn(r'^var PBDATA = .*;$', lambda m: 'var PBDATA = ' + blob + ';', html, count=1, flags=re.M)
 assert n == 1, 'PBDATA line not found'
-open(path, 'w', encoding='utf-8').write(new)
+open(path, 'w', encoding='utf-8', newline='').write(new)   # newline='' keeps the page's line endings as they are on every system
 print('embedded', len(data), 'playbooks,', len(blob), 'chars')

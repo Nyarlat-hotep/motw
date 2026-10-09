@@ -96,6 +96,8 @@ The campaign is a post-apocalyptic wasteland, and the journal was styled as a go
 
 ## Decided, not doing
 
+- The official playbook sheets and reference sheets are the source for rules. On 2026-10-08 all twelve playbooks, the basic and weird moves, and the harm, healing, Luck and level-up rules were compared with them line by line. What differed was fixed: the builder now asks for a playbook's own choices before moves and gear, as the sheets do; a pronouns field was added; and a few wordings were corrected (Protect Someone on a 10+, the telekinesis explosion's fire tag, two history prompts, the Divine's Boss from Beyond).
+- The Harm row has eight pips where the printed sheet has seven boxes. The eighth is "8 harm kills", which the reference sheet states.
 - Rules stay as built from the rulebook. A how-to-play video was checked on 2026-10-08 and nothing was changed to match it, including the hand-set ratings range and adding a "the Keeper never rolls" line to the Guide.
 - Sigils are one-color stamps in the pip color, not full-color pictures (Jacob, 2026-10-08).
 - 3D dice are flown along a set path to the numbers already rolled. No physics library (Jacob, 2026-10-08).
