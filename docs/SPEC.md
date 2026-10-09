@@ -118,7 +118,7 @@ No audio nodes are created while sound is off. With sound on, a roll makes one h
 
 ## 3. Luck as seven candles
 
-Status: built 2026-10-07, held because Jacob wanted the look improved, and redrawn 2026-10-08 on the `luck-candles-v2` branch. Not merged: waiting for him to look. The candles are now shaded wax of different heights with drips, a glow and a ledge to stand on. The flame and the wisp of smoke are pictures made from Kenney's Particle Pack when those files are present, and drawn when they are not. At 2 Luck or fewer the flames gutter (small and jumpy) and the line under them turns red, which replaced the tint described below. A line under the row counts what is left.
+Status: built 2026-10-07, held because Jacob wanted the look improved, then redrawn and merged into `main` on 2026-10-08 after he had seen the new look and asked for a flame with more frames. The candles are now shaded wax of different heights with drips, a glow and a ledge to stand on. The flame and the wisp of smoke are pictures made from Kenney's Particle Pack when those files are present, and drawn when they are not. At 2 Luck or fewer the flames gutter (small and jumpy) and the line under them turns red, which replaced the tint described below. A line under the row counts what is left.
 
 ### What the player gets
 On Play and My sheet, the seven Luck pips become seven small candles. A lit candle is a Luck point you still have. Spending one snuffs it: the flame shrinks, a wisp of smoke rises, and the wick glows for a moment. The Roller's "Spend Luck" button and Play's "cancel that wound" trigger the same animation.

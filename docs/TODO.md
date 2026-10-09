@@ -6,9 +6,8 @@ Last tidied 2026-10-08. Next session is around 2026-10-19. Feature details are i
 
 | Branch | What it holds | State |
 |---|---|---|
-| `main` | The live site, with all the dice work: 3D dice, lighting, 14 finishes, 7 trays, the sigil library, recorded dice sounds | Deployed 2026-10-08 |
-| `luck-candles-v2` | Luck drawn as seven candles, redrawn 2026-10-08 on top of current `main` | Tested, waiting for Jacob to look |
-| `luck-candles` | The first candles | Replaced by `luck-candles-v2`. Delete once that is merged. |
+| `main` | The site: all the dice work (3D dice, lighting, 14 finishes, 7 trays, the sigil library, recorded dice sounds), the Luck candles, and the builder and rules matched to the official sheets | Dice work deployed 2026-10-08. The candles and the rules fixes were merged the same day and go live with the next push. |
+| `luck-candles-v2`, `luck-candles` | The candle work, and the first candles it replaced | Both merged or replaced. Safe to delete. |
 
 Pushing `main` deploys. Pushing any other branch does not.
 
@@ -24,8 +23,6 @@ The dice work below is live, but none of it has had his review yet. 3D dice and 
 
 - [ ] **3D dice.** Judge them in motion: the fuel swish, the three lighting moods, the finishes. Try them on a phone.
 - [ ] **Dice sounds.** Nothing has been tuned by ear. Turn sound on and use "Hear these dice" in the dice maker to try each die on each tray, and note which pairs are wrong. From the first, made-up pass: gem was the only die sound he liked, and leather and felt should land as more of a thud.
-- [ ] **Luck candles** (`luck-candles-v2`). Redrawn after "the look could use some improvements": shaded wax, drips, a glow, and Kenney's flame and smoke. Look at them on My sheet and Play in both themes, watch one go out, and drop to 2 Luck to see the flames gutter. Not on the live site.
-
 ## Dice maker
 
 - [ ] Let the preview dice be turned by dragging, to look at every face.
