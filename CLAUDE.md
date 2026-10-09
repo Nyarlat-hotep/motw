@@ -33,6 +33,7 @@ A vanilla JS companion app for a Monster of the Week campaign, almost all of it 
 - Name generator: block between `/*NAMEGEN*/` and `/*END NAMEGEN*/` (Appalachian names, 1600s-1800s, with Soulsborne-style titles).
 - History: builder step 7 and the "History and bonds" card on My sheet both edit `S.sheet.bonds` ({who, tie, note, theirs}). `note` is the history you picked for them, `theirs` is what they picked for you. Each playbook's list is `history` in its data file.
 - Party card: `partyBody()` builds what is shared.
+- Luck candles: `luckPips()` draws the seven Luck buttons as inline SVG candles on My sheet (`#luck`) and Play (`#pl-luck`), each from its own row in `CANDLES`. The gradients they share are in the `svg.cdefs` block at the top of the body, and the colors that differ by theme are the `--cw-*` tokens. Change Luck through `setLuck()` so the spent candle plays its snuff. The flame and smoke are `img/candle-flame.png` and `img/candle-smoke.png` when those are there, and are drawn when not. The flame picture is a strip of 16 frames that the `cframes` keyframes step through; the frame count and size are written in both the page and `tools/make_candles.py`.
 
 ## Dice
 
@@ -74,13 +75,14 @@ A vanilla JS companion app for a Monster of the Week campaign, almost all of it 
 | `/*SIGILART*/` in the page | `python tools/make_sigils.py <folder>` | Jacob's sigil artwork, isolated and traced |
 | `sigils.js` | `python tools/make_sigil_pack.py <download folder>` | game-icons.net (CC BY 3.0) and the Noto fonts (OFL). Add an entry to `PICKS` and rerun. |
 | `snd/dicehit_glass*`, `snd/surface_soft*` | `python tools/make_sounds.py <pack's Audio folder>` | Kenney's Impact Sounds (CC0). The other recordings were copied as they are. |
+| `img/candle-flame.png`, `img/candle-smoke.png` | `python tools/make_candles.py <the unzipped pack>` | Kenney's Particle Pack (CC0) |
 | the embedded playbooks | `python3 tools/embed_data.py` | `data/*.json` |
 
 ## Tests
 `npm install`, then `npm test`. All of them drive the page with Playwright and write screenshots to `tests/out/` (not in git).
 - `tests/t7.js`: all 12 playbooks through the builder, gear, details, history, level-up and phone-width overflow in both themes (`node tests/t7.js chosen` runs one).
 - `tests/t5.js`: the broad regression suite. One of its checks depends on luck and fails about one run in ten (docs/TODO.md).
-- `tests/t8.js`: the dice maker and sigils. `tests/t9.js`: dice sounds, with a counting stand-in for AudioContext.
+- `tests/t8.js`: the dice maker and sigils. `tests/t9.js`: dice sounds, with a counting stand-in for AudioContext. `tests/t10.js`: the Luck candles.
 - `tests/t11.js`: 3D dice. `tests/t12.js`: recorded sounds. These two serve the repo over http themselves.
 
 ## What is next

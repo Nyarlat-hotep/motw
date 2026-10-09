@@ -21,6 +21,8 @@
   --accent: #8c1d2b; --accent-ink: #fff8f0; --brass: #85601a;
   --good: #0b6b57; --good-bg: #d3eadf; --warn: #855200; --warn-bg: #f2dfb4; --bad: #a82424; --bad-bg: #f3d3cf;
   --die: #f6efe1; --pip: #22171a;
+  --cw-a: #b09a70; --cw-b: #f7ecd0; --cw-c: #dccba3; --cw-d: #c4b189; --cw-pd: #dccba3; --cw-rim: #f3e6c6; --cw-pool: #cdbb92; --cw-smoke: #6d625c; --cw-dk: 0; --cw-sh: .16; --cw-ledge: .2;
+  --cw-out: saturate(.35) brightness(.96); --cw-outo: .6; --cw-edge: drop-shadow(0 0 .5px #c25600) drop-shadow(0 0 1.6px rgba(232, 120, 20, .55)); --cw-tint: brightness(.35);
   --display: 'IM Fell English SC', 'IM Fell English', 'Palatino Linotype', Georgia, serif;
   --black: 'UnifrakturCook', 'Old English Text MT', 'IM Fell English SC', serif;
   --num: 'EB Garamond', Garamond, Georgia, serif;
@@ -32,6 +34,8 @@
     --bg: #110c0e; --surface: #1a1215; --surface2: #26191d; --ink: #f0e7dc; --muted: #b3a496; --line: #3e2c31;
     --accent: #e0675b; --accent-ink: #1a0b0d; --brass: #d1a954;
     --good: #62d6b0; --good-bg: #10302a; --warn: #eebb4c; --warn-bg: #392a0c; --bad: #ff8a80; --bad-bg: #3b1618;
+    --cw-a: #7d6c4d; --cw-b: #e9dcb9; --cw-c: #bfae86; --cw-d: #a3916b; --cw-pd: #7a6a4c; --cw-rim: #e6d8b4; --cw-pool: #a3936f; --cw-smoke: #cfc6bb; --cw-dk: 1; --cw-sh: .45; --cw-ledge: .5;
+    --cw-out: saturate(.4) brightness(.48); --cw-outo: 1; --cw-edge: none; --cw-tint: none;
     color-scheme: dark;
   }
 }
@@ -39,6 +43,8 @@
   --bg: #110c0e; --surface: #1a1215; --surface2: #26191d; --ink: #f0e7dc; --muted: #b3a496; --line: #3e2c31;
   --accent: #e0675b; --accent-ink: #1a0b0d; --brass: #d1a954;
   --good: #62d6b0; --good-bg: #10302a; --warn: #eebb4c; --warn-bg: #392a0c; --bad: #ff8a80; --bad-bg: #3b1618;
+  --cw-a: #7d6c4d; --cw-b: #e9dcb9; --cw-c: #bfae86; --cw-d: #a3916b; --cw-pd: #7a6a4c; --cw-rim: #e6d8b4; --cw-pool: #a3936f; --cw-smoke: #cfc6bb; --cw-dk: 1; --cw-sh: .45; --cw-ledge: .5;
+  --cw-out: saturate(.4) brightness(.48); --cw-outo: 1; --cw-edge: none; --cw-tint: none;
   color-scheme: dark;
 }
 * { box-sizing: border-box; }
@@ -169,6 +175,39 @@ details.sect > .body { padding: 0 16px 16px; }
 .pips button { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--line); background: var(--bg); cursor: pointer; font-family: var(--type); font-size: 13px; color: var(--muted); }
 .pips button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .pips.harm button[aria-pressed="true"] { background: var(--bad); border-color: var(--bad); color: var(--bg); }
+.pips.candles { flex-wrap: nowrap; gap: 2px; align-items: flex-end; max-width: 334px; border-bottom: 1px solid var(--line); box-shadow: 0 5px 5px -5px rgba(0, 0, 0, var(--cw-ledge)); }
+.pips.candles button, .play .pips.candles button, .pips.candles button[aria-pressed="true"] { flex: 1 1 0; min-width: 0; max-width: 46px; width: auto; height: auto; aspect-ratio: 40 / 84; padding: 0; border: 0; border-radius: 6px; background: none; }
+.candles button > svg { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.cdefs { position: absolute; width: 0; height: 0; }
+.candles .wx { fill: url(#cn-wax); } .candles .dr { fill: url(#cn-drip); } .candles .pd { fill: var(--cw-pd); } .candles .tp { fill: var(--cw-rim); } .candles .pl { fill: var(--cw-pool); }
+.candles button[aria-pressed="true"] .pl { fill: url(#cn-pool); }
+.candles .gw { fill: url(#cn-glow); } .candles .dk { fill: url(#cn-dark); opacity: var(--cw-dk); } .candles .sh { fill: #000; opacity: var(--cw-sh); } .candles .hl { fill: url(#cn-halo); }
+.candles .wk { fill: none; stroke: #2b1d16; stroke-width: 1.2; stroke-linecap: round; }
+.candles .fo { fill: url(#cn-fo); } .candles .fi { fill: url(#cn-fi); } .candles .fb { fill: #4f7dff; opacity: .5; } .candles .em { fill: #ff7a1a; }
+.candles .fs { filter: var(--cw-edge); }
+.candles path.sm { fill: none; stroke: var(--cw-smoke); stroke-width: 1.5; stroke-linecap: round; filter: blur(.5px); }
+.candles g.sm { filter: var(--cw-tint); }
+.candles .fl { transform-origin: 0 -1px; } .candles .sm { transform-box: fill-box; transform-origin: 50% 100%; }
+.candles .sm, .candles .em, .candles button[aria-pressed="false"] .fl, .candles button[aria-pressed="false"] .hl, .candles button[aria-pressed="false"] .gw { opacity: 0; }
+.candles .bd { transition: filter .7s ease-out, opacity .7s ease-out; }
+.candles button[aria-pressed="false"] .bd { filter: var(--cw-out); opacity: var(--cw-outo); }
+.candles button[aria-pressed="true"] .fl { animation: cflick var(--ft, 3s) ease-in-out infinite; animation-delay: var(--fd, 0s); }
+.candles button[aria-pressed="true"] .hl { animation: lampflicker 4.3s ease-in-out infinite; animation-delay: var(--fd, 0s); }
+.candles button[aria-pressed="true"] .ff { animation: cframes calc(var(--ft, 3s) * .45) steps(16) infinite; animation-delay: var(--fd, 0s); }
+.candles.low button[aria-pressed="true"] .fl { animation-name: cgutter; animation-duration: 1.3s; }
+.candles.low button[aria-pressed="true"] .ff { animation-duration: .8s; }
+.candles button.snuff .fl { animation: snuff .45s ease-in var(--sn, 0s) both; }
+.candles button.snuff .sm { animation: wisp 1.7s ease-out calc(.2s + var(--sn, 0s)); }
+.candles button.snuff .em { animation: ember 1.9s ease-out var(--sn, 0s); }
+@keyframes cflick { 0%, 100% { transform: scale(1) rotate(0deg); } 18% { transform: scale(.95, 1.07) rotate(-2.5deg); } 37% { transform: scale(1.05, .94) rotate(2deg); } 55% { transform: scale(.97, 1.04) rotate(-1deg); } 76% { transform: scale(1.03, .97) rotate(2.5deg); } }
+@keyframes cframes { to { transform: translateX(-640px); } }
+@keyframes cgutter { 0%, 100% { transform: scale(.82, .7) rotate(0deg); } 22% { transform: scale(.7, .9) rotate(-6deg); } 48% { transform: scale(.88, .64) rotate(5deg); } 71% { transform: scale(.74, .84) rotate(-3deg); } }
+@keyframes snuff { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(.2); } }
+@keyframes wisp { 0% { opacity: 0; transform: translateY(5px) scaleY(.5); } 25% { opacity: .85; } 100% { opacity: 0; transform: translateY(-9px) scaleY(1.15); } }
+@keyframes ember { from { opacity: 1; } to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .candles .fl, .candles .ff, .candles .sm, .candles .em, .candles .hl { animation: none !important; } .candles .bd { transition: none; } }
+.lucknote { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
+.lucknote.low { color: var(--bad); }
 .levelup { background: var(--good-bg); border: 1px solid var(--good); border-radius: 8px; padding: 12px 14px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: space-between; margin-top: 10px; }
 
 /* tips */
@@ -671,6 +710,16 @@ div.wcard { cursor: default; border-color: var(--good); }
 .psel p { margin: 4px 0 0; }
 </style>
 
+<svg class="cdefs" aria-hidden="true" focusable="false"><defs>
+  <linearGradient id="cn-wax"><stop offset="0" style="stop-color:var(--cw-a)"/><stop offset=".2" style="stop-color:var(--cw-c)"/><stop offset=".46" style="stop-color:var(--cw-b)"/><stop offset=".7" style="stop-color:var(--cw-c)"/><stop offset="1" style="stop-color:var(--cw-a)"/></linearGradient>
+  <linearGradient id="cn-drip"><stop offset="0" style="stop-color:var(--cw-c)"/><stop offset=".4" style="stop-color:var(--cw-b)"/><stop offset="1" style="stop-color:var(--cw-d)"/></linearGradient>
+  <linearGradient id="cn-glow" x2="0" y2="1"><stop offset="0" stop-color="#ffb24c" stop-opacity=".9"/><stop offset=".28" stop-color="#ff9c3e" stop-opacity=".42"/><stop offset=".7" stop-color="#ff8a30" stop-opacity="0"/></linearGradient>
+  <linearGradient id="cn-dark" x2="0" y2="1"><stop offset=".25" stop-color="#120a08" stop-opacity="0"/><stop offset="1" stop-color="#120a08" stop-opacity=".62"/></linearGradient>
+  <radialGradient id="cn-pool"><stop offset="0" stop-color="#fff3c2"/><stop offset="1" stop-color="#f2ac4c"/></radialGradient>
+  <radialGradient id="cn-halo"><stop offset="0" stop-color="#ffc468" stop-opacity=".55"/><stop offset=".4" stop-color="#ff9a30" stop-opacity=".17"/><stop offset="1" stop-color="#ff8a20" stop-opacity="0"/></radialGradient>
+  <linearGradient id="cn-fo" x2="0" y1="1" y2="0"><stop offset="0" stop-color="#ff7412"/><stop offset=".3" stop-color="#ff9a1e"/><stop offset=".68" stop-color="#ffc44a"/><stop offset="1" stop-color="#ff8418"/></linearGradient>
+  <linearGradient id="cn-fi" x2="0" y1="1" y2="0"><stop offset="0" stop-color="#fffbe6"/><stop offset="1" stop-color="#ffe17c"/></linearGradient>
+</defs></svg>
 <div class="texture" aria-hidden="true"></div>
 <div class="texture t2" aria-hidden="true"></div>
 <div id="fx" aria-hidden="true"></div>
@@ -971,7 +1020,8 @@ div.wcard { cursor: default; border-color: var(--good); }
       <div class="grid g3" style="margin-top:16px">
         <div class="card">
           <span class="lbl">Luck</span>
-          <div class="pips" id="luck" role="group" aria-label="Luck points"></div>
+          <div class="pips candles" id="luck" role="group" aria-label="Luck points"></div>
+          <p class="lucknote" id="lucktxt"></p>
           <p class="small muted" style="margin:10px 0 0">Spend one to cut a wound to 0 harm, or turn a roll into a 12. The Roller tab has a button for the second.</p>
         </div>
         <div class="card">
@@ -1107,7 +1157,7 @@ div.wcard { cursor: default; border-color: var(--good); }
     <summary>Credits</summary>
     <div class="body">
       <p>Some dice sigils are icons made by <span id="sigcredit">their authors</span>, from <a href="https://game-icons.net" rel="noopener">game-icons.net</a>, used under the Creative Commons Attribution 3.0 license. Runes and alchemical signs are drawn from the Noto fonts, under the SIL Open Font License.</p>
-      <p>3D dice lighting, trays and die materials come from <a href="https://polyhaven.com" rel="noopener">Poly Haven</a> and <a href="https://ambientcg.com" rel="noopener">ambientCG</a>, and some dice sounds from <a href="https://kenney.nl" rel="noopener">Kenney</a>, all released into the public domain. Other dice sounds come from the dice-box-threejs project. The 3D dice are drawn with three.js.</p>
+      <p>3D dice lighting, trays and die materials come from <a href="https://polyhaven.com" rel="noopener">Poly Haven</a> and <a href="https://ambientcg.com" rel="noopener">ambientCG</a>, and some dice sounds and the candle flames from <a href="https://kenney.nl" rel="noopener">Kenney</a>, all released into the public domain. Other dice sounds come from the dice-box-threejs project. The 3D dice are drawn with three.js.</p>
     </div>
   </details>
   <p class="foot">Rules and playbooks are summarized here in plain English. Your printed playbook sheet and your Keeper have the final word.</p>
@@ -1436,7 +1486,7 @@ function rollClicks(e) {
     renderRoller(); scheduleSave(); return;
   }
   if (e.target.id === 'markxp' && last && !last.xpMarked) { last.xpMarked = true; S.sheet.xp = Math.min(S.sheet.xp + 1, 9); renderSheet(); renderStage(); scheduleSave(); }
-  if (e.target.id === 'spendluck' && last && !last.luck && S.sheet.luck > 0) { last.luck = true; last.total = 12; S.sheet.luck--; if (S.rolls[0]) { S.rolls[0].total = 12; S.rolls[0].tier = 'full'; S.rolls[0].name += ' (Luck)'; } if (HOLDS[last.move]) { var was = last.hold && S.hold.move === last.move ? S.hold.asked : []; S.hold = { n: Math.max(0, HOLDS[last.move].full - was.length), move: last.move, asked: was }; last.hold = true; } renderSheet(); renderRoller(); fxPlay('crit'); stinger(12); scheduleSave(); }
+  if (e.target.id === 'spendluck' && last && !last.luck && S.sheet.luck > 0) { last.luck = true; last.total = 12; setLuck(S.sheet.luck - 1); if (S.rolls[0]) { S.rolls[0].total = 12; S.rolls[0].tier = 'full'; S.rolls[0].name += ' (Luck)'; } if (HOLDS[last.move]) { var was = last.hold && S.hold.move === last.move ? S.hold.asked : []; S.hold = { n: Math.max(0, HOLDS[last.move].full - was.length), move: last.move, asked: was }; last.hold = true; } renderSheet(); renderRoller(); fxPlay('crit'); stinger(12); scheduleSave(); }
 }
 $('#p-roll').addEventListener('click', rollClicks);
 $('#p-play').addEventListener('click', rollClicks);
@@ -2050,6 +2100,44 @@ document.addEventListener('click', function (e) {
   levelDone(it.text + (it.kind === 'move' ? ' (add it from Your playbook card).' : '.'), r.key);
 });
 
+/* Luck is drawn as seven candles. They are the same buttons as the other pips, so clicks and labels work alike.
+   Each candle is its own: h is the height of the wax, w half its width, d its drips as [x from the middle, length, width], p the side its puddle leans to.
+   The flame and the smoke are pictures when img/candle-flame.png and img/candle-smoke.png are there (tools/make_candles.py), and are drawn here when they are not.
+   The flame picture is 16 frames of 40 x 72 side by side: a small window shows one, and the `cframes` keyframes step the strip along behind it. */
+var CANDLES = [
+  { h: 40, w: 10, d: [[-5.6, 14, 4], [4.4, 7, 3.2]], p: -1 }, { h: 31, w: 11, d: [[5.4, 15, 4.2], [-6.6, 5, 3]], p: 1 }, { h: 46, w: 9.5, d: [[-4.6, 10, 3.4], [5, 22, 3.8]], p: 1 },
+  { h: 26, w: 11.5, d: [[-6.4, 9, 4.2], [3, 5, 3.2]], p: -1 }, { h: 37, w: 10, d: [[5.4, 12, 3.8], [-2, 4.5, 3]], p: -1 }, { h: 33, w: 10.5, d: [[-5.6, 18, 4], [5.2, 6.5, 3.2]], p: 1 },
+  { h: 43, w: 9.5, d: [[-4.4, 13, 3.8], [5.2, 6, 3]], p: -1 }
+];
+var CANDLED = [-0.3, -2.1, -1.2, -2.8, -0.8, -1.9, -1.5], CANDLET = [3.1, 2.7, 3.4, 2.9, 3.6, 2.6, 3.2];   // each flame starts its flicker somewhere else and takes its own time
+var snuffed = null;
+function setLuck(v) { var o = S.sheet.luck; S.sheet.luck = v; snuffed = v < o ? { lo: v + 1, hi: o, t: Date.now() } : null; }
+function n1(v) { return String(Math.round(v * 10) / 10); }
+function candleSVG(i) {
+  var c = CANDLES[i - 1], T = 79 - c.h, L = 20 - c.w, R = 20 + c.w, flip = i % 2 ? '' : ' transform="scale(-1 1)"', k, d, y;
+  var body = 'M' + n1(L) + ' ' + T + 'V77.6A' + c.w + ' 2 0 0 0 ' + n1(R) + ' 77.6V' + T + 'A' + c.w + ' 2.4 0 0 0 ' + n1(L) + ' ' + T + 'Z';
+  var s = '<circle class="hl" cx="20" cy="' + (T - 10) + '" r="24"/><g class="bd"><ellipse class="sh" cx="20" cy="80.2" rx="' + n1(c.w + 6.5) + '" ry="2.6"/>' +
+    '<path class="pd" d="M' + n1(L - 2.2) + ' 79.7C' + n1(L - 2.4) + ' 78.2 ' + n1(L + 2) + ' 77.6 20 77.6C' + n1(R - 2) + ' 77.6 ' + n1(R + 2.4) + ' 78.2 ' + n1(R + 2.2) + ' 79.7C' + n1(R + 1.6) + ' 81 ' + n1(L - 1.6) + ' 81 ' + n1(L - 2.2) + ' 79.7Z"/>' +
+    '<ellipse class="pd" cx="' + n1(20 + c.p * (c.w + 1.2)) + '" cy="80" rx="2.6" ry="1.1"/><path class="wx" d="' + body + '"/>';
+  for (k = 0; k < c.d.length; k++) {
+    d = c.d[k]; y = n1(T + 2.4 * Math.sqrt(Math.max(0, 1 - d[0] * d[0] / (c.w * c.w))) - 1.2);   // a drip starts at the front of the rim
+    s += '<path class="dr" d="M' + n1(20 + d[0] - d[2] / 2) + ' ' + y + 'V' + n1(T + d[1]) + 'a' + n1(d[2] / 2) + ' ' + n1(d[2] / 2 + .6) + ' 0 0 0 ' + n1(d[2]) + ' 0V' + y + 'Z"/>';
+  }
+  s += '<path class="dk" d="' + body + '"/><path class="gw" d="' + body + '"/><ellipse class="tp" cx="20" cy="' + T + '" rx="' + c.w + '" ry="2.4"/><ellipse class="pl" cx="20" cy="' + n1(T + .3) + '" rx="' + n1(c.w - 2.4) + '" ry="1.4"/>' +
+    '<path class="wk" d="M20 ' + n1(T + .4) + 'C20 ' + n1(T - 1.6) + ' 20.6 ' + (T - 3) + ' 20.9 ' + n1(T - 4.6) + '"/></g><circle class="em" cx="20.9" cy="' + n1(T - 4.6) + '" r="1.2"/><g transform="translate(20 ' + T + ')">' +
+    (ART.smoke ? '<g class="sm"><image href="img/candle-smoke.png" x="-4.5" y="-37" width="9" height="32" preserveAspectRatio="none"' + flip + '/></g>' : '<path class="sm" d="M.9 -6C-2.4 -10 3.6 -13.5 .6 -18C-1.8 -21.6 2.2 -24 .8 -28.5"/>') +
+    '<g class="fl" style="--fd:' + CANDLED[i - 1] + 's;--ft:' + CANDLET[i - 1] + 's">' +
+    (ART.flame ? '<g class="fs"' + flip + '><svg x="-8.1" y="-29.6" width="16.1" height="29" viewBox="0 0 40 72" preserveAspectRatio="none"><image class="ff" href="img/candle-flame.png" width="640" height="72"/></svg></g>' :
+      '<path class="fo" d="M0 -1.6C-3.4 -2.4 -4.9 -6 -4.5 -9.4C-4 -13.4 -1.3 -16 .3 -21.5C1.7 -16.6 4.7 -13.4 4.6 -9.2C4.5 -5.6 3.2 -2.4 0 -1.6Z"/><ellipse class="fb" cx="0" cy="-3.9" rx="2.9" ry="2.2"/>' +
+      '<path class="fi" d="M.1 -3.4C-2 -4 -2.7 -6.6 -2.4 -8.8C-2.1 -11.2 -.7 -12.8 .2 -16C1.1 -13 2.6 -11 2.5 -8.6C2.4 -6.4 2 -4 .1 -3.4Z"/>') + '</g></g>';
+  return '<svg viewBox="0 0 40 84" aria-hidden="true" focusable="false">' + s + '</svg>';
+}
+function luckPips(val) {
+  var h = '', age = snuffed ? (Date.now() - snuffed.t) / 1000 : 9, sn = age < 2.1 ? snuffed : null;   // a redraw part-way through carries the snuff on from where it was
+  for (var i = 1; i <= 7; i++) h += '<button type="button" data-n="' + i + '" aria-pressed="' + (i <= val) + '" aria-label="Luck ' + i + '"' + (sn && i >= sn.lo && i <= sn.hi ? ' class="snuff" style="--sn:-' + age.toFixed(2) + 's"' : '') + '>' + candleSVG(i) + '</button>';
+  return h;
+}
+function luckNote(v) { return v < 1 ? 'Out of Luck. Bad things find you.' : v < 3 ? 'Running low: ' + v + ' left.' : v + ' of 7 left.'; }
 function pips(el, n, val, label) {
   var h = '';
   for (var i = 1; i <= n; i++) h += '<button type="button" data-n="' + i + '" aria-pressed="' + (i <= val) + '" aria-label="' + label + ' ' + i + '">' + i + '</button>';
@@ -2069,7 +2157,8 @@ function renderSheet() {
   $('#sheetstats').innerHTML = STATS.map(function (s) {
     return '<div class="sstat"><span class="lbl" style="margin:0">' + STATNAME[s] + '</span><div class="ctl"><button type="button" data-sd="' + s + ':-1" aria-label="Lower ' + STATNAME[s] + '">&minus;</button><output>' + fmt(sh.stats[s]) + '</output><button type="button" data-sd="' + s + ':1" aria-label="Raise ' + STATNAME[s] + '">+</button></div></div>';
   }).join('');
-  pips($('#luck'), 7, sh.luck, 'Luck');
+  $('#luck').innerHTML = luckPips(sh.luck); $('#luck').className = 'pips candles' + (sh.luck < 3 ? ' low' : '');
+  $('#lucktxt').textContent = luckNote(sh.luck); $('#lucktxt').className = 'lucknote' + (sh.luck < 3 ? ' low' : '');
   pips($('#harm'), 8, sh.harm, 'Harm');
   pips($('#xp'), 5, Math.min(sh.xp, 5), 'XP');
   $('#harmtxt').textContent = harmText(sh.harm);
@@ -2094,7 +2183,7 @@ $('#p-hunter').addEventListener('click', function (e) {
   var pb = t.closest('.pips button');
   if (pb) {
     var n = +pb.dataset.n, host = pb.parentElement.id;
-    if (host === 'luck') sh.luck = sh.luck === n ? n - 1 : n;
+    if (host === 'luck') setLuck(sh.luck === n ? n - 1 : n);
     if (host === 'harm') { sh.harm = sh.harm === n ? n - 1 : n; if (sh.harm >= 4) sh.unstable = true; if (sh.harm === 0) sh.unstable = false; }
     if (host === 'xp') sh.xp = sh.xp === n ? n - 1 : n;
     renderSheet(); scheduleSave(); return;
@@ -2171,7 +2260,7 @@ function renderPlay() {
       '<div class="prow"><label><input type="checkbox" id="pl-ign"' + (play.ignore ? ' checked' : '') + '> Ignores armor</label><button type="button" class="btn ghost sm" id="pl-heal1"' + (sh.harm < 1 ? ' disabled' : '') + '>Heal 1</button></div>' +
       '<p class="pmsg" role="status">' + esc(play.msg) + '</p>' +
       (play.wound > 0 && sh.luck > 0 ? '<button type="button" class="btn ghost sm" id="pl-undo">Spend Luck: cancel that wound</button>' : '') + '</div>' +
-    '<div class="pblock"><span class="lbl">Luck</span>' + pipStr('pl-luck', '', 7, sh.luck, 'Luck') + (d ? '<p class="small muted" style="margin:6px 0 0"><b>When you spend Luck:</b> ' + esc(d.luckSpecial) + '</p>' : '') + '</div>' +
+    '<div class="pblock"><span class="lbl">Luck</span>' + '<div class="pips candles' + (sh.luck < 3 ? ' low' : '') + '" id="pl-luck" role="group" aria-label="Luck">' + luckPips(sh.luck) + '</div><p class="lucknote' + (sh.luck < 3 ? ' low' : '') + '">' + luckNote(sh.luck) + '</p>' + (d ? '<p class="small muted" style="margin:6px 0 0"><b>When you spend Luck:</b> ' + esc(d.luckSpecial) + '</p>' : '') + '</div>' +
     '<div class="pblock"><span class="lbl">Experience</span>' + pipStr('pl-xp', '', 5, Math.min(sh.xp, 5), 'XP') + (sh.xp >= 5 ? '<div class="prow"><b>Level up ready.</b><button type="button" class="btn sm" data-pgo="sheet">Pick an improvement</button></div>' : '') + '</div>' +
     '<div class="pblock"><span class="lbl">This roll</span>' + stepStr('+1 forward', 'forward', fmt(R.forward), '(clears)') + stepStr('+1 ongoing', 'ongoing', fmt(R.ongoing)) + stepStr('Other', 'other', fmt(R.other), '(clears)') + stepStr('Hold', 'hold', S.hold.n) + '</div>' +
     (gear ? '<div class="pblock"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '');
@@ -2213,7 +2302,7 @@ function renderPlay() {
     if ((g = t.closest('[data-ph]'))) { play.harm = clamp(play.harm + +g.dataset.ph, 1, 12); renderPlay(); return; }
     if ((g = t.closest('.pips button')) && $('#play-status').contains(g)) {
       var n = +g.dataset.n, id = g.parentElement.id;
-      if (id === 'pl-luck') sh.luck = sh.luck === n ? n - 1 : n;
+      if (id === 'pl-luck') setLuck(sh.luck === n ? n - 1 : n);
       if (id === 'pl-harm') { sh.harm = sh.harm === n ? n - 1 : n; if (sh.harm >= 4) sh.unstable = true; if (sh.harm === 0) sh.unstable = false; play.wound = 0; play.msg = ''; }
       if (id === 'pl-xp') sh.xp = sh.xp === n ? n - 1 : n;
       renderSheet(); scheduleSave(); return;
@@ -2227,7 +2316,7 @@ function renderPlay() {
     }
     if (t.id === 'pl-heal1') { sh.harm = Math.max(0, sh.harm - 1); if (sh.harm < 4) sh.unstable = false; play.wound = 0; play.msg = ''; renderSheet(); scheduleSave(); return; }
     if (t.id === 'pl-undo' && play.wound > 0 && sh.luck > 0) {
-      sh.harm = Math.max(0, sh.harm - play.wound); if (sh.harm < 4) sh.unstable = false; sh.luck--;
+      sh.harm = Math.max(0, sh.harm - play.wound); if (sh.harm < 4) sh.unstable = false; setLuck(sh.luck - 1);
       play.msg = 'Luck spent. That wound is cancelled. ' + sh.luck + ' Luck left.'; play.wound = 0;
       renderSheet(); scheduleSave(); return;
     }
@@ -2802,7 +2891,7 @@ function startRecap(c) {
 }
 
 /* ---------- art hooks ---------- */
-var ART = { pb: {}, misc: {}, tex1: false, tex2: false, tray: false, trays: {} };
+var ART = window.__art = { pb: {}, misc: {}, tex1: false, tex2: false, tray: false, trays: {}, flame: false, smoke: false }; /* on window so tests can look in */
 function artImg(name, cls) { return ART.misc[name] ? '<img class="' + cls + '" src="img/' + name + '.jpg" alt="">' : ''; }
 function applyTex() {
   var b = ['party', 'bestiary', 'notes'].indexOf(S.tab) >= 0, useB = ART.tex2 && (b || !ART.tex1), useA = ART.tex1 && !useB;
@@ -2816,6 +2905,8 @@ function initArt() {
   probe('img/texture.jpg', function () { $('.texture:not(.t2)').style.backgroundImage = 'url(img/texture.jpg)'; ART.tex1 = true; applyTex(); });
   probe('img/texture2.jpg', function () { $('.texture.t2').style.backgroundImage = 'url(img/texture2.jpg)'; ART.tex2 = true; applyTex(); });
   probe('img/tray.jpg', function () { ART.tray = true; applyTray(); });
+  probe('img/candle-flame.png', function () { ART.flame = true; renderSheet(); });
+  probe('img/candle-smoke.png', function () { ART.smoke = true; renderSheet(); });
   probe('img/die-glass.jpg', function (im) { D3.scuffImg = im; D3.sig = ''; d3Sync(); });
   probe('img/env.jpg', function (im) { D3.envImg = im; if (D3.renderer) { d3Env(); d3Mood(); } });
   TRAYS.forEach(function (t) { if (t !== 'leather') probe('img/tray-' + t + '.jpg', function () { ART.trays[t] = true; applyTray(); }); });
