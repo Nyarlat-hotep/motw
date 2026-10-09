@@ -1,0 +1,19 @@
+{
+  // The backend trial (G0 in docs/WORKPLAN.md). This is NOT the config that deploys the live site: that is ../wrangler.jsonc, which is untouched.
+  // Run it locally with:  npm run build  then  npx wrangler dev --config worker/wrangler.jsonc --var DEV:1
+  // (DEV:1 lets ?as=name stand in for Cloudflare Access on your own machine; never set it on a deployed Worker.)
+  "name": "hunters-journal-spike",
+  "main": "index.mjs",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": "../dist",
+    "binding": "ASSETS",
+    // only /api/* wakes the Worker; the site itself is served straight from the assets
+    "run_worker_first": ["/api/*"]
+  },
+  "durable_objects": { "bindings": [{ "name": "TABLE", "class_name": "Table" }] },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["Table"] }],
+  // Not secrets. Fill in from the Zero Trust dashboard before a real deploy: the team name (the part before .cloudflareaccess.com),
+  // the application's audience tag, and the Keeper's email.
+  "vars": { "ACCESS_TEAM": "", "ACCESS_AUD": "", "KEEPER_EMAILS": "" }
+}

@@ -8,6 +8,15 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }).catch(()=>chromium.launch());
   const ctx = await b.newContext({ viewport: { width: 1100, height: 900 }, colorScheme: 'dark' });
   await ctx.addInitScript(STUB);
+  // The page rolls from crypto.getRandomValues. Push die faces (1 to 6) onto window.__dice and the next rolls use them in order; with the queue empty, rolls are random as usual.
+  await ctx.addInitScript(() => {
+    window.__dice = [];
+    const real = crypto.getRandomValues.bind(crypto);
+    crypto.getRandomValues = function (a) {
+      if (a instanceof Uint8Array && a.length === 1 && window.__dice.length) { a[0] = window.__dice.shift() - 1; return a; }
+      return real(a);
+    };
+  });
   const p = await ctx.newPage();
   p.on('pageerror', e => errs.push('PAGEERR ' + e.message));
   p.on('console', m => { if (m.type()==='error' && !/Failed to load resource/.test(m.text())) errs.push('CONSOLE ' + m.text()); });
@@ -39,8 +48,9 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   // ---- ROLLER ----
   await p.selectOption('#mv','inv');
   check('moving to Investigate selects Sharp', (await p.getAttribute('.statbtn[data-stat=sharp]','aria-pressed'))==='true');
-  await p.click('[data-adj=stat][data-d="1"]'); await p.click('[data-adj=forward][data-d="1"]'); await p.click('[data-adj=ongoing][data-d="1"]'); await p.click('[data-adj=other][data-d="-1"]');
-  check('steppers update', (await T('#o-stat'))==='+1' && (await T('#o-forward'))==='+1' && (await T('#o-ongoing'))==='+1' && (await T('#o-other'))==='−1', await T('#o-stat')+' '+await T('#o-forward')+' '+await T('#o-ongoing')+' '+await T('#o-other'));
+  check('the Roller has no stepper for ratings (they come from the sheet)', (await p.locator('[data-adj="stat"]').count())===0 && (await p.locator('#o-stat').count())===0);
+  await p.click('[data-adj=forward][data-d="1"]'); await p.click('[data-adj=ongoing][data-d="1"]'); await p.click('[data-adj=other][data-d="-1"]');
+  check('steppers update', (await T('#o-forward'))==='+1' && (await T('#o-ongoing'))==='+1' && (await T('#o-other'))==='−1', await T('#o-forward')+' '+await T('#o-ongoing')+' '+await T('#o-other'));
   const odds = await T('#odds'); check('odds bars show three bands', /10\+.*7-9.*6 or less/.test(odds), odds);
   await p.check('#adv');
   const t0 = Date.now(); await p.click('#roll');
@@ -51,17 +61,19 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   const sumTxt = await T('#sum small'); const nums = sumTxt.match(/(\d+)\s*\+\s*(\d+)/);
   check('breakdown shows both dice', !!nums, sumTxt);
   const total = parseInt(await p.evaluate(()=>document.querySelector('#sum').firstChild.textContent)); const d1=+nums[1], d2=+nums[2];
-  check('total = dice + bonuses (+1 stat +1 fwd +1 ong -1 other = +2)', total === d1+d2+2, total+' vs '+(d1+d2+2));
+  check('total = dice + bonuses (+1 fwd +1 ong -1 other = +1)', total === d1+d2+1, total+' vs '+(d1+d2+1));
   check('forward and other cleared, ongoing kept', (await T('#o-forward'))==='+0' && (await T('#o-other'))==='+0' && (await T('#o-ongoing'))==='+1');
   const faces = await p.evaluate(()=>[...document.querySelectorAll('.slot')].map(s=>+s.getAttribute('aria-label').match(/\d/)[0]));
   check('dice faces equal rolled dice', faces[0]===d1 && faces[1]===d2, faces.join(',')+' vs '+d1+','+d2);
   check('history logged', (await p.locator('#hist li').count())>=1 && /Investigate/.test(await T('#hist li')));
   // luck + xp buttons
-  let guard=0; while(!(await p.locator('#markxp').count()) && guard++<25){ await p.click('#roll'); await p.waitForTimeout(1400); }
-  if (await p.locator('#markxp').count()) { await p.click('#markxp'); check('Mark XP on a miss disables itself', await p.locator('#markxp').isDisabled()); }
-  else check('Mark XP reachable (miss within 25 rolls)', false);
+  // Two 1s plus the +1 still set on the roller is a 3, always a miss.
+  await p.evaluate(()=>{ window.__dice.push(1, 1); });
+  await p.click('#roll'); await p.waitForSelector('#markxp', {timeout:4000});
+  check('forced roll is a miss', /Miss/.test(await T('#result .tier')), await T('#result .tier'));
+  await p.click('#markxp'); check('Mark XP on a miss disables itself', await p.locator('#markxp').isDisabled());
   const lucky0 = await p.evaluate(()=>/\((\d) left\)/.exec(document.body.textContent)?.[1]);
-  if (await p.locator('#spendluck').count()===0) { guard=0; while(!(await p.locator('#spendluck').count()) && guard++<10){ await p.click('#roll'); await p.waitForTimeout(1400);} }
+  check('Spend Luck is offered after a miss', (await p.locator('#spendluck').count())===1);
   await p.click('#spendluck'); await p.waitForTimeout(150);
   check('Spend Luck makes it a 12 and costs 1', (await T('#sum')).startsWith('12') && (await T('#rollas')).includes('Luck 6'), await T('#rollas'));
   check('lightning flash fired on 12', await p.evaluate(()=>document.getElementById('fx').className)==='fx-crit');
@@ -81,8 +93,11 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await p.fill('#f-name','Dee Ray'); await p.fill('#f-catch','Not tonight.'); await p.fill('#f-look','Burn scar on left hand'); await p.fill('#f-back','Lost a brother to something in the mine.');
   await p.setInputFiles('#photo',require('path').join(__dirname,'fixtures','hunter.jpg')); await p.waitForTimeout(500);
   check('photo upload shows portrait', (await p.locator('#portrait img.portrait').count())===1 && /Photo added/.test(await T('#photomsg')));
-  await p.click('[data-sd="sharp:1"]'); await p.click('[data-sd="sharp:1"]'); await p.click('[data-sd="tough:-1"]');
-  check('sheet stat buttons', /\+3/.test(await T('#sheetstats .sstat:nth-child(3)')) && /−1/.test(await T('#sheetstats .sstat:nth-child(4)')));
+  check('the sheet shows five ratings and has no buttons to change them', (await p.locator('#sheetstats .sstat').count())===5 && (await p.locator('#sheetstats button').count())===0 && (await p.locator('[data-sd]').count())===0);
+  await p.click('#seg-build'); await p.click('#wpills button >> nth=2'); await p.locator('.wopt').nth(1).click(); await p.click('#seg-sheet');
+  const line = require('../data/expert.json').ratings[1], sgn = v => (v>=0?'+':'−')+Math.abs(v);
+  const shown = await p.$$eval('#sheetstats .sstat output', els=>els.map(e=>e.textContent.trim()));
+  check('the sheet shows the ratings line that was picked', shown.join()===['charm','cool','sharp','tough','weird'].map(k=>sgn(line[k])).join(), shown.join()+' vs '+JSON.stringify(line));
   await p.click('#luck button[data-n="3"]'); check('luck pip set to 3', (await p.locator('#luck button[aria-pressed=true]').count())===3);
   await p.click('#harm button[data-n="5"]'); check('harm 5 marks unstable', await p.isChecked('#unstable') && /Serious/.test(await T('#harmtxt')));
   await p.click('#heal1'); check('heal 1 -> harm 4 still unstable', (await p.locator('#harm button[aria-pressed=true]').count())===4 && await p.isChecked('#unstable'));

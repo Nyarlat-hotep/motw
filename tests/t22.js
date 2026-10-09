@@ -1,0 +1,105 @@
+// The table's two locks, run in plain Node (no server): worker/access.mjs checks who is asking (a Cloudflare Access token), worker/clean.mjs cleans what a page sends.
+// A real RSA key pair signs the good tokens; the bad ones are forged, expired, for another audience, signed with another key or algorithm, or garbage.
+const path = require('path'), { pathToFileURL } = require('url');
+const results = [];
+function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===undefined?'':String(extra)]); }
+const load = (f) => import(pathToFileURL(path.join(__dirname, '..', 'worker', f)).href);
+const b64 = (bytes) => Buffer.from(bytes).toString('base64url');
+const enc = (o) => b64(Buffer.from(JSON.stringify(o)));
+const ALG = { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: 'SHA-256' };
+
+(async () => {
+  const A = await load('access.mjs'), C = await load('clean.mjs');
+  const pair = await crypto.subtle.generateKey(ALG, true, ['sign', 'verify']), other = await crypto.subtle.generateKey(ALG, true, ['sign', 'verify']);
+  const pub = await crypto.subtle.exportKey('jwk', pair.publicKey);
+  const env = { ACCESS_TEAM: 'friends', ACCESS_AUD: 'aud123', ACCESS_JWKS: JSON.stringify({ keys: [{ ...pub, kid: 'k1', alg: 'RS256', use: 'sig' }] }) };
+  const NOW = 1_800_000_000_000, sec = NOW / 1000;
+  const sign = async (payload, header = { alg: 'RS256', kid: 'k1', typ: 'JWT' }, key = pair.privateKey) => {
+    const body = enc(header) + '.' + enc(payload);
+    return body + '.' + b64(await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, Buffer.from(body)));
+  };
+  const good = { iss: 'https://friends.cloudflareaccess.com', aud: ['aud123'], email: 'Jacob@Example.com', exp: sec + 3600, iat: sec - 10, nbf: sec - 10 };
+  const v = (t, e = env, n = NOW, f) => A.verifyAccessJwt(t, e, n, f);
+
+  // ---- tokens ----
+  check('a good token gives the email, in lower case', JSON.stringify(await v(await sign(good))) === '{"email":"jacob@example.com"}');
+  check('an audience that is a plain string works too', (await v(await sign({ ...good, aud: 'aud123' }))) !== null);
+  check('another audience is refused', (await v(await sign({ ...good, aud: ['someone-else'] }))) === null);
+  check('an expired token is refused', (await v(await sign({ ...good, exp: sec - 1 }))) === null);
+  check('a token with no expiry is refused', (await v(await sign({ ...good, exp: undefined }))) === null);
+  check('a token that starts far in the future is refused', (await v(await sign({ ...good, nbf: sec + 3600 }))) === null);
+  check('a little clock drift is allowed', (await v(await sign({ ...good, nbf: sec + 30 }))) !== null);
+  check('another issuer is refused', (await v(await sign({ ...good, iss: 'https://evil.cloudflareaccess.com' }))) === null);
+  check('signed with a different key under the same name is refused', (await v(await sign(good, undefined, other.privateKey))) === null);
+  const real = await sign(good), [h, , sg] = real.split('.');
+  check('the payload changed after signing is refused', (await v(h + '.' + enc({ ...good, email: 'attacker@example.com' }) + '.' + sg)) === null);
+  check('an unsigned token (alg none) is refused', (await v(enc({ alg: 'none', kid: 'k1' }) + '.' + enc(good) + '.')) === null && (await v(enc({ alg: 'none', kid: 'k1' }) + '.' + enc(good) + '.' + sg)) === null);
+  check('an HS256 token is refused, so the public key cannot be used as a secret', (await v(await sign(good, { alg: 'HS256', kid: 'k1' }))) === null);
+  check('an unknown key id is refused', (await v(await sign(good, { alg: 'RS256', kid: 'nope' }))) === null);
+  check('a missing key id is refused', (await v(await sign(good, { alg: 'RS256' }))) === null);
+  check('no email, or something that is not an email, is refused', (await v(await sign({ ...good, email: undefined }))) === null && (await v(await sign({ ...good, email: 'not an email' }))) === null && (await v(await sign({ ...good, email: 42 }))) === null);
+  for (const junk of ['', 'a', 'a.b', 'a.b.c', '...', null, undefined, 42, {}, 'x'.repeat(5000), enc({ alg: 'RS256', kid: 'k1' }) + '.%%%.%%%']) {
+    let r = 'threw'; try { r = await v(junk); } catch (e) { /* stays "threw" */ }
+    if (r !== null) check('junk token refused without throwing: ' + String(junk).slice(0, 20), false, r);
+  }
+  check('twelve kinds of junk are refused without throwing', true);
+  check('with no team or audience set it refuses everything (fails closed)', (await v(await sign(good), { ACCESS_JWKS: env.ACCESS_JWKS })) === null && (await v(await sign(good), { ...env, ACCESS_AUD: '' })) === null);
+
+  // ---- fetching the team's keys ----
+  const live = { ACCESS_TEAM: 'friends', ACCESS_AUD: 'aud123' };
+  let calls = [];
+  const fakeFetch = async (u) => { calls.push(u); return { ok: true, json: async () => JSON.parse(env.ACCESS_JWKS) }; };
+  check('without a supplied key set it fetches from the team address', (await v(await sign(good), live, NOW, fakeFetch)) !== null && calls[0] === 'https://friends.cloudflareaccess.com/cdn-cgi/access/certs', calls.join());
+  await v(await sign(good), live, NOW + 1000, fakeFetch);
+  check('and keeps the keys for an hour', calls.length === 1, calls.length);
+  await v(await sign({ ...good, exp: sec + 99999 }), live, NOW + 3700e3, fakeFetch);
+  check('then fetches again', calls.length === 2, calls.length);
+
+  // ---- who is asking ----
+  const req = (u, hd = {}) => new Request('https://x.test' + u, { headers: hd });
+  check('local development: ?as=alice stands in for Access', JSON.stringify(await A.identify(req('/api/me?as=alice'), { DEV: '1' })) === '{"email":"alice@dev.test","dev":true}');
+  check('local development: so does an x-dev-user header', (await A.identify(req('/api/me', { 'x-dev-user': 'bob' }), { DEV: '1' })).email === 'bob@dev.test');
+  check('WITHOUT DEV set, ?as=alice and the header do nothing', (await A.identify(req('/api/me?as=alice', { 'x-dev-user': 'alice' }), {})) === null && (await A.identify(req('/api/me?as=alice'), { DEV: '0' })) === null && (await A.identify(req('/api/me?as=alice'), { DEV: 'true' })) === null);
+  check('a typed email header is not trusted', (await A.identify(req('/api/me', { 'Cf-Access-Authenticated-User-Email': 'jacob@example.com' }), env)) === null);
+  check('a good Access token is', (await A.identify(req('/api/me', { 'Cf-Access-Jwt-Assertion': await sign({ ...good, exp: Date.now() / 1000 + 3600, nbf: Date.now() / 1000 - 5 }) }), env, Date.now())).email === 'jacob@example.com');
+  check('odd dev names are not accepted', (await A.identify(req('/api/me?as=' + encodeURIComponent('a b<script>')), { DEV: '1' })) === null);
+  check('Keeper is decided by the server list, case and spaces aside', A.isKeeper('Jacob@Example.com', { KEEPER_EMAILS: ' kay@example.com , jacob@example.com ' }) && !A.isKeeper('jacob@example.com', { KEEPER_EMAILS: '' }) && !A.isKeeper('jacob@example.com', {}) && !A.isKeeper('x@example.com', { KEEPER_EMAILS: 'jacob@example.com' }));
+
+  // ---- cleaning what a page sends ----
+  const card = C.cleanCard({ name: 'Dee\u0000 Ray\n', pronouns: 'she/her', playbook: 'The Mundane', catchline: 'x'.repeat(500), look: 'y', photo: 'data:image/jpeg;base64,AAAA', stats: { charm: 99, cool: -99, sharp: 'x', tough: 2.6, weird: null }, luck: 99, harm: -4, unstable: 'yes', xp: 1e9, level: NaN, armor: 5, weapons: new Array(20).fill('Axe'), moves: ['A', '', 7, 'B'], extra: 'dropped', __proto__x: 1 });
+  check('card: control characters become spaces, long text is cut', card.name === 'Dee  Ray' && card.catchline.length === 200, JSON.stringify(card.name));
+  check('card: numbers are clamped', card.stats.charm === 5 && card.stats.cool === -3 && card.stats.sharp === 0 && card.stats.tough === 3 && card.stats.weird === 0 && card.luck === 7 && card.harm === 0 && card.xp === 9 && card.level === 0, JSON.stringify(card.stats));
+  check('card: unstable is true only for true', card.unstable === false && C.cleanCard({ unstable: true }).unstable === true);
+  check('card: lists are cut and emptied of junk', card.weapons.length === 6 && card.moves.join() === 'A,B' && !('extra' in card));
+  check('card: a small JPEG data URL is kept', card.photo === 'data:image/jpeg;base64,AAAA');
+  check('card: other photos are dropped (a link, an SVG, a script, too big)', ['https://evil.test/x.jpg', 'data:image/svg+xml;base64,AAAA', 'data:text/html;base64,AAAA', 'javascript:alert(1)', 'data:image/jpeg;base64,' + 'A'.repeat(24001)].every((p) => C.cleanCard({ photo: p }).photo === ''));
+  check('card: things that are not objects are refused', [null, undefined, 'a', 5, [], [1]].every((x) => C.cleanCard(x) === null));
+  const hostile = JSON.parse('{"__proto__": {"polluted": 1}, "constructor": {"prototype": {"polluted": 2}}, "name": "x", "stats": {"__proto__": {"polluted": 3}}}');
+  const clean = C.cleanCard(hostile);
+  check('card: prototype tricks do nothing', ({}).polluted === undefined && clean.polluted === undefined && Object.keys(clean).join() === 'name,pronouns,playbook,catchline,look,photo,stats,luck,harm,unstable,xp,level,armor,weapons,moves');
+  const dice = { a: { body: '#AABBCC', pip: '#102030', finish: 'bone"><script>', sigil: 'skull', glow: true }, b: { body: '#aabbcc', pip: '#102030', finish: 'resin', sigil: '', glow: 'yes' }, tray: 'wood' };
+  const cd = C.cleanDice(dice);
+  check('dice: colors lower-cased, names reduced to plain words, glow only for true', cd.a.body === '#aabbcc' && cd.a.finish === 'bonescript' && cd.b.glow === false && cd.tray === 'wood', JSON.stringify(cd.a));
+  check('dice: a bad color or a missing die is refused', C.cleanDice({ ...dice, a: { ...dice.a, body: 'red' } }) === null && C.cleanDice({ ...dice, a: { ...dice.a, pip: 'url(x)' } }) === null && C.cleanDice({ a: dice.a }) === null && C.cleanDice('x') === null);
+  const roll = C.cleanRoll({ move: 'Kick Some Ass', d1: 4, d2: 3, mod: 2, total: 9, tier: 'part', luck: false, dice });
+  check('roll: a good one is kept, with its dice', roll.total === 9 && roll.tier === 'part' && roll.dice.a.body === '#aabbcc');
+  check('roll: dice that are not real faces are refused', [{ d1: 0, d2: 3 }, { d1: 4, d2: 7 }, { d1: 4, d2: 2.5 }, { d1: '4', d2: 3 }, { d1: 4 }, {}, null, 'x', []].every((r) => C.cleanRoll(r) === null));
+  const lie = C.cleanRoll({ d1: 1, d2: 2, mod: 0, total: 12, tier: 'full', luck: false });
+  check('roll: the total and tier are worked out here, not believed', lie.total === 3 && lie.tier === 'miss' && C.cleanRoll({ d1: 4, d2: 3, mod: 2, total: 1, tier: 'miss' }).tier === 'part' && C.cleanRoll({ d1: 6, d2: 5, mod: 0 }).tier === 'full');
+  check('roll: Luck makes it a 12 whatever the dice say', C.cleanRoll({ d1: 1, d2: 1, mod: 0, luck: true }).total === 12 && C.cleanRoll({ d1: 1, d2: 1, mod: 0, luck: true }).tier === 'full');
+  check('roll: the modifier is clamped and luck is a plain true', C.cleanRoll({ d1: 6, d2: 6, mod: 500 }).mod === 15 && C.cleanRoll({ d1: 6, d2: 6, mod: -500 }).total === 12 - 15 + 0 && C.cleanRoll({ d1: 3, d2: 3, luck: 1 }).luck === false);
+  const jpg = new Uint8Array(100); jpg.set([0xff, 0xd8, 0xff, 0xe0]);
+  const webp = new Uint8Array(100); webp.set([0x52, 0x49, 0x46, 0x46, 0, 0, 0, 0, 0x57, 0x45, 0x42, 0x50]);
+  const png = new Uint8Array(100); png.set([0x89, 0x50, 0x4e, 0x47]);
+  const svg = new TextEncoder().encode('<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"></svg>');
+  check('pictures: JPEG and WebP are known by their first bytes', C.imageType(jpg) === 'image/jpeg' && C.imageType(webp) === 'image/webp');
+  check('pictures: PNG, SVG, text, empty and too-short are not', [png, svg, new Uint8Array(0), new Uint8Array(5), null].every((b) => C.imageType(b) === null));
+  const big = new Uint8Array(C.LIMITS.image + 1); big.set([0xff, 0xd8, 0xff]);
+  check('pictures: one byte over the cap is refused, at the cap is fine', C.imageType(big) === null && C.imageType(big.subarray(0, C.LIMITS.image)) === 'image/jpeg');
+  check('names: tidied, cut to 30, and the fallback is used when nothing is left', C.cleanName('  Dee \n\t Ray  ') === 'Dee Ray' && C.cleanName('x'.repeat(100)).length === 30 && C.cleanName('\u0000\u0001', 'Player 1a2b') === 'Player 1a2b' && C.cleanName(42, 'F') === 'F');
+
+  console.log(results.map(r=>r.join(' | ')).join('\n'));
+  const fails = results.filter(r=>r[0]==='FAIL').length;
+  console.log('\nTOTAL', results.length, 'FAIL', fails);
+  if (fails) process.exit(1);
+})().catch(e=>{ console.log(results.map(r=>r.join(' | ')).join('\n')); console.log('CRASH', e.stack.split('\n').slice(0,6).join('\n')); process.exit(1); });

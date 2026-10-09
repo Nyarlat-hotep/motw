@@ -3,3 +3,6 @@ tests/out/
 dist/
 .DS_Store
 .env
+
+.dev.vars
+.wrangler/

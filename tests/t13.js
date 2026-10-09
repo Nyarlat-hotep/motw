@@ -95,12 +95,11 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await p.locator('#wpills button').nth(1).click(); await p.locator('#wpills button').nth(0).click(); await p.waitForTimeout(100);
   check('the note goes once you move on', (await p.locator('#wswitch').count())===0);
 
-  // ---- session over: the case file offers a backup ----
+  // ---- the backup offer after a session now lives in the end-of-session ritual (tests/t17.js); the case file no longer shows one ----
   await p.click('#t-notes'); await p.waitForTimeout(150);
   await p.locator('details.case [data-eos]').first().check(); await p.waitForTimeout(100);
-  check('no nudge before the session XP is added', (await p.locator('details.case .bknudge').count())===0);
   await p.locator('details.case [data-applyxp]').first().click(); await p.waitForTimeout(150);
-  check('adding the session XP offers a backup', /Session over\? Save what happened tonight\. Last backup: today/.test(await T(p,'details.case .bknudge')), await T(p,'details.case'));
+  check('adding the session XP from the case file shows no backup note (it moved to the ritual)', (await p.locator('details.case .bknudge').count())===0 && /Added to my sheet/.test(await T(p,'details.case')));
 
   // ---- marking moves advanced at level-up ----
   s = await st(p); s.sheet.level = 5; s.sheet.xp = 5;

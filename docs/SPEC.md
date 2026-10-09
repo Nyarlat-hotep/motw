@@ -157,6 +157,8 @@ A full hunter, an empty hunter and a hunter with very long text all produce a le
 
 ## 5. End-of-session ritual
 
+Chunk T3 in [WORKPLAN.md](WORKPLAN.md); it also takes over the backup nudge and starts a fresh session timeline.
+
 ### What the player gets
 An "End session" button on Play. It opens a short guided panel:
 1. Which case was this? (pick an open case, or none)
@@ -175,6 +177,8 @@ XP cannot be applied twice for the same case and session, healing matches the Gu
 ---
 
 ## 6. Session timeline
+
+Chunks T1 and T2 in [WORKPLAN.md](WORKPLAN.md). **Changed 2026-10-09:** pip clicks are logged too, merged when they come within five seconds, so that a mis-click can be undone. The "direct pip clicks leave none" line below no longer applies. Events also carry an `undo` record (T2).
 
 ### What the player gets
 On Play, "Recent rolls" becomes "This session": rolls plus harm taken, healing, Luck spent, XP marked, hold spent and level-ups, newest first, each one line. Any line can be removed. At the end-of-session ritual the timeline is turned into a short paragraph-per-event list and appended to the chosen case's session log, where it can be edited freely.
@@ -195,6 +199,8 @@ Every action that changes Harm, Luck, XP or hold through a button leaves one lin
 
 ## 7. Ink themes and ambient sound
 
+Chunks C1 (look and inks, with two added for The Long Dry: Rust and Dust) and C2 (ambient sound) in [WORKPLAN.md](WORKPLAN.md).
+
 ### Ink themes
 - A "Look" setting: Follow my device, Light, Dark (the CSS already supports `data-theme`, there is just no switch), and an ink: Oxblood (today), Graveyard moss, Midnight blue, Brass.
 - An ink only overrides `--accent`, `--accent-ink` and `--brass` for both themes via `[data-ink="moss"]` and so on. Every pair must pass 4.5:1 contrast for text on its button.
@@ -210,6 +216,8 @@ Themes switch without a reload and persist; ambient sound creates no audio nodes
 ---
 
 ## 8. Shared roll feed (and the shared table)
+
+Cut into chunks G0 to G8 (the table) and H0 to H3 (the Keeper's scene board and handouts) in [WORKPLAN.md](WORKPLAN.md). Checked 2026-10-09: the Party tab does not work on the live site today, because it reads its table from `window.claude`, which only exists inside claude.ai; the "unchecked" limits in the table below are now checked and recorded in the work plan; and the plan is to try Cloudflare first and Supabase only if that fails.
 
 ### What the group gets
 On Play, a "Table" strip showing the last few rolls from everyone: who, which move, the total and tier, thrown with that player's own dice. The Party tab shows everyone's hunter card live. This is the piece that makes the dice maker social.

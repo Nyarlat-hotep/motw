@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Hunter's Journal</title>
 <meta name="theme-color" content="#110c0e">
+<script>try { var st0 = (JSON.parse(localStorage.getItem("hunters-journal-v1")) || {}).settings || {}, r0 = document.documentElement; if (st0.theme === "light" || st0.theme === "dark") r0.setAttribute("data-theme", st0.theme); if (/^[a-z]{1,12}$/.test(st0.ink || "")) r0.setAttribute("data-ink", st0.ink); } catch (e) {}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="img/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="img/icon-180.png">
@@ -47,6 +48,29 @@
   --cw-out: saturate(.4) brightness(.48); --cw-outo: 1; --cw-edge: none; --cw-tint: none;
   color-scheme: dark;
 }
+/* Inks: each changes only the accent and the text on it. Like the tokens above, an ink needs a rule for light, one for dark by device, and one for dark by choice.
+   Every pair is checked at 4.5:1 or better in tests/t18.js. The swatches in Settings read --sl (light) and --sd (dark). */
+:root[data-ink="moss"] { --accent: #2f6b3a; --accent-ink: #f4fbf4; }
+@media (prefers-color-scheme: dark) { :root[data-ink="moss"]:not([data-theme="light"]) { --accent: #7fcf8e; --accent-ink: #0a170c; } }
+:root[data-ink="moss"][data-theme="dark"] { --accent: #7fcf8e; --accent-ink: #0a170c; }
+:root[data-ink="midnight"] { --accent: #28509a; --accent-ink: #f2f6ff; }
+@media (prefers-color-scheme: dark) { :root[data-ink="midnight"]:not([data-theme="light"]) { --accent: #86abf2; --accent-ink: #0b1226; } }
+:root[data-ink="midnight"][data-theme="dark"] { --accent: #86abf2; --accent-ink: #0b1226; }
+:root[data-ink="brass"] { --accent: #7a5a0e; --accent-ink: #fff8e6; }
+@media (prefers-color-scheme: dark) { :root[data-ink="brass"]:not([data-theme="light"]) { --accent: #e2b955; --accent-ink: #1e1606; } }
+:root[data-ink="brass"][data-theme="dark"] { --accent: #e2b955; --accent-ink: #1e1606; }
+:root[data-ink="rust"] { --accent: #a3410d; --accent-ink: #fff5ec; }
+@media (prefers-color-scheme: dark) { :root[data-ink="rust"]:not([data-theme="light"]) { --accent: #f0894a; --accent-ink: #1f0e04; } }
+:root[data-ink="rust"][data-theme="dark"] { --accent: #f0894a; --accent-ink: #1f0e04; }
+:root[data-ink="dust"] { --accent: #6b5630; --accent-ink: #fbf5e8; }
+@media (prefers-color-scheme: dark) { :root[data-ink="dust"]:not([data-theme="light"]) { --accent: #d9bf8f; --accent-ink: #1b1409; } }
+:root[data-ink="dust"][data-theme="dark"] { --accent: #d9bf8f; --accent-ink: #1b1409; }
+.inks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.inkbtn { display: inline-flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; min-height: 44px; cursor: pointer; font-weight: 700; }
+.inkbtn i { width: 18px; height: 18px; border-radius: 50%; background: var(--sl); border: 1px solid var(--line); flex: none; }
+.inkbtn[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .inkbtn i { background: var(--sd); } }
+:root[data-theme="dark"] .inkbtn i { background: var(--sd); }
 * { box-sizing: border-box; }
 body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); padding-inline: 16px; margin: 0; }
 .wrap { max-width: 980px; margin: 0 auto; padding-block: 20px 72px; }
@@ -148,6 +172,24 @@ details.sect > .body { padding: 0 16px 16px; }
 .hist { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
 .hist li { display: grid; grid-template-columns: 3.2em 1fr auto; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); }
 .hist b { font-variant-numeric: tabular-nums; }
+.hist li.ev { align-items: center; }
+.hist .evk { font-family: var(--type); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.hist .evend { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px; }
+.hist .evx { background: none; border: 0; border-radius: 6px; color: var(--muted); cursor: pointer; font-size: 22px; line-height: 1; min-width: 40px; min-height: 40px; }
+.hist .evx:hover { color: var(--ink); }
+.hist .evmore { border-bottom: 0; }
+.hunters { margin-bottom: 16px; }
+.hunters .hwho { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
+.hunters .hwho b { font-size: 20px; overflow-wrap: anywhere; }
+.hlist { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+.hlist li { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 8px; }
+.hlist .htxt { flex: 1 1 200px; min-width: 0; }
+.hlist .htxt p { margin: 2px 0 0; overflow-wrap: anywhere; }
+.hlist .hbtns { display: flex; flex-wrap: wrap; gap: 6px; }
+.hret { margin-top: 10px; display: grid; gap: 6px; }
+.evtoast { position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 20; display: flex; align-items: center; gap: 12px; width: max-content; max-width: min(92vw, 520px); background: var(--surface2); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 8px; padding: 10px 12px; box-shadow: 0 6px 24px rgba(0, 0, 0, .35); }
+.evtoast[hidden] { display: none; }
+.evtoast span { flex: 1 1 auto; }
 .tag { font-family: var(--type); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
 .tag.full { color: var(--good); } .tag.part { color: var(--warn); } .tag.miss { color: var(--bad); }
 
@@ -167,9 +209,7 @@ details.sect > .body { padding: 0 16px 16px; }
 .sheetstats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
 @media (max-width: 520px) { .sheetstats { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .sstat { border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 10px 4px; text-align: center; }
-.sstat .ctl { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; }
-.sstat output { width: 100%; order: -1; text-align: center; }
-.sstat .ctl button { width: 32px; height: 32px; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; cursor: pointer; }
+.sstat output { display: block; width: 100%; text-align: center; }
 .sstat output { font-family: var(--display); font-size: 28px; min-width: 2ch; font-variant-numeric: tabular-nums; }
 .pips { display: flex; flex-wrap: wrap; gap: 6px; }
 .pips button { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--line); background: var(--bg); cursor: pointer; font-family: var(--type); font-size: 13px; color: var(--muted); }
@@ -250,7 +290,7 @@ details.case .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 .clock button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .eos { display: grid; gap: 6px; }
 .eos label { display: flex; gap: 10px; align-items: flex-start; }
-.eos input { width: 20px; height: 20px; margin-top: 3px; accent-color: var(--accent); }
+.eos input { flex: none; width: 20px; height: 20px; margin-top: 3px; accent-color: var(--accent); }
 .example { font-family: var(--type); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: var(--warn-bg); color: var(--warn); border-radius: 4px; padding: 1px 8px; }
 .empty { text-align: center; padding: 28px 16px; color: var(--muted); border: 2px dashed var(--line); border-radius: 8px; }
 .foot { margin-top: 36px; color: var(--muted); font-size: 14px; }
@@ -741,6 +781,7 @@ div.wcard { cursor: default; border-color: var(--good); }
 <div class="texture" aria-hidden="true"></div>
 <div class="texture t2" aria-hidden="true"></div>
 <div id="fx" aria-hidden="true"></div>
+<div class="evtoast" id="evtoast" role="status" hidden><span id="evtoast-t"></span><button class="btn sm" type="button" id="evtoast-undo">Undo</button></div>
 <dialog class="hcdlg" id="hcdlg" aria-labelledby="hc-title">
   <h2 class="sectitle" id="hc-title">Hunter card</h2>
   <p class="small muted" style="margin:0 0 10px">A picture of your hunter to drop in the group chat. It always uses the dark look, so it reads the same wherever you paste it.</p>
@@ -929,6 +970,52 @@ div.wcard { cursor: default; border-color: var(--good); }
       </div>
     </details>
 
+    <details class="sect" id="sect-keeper">
+      <summary>Running the game (for the Keeper)</summary>
+      <div class="body">
+        <p>For whoever runs the game. It is a plain-English summary of the Keeper's reference sheets; the printed sheets have the final word. When it is time to wrap up, the End the session button on Play walks everyone through XP and healing.</p>
+        <h3>Your job</h3>
+        <p>Three goals: make the world feel real, play to find out what happens, and make the hunters' lives dangerous and scary. When you say what happens next, let four things guide you: the principles below, the rules, what you prepared, and honesty.</p>
+        <h3>Principles</h3>
+        <ul class="chips"><li class="chip">Find the horror in everyday places</li><li class="chip">Talk to the hunters, not the players</li><li class="chip">Use your moves without naming them</li><li class="chip">Root for the hunters</li><li class="chip">Build the mythology as you play, and keep it consistent</li><li class="chip">Nothing is safe</li><li class="chip">Name everyone they meet and make them feel like ordinary people</li><li class="chip">Ask questions and build on the answers</li><li class="chip">Sometimes give them exactly what they earned, not all they wanted</li><li class="chip">Ask what is happening off-screen</li><li class="chip">Do not always decide what happens</li><li class="chip">Everything is a threat</li></ul>
+        <h3>Your moves</h3>
+        <p>When the hunters miss, or look to you to see what happens next, pick one. After every move, ask what they do.</p>
+        <ul class="chips"><li class="chip">Split the group up</li><li class="chip">Show badness coming</li><li class="chip">Show badness happening out of sight</li><li class="chip">Do the harm you already set up</li><li class="chip">Make them investigate</li><li class="chip">Make them get something</li><li class="chip">Warn of the consequences and ask if they still want to go ahead</li><li class="chip">Turn their own move back on them</li><li class="chip">Offer a chance, maybe at a price</li><li class="chip">Take some of their stuff away</li><li class="chip">Put someone in trouble</li><li class="chip">Make a threat move from your mystery or your arc</li><li class="chip">After every move, ask what they do next</li></ul>
+        <h3>When a hunter is hurt</h3>
+        <p>Every time anyone gets hurt, use one of these.</p>
+        <div class="tw"><table><tbody><tr><td><b>0-harm or more</b></td><td>Thrown off for a moment, drop something, or take -1 forward</td></tr><tr><td><b>1-harm or more</b></td><td>Fall down, take -1 ongoing, pass out, or intense pain</td></tr><tr><td><b>Unstable wounds</b></td><td>They can get worse: add 1 harm</td></tr><tr><td><b>8-harm or more</b></td><td>Dying or dead</td></tr></tbody></table></div>
+        <h3>Threat moves</h3>
+        <p>Each kind of threat has its own list. Use them when a threat acts on its own.</p>
+        <p class="lbl">Monsters</p>
+        <ul class="chips"><li class="chip">Hint that it is near</li><li class="chip">Show up suddenly</li><li class="chip">Show its full might</li><li class="chip">Attack with great force and fury</li><li class="chip">Seize someone or something</li><li class="chip">Attack with stealth and planning</li><li class="chip">Order its underlings to do awful things</li><li class="chip">Destroy something</li><li class="chip">Escape, however well it was held</li><li class="chip">Give chase</li><li class="chip">Retreat to its home ground</li><li class="chip">Brag and taunt, maybe letting a secret slip</li><li class="chip">Come back from apparent destruction</li><li class="chip">Use an unnatural power</li></ul>
+        <p class="lbl">Minions</p>
+        <ul class="chips"><li class="chip">Burst into sudden, wild violence</li><li class="chip">Attack together in a planned way</li><li class="chip">Grab someone or steal something</li><li class="chip">Give away a secret</li><li class="chip">Bring someone or something to the master</li><li class="chip">Give chase</li><li class="chip">Make a threat or demand for the master</li><li class="chip">Run away</li><li class="chip">Use an unnatural power</li><li class="chip">Show a flicker of conscience or humanity</li><li class="chip">Defy their master in some small way</li></ul>
+        <p class="lbl">Bystanders</p>
+        <ul class="chips"><li class="chip">Wander off alone</li><li class="chip">Argue with the hunters</li><li class="chip">Get in the way</li><li class="chip">Reveal something</li><li class="chip">Admit their fears</li><li class="chip">Panic in terror</li><li class="chip">Try to help the hunters</li><li class="chip">Try to protect people</li><li class="chip">Show they are not up to it</li><li class="chip">Look for help or comfort</li></ul>
+        <p class="lbl">Locations</p>
+        <ul class="chips"><li class="chip">Present a hazard</li><li class="chip">Reveal something</li><li class="chip">Hide something</li><li class="chip">Close a way</li><li class="chip">Open a way</li><li class="chip">Reshape itself</li><li class="chip">Trap someone</li><li class="chip">Offer a guide</li><li class="chip">Present a guardian</li><li class="chip">Stop working the way it should</li><li class="chip">Set a particular mood</li></ul>
+        <h3>Making a mystery</h3>
+        <p>Where an idea can come from: an urban legend or folklore monster, a loose end from an earlier mystery, a problem from one of your longer story arcs, a plot borrowed from somewhere else with the details changed, a place you know that would suit a monster, something the hunters want to check out, or the return of a monster, bystander or location from before. Then write the hook (the clue that catches the hunters' attention), create the threats, and set the countdown: what happens if the hunters never come, in six steps (Day, Shadows, Sunset, Dusk, Nightfall, Midnight).</p>
+        <h3>Building threats</h3>
+        <p>Pick a type, which sets what it wants, then fill in the details. The Case files tab has room for all of it.</p>
+        <p class="lbl">Monsters</p>
+        <div class="tw"><table><tbody><tr><td><b>Beast</b></td><td>Runs wild, destroying and killing</td></tr><tr><td><b>Breeder</b></td><td>Gives birth to or brings forth evil</td></tr><tr><td><b>Collector</b></td><td>Steals particular kinds of things</td></tr><tr><td><b>Destroyer</b></td><td>Wants to end the world</td></tr><tr><td><b>Devourer</b></td><td>Consumes people</td></tr><tr><td><b>Executioner</b></td><td>Punishes the guilty</td></tr><tr><td><b>Parasite</b></td><td>Infests, controls and devours</td></tr><tr><td><b>Queen</b></td><td>Possesses and controls</td></tr><tr><td><b>Sorcerer</b></td><td>Seizes unnatural power</td></tr><tr><td><b>Tempter</b></td><td>Lures people into evil deeds</td></tr><tr><td><b>Torturer</b></td><td>Hurts and terrifies</td></tr><tr><td><b>Trickster</b></td><td>Creates chaos</td></tr></tbody></table></div>
+        <p class="small">Give it a name, a look and a goal, then its powers, its <b>weakness</b>, and its attacks (a description, usually 3 to 5 harm, a range and any tags). Armor is normally 1 to 2, and it normally takes 8 to 12 harm to kill. Add custom moves for its powers if it needs them.</p>
+        <p class="lbl">Minions</p>
+        <div class="tw"><table><tbody><tr><td><b>Assassin</b></td><td>Kills the hunters</td></tr><tr><td><b>Brute</b></td><td>Intimidates and attacks</td></tr><tr><td><b>Cultist</b></td><td>Saves their own skin at any cost</td></tr><tr><td><b>Guardian</b></td><td>Bars a way or protects something</td></tr><tr><td><b>Right hand</b></td><td>Backs up the monster</td></tr><tr><td><b>Plague</b></td><td>Swarms and destroys</td></tr><tr><td><b>Renfield</b></td><td>Pushes victims toward the monster</td></tr><tr><td><b>Scout</b></td><td>Stalks, watches and reports</td></tr><tr><td><b>Thief</b></td><td>Steals and delivers to the monster</td></tr><tr><td><b>Traitor</b></td><td>Betrays people</td></tr></tbody></table></div>
+        <p class="small">Give it a name and a look, and decide how loyal it is to its master. Then its powers, whether it is especially vulnerable to anything, and its attacks (usually 2 to 4 harm). Armor is normally 0 to 1, and it normally takes 5 to 10 harm to kill.</p>
+        <p class="lbl">Bystanders</p>
+        <div class="tw"><table><tbody><tr><td><b>Busybody</b></td><td>Interferes in other people&#39;s plans</td></tr><tr><td><b>Detective</b></td><td>Rules out explanations</td></tr><tr><td><b>Gossip</b></td><td>Passes on rumors</td></tr><tr><td><b>Helper</b></td><td>Joins the hunt</td></tr><tr><td><b>Innocent</b></td><td>Does the right thing</td></tr><tr><td><b>Official</b></td><td>Is suspicious</td></tr><tr><td><b>Skeptic</b></td><td>Denies supernatural explanations</td></tr><tr><td><b>Victim</b></td><td>Puts themselves in danger</td></tr><tr><td><b>Witness</b></td><td>Reveals information</td></tr></tbody></table></div>
+        <p class="small">Name them, then decide what they know, what they do, what they look like and what they want from the hunters.</p>
+        <p class="lbl">Locations</p>
+        <div class="tw"><table><tbody><tr><td><b>Crossroads</b></td><td>Brings people and things together</td></tr><tr><td><b>Deathtrap</b></td><td>Harms intruders</td></tr><tr><td><b>Den</b></td><td>Harbors monsters</td></tr><tr><td><b>Fortress</b></td><td>Denies entry</td></tr><tr><td><b>Hellgate</b></td><td>Creates evil</td></tr><tr><td><b>Hub</b></td><td>Reveals information</td></tr><tr><td><b>Lab</b></td><td>Creates weirdness</td></tr><tr><td><b>Maze</b></td><td>Confuses and separates</td></tr><tr><td><b>Prison</b></td><td>Holds people in and stops them leaving</td></tr><tr><td><b>Wilds</b></td><td>Contains hidden things</td></tr></tbody></table></div>
+        <p class="small">Name it and say what it is like. A map is optional but helps.</p>
+        <p class="small"><b>Custom moves</b> for any threat answer three questions: what is the idea, when does it trigger, and what does it do?</p>
+        <h3>At the end of a session</h3>
+        <p>Ask the four questions: did they conclude the mystery, did they save someone from certain death (or worse), did you learn something new and important about the world, and did you learn something new and important about one of the hunters. One or two yes answers is 1 XP for each hunter, three or four is 2. When a mystery ends, a hunter who had no chance to rest heals 1 harm, and one who had plenty of time heals all of it.</p>
+      </div>
+    </details>
+
     <details class="sect">
       <summary>Glossary</summary>
       <div class="body"><div class="tw"><table><tbody id="gloss"></tbody></table></div></div>
@@ -955,10 +1042,9 @@ div.wcard { cursor: default; border-color: var(--good); }
 
         <span class="lbl" style="margin-top:14px">Stat</span>
         <div class="statrow" id="statrow" role="group" aria-label="Stat to roll"></div>
-        <p class="small muted" style="margin:8px 0 0">Stat values live on your Hunter sheet. Change one here and it updates there.</p>
+        <p class="small muted" style="margin:8px 0 0">Ratings come from the line you picked on your Hunter sheet, and go up when you level up.</p>
 
         <div class="steppers">
-          <div class="step"><span>Stat value</span><span class="ctl"><button type="button" data-adj="stat" data-d="-1" aria-label="Lower stat">&minus;</button><output id="o-stat">0</output><button type="button" data-adj="stat" data-d="1" aria-label="Raise stat">+</button></span></div>
           <div class="step"><span>+1 forward <span class="muted small">(clears after the roll)</span></span><span class="ctl"><button type="button" data-adj="forward" data-d="-1" aria-label="Lower forward">&minus;</button><output id="o-forward">0</output><button type="button" data-adj="forward" data-d="1" aria-label="Raise forward">+</button></span></div>
           <div class="step"><span>+1 ongoing</span><span class="ctl"><button type="button" data-adj="ongoing" data-d="-1" aria-label="Lower ongoing">&minus;</button><output id="o-ongoing">0</output><button type="button" data-adj="ongoing" data-d="1" aria-label="Raise ongoing">+</button></span></div>
           <div class="step"><span>Other <span class="muted small">(help, harm, gear; clears)</span></span><span class="ctl"><button type="button" data-adj="other" data-d="-1" aria-label="Lower other">&minus;</button><output id="o-other">0</output><button type="button" data-adj="other" data-d="1" aria-label="Raise other">+</button></span></div>
@@ -995,7 +1081,7 @@ div.wcard { cursor: default; border-color: var(--good); }
         </div>
         <div class="card" style="margin-top:16px">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px">
-            <span class="lbl" style="margin:0">Recent rolls</span>
+            <span class="lbl" id="histttl" style="margin:0">Recent rolls</span>
             <button class="btn ghost sm" id="clearhist" type="button">Clear</button>
           </div>
           <ul class="hist" id="hist"></ul>
@@ -1007,6 +1093,7 @@ div.wcard { cursor: default; border-color: var(--good); }
   <!-- HUNTER -->
   <section class="panel" id="p-hunter" role="tabpanel" aria-labelledby="t-hunter" hidden>
     <div class="hero" id="hero-hunter" hidden></div>
+    <div id="hbar"></div>
     <div class="seg" role="group" aria-label="Hunter view">
       <button type="button" id="seg-build" aria-pressed="true">Build a hunter</button>
       <button type="button" id="seg-sheet" aria-pressed="false">My sheet</button>
@@ -1042,7 +1129,7 @@ div.wcard { cursor: default; border-color: var(--good); }
       <div class="card" style="margin-top:16px">
         <span class="lbl">Stats</span>
         <div class="sheetstats" id="sheetstats"></div>
-        <p class="small muted" style="margin:10px 0 0">Pick a ratings line in Build a hunter. Adjust by hand only if your Keeper says so.</p>
+        <p class="small muted" style="margin:10px 0 0">Your ratings are the line you picked in Build a hunter. They only go up when you level up.</p>
       </div>
 
       <div class="grid g3" style="margin-top:16px">
@@ -1159,6 +1246,10 @@ div.wcard { cursor: default; border-color: var(--good); }
   <details class="sect slim" id="settings" style="margin-top:28px">
     <summary>Settings and backup</summary>
     <div class="body">
+      <h3>Look</h3>
+      <div class="seg" role="group" aria-label="Light or dark" style="margin-bottom:0"><button type="button" data-look="auto">My device</button><button type="button" data-look="light">Light</button><button type="button" data-look="dark">Dark</button></div>
+      <div class="inks" id="inks" role="group" aria-label="Ink color"></div>
+      <p class="small muted" style="margin:8px 0 0">The ink colors the buttons, tabs and links. It does not change any of the art.</p>
       <h3>Big moments</h3>
       <label class="switch"><input type="checkbox" id="set-fx"><span>Lightning on a 12+, a shake on a miss, a glow on level-up</span></label>
       <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-snd"><span>Sound: dice that sound like what they are made of, a bell on a 10+, thunder on a 12+ and a low thud on a miss</span></label>
@@ -1300,7 +1391,7 @@ function exampleCase() {
 }
 function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.hook = c.threats = c.weakness = c.npcs = c.loose = c.log = ''; c.clock = 0; c.eos = [false, false, false, false]; c.date = new Date().toISOString().slice(0, 10); return c; }
 function defaults() {
-  return { v: 1, tab: 'guide', hv: 'build', wiz: 0, bkAt: 0, start: { hide: false, rolled: false }, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage' }, hold: { n: 0, move: '', asked: [] }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
+  return { v: 1, tab: 'guide', hv: 'build', wiz: 0, bkAt: 0, start: { hide: false, rolled: false }, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage', theme: 'auto', ink: '' }, hold: { n: 0, move: '', asked: [] }, session: { started: 0, events: [] }, bench: [], dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0 },
     sheet: { name: '', pronouns: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, adv: {}, moves: '', gear: '' } };   // adv: the moves marked advanced, by id
 }
@@ -1322,14 +1413,15 @@ function lsWrite() { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); retu
 function setSync(msg) { var el = document.getElementById('sync'); if (el) el.textContent = /^Saving|^Saved to your account/.test(msg) ? '' : msg; }
 function scheduleSave() {
   if (!store.loaded) return;
+  evTrack();
   setSync('Saving...');
   clearTimeout(store.timer);
   store.timer = setTimeout(flush, 500);
 }
 function flush() {
-  lsWrite();
+  var kept = lsWrite();
   pushParty();
-  if (!store.ref || store.mode !== 'account') { setSync('Saved on this device'); return; }
+  if (!store.ref || store.mode !== 'account') { setSync(kept ? 'Saved on this device' : 'NOT saved: this browser has no room left. Download a backup now.'); return; }
   if (store.writing) { store.again = true; return; }
   store.writing = true;
   var body = JSON.parse(JSON.stringify(S));
@@ -1343,9 +1435,9 @@ window.addEventListener('pagehide', flushNow);
 document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') flushNow(); });
 function initStore() {
   var local = lsRead();
-  if (local) { S = merge(defaults(), local); }
+  if (local) { S = merge(defaults(), local); benchClean(); }
   var cl = window.claude;
-  if (!cl || !cl.use) { store.loaded = true; setSync('Saved on this device'); return Promise.resolve(); }
+  if (!cl || !cl.use) { store.loaded = true; evBase(); setSync('Saved on this device'); return Promise.resolve(); }
   return Promise.all([cl.use('db'), cl.use('user')]).then(function (r) {
     var db = r[0], user = r[1];
     if (!db || !user) return null;
@@ -1355,11 +1447,11 @@ function initStore() {
       store.ref = db.doc('data/users/' + id + '/journal');
       return store.ref.get().then(function (snap) {
         store.mode = 'account';
-        if (snap.exists) { S = merge(defaults(), snap.data()); }
+        if (snap.exists) { S = merge(defaults(), snap.data()); benchClean(); }
       });
     });
   }).catch(function () { store.mode = 'local'; }).then(function () {
-    store.loaded = true;
+    store.loaded = true; evBase();
     setSync(store.mode === 'account' ? 'Saved to your account' : 'Saved on this device');
     if (store.mode === 'account' && !lsRead()) flush();
   });
@@ -1374,6 +1466,121 @@ function fmt(n) { return (n >= 0 ? '+' : '−') + Math.abs(n); }
 function getPath(o, p) { return p.split('.').reduce(function (a, k) { return a == null ? a : a[k]; }, o); }
 function setPath(o, p, v) { var ks = p.split('.'), last = ks.pop(); var t = ks.reduce(function (a, k) { return a[k]; }, o); t[last] = v; }
 
+/* ---------- session timeline: what happened this session, and taking it back ---------- */
+/* Harm, Unstable, Luck, XP, hold and level are compared with a snapshot each time the journal saves, so every control that changes one leaves a line (a new control cannot forget to).
+   A change that touches several at once, such as a wound that also marks Unstable, or Luck spent to cancel a wound, is one line. Rolls are logged by finish() in doRoll.
+   Changes to the same field within five seconds merge into one line, so scrubbing Luck from 7 to 4 is one line. Controls call evSay(why) just before they save to give the line a reason. */
+var EVF = ['harm', 'unstable', 'luck', 'xp', 'hold', 'level'], EVNAME = { harm: 'Harm', luck: 'Luck', xp: 'XP', hold: 'Hold', level: 'Level' };
+var EVKIND = { roll: 'Roll', harm: 'Harm', heal: 'Heal', luck: 'Luck', xp: 'XP', hold: 'Hold', level: 'Level' };
+var evSnap = null, evWhy = '', evNoUndo = false, evShown = 15, evToastTimer = 0;
+function evNow() { var sh = S.sheet; return { harm: sh.harm, unstable: !!sh.unstable, luck: sh.luck, xp: sh.xp, hold: S.hold.n, level: sh.level }; }
+function evBase() { evSnap = evNow(); }
+function evSay(why, noUndo) { evWhy = why || ''; evNoUndo = !!noUndo; }
+function evSkip(k) { if (evSnap) evSnap[k] = evNow()[k]; }   // a change that is already part of another line, such as the hold a roll hands out
+function evList() { var s = S.session; if (!s || !Array.isArray(s.events)) s = S.session = { started: 0, events: [] }; return s.events; }
+function evAdd(ev) {
+  var s = S.session, evs = evList(), at = Date.now();
+  if (evs.length && at - evs[0].t > 6 * 36e5) { s.events = evs = []; s.started = 0; }   // six quiet hours is a new session
+  if (!evs.length) s.started = at;
+  ev.id = uid(); ev.t = at; evs.unshift(ev);
+  if (evs.length > 200) evs.length = 200;
+  return ev;
+}
+function evKind(f) {
+  if (f.level) return 'level';
+  if (f.harm) return f.harm.to > f.harm.from ? 'harm' : 'heal';
+  if (f.luck) return 'luck';
+  if (f.xp) return 'xp';
+  if (f.hold) return 'hold';
+  return 'harm';   // only the Unstable box changed
+}
+function evText(ev) {
+  var f = ev.f || {}, bits = [];
+  ['harm', 'luck', 'xp', 'hold', 'level'].forEach(function (k) { if (f[k]) bits.push(EVNAME[k] + ' ' + f[k].from + ' to ' + f[k].to); });
+  if (f.unstable) bits.push(f.unstable.to ? 'now Unstable' : 'no longer Unstable');
+  return ev.why ? String(ev.why) + (bits.length ? ' (' + bits.join(', ') + ')' : '') : bits.join(', ');
+}
+function evTrack() {
+  var now = evNow(), f = {}, any = false, why = evWhy, nu = evNoUndo;
+  evWhy = ''; evNoUndo = false;
+  if (!evSnap) { evSnap = now; return; }
+  EVF.forEach(function (k) { if (now[k] !== evSnap[k]) { f[k] = { from: evSnap[k], to: now[k] }; any = true; } });
+  evSnap = now;
+  if (!any) return;
+  var evs = evList(), top = evs[0], at = Date.now(), ev;
+  if (f.level) nu = true;   // a level-up also changes the picks and advanced moves, so it is not undone from here
+  if (top && top.f && !top.why && !why && !top.nu && !nu && at - top.t < 5000 && Object.keys(f).some(function (k) { return top.f[k]; })) {
+    Object.keys(f).forEach(function (k) { if (top.f[k]) top.f[k].to = f[k].to; else top.f[k] = f[k]; });
+    Object.keys(top.f).forEach(function (k) { if (top.f[k].from === top.f[k].to) delete top.f[k]; });
+    top.t = at; ev = top;
+    if (!Object.keys(top.f).length) { evs.shift(); ev = null; } else top.kind = evKind(top.f);   // back where it started: no line
+  } else ev = evAdd({ kind: evKind(f), why: why, f: f, nu: nu });
+  evToastShow(ev); renderHist();
+}
+/* a roll goes on the timeline as it was shown; Spend Luck rewrites it with evRollUpdate() */
+function evRoll(r) { return evAdd({ kind: 'roll', r: r, nu: true }).id; }
+function evRollUpdate() {
+  if (!last || !last.evid) return;
+  evList().forEach(function (e) { if (e.id === last.evid && e.r) { e.r.total = last.total; e.r.tier = tierOf(last.total); if (!/\(Luck\)$/.test(e.r.name)) e.r.name += ' (Luck)'; } });
+}
+/* an event can be undone while every field it changed still holds what the event set it to */
+function evCanUndo(ev) {
+  if (!ev || ev.nu || !ev.f) return false;
+  var ks = Object.keys(ev.f), now = evNow();
+  return ks.length > 0 && ks.every(function (k) { return EVF.indexOf(k) >= 0 && ev.f[k] && now[k] === ev.f[k].to; });
+}
+function evToastShow(ev) {
+  var el = $('#evtoast'); if (!el) return;
+  clearTimeout(evToastTimer);
+  if (!ev || !evCanUndo(ev)) { el.hidden = true; return; }
+  $('#evtoast-t').textContent = evText(ev) + '.'; $('#evtoast-undo').hidden = false;
+  el.dataset.ev = ev.id; el.hidden = false;
+  evToastTimer = setTimeout(function () { el.hidden = true; }, 8000);
+}
+function evMsg(t) {
+  var el = $('#evtoast'); if (!el) return;
+  clearTimeout(evToastTimer);
+  $('#evtoast-t').textContent = t; $('#evtoast-undo').hidden = true; el.hidden = false;
+  evToastTimer = setTimeout(function () { el.hidden = true; }, 4500);
+}
+function evUndo(id) {
+  var evs = evList(), i, ev = null;
+  for (i = 0; i < evs.length; i++) if (evs[i].id === id) { ev = evs[i]; break; }
+  if (!ev || ev.nu || !ev.f) return;
+  if (!evCanUndo(ev)) { evMsg('That changed again since. Undo the newer change first.'); renderHist(); return; }
+  var sh = S.sheet, f = ev.f;
+  function from(k, max) { var v = +f[k].from; return clamp(isFinite(v) ? Math.round(v) : 0, 0, max); }
+  if (f.harm) sh.harm = from('harm', 8);
+  if (f.unstable) sh.unstable = !!f.unstable.from;
+  if (f.luck) setLuck(from('luck', 7));
+  if (f.xp) sh.xp = from('xp', 9);
+  if (f.hold) S.hold.n = from('hold', 9);
+  evs.splice(i, 1); evBase();
+  play.wound = 0; play.msg = '';
+  renderSheet(); renderPlay(); renderStage(); renderHist(); scheduleSave();
+  evMsg('Undone.');
+}
+function evRemove(id) {
+  var evs = evList(), i;
+  for (i = 0; i < evs.length; i++) if (evs[i].id === id) { evs.splice(i, 1); break; }
+  renderHist(); scheduleSave();
+}
+function evLine(ev) {
+  var act = (evCanUndo(ev) ? '<button type="button" class="btn ghost sm" data-evundo="' + esc(ev.id) + '">Undo</button>' : '') + '<button type="button" class="evx" data-evrm="' + esc(ev.id) + '" aria-label="Remove this line from the list">&times;</button>';
+  if (ev.kind === 'roll' && ev.r) {
+    var r = ev.r, tier = TIERNAME[r.tier] ? r.tier : 'miss';
+    return '<li><b>' + (+r.total || 0) + '</b><span>' + esc(r.name) + ' <span class="muted">(' + (+r.d1 || 0) + '+' + (+r.d2 || 0) + ' ' + fmt(+r.mod || 0) + ')</span></span><span class="evend"><span class="tag ' + tier + '">' + TIERNAME[tier] + '</span>' + act + '</span></li>';
+  }
+  return '<li class="ev"><span class="evk">' + esc(EVKIND[ev.kind] || 'Note') + '</span><span>' + esc(evText(ev)) + '</span><span class="evend">' + act + '</span></li>';
+}
+/* on window so tests can look in and drive the timeline directly */
+window.__journal = { S: function () { return S; }, evAdd: evAdd, evUndo: evUndo, evBase: evBase, evList: evList, levelDone: levelDone, scheduleSave: scheduleSave };
+function renderSession(el) {
+  var evs = evList();
+  if (!evs.length) { el.innerHTML = '<li class="muted"><span></span>Nothing yet. Rolls, harm, Luck and XP show up here as you play.<span></span></li>'; return; }
+  el.innerHTML = evs.slice(0, evShown).map(evLine).join('') + (evs.length > evShown ? '<li class="evmore"><span></span><button type="button" class="linkbtn" data-evall>Show all ' + evs.length + '</button><span></span></li>' : '');
+}
+
 /* ---------- tabs ---------- */
 var TABS = ['guide', 'play', 'roll', 'hunter', 'party', 'bestiary', 'tips', 'notes'];
 function showTab(name, fromHash) {
@@ -1386,6 +1593,7 @@ function showTab(name, fromHash) {
   });
   var kit = $('#rollkit'), home = $(name === 'play' ? '#play-stage' : '#roll-home');
   if (kit && home && kit.parentElement !== home) home.appendChild(kit);
+  if (name === 'play' || name === 'roll') renderHist();
   $('.wrap').classList.toggle('wide', name === 'play');
   if (name === 'party') renderParty();
   if (name === 'guide') renderStart();
@@ -1438,7 +1646,6 @@ function renderRoller() {
   if (!BYID[R.move]) R.move = 'kick';
   sel.value = R.move;
   $('#statrow').innerHTML = STATS.map(function (s) { return '<button type="button" class="statbtn" data-stat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmt(S.sheet.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('');
-  $('#o-stat').textContent = fmt(S.sheet.stats[R.stat]);
   $('#o-forward').textContent = fmt(R.forward);
   $('#o-ongoing').textContent = fmt(R.ongoing);
   $('#o-other').textContent = fmt(R.other);
@@ -1486,11 +1693,32 @@ function renderStage() {
   html += '</div><div class="actions">';
   if (t === 'miss' && !last.luck) html += '<button class="btn sm" type="button" id="markxp"' + (last.xpMarked ? ' disabled' : '') + '>' + (last.xpMarked ? 'XP marked' : 'Mark XP') + '</button>';
   if (last.total < 12 && !last.luck) html += '<button class="btn ghost sm" type="button" id="spendluck"' + (S.sheet.luck < 1 ? ' disabled' : '') + '>Spend Luck: make it a 12 (' + S.sheet.luck + ' left)</button>';
+  html += '<button class="btn ghost sm" type="button" id="copyroll">Copy for chat</button><span class="small muted" id="copymsg" role="status" style="flex:1 1 100%"></span>';
   html += '</div>';
   $('#result').innerHTML = html;
 }
+/* The last roll as one plain line for a chat: "Mara: Kick Some Ass, 9 (4 + 3, +2), partial success".
+   Plain hyphen for a minus, because chat apps mangle the real minus sign. If Luck made it a 12, the line shows the dice as rolled and says so. */
+function rollLine() {
+  if (!last) return '';
+  var mv = BYID[last.move] || PLAIN, who = String(S.sheet.name || '').replace(/\s+/g, ' ').trim().slice(0, 60) || 'A hunter';
+  var mod = (last.statVal || 0) + (last.fwd || 0) + (last.ong || 0) + (last.oth || 0);
+  return who + ': ' + (mv.id === 'plain' ? STATNAME[last.stat] + ' roll' : mv.name) + ', ' + last.total + ' (' + last.d1 + ' + ' + last.d2 + ', ' + (mod < 0 ? '-' : '+') + Math.abs(mod) + (last.luck ? ', spent Luck' : '') + '), ' + TIERNAME[tierOf(last.total)].toLowerCase();
+}
+function copyRoll() {
+  var line = rollLine();
+  function say(t) { var m = $('#copymsg'); if (m) m.textContent = t; }
+  function byHand() {   // the browser would not let the page use the clipboard: show the line to copy
+    var m = $('#copymsg'); if (!m) return;
+    m.innerHTML = 'Copying was blocked here. Copy this by hand:<input type="text" id="copybox" readonly aria-label="Roll for chat" value="' + esc(line) + '">';
+    var i = $('#copybox'); i.focus(); i.select();
+  }
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(line).then(function () { say('Copied. Paste it in the chat.'); }, byHand); else byHand();
+}
 function renderHist() {
-  var el = $('#hist');
+  var el = $('#hist'), onPlay = S.tab === 'play';
+  $('#histttl').textContent = onPlay ? 'This session' : 'Recent rolls';   // the same card sits on both tabs: Play lists everything that happened, the Roller only the last ten rolls
+  if (onPlay) { renderSession(el); return; }
   if (!S.rolls.length) { el.innerHTML = '<li class="muted"><span></span>No rolls yet. Your last ten show up here.<span></span></li>'; return; }
   el.innerHTML = S.rolls.slice(0, 10).map(function (r) { return '<li><b>' + r.total + '</b><span>' + esc(r.name) + ' <span class="muted">(' + r.d1 + '+' + r.d2 + ' ' + fmt(r.mod) + ')</span></span><span class="tag ' + r.tier + '">' + TIERNAME[r.tier] + '</span></li>'; }).join('');
 }
@@ -1503,23 +1731,35 @@ var HOLDS = { inv: { full: 2, part: 1 }, read: { full: 3, part: 1 } };
 function rollClicks(e) {
   var ask = e.target.closest('[data-ask]');
   if (ask && last && last.hold) {
-    var H = S.hold, qi = +ask.dataset.ask, at = H.asked.indexOf(qi);
+    var H = S.hold, qi = +ask.dataset.ask, at = H.asked.indexOf(qi), qmv = BYID[last.move] || PLAIN;
+    evSay(at >= 0 ? 'Took a question back' : 'Asked: ' + String((qmv.chips || [])[qi] || 'a question'), true);   // not undone from the list: tapping the question again takes it back
     if (at >= 0) { H.asked.splice(at, 1); H.n++; } else if (H.n > 0) { H.asked.push(qi); H.n--; }
     renderStage(); renderPlay(); scheduleSave(); return;
   }
   var b = e.target.closest('[data-adj]');
   if (b) {
     var k = b.dataset.adj, d = +b.dataset.d;
-    if (k === 'stat') { var s = S.roller.stat; S.sheet.stats[s] = clamp(S.sheet.stats[s] + d, -3, 5); renderSheet(); }
-    else S.roller[k] = clamp(S.roller[k] + d, -5, 5);
+    if (k !== 'forward' && k !== 'ongoing' && k !== 'other') return;   // ratings are never changed from here
+    S.roller[k] = clamp(S.roller[k] + d, -5, 5);
     renderRoller(); scheduleSave(); return;
   }
-  if (e.target.id === 'markxp' && last && !last.xpMarked) { last.xpMarked = true; S.sheet.xp = Math.min(S.sheet.xp + 1, 9); renderSheet(); renderStage(); scheduleSave(); }
-  if (e.target.id === 'spendluck' && last && !last.luck && S.sheet.luck > 0) { last.luck = true; last.total = 12; setLuck(S.sheet.luck - 1); if (S.rolls[0]) { S.rolls[0].total = 12; S.rolls[0].tier = 'full'; S.rolls[0].name += ' (Luck)'; } if (HOLDS[last.move]) { var was = last.hold && S.hold.move === last.move ? S.hold.asked : []; S.hold = { n: Math.max(0, HOLDS[last.move].full - was.length), move: last.move, asked: was }; last.hold = true; } renderSheet(); renderRoller(); fxPlay('crit'); stinger(12); scheduleSave(); }
+  if (e.target.id === 'copyroll' && last) { copyRoll(); return; }
+  if (e.target.id === 'markxp' && last && !last.xpMarked) { evSay('Marked XP on a miss', true); last.xpMarked = true; S.sheet.xp = Math.min(S.sheet.xp + 1, 9); renderSheet(); renderStage(); scheduleSave(); }
+  if (e.target.id === 'spendluck' && last && !last.luck && S.sheet.luck > 0) { evSay('Spent Luck: made the roll a 12', true); last.luck = true; last.total = 12; setLuck(S.sheet.luck - 1); evRollUpdate(); if (S.rolls[0]) { S.rolls[0].total = 12; S.rolls[0].tier = 'full'; S.rolls[0].name += ' (Luck)'; } if (HOLDS[last.move]) { var was = last.hold && S.hold.move === last.move ? S.hold.asked : []; S.hold = { n: Math.max(0, HOLDS[last.move].full - was.length), move: last.move, asked: was }; last.hold = true; evSkip('hold'); } renderSheet(); renderRoller(); fxPlay('crit'); stinger(12); scheduleSave(); }
 }
 $('#p-roll').addEventListener('click', rollClicks);
 $('#p-play').addEventListener('click', rollClicks);
-$('#clearhist').addEventListener('click', function () { S.rolls = []; last = null; renderRoller(); scheduleSave(); });
+$('#clearhist').addEventListener('click', function () {
+  if (S.tab === 'play') { S.session.events = []; S.session.started = 0; evToastShow(null); renderHist(); scheduleSave(); return; }   // the timeline; the sheet is untouched
+  S.rolls = []; last = null; renderRoller(); scheduleSave();
+});
+$('#hist').addEventListener('click', function (e) {
+  var u = e.target.closest('[data-evundo]'), x = e.target.closest('[data-evrm]');
+  if (u) { evUndo(u.dataset.evundo); return; }
+  if (x) { evRemove(x.dataset.evrm); return; }
+  if (e.target.closest('[data-evall]')) { evShown = 1000; renderHist(); }
+});
+$('#evtoast-undo').addEventListener('click', function () { evUndo($('#evtoast').dataset.ev); });
 
 /* ---------- hunter ---------- */
 function setHV(v) {
@@ -1537,18 +1777,95 @@ PBDATA.forEach(function (d) { PBD[d.name] = d; });
 var WSTEPS = ['Playbook', 'Who they are', 'Ratings', 'Details', 'Moves', 'Gear', 'History', 'Review'];   // the order the playbook sheets give: look, ratings, the playbook's own choices, moves, gear, then history
 var PBTAG = ['Easier to learn', 'A bit more to track', 'More rules to manage'];
 /*NAMEGEN*/
+/* Name ideas for the builder's Surprise me. Six worlds, each with names in three registers: plain, funny and over the top.
+   The old Appalachian hollows and their folk-horror gods; the dry highways and scrap towns of the wasteland; a retro 1950s that never ended, in its bunkers;
+   the Louisiana bayou; the frontier; and the metro tunnels. Everything is made up in the spirit of those worlds, with no names borrowed from any story. */
 var NM = {
-  fem: ['Abigail', 'Araminta', 'Cassia', 'Charity', 'Delphia', 'Eliza', 'Hepzibah', 'Jemima', 'Keziah', 'Lavinia', 'Lucinda', 'Mahala', 'Mercy', 'Naomi', 'Orpha', 'Patience', 'Prudence', 'Rhoda', 'Ruhamah', 'Sukey', 'Tabitha', 'Temperance', 'Zilpha', 'Ottilie', 'Winifred', 'Eulalie'],
-  masc: ['Abner', 'Amos', 'Ambrose', 'Asa', 'Barnabas', 'Cyrus', 'Ebenezer', 'Elias', 'Ephraim', 'Gideon', 'Hiram', 'Jedediah', 'Josiah', 'Lemuel', 'Micajah', 'Obadiah', 'Reuben', 'Silas', 'Thaddeus', 'Zebulon', 'Zachariah', 'Absalom', 'Ansel', 'Lazarus'],
-  sur: ['Blevins', 'Bledsoe', 'Caudill', 'Combs', 'Crabtree', 'Cornett', 'Fugate', 'Gentry', 'Hensley', 'Honeycutt', 'Ison', 'Kincaid', 'Ledford', 'Maddox', 'McGraw', 'Mullins', 'Pruitt', 'Ramsey', 'Setzer', 'Shelton', 'Sizemore', 'Slone', 'Stidham', 'Teague', 'Tolliver', 'Whitaker', 'Whitlock', 'Yount', 'Eller', 'Hartsell', 'Carmichael', 'Wolfe'],
+  fem: ['Abigail', 'Araminta', 'Cassia', 'Charity', 'Delphia', 'Eliza', 'Hepzibah', 'Jemima', 'Keziah', 'Lavinia', 'Lucinda', 'Mahala', 'Mercy', 'Naomi', 'Orpha', 'Patience', 'Prudence', 'Rhoda', 'Ruhamah', 'Sukey', 'Tabitha', 'Temperance', 'Zilpha', 'Ottilie', 'Winifred', 'Eulalie',
+    'Bethany', 'Loretta', 'Mavis', 'Opal', 'Pearl', 'Verna', 'Dolly', 'Maybelle', 'Odessa', 'Wilhelmina', 'Clementine', 'Birdie', 'Hester', 'Marigold', 'Nettie', 'Ora'],
+  masc: ['Abner', 'Amos', 'Ambrose', 'Asa', 'Barnabas', 'Cyrus', 'Ebenezer', 'Elias', 'Ephraim', 'Gideon', 'Hiram', 'Jedediah', 'Josiah', 'Lemuel', 'Micajah', 'Obadiah', 'Reuben', 'Silas', 'Thaddeus', 'Zebulon', 'Zachariah', 'Absalom', 'Ansel', 'Lazarus',
+    'Boyd', 'Clyde', 'Dwayne', 'Earl', 'Hollis', 'Jubal', 'Orville', 'Virgil', 'Wade', 'Elmer', 'Cecil', 'Roscoe', 'Lonnie', 'Ward', 'Dewey', 'Fenton'],
+  sur: ['Blevins', 'Bledsoe', 'Caudill', 'Combs', 'Crabtree', 'Cornett', 'Fugate', 'Gentry', 'Hensley', 'Honeycutt', 'Ison', 'Kincaid', 'Ledford', 'Maddox', 'McGraw', 'Mullins', 'Pruitt', 'Ramsey', 'Setzer', 'Shelton', 'Sizemore', 'Slone', 'Stidham', 'Teague', 'Tolliver', 'Whitaker', 'Whitlock', 'Yount', 'Eller', 'Hartsell', 'Carmichael', 'Wolfe',
+    'Absher', 'Dillard', 'Greer', 'Mabry', 'Mayes', 'Pennington', 'Reece', 'Triplett', 'Vance', 'Hundley', 'Tipton', 'Varney', 'Wagoner'],
   titleF: ['Granny', 'Sister', 'Widow', 'Aunt', 'Old', 'Midwife', 'Mother'],
   titleM: ['Brother', 'Deacon', 'Preacher', 'Uncle', 'Old', 'Elder', 'Father'],
-  epi: ['Hollow', 'Unburied', 'Lantern-Bearer', 'Bone-Setter', 'Pale', 'Late', 'Ashen', 'Quiet', 'Hungry', 'Half-Drowned', 'Rootworker', 'Mist-Walker', 'Third-Born', 'Unmourned', 'Barefoot', 'Cold-Handed', 'Thrice-Buried', 'Faithless', 'Bell-Ringer', 'Briar-Scarred', 'Wolf-Tender', 'Wayward', 'Weeping', 'Sleepless', 'Salt-Wise', 'Crow-Friend'],
-  place: ['Sorrow Hollow', 'Widow\'s Branch', 'Gallows Gap', 'Sinking Run', 'Cold Spring Ridge', 'Burnt Meeting House', 'Ash Fork', 'Lantern Gap', 'Weeping Rock', 'Blackwater Fork', 'Laurel Bald', 'Dry Bone Creek', 'Hangman\'s Knob', 'Mourning Dove Run', 'Thornback Ridge', 'Pale Mountain', 'Drowned Church', 'Hollow Pine']
+  epi: ['Hollow', 'Unburied', 'Lantern-Bearer', 'Bone-Setter', 'Pale', 'Late', 'Ashen', 'Quiet', 'Hungry', 'Half-Drowned', 'Rootworker', 'Mist-Walker', 'Third-Born', 'Unmourned', 'Barefoot', 'Cold-Handed', 'Thrice-Buried', 'Faithless', 'Bell-Ringer', 'Briar-Scarred', 'Wolf-Tender', 'Wayward', 'Weeping', 'Sleepless', 'Salt-Wise', 'Crow-Friend',
+    'Moth-Eaten', 'Ridge-Walker', 'Coal-Handed', 'Fiddle-Cursed', 'Moonlit', 'Root-Bound', 'Hollow-Voiced', 'Ever-Hungry'],
+  place: ["Sorrow Hollow", "Widow's Branch", "Gallows Gap", "Sinking Run", "Cold Spring Ridge", "Burnt Meeting House", "Ash Fork", "Lantern Gap", "Weeping Rock", "Blackwater Fork", "Laurel Bald", "Dry Bone Creek", "Hangman's Knob", "Mourning Dove Run", "Thornback Ridge", "Pale Mountain", "Drowned Church", "Hollow Pine",
+    "Moth Holler", "Possum Trot", "Devil's Backbone", "Brimstone Bend", "Bone Cave", "Cinder Run"]
 };
+/* each world: first names, surnames, titles, funny nicknames and whole funny names, epithets, deeds ("Who ..."), roles, and places */
+var NMF = {
+  appal: {
+    first: NM.fem.concat(NM.masc), sur: NM.sur, epi: NM.epi,
+    title: ['Granny', 'Deacon', 'Preacher', 'Sister', 'Brother', 'Uncle', 'Aunt', 'Widow', 'Elder', 'Doc', 'Midwife', 'Sheriff'],
+    nick: ['Moonshine', 'Possum', 'Cornbread', 'Biscuit', 'Ramp', 'Two-Toe', 'Fiddle', 'Mason Jar', 'Pawpaw', 'Sassafras', 'Buttermilk', 'Pickle', 'Hushpuppy', 'Skillet', 'Holler Hound'],
+    pun: ['Moonshine Mavis', 'Possum Pete', 'Cornbread Clyde', 'Biscuit Bethany', 'Sassafras Sue', 'Fiddle Dee Dillard'],
+    deed: ['Who Walks the Ridge After Dark', 'Who Answers the Knocking', 'Who Sings the Mountain Awake', 'Who Was Promised to the Hollow', 'Who Kept the Last Lantern Lit', 'Who Buried the Old Gods and Dug Them Up Again'],
+    role: ['Keeper of the Seven Hollers', 'Voice of the Hollow', 'Bride of the Mountain', 'Herald of the Moth-Mother', 'Warden of Sorrow Ridge', 'Last Preacher of the Burnt Meeting House']
+  },
+  waste: {
+    first: ['Marlowe', 'Hollis', 'Reese', 'Odessa', 'Wilder', 'Jolene', 'Boone', 'Nell', 'Ramona', 'Gus', 'Teddy', 'Wanda', 'Cormac', 'Tallulah', 'Dagny', 'Jericho', 'Mika', 'Sable', 'Zeke', 'Ines', 'Cass', 'Rafferty', 'Dex', 'Lark', 'Quill', 'Thea', 'Rex', 'Lupe'],
+    sur: ['Calloway', 'Okafor', 'Reyes', 'Brandt', 'Voss', 'Kowalski', 'Tran', 'Delgado', 'Whitfield', 'Navarro', 'Pike', 'Hargrove', 'Mbeki', 'Castellano', 'Ostrander', 'Szabo', 'Nakamura', 'Abara', 'Lindqvist', 'Moreau'],
+    title: ['Road Marshal', 'Water Warden', 'Fuel Baron', 'Scrap Prophet', 'Bone Chaplain', 'High Mechanic', 'Pit Boss', 'Dust Queen', 'Chrome Matron', 'Convoy Captain', 'Wellkeeper'],
+    nick: ['Hubcap', 'Spare Parts', 'Duct Tape', 'Rustbucket', 'Jerry Can', 'Wrench', 'Gravel', 'Tumbleweed', 'Spork', 'Canned Peaches', 'Three-Bullets', 'Mostly Harmless', 'Dust Bunny', 'Axle', 'Bolt', 'Scrapper', 'Fuzzy Dice', 'Good Tires', 'Sunburn', 'Loot Goblin'],
+    pun: ['Rusty Hinges', 'Axel Grease', 'Dustin Windham', 'Jerry Cann', 'Sandy Gravel', 'Crash Tessler'],
+    epi: ['Gasoline-Anointed', 'Chrome-Throated', 'Rust-Crowned', 'Dust-Baptized', 'Sun-Scorched', 'Oil-Slicked', 'Twice-Fueled', 'Never-Parked', 'Bullet-Blessed', 'Last-Gallon', 'Horizon-Eyed'],
+    deed: ['Who Drinks the Horizon', 'Who Outran the Sun', 'Who Buried the Sea', 'Who Rides the Last Road', 'Who Never Stopped Running', 'Who Taught the Engines to Pray', 'Who Owes the Desert Nothing', 'Who Died Twice and Charged Extra'],
+    role: ['Warden of the Dry Sea', 'Prophet of the Rusted Choir', 'Last Attendant of the Last Gas Station', 'Queen of the Burning Mile', 'Lord of the Glass Desert', 'Keeper of the Bone Highway']
+  },
+  retro: {
+    first: ['Dorothy', 'Eugene', 'Betty', 'Wendell', 'Harold', 'Mabel', 'Gladys', 'Clifford', 'Norma', 'Walter', 'Margie', 'Lloyd', 'Edna', 'Chet', 'Shirley', 'Vernon', 'Ruthie', 'Stan'],
+    sur: ['Pembrook', 'Hargrave', 'Whitmore', 'Applegate', 'Fairchild', 'Sutherland', 'Mercer', 'Prescott', 'Linwood', 'Dunmore', 'Ashcroft', 'Caldwell'],
+    title: ['Overseer', 'Doctor', 'Professor', 'Scribe', 'Ranger', 'Sergeant', 'Mayor', 'Chief', 'Sister'],
+    nick: ['Sparky', 'Chip', 'Skip', 'Buzz', 'Tubes', 'Transistor', 'Hi-Fi', 'Atomic', 'Soda Jerk', 'Milkshake', 'Pin Curl', 'Static', 'Kilowatt', 'Rations'],
+    pun: ['Mabel Meltdown', 'Gladys Geiger', 'Rad Roger Pembrook', 'Walt Whiskers', 'Dot Matrix', 'Betty Boom-Boom'],
+    epi: ['Rad-Kissed', 'Pre-War', 'Vacuum-Tube', 'Ever-Smiling', 'Duck-and-Cover', 'Shelter-Born', 'Atom-Bright', 'Fully-Insured', 'Geiger-Tuned'],
+    deed: ['Who Smiled Through the Fallout', 'Who Never Missed a Bake Sale', 'Who Outlived the Warranty', 'Who Kept the Lights On Underground', 'Who Won the Last Good War', 'Who Read the Fine Print'],
+    role: ['Overseer of Shelter 41', 'Last Mayor of Sublevel Seven', 'Keeper of Bunker 9', 'Chief Engineer of the Deep Pantry', 'Sweetheart of the Silo', 'Head of the Fallout Committee']
+  },
+  bayou: {
+    first: ['Remy', 'Thibault', 'Marguerite', 'Odalie', 'Celestine', 'Beaumont', 'Lucien', 'Clovis', 'Delphine', 'Fontaine', 'Mireille', 'Aurelie', 'Gaston', 'Josephine', 'Evangeline', 'Percy', 'Ignatius', 'Pascal', 'Bernadette', 'Hippolyte', 'Lazare'],
+    sur: ['Boudreaux', 'Thibodeaux', 'Fontenot', 'Landry', 'Guidry', 'Broussard', 'Arceneaux', 'Comeaux', 'Hebert', 'Savoie', 'LeBlanc', 'Trahan', 'Mouton', 'Delacroix', 'Duplantis', 'Villere'],
+    title: ['Madame', 'Monsieur', 'Captain', 'Warden', 'Father', 'Sister', 'Marshal', 'Old'],
+    nick: ['Catfish', 'Beignet', 'Swamp Donkey', 'Sweet Tea', 'Crawdad', 'Bait Shop', 'Gumbo', 'Mudbug', 'Gator Bait', 'Hush', 'Okra', 'Pecan', 'Sugar Cane', 'Dock Cat'],
+    pun: ['Beau Regard', 'Cat Fish Cassidy', 'Boudin Bob', 'Marsh Mallow', 'Crawford Crawdad'],
+    epi: ['Lantern-Eyed', 'Bayou-Born', 'Mud-Blessed', 'Moss-Draped', 'Hex-Handed', 'Gator-Wise', 'Brackish', 'Fog-Walking', 'Bell-Ringing', 'Twice-Drowned', 'Cypress-Rooted'],
+    deed: ['Who Rang the Bell and Ran', 'Who Haunts the Brackish Water', 'Who Paid the Bounty in Full', 'Who Out-Waited the Swamp', 'Who Hunts What Hunts the Hunters', 'Who Was Baptized in the Bayou and Did Not Come Out Clean'],
+    role: ['Warden of the Drowned Parish', 'Saint of the Brackish Water', 'Last Light of the Marais', "Bellringer of Dead Man's Landing", 'Queen of the Weeping Cypress', 'Hunter of Blackwater Reach']
+  },
+  frontier: {
+    first: ['Cole', 'Hattie', 'Tex', 'Clementine', 'Jessup', 'Josephine', 'Eustace', 'Lottie', 'Sterling', 'Ezra', 'Calla', 'Abilene', 'Rowan', 'Bess', 'Hank', 'Delilah', 'Cassius', 'Wyatt', 'Pearl', 'Mercy'],
+    sur: ['McCall', 'Brannigan', 'Slade', 'Whitcomb', 'Calhoun', 'Rourke', 'Fenwick', 'Stroud', 'Tarleton', 'Quigley', 'Pritchard', 'Kettleman', 'Hargrove', 'Dunmore'],
+    title: ['Marshal', 'Deputy', 'Sheriff', 'Doc', 'Reverend', 'Judge', 'Colonel', 'Madam'],
+    nick: ['Tex', 'Lefty', 'Buckshot', 'Two-Gun', 'Squint', 'Boots', 'Spurs', 'Biscuit', 'Hardtack', 'Rattlesnake', 'Slim', 'Whiskers', 'Dead Reckoning'],
+    pun: ['Calamity Janet', 'Lefty Righty', 'Buck Shot', 'Sheriff Nobody', 'Dusty Boots', 'Tumbleweed Tom'],
+    epi: ['Gallows-Born', 'Dust-Hardened', 'Sun-Bleached', 'Lead-Lunged', 'Rope-Scarred', 'Trail-Weary', 'Gun-Blessed', 'Hell-Bound', 'Spur-Jingling', 'Quick-Fingered'],
+    deed: ['Who Rides at Dusk', 'Who Outdrew the Devil', 'Who Left Town Before the Town Left', 'Who Hanged Once and Argued', 'Who Owes Nothing to the Law', 'Who Shot the Moon and Missed'],
+    role: ['Marshal of the Last Mile', 'Sheriff of Nowhere in Particular', 'Judge of Dead Horse Pass', 'Terror of Skeleton Gulch', 'Widow of Gallows Creek', "Keeper of the Hangman's Rise"]
+  },
+  metro: {
+    first: ['Dmitri', 'Katya', 'Anya', 'Pavel', 'Mila', 'Gleb', 'Sasha', 'Vera', 'Ilya', 'Yuri', 'Nadia', 'Oleg', 'Tamara', 'Misha', 'Zoya', 'Lev', 'Irina', 'Roman', 'Galina', 'Taras'],
+    sur: ['Volkov', 'Petrenko', 'Sokolov', 'Kozlov', 'Marchenko', 'Zelenko', 'Antonov', 'Baranov', 'Orlov', 'Kuznetsov', 'Lysenko', 'Morozov'],
+    title: ['Commander', 'Comrade', 'Sergeant', 'Doctor', 'Elder', 'Warden', 'Station Master', 'Scout'],
+    nick: ['Flashlight', 'Gasmask', 'Tunnel Rat', 'Batteries', 'Canary', 'Mittens', 'Cabbage', 'Rust Spoon', 'Pothole', 'Dry Bread', 'Tin Cup'],
+    pun: ['Pavel Pothole', 'Misha Mittens', 'Boris Bunker', 'Katya Kaboom', 'Gleb Glowstick'],
+    epi: ['Tunnel-Born', 'Lamp-Bearing', 'Deep-Dwelling', 'Mask-Wearing', 'Surface-Scarred', 'Dark-Adjusted', 'Static-Haunted', 'Filter-Fed', 'Rail-Walking'],
+    deed: ['Who Walked the Surface and Came Back', 'Who Counts the Last Cartridges', 'Who Lights the Dark', 'Who Knows Every Tunnel by Heart', 'Who Heard the Station Whisper'],
+    role: ['Warden of the Deep Line', 'Station Master of Nowhere', 'Lamplighter of the Ninth Tunnel', 'Last Voice of the Sealed Station', 'Keeper of the Long Dark']
+  }
+};
+var NMW = [['appal', 5], ['waste', 5], ['retro', 2], ['bayou', 3], ['frontier', 2], ['metro', 2]];   // how often each world comes up
+var NMINIT = 'ABCDEFGHJKLMNOPRSTW';
 function nmPick(a) { return a[Math.floor(Math.random() * a.length)]; }
-function genName() {
-  var fem = Math.random() < 0.5, g = nmPick(fem ? NM.fem : NM.masc), r = Math.random(), t = nmPick(fem ? NM.titleF : NM.titleM);
+function nmFam() {
+  var tot = NMW.reduce(function (s, w) { return s + w[1]; }, 0), r = Math.random() * tot;
+  for (var i = 0; i < NMW.length; i++) { r -= NMW[i][1]; if (r < 0) return NMW[i][0]; }
+  return NMW[0][0];
+}
+/* the old Appalachian patterns, kept as they were: gothic titles, epithets and places */
+function nmClassic(epic) {   // epic keeps only the patterns with an epithet or a place in them
+  var fem = Math.random() < 0.5, g = nmPick(fem ? NM.fem : NM.masc), r = epic ? 0.34 + Math.random() * 0.52 : Math.random(), t = nmPick(fem ? NM.titleF : NM.titleM);
   if (r < 0.18) return g + ' ' + nmPick(NM.sur);
   if (r < 0.34) return t + ' ' + g;
   if (r < 0.52) return g + ' the ' + nmPick(NM.epi);
@@ -1556,10 +1873,82 @@ function genName() {
   if (r < 0.86) return g + ' ' + nmPick(NM.sur) + ', the ' + nmPick(NM.epi);
   return t + ' ' + g + ' ' + nmPick(NM.sur);
 }
-function genNames(n) { var out = [], guard = 0; while (out.length < n && guard++ < 60) { var x = genName(); if (out.indexOf(x) < 0) out.push(x); } return out; }
+function nmPlain(f) {
+  var r = Math.random(), g = nmPick(f.first), s = nmPick(f.sur);
+  if (r < 0.62) return g + ' ' + s;
+  if (r < 0.78) return g + ' ' + NMINIT.charAt(Math.floor(Math.random() * NMINIT.length)) + '. ' + s;
+  return nmPick(f.title) + ' ' + s;
+}
+function nmFunny(f) {
+  var r = Math.random();
+  if (r < 0.3) return nmPick(f.pun);
+  if (r < 0.75) return nmPick(f.first) + ' "' + nmPick(f.nick) + '" ' + nmPick(f.sur);
+  return nmPick(f.nick) + ' ' + nmPick(f.sur);
+}
+function nmEpic(f) {
+  var r = Math.random(), g = nmPick(f.first), s = nmPick(f.sur);
+  if (r < 0.28) return nmPick(f.title) + ' ' + s + ', ' + nmPick(f.deed);   // a title goes with a surname only: many titles are Sister or Madame or Uncle, and would not suit every first name
+  if (r < 0.46) return g + ' ' + s + ', ' + nmPick(f.role);
+  if (r < 0.64) return g + ' the ' + nmPick(f.epi);
+  if (r < 0.8) return nmPick(f.epi) + ' ' + g + ' ' + s;
+  if (r < 0.92) { var a = nmPick(f.epi), b = nmPick(f.epi); return g + ', ' + a + (a === b ? '' : ' and ' + b); }
+  return g + ' ' + s + ' ' + nmPick(f.deed);
+}
+/* one name from a world in a register ('plain', 'funny' or 'epic'); either can be left out for a random pick */
+function genName(reg, fam) {
+  var f = NMF[fam || nmFam()] || NMF.appal, isAppal = f === NMF.appal;
+  reg = reg || nmPick(['plain', 'plain', 'funny', 'epic']);
+  if (isAppal && reg !== 'funny' && Math.random() < 0.4) return nmClassic(reg === 'epic');
+  return reg === 'funny' ? nmFunny(f) : reg === 'epic' ? nmEpic(f) : nmPlain(f);
+}
+/* a handful that is always a mix: mostly plain, some funny, one over the top, in no fixed order */
+function genNames(n) {
+  var plan = ['plain', 'plain', 'plain', 'funny', 'funny', 'epic'], regs = [], out = [], guard = 0, i, j, t;
+  for (i = 0; i < n; i++) regs.push(plan[i % plan.length]);
+  for (i = regs.length - 1; i > 0; i--) { j = Math.floor(Math.random() * (i + 1)); t = regs[i]; regs[i] = regs[j]; regs[j] = t; }
+  regs.forEach(function (reg) { var x, tries = 0; do { x = genName(reg); } while (out.indexOf(x) >= 0 && tries++ < 30); if (out.indexOf(x) < 0 && guard++ < 60) out.push(x); });
+  return out;
+}
 /*END NAMEGEN*/
 
+/* Catchphrases. The builder first shows the original six; More ideas deals six new ones from the pool: two plain, two funny, two over the top.
+   The pool borrows the moods of the same worlds as the names (hollows, wasteland, bunkers, bayou, frontier, tunnels) and quotes nothing from them. */
 var CATCHES = ['Not on my watch.', 'I have a bad feeling about this.', 'Salt first, questions later.', 'Stay behind me.', 'It is always the quiet ones.', 'Well, that is not good.'];
+var CATCHX = {
+  plain: ['Water first, then feelings.', 'Keep your head down and your lantern up.', 'Nothing runs forever. I run until it stops.', 'The road gives, and the road takes.', 'Stay close, stay quiet, stay alive.',
+    'Some doors are better left shut.', 'Granny always said never answer the knocking.', 'The bayou keeps what it takes.', 'Ring the bell, then run.', 'Hush now. The ridge is listening.',
+    'We do not say its name after dark.', 'Light is a luxury. Spend it wisely.', 'Everything has a weakness. Even this.', 'It is only a monster. We have done this before.', 'Dig in. It is going to be a long night.',
+    'Out here, you earn every sunrise.', 'Someone has to go first. Might as well be me.', 'Whatever it is, it bleeds. Or burns. Or both.', 'Do not go in alone. Go in with me.', 'Better a short fight than a long funeral.',
+    'I have seen worse. Not often, though.', 'Trust the dog, and keep the gun handy.', 'Count your rounds and your friends.', 'The dark is only quiet until it is not.'],
+  funny: ['I did not sign up for the monster part.', 'My mother warned me about nights like this.', 'I am not lost. I am exploring aggressively.', 'This is fine. This is very much fine.', 'If I die, tell the Keeper I said hi.',
+    'Duck and cover is not a plan, but it is a start.', 'It glows, so it is probably good for you.', 'Everything is fine, and I have the paperwork.', 'I brought snacks. I did not bring a plan.',
+    'The old gods are hungry. Good thing I brought biscuits.', 'Fuel is a love language.', "I would like to speak to the monster's manager.", 'I traded my last bullet for a better attitude.',
+    'I have the good duct tape. We are fine.', 'Weakness first, then lunch.', 'Why is it always a basement?', 'I regret everything, but mostly the casserole.', 'Cool. Cool cool cool. Run.',
+    'Only my left eye is twitching. We are fine.', 'I am not scared. This is just my face.', 'Nobody panic. I am panicking for all of us.', 'That is not a bug. That is a feature with teeth.',
+    'I can fix this. I cannot fix this. Hold my coffee.', 'Plan A was a disaster, but Plan B has a trampoline.'],
+  epic: ['I will drink the horizon and ask for seconds.', 'Let the thunder learn my name and mispronounce it.', 'Burn the map. We are making history.', 'I have stared into the dark, and the dark asked me to stop.',
+    'Bring me my chainsaw and my finest hat.', 'I was born in a storm and I never forgave it.', 'The desert took everything. I took it back with interest.', 'Let the wasteland tremble. I have brought a wrench.',
+    'I carry the last gallon, and I will spend it well.', 'The hollow cannot hold me, and neither can the grave.', 'Rise, you hungry old gods. I have come to argue.', 'Every monster ends. I will be there for the finale.',
+    'I am the lantern at the end of the road.', 'The swamp swallows kings. It will choke on me.', 'Come closer, nightmare. I have been waiting all my life.', 'I have died twice. Neither time took.',
+    'Tell the dark I am coming, and I am not alone.', 'I will outlive the sun and make it watch.', 'The ridge kept its secrets. I am here to collect.', 'Fear me, or at least stand back.',
+    'Forged in dust, tempered in fire, grumpy by nature.', 'When the world ends, I will be in the front row.', 'My engine screams, my heart roars, my knees complain.', 'I have buried the sea. Do not ask how.']
+};
+var wizCatch = CATCHES.slice();   // the six chips on show
+function pickCatches(n) {
+  var plan = ['plain', 'plain', 'funny', 'funny', 'epic', 'epic'], regs = [], out = [], i, j, t;
+  for (i = 0; i < n; i++) regs.push(plan[i % plan.length]);
+  for (i = regs.length - 1; i > 0; i--) { j = Math.floor(Math.random() * (i + 1)); t = regs[i]; regs[i] = regs[j]; regs[j] = t; }
+  regs.forEach(function (r) {
+    var x, tries = 0;
+    do { x = nmPick(CATCHX[r]); } while ((out.indexOf(x) >= 0 || wizCatch.indexOf(x) >= 0) && tries++ < 40);   // not ones already on show
+    if (out.indexOf(x) < 0) out.push(x);
+  });
+  return out;
+}
+function catchHTML() {
+  return '<ul class="chips">' + wizCatch.map(function (t, i) { return '<li><button type="button" class="chip" data-wcatch="' + i + '">+ ' + esc(t) + '</button></li>'; }).join('') + '</ul>' +
+    '<button class="btn ghost sm" type="button" id="wcatchmore">More ideas</button>';
+}
 var LOOKS = ['Battered leather jacket', 'A scar I do not talk about', 'Smells like coffee and gun oil', 'Always carries a notebook', 'Mismatched boots', 'Tired eyes, steady hands', 'Rings on every finger', 'Dressed for a funeral'];
 var BACKQ = ['Why do I hunt?', 'What am I afraid of?', 'What do I want more than anything?', 'Who do I miss?'];
 var STATDESC = {
@@ -1576,9 +1965,9 @@ function curPB() { return PBD[S.sheet.playbook] || null; }
 function pbState() {
   var sh = S.sheet, k = sh.playbook || '_none';
   if (!sh.pbs || typeof sh.pbs !== 'object') sh.pbs = {};
-  if (!sh.pbs[k]) sh.pbs[k] = { rating: -1, look: {}, moves: {}, gear: {}, build: {}, extras: {}, imp: {} };
+  if (!sh.pbs[k]) sh.pbs[k] = { rating: -1, look: {}, moves: {}, gear: {}, build: {}, extras: {}, imp: {}, skill: {} };
   var st = sh.pbs[k];
-  ['look', 'moves', 'gear', 'build', 'extras', 'imp'].forEach(function (f) { if (!st[f] || typeof st[f] !== 'object') st[f] = {}; });
+  ['look', 'moves', 'gear', 'build', 'extras', 'imp', 'skill'].forEach(function (f) { if (!st[f] || typeof st[f] !== 'object') st[f] = {}; });
   if (typeof st.rating !== 'number') st.rating = -1;
   return st;
 }
@@ -1750,34 +2139,36 @@ function wizWho() {
     '<p>Just enough that the table can picture your hunter. You can change all of this later, and you will learn more about them as you play.</p>' +
     '<div class="wfield"><label class="lbl" for="w-name">Name</label><div class="wrow2"><input type="text" id="w-name" data-bind="sheet.name" autocomplete="off" placeholder="First and last name"><button class="btn ghost sm" type="button" id="wrand">Surprise me</button></div>' + wizSuggHTML() + '</div>' +
     '<div class="wfield"><label class="lbl" for="w-pron">Pronouns</label><input type="text" id="w-pron" data-bind="sheet.pronouns" autocomplete="off" placeholder="she/her, he/him, they/them"></div>' +
-    '<div class="wfield"><label class="lbl" for="w-catch">Catchphrase (optional)</label><input type="text" id="w-catch" data-bind="sheet.catch" autocomplete="off" placeholder="What you say when the fight turns">' + chips('data-wcatch', CATCHES) + '</div>' +
+    '<div class="wfield"><label class="lbl" for="w-catch">Catchphrase (optional)</label><input type="text" id="w-catch" data-bind="sheet.catch" autocomplete="off" placeholder="What you say when the fight turns"><div id="wcatchbox">' + catchHTML() + '</div></div>' +
     lk +
     '<div class="wfield"><label class="lbl" for="w-look">Anything else about their look?</label><textarea id="w-look" data-bind="sheet.look" placeholder="Scars, the way they carry themselves"></textarea>' + chips('data-wlook', LOOKS) + '</div>' +
     '<div class="wfield"><label class="lbl" for="w-back">Why do they hunt?</label><textarea id="w-back" data-bind="sheet.backstory" placeholder="A sentence or two is plenty"></textarea>' + chips('data-wback', BACKQ) + '</div>';
 }
 function wizSuggHTML() {
-  return '<div id="wsugg" aria-live="polite">' + (wizSugg.length ? '<p class="small muted" style="margin:10px 0 0">Tap one to use it, or tap Surprise me again for more.</p><ul class="chips">' + wizSugg.map(function (n, i) { return '<li><button type="button" class="chip" data-wsug="' + i + '">' + esc(n) + '</button></li>'; }).join('') + '</ul>' : '<p class="small muted" style="margin:8px 0 0">Stuck? Surprise me suggests names from the old Appalachian hollows, with a touch of the gothic.</p>') + '</div>';
+  return '<div id="wsugg" aria-live="polite">' + (wizSugg.length ? '<p class="small muted" style="margin:10px 0 0">Tap one to use it, or tap Surprise me again for more.</p><ul class="chips">' + wizSugg.map(function (n, i) { return '<li><button type="button" class="chip" data-wsug="' + i + '">' + esc(n) + '</button></li>'; }).join('') + '</ul>' : '<p class="small muted" style="margin:8px 0 0">Stuck? Surprise me suggests names, from plain to ridiculous: old Appalachian hollows, dry highways and scrap towns, bunkers, the bayou, the frontier and the tunnels.</p>') + '</div>';
 }
 
 /* ----- step 3: ratings ----- */
+/* The sheet says "pick one line", and that is all this step does. After that a rating only changes when the hunter levels up (or, for The Crooked, from the skill perk on the Moves step).
+   Once a hunter has levelled up the lines lock: tapping one would put the ratings back to the line and lose what the level-ups added. */
 function wizRatings() {
-  var d = curPB(), sh = S.sheet, tot = STATS.reduce(function (a, s) { return a + sh.stats[s]; }, 0);
+  var d = curPB(), sh = S.sheet, lock = sh.level > 0;
   var lines = '';
   if (d) {
     var st = pbState();
     lines = '<span class="lbl">Pick one line</span><div class="wopts" role="group" aria-label="Rating lines">' + d.ratings.map(function (r, i) {
-      return '<button type="button" class="wopt" data-wrate="' + i + '" aria-pressed="' + (st.rating === i) + '">' + STATS.map(function (s) { return '<span class="rc' + (r[s] >= 2 ? ' hi' : '') + '"><small>' + STATNAME[s] + '</small><b>' + fmt(r[s]) + '</b></span>'; }).join('') + '</button>';
-    }).join('') + '</div>';
+      return '<button type="button" class="wopt" data-wrate="' + i + '" aria-pressed="' + (st.rating === i) + '"' + (lock ? ' disabled' : '') + '>' + STATS.map(function (s) { return '<span class="rc' + (r[s] >= 2 ? ' hi' : '') + '"><small>' + STATNAME[s] + '</small><b>' + fmt(r[s]) + '</b></span>'; }).join('') + '</button>';
+    }).join('') + '</div>' + (lock ? '<p class="note" style="margin-top:12px">Your ratings only change when you level up, so the lines are locked.</p>' : '');
   }
   var rows = STATS.map(function (s) {
     var used = MOVES.filter(function (m) { return m.g === 'basic' && m.stat === s; }).map(function (m) { return m.name; });
     return '<div class="wstat"><div><b>' + STATNAME[s] + '</b><p class="small muted" style="margin:2px 0">' + STATDESC[s] + '</p>' + (used.length ? '<p class="small" style="margin:2px 0">Basic moves: ' + used.map(esc).join(', ') + '</p>' : '') + '</div>' +
-      '<div class="wctl"><button type="button" data-wsd="' + s + ':-1" aria-label="Lower ' + STATNAME[s] + '">&minus;</button><output data-wout="' + s + '">' + fmt(sh.stats[s]) + '</output><button type="button" data-wsd="' + s + ':1" aria-label="Raise ' + STATNAME[s] + '">+</button></div></div>';
+      '<div class="wctl"><output data-wout="' + s + '" aria-label="' + STATNAME[s] + ' now">' + fmt(sh.stats[s]) + '</output></div></div>';
   }).join('');
   return '<h2 class="sectitle" tabindex="-1">Set your ratings</h2>' +
-    '<p>Ratings are the five numbers you add to your 2d6 when you roll. A +1 means roll two dice and add 1. Your playbook offers a few ready-made sets. Pick the one that fits the hunter you imagine: highlighted numbers are the strong ones.</p>' +
+    '<p>Ratings are the five numbers you add to your 2d6 when you roll. A +1 means roll two dice and add 1. Your playbook gives you a few ready-made lines. Pick the one that fits the hunter you imagine: highlighted numbers are the strong ones.</p>' +
     (d ? lines : needPB()) +
-    '<details class="wex"' + (!d ? ' open' : '') + '><summary>What do the ratings mean? (and adjust by hand)</summary><div class="wstats">' + rows + '</div><p class="small muted" style="margin-top:12px">Total of your five ratings: <b data-wtot>' + fmt(tot) + '</b>. Only adjust by hand if your Keeper tells you to.</p></details>';
+    '<details class="wex"' + (!d ? ' open' : '') + '><summary>What do the ratings mean?</summary><div class="wstats">' + rows + '</div></details>';
 }
 
 /* ----- step 5: moves ----- */
@@ -1789,12 +2180,23 @@ function wizMoveCard(m, auto, picked) {
   var btn = auto ? '' : '<button type="button" class="btn ' + (picked ? '' : 'ghost') + ' sm" data-wmv="' + esc(m.id) + '" aria-pressed="' + picked + '">' + (picked ? 'Picked (tap to undo)' : 'Pick this move') + '</button>';
   return '<article class="wmove" data-picked="' + (!!picked || !!auto) + '">' + head + body + btn + '</article>';
 }
+/* The Crooked's Deal with the Devil move: one of its perks is skill, "+1 to two ratings". It is the one place the sheet changes ratings while you build, so it gets a picker here
+   rather than a hand adjuster. A rating never goes above +3, and the bonus comes off again if the move is put back. */
+var SKILLMOVE = 'crooked-deal-with-the-devil', wizSkillMsg = '';
+function skillClear(st) { STATS.forEach(function (s) { if (st.skill[s]) S.sheet.stats[s] -= 1; }); st.skill = {}; }
+function wizSkill(d, st) {
+  if (!d || d.id !== 'crooked' || !st.moves[SKILLMOVE]) return '';
+  var sh = S.sheet, lock = sh.level > 0;
+  return '<div class="wskill" style="margin-top:16px"><span class="lbl">Deal with the Devil: the skill perk</span><p class="small muted" style="margin:0 0 8px">If skill is one of the things you got out of the deal, pick the two ratings that go up by 1. If you took other perks, leave this alone.</p>' +
+    '<ul class="chips">' + STATS.map(function (s) { return '<li><button type="button" class="chip" data-wskill="' + s + '" aria-pressed="' + !!st.skill[s] + '"' + (lock ? ' disabled' : '') + '>' + STATNAME[s] + ' ' + fmt(sh.stats[s]) + (st.skill[s] ? ' (skill)' : '') + '</button></li>'; }).join('') + '</ul>' +
+    '<p class="small" id="wskillmsg" role="status" style="margin:6px 0 0">' + esc(wizSkillMsg) + '</p></div>';
+}
 function wizMoves() {
   var d = curPB(); if (!d) return '<h2 class="sectitle" tabindex="-1">Special moves</h2>' + needPB();
   var st = pbState(), n = countOn(st.moves);
   var auto = d.moves.auto.length ? '<span class="lbl">You get these automatically</span><div class="wmoves">' + d.moves.auto.map(function (m) { return wizMoveCard(m, true, true); }).join('') + '</div>' : '';
   var choices = d.moves.pick ? '<span class="lbl" style="margin-top:16px">Pick ' + d.moves.pick + ' of these</span>' + cnt(n, d.moves.pick) + '<p class="wmsg" id="wmsg" role="status"></p><div class="wmoves">' + d.moves.choices.map(function (m) { return wizMoveCard(m, false, !!st.moves[m.id]); }).join('') + '</div>' : '';
-  return '<h2 class="sectitle" tabindex="-1">Special moves</h2><p>' + esc(d.moves.intro) + ' Moves with a roll show up in the Roller automatically.</p>' + auto + choices +
+  return '<h2 class="sectitle" tabindex="-1">Special moves</h2><p>' + esc(d.moves.intro) + ' Moves with a roll show up in the Roller automatically.</p>' + auto + choices + wizSkill(d, st) +
     '<details class="wex"><summary>Add a move from another playbook, or your own</summary><div class="wfield"><label class="lbl" for="w-mvpaste">Paste a move from a sheet</label><textarea id="w-mvpaste" placeholder="Paste the move text, like: Tough as nails: When you take harm, roll +Tough. On a 10+, ... On a 7-9, ..."></textarea>' +
     '<div class="actions"><button class="btn sm" type="button" id="wmvparse">Add this move</button></div><p class="small muted" id="wmvmsg" role="status" style="margin:8px 0 0"></p></div></details>';
 }
@@ -1967,7 +2369,8 @@ function wizToggle(map, key, limit, what) {
       var pickd = wizSugg[+g.dataset.wsug]; if (!pickd) return;
       S.sheet.name = pickd; $('#w-name').value = pickd; wizPills(); renderRollas(); scheduleSave(); $('#w-name').focus(); return;
     }
-    if ((g = t.closest('[data-wcatch]'))) { S.sheet.catch = CATCHES[+g.dataset.wcatch]; $('#w-catch').value = S.sheet.catch; scheduleSave(); return; }
+    if (t.id === 'wcatchmore') { wizCatch = pickCatches(6); var cb = $('#wcatchbox'); if (cb) cb.innerHTML = catchHTML(); var cm = $('#wcatchmore'); if (cm) cm.focus(); return; }
+    if ((g = t.closest('[data-wcatch]'))) { var line = wizCatch[+g.dataset.wcatch]; if (line == null) return; S.sheet.catch = line; $('#w-catch').value = line; scheduleSave(); return; }
     if ((g = t.closest('[data-wlook]'))) { wizAppend('sheet.look', LOOKS[+g.dataset.wlook], 'w-look'); return; }
     if ((g = t.closest('[data-wback]'))) { wizAppend('sheet.backstory', BACKQ[+g.dataset.wback] + ' ', 'w-back', true); return; }
     if ((g = t.closest('[data-wlk]'))) {
@@ -1977,21 +2380,25 @@ function wizToggle(map, key, limit, what) {
     }
     if ((g = t.closest('[data-wrate]'))) {
       var i0 = +g.dataset.wrate, d1 = curPB(), st1 = pbState();
-      st1.rating = i0; STATS.forEach(function (s) { S.sheet.stats[s] = d1.ratings[i0][s]; });
+      if (S.sheet.level > 0 || !d1 || !d1.ratings[i0]) return;   // locked once the hunter has levelled up
+      st1.rating = i0; STATS.forEach(function (s) { S.sheet.stats[s] = d1.ratings[i0][s] + (st1.skill[s] ? 1 : 0); });
       renderWiz(false); renderSheet(); scheduleSave(); return;
     }
-    if ((g = t.closest('[data-wsd]'))) {
-      q = g.dataset.wsd.split(':'); var sh = S.sheet;
-      sh.stats[q[0]] = clamp(sh.stats[q[0]] + +q[1], -3, 5);
-      if (curPB()) pbState().rating = -1;
-      var out = $('[data-wout="' + q[0] + '"]'); if (out) out.textContent = fmt(sh.stats[q[0]]);
-      var tot = $('[data-wtot]'); if (tot) tot.textContent = fmt(STATS.reduce(function (a, s) { return a + sh.stats[s]; }, 0));
-      $$('.wopt').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
-      wizPills(); renderSheet(); scheduleSave(); return;
+    if ((g = t.closest('[data-wskill]'))) {
+      var s5 = g.dataset.wskill, sh5 = S.sheet, d5 = curPB(), st5 = pbState();
+      if (STATS.indexOf(s5) < 0 || sh5.level > 0 || !d5 || d5.id !== 'crooked' || !st5.moves[SKILLMOVE]) return;
+      if (st5.skill[s5]) { delete st5.skill[s5]; sh5.stats[s5] -= 1; wizSkillMsg = ''; }
+      else if (STATS.filter(function (x) { return st5.skill[x]; }).length >= 2) wizSkillMsg = 'Two ratings at most. Tap one you picked to take it back.';
+      else if (sh5.stats[s5] >= 3) wizSkillMsg = STATNAME[s5] + ' is already +3, the most a rating can be.';
+      else { st5.skill[s5] = true; sh5.stats[s5] += 1; wizSkillMsg = ''; }
+      renderWiz(false); renderSheet(); scheduleSave(); return;
     }
     if ((g = t.closest('[data-wmv]'))) {
       var d2 = curPB(), st2 = pbState();
-      if (wizToggle(st2.moves, g.dataset.wmv, d2.moves.pick, 'moves')) { syncPbMoves(); renderPbCard(); scheduleSave(); }
+      if (wizToggle(st2.moves, g.dataset.wmv, d2.moves.pick, 'moves')) {
+        if (!st2.moves[SKILLMOVE]) { skillClear(st2); wizSkillMsg = ''; renderSheet(); }   // put the move back and its skill bonus goes with it
+        syncPbMoves(); renderPbCard(); scheduleSave();
+      }
       renderWiz(false); return;
     }
     if ((g = t.closest('[data-wgg]'))) {
@@ -2128,6 +2535,7 @@ function advPanel() {
 }
 function levelDone(note, key) {
   var sh = S.sheet, st = curPB() ? pbState() : null;
+  evSay('Levelled up', true);
   if (st && key) st.imp[key] = true;
   sh.level++; sh.xp = Math.max(0, sh.xp - 5);
   if (note) sh.moves = (String(sh.moves || '').replace(/\s+$/, '') + (sh.moves ? '\n' : '') + 'Level ' + sh.level + ': ' + note).trim();
@@ -2212,7 +2620,7 @@ function renderSheet() {
   if (!sel.options.length) sel.innerHTML = '<option value="">Not chosen yet</option>' + PLAYBOOKS.map(function (p) { return '<option>' + esc(p[0]) + '</option>'; }).join('');
   $$('[data-bind]').forEach(function (el) { var v = getPath(S, el.dataset.bind); if (el.value !== v && document.activeElement !== el) el.value = v == null ? '' : v; });
   $('#sheetstats').innerHTML = STATS.map(function (s) {
-    return '<div class="sstat"><span class="lbl" style="margin:0">' + STATNAME[s] + '</span><div class="ctl"><button type="button" data-sd="' + s + ':-1" aria-label="Lower ' + STATNAME[s] + '">&minus;</button><output>' + fmt(sh.stats[s]) + '</output><button type="button" data-sd="' + s + ':1" aria-label="Raise ' + STATNAME[s] + '">+</button></div></div>';
+    return '<div class="sstat"><span class="lbl" style="margin:0">' + STATNAME[s] + '</span><output>' + fmt(sh.stats[s]) + '</output></div>';
   }).join('');
   $('#luck').innerHTML = luckPips(sh.luck); $('#luck').className = 'pips candles' + (sh.luck < 3 ? ' low' : '');
   $('#lucktxt').textContent = luckNote(sh.luck); $('#lucktxt').className = 'lucknote' + (sh.luck < 3 ? ' low' : '');
@@ -2235,8 +2643,6 @@ document.addEventListener('input', function (e) {
 });
 $('#p-hunter').addEventListener('click', function (e) {
   var t = e.target, sh = S.sheet;
-  var sd = t.closest('[data-sd]');
-  if (sd) { var q = sd.dataset.sd.split(':'); sh.stats[q[0]] = clamp(sh.stats[q[0]] + +q[1], -3, 5); renderSheet(); scheduleSave(); return; }
   var pb = t.closest('.pips button');
   if (pb) {
     var n = +pb.dataset.n, host = pb.parentElement.id;
@@ -2245,8 +2651,8 @@ $('#p-hunter').addEventListener('click', function (e) {
     if (host === 'xp') sh.xp = sh.xp === n ? n - 1 : n;
     renderSheet(); scheduleSave(); return;
   }
-  if (t.id === 'heal1') { sh.harm = Math.max(0, sh.harm - 1); if (sh.harm < 4) sh.unstable = false; renderSheet(); scheduleSave(); }
-  if (t.id === 'healall') { sh.harm = 0; sh.unstable = false; renderSheet(); scheduleSave(); }
+  if (t.id === 'heal1') { evSay('Healed 1'); sh.harm = Math.max(0, sh.harm - 1); if (sh.harm < 4) sh.unstable = false; renderSheet(); scheduleSave(); }
+  if (t.id === 'healall') { evSay('Healed all harm'); sh.harm = 0; sh.unstable = false; renderSheet(); scheduleSave(); }
   if (t.id === 'dolevel') { levelPanel(); }
 });
 $('#unstable').addEventListener('change', function (e) { S.sheet.unstable = e.target.checked; scheduleSave(); });
@@ -2291,6 +2697,7 @@ function photoMsg(t) { $('#photomsg').textContent = t || ''; }
 
 /* ---------- play screen ---------- */
 var play = { harm: 1, ignore: false, msg: '', wound: 0, want: '' };
+var rit = { open: false, caseId: '', eos: [false, false, false, false], heal: 'none', clear: true, done: null };   // the end-of-session panel; nothing it holds is saved
 /* what a new player says they want to do: the move that covers it, or a line of advice when no move does */
 var WANTS = [
   ['fight something', 'kick'], ['shield someone from harm', 'prot'], ['do something risky, or keep my nerve', 'act'], ['sneak, run, climb or dodge', 'act'],
@@ -2337,7 +2744,8 @@ function renderPlay() {
     '<div class="pblock"><span class="lbl">Luck</span>' + '<div class="pips candles' + (sh.luck < 3 ? ' low' : '') + '" id="pl-luck" role="group" aria-label="Luck">' + luckPips(sh.luck) + '</div><p class="lucknote' + (sh.luck < 3 ? ' low' : '') + '">' + luckNote(sh.luck) + '</p>' + (d ? '<p class="small muted" style="margin:6px 0 0"><b>When you spend Luck:</b> ' + esc(d.luckSpecial) + '</p>' : '') + '</div>' +
     '<div class="pblock"><span class="lbl">Experience</span>' + pipStr('pl-xp', '', 5, Math.min(sh.xp, 5), 'XP') + (sh.xp >= 5 ? '<div class="prow"><b>Level up ready.</b><button type="button" class="btn sm" data-pgo="sheet">Pick an improvement</button></div>' : '') + '</div>' +
     '<div class="pblock"><span class="lbl">This roll</span>' + stepStr('+1 forward', 'forward', fmt(R.forward), '(clears)') + stepStr('+1 ongoing', 'ongoing', fmt(R.ongoing)) + stepStr('Other', 'other', fmt(R.other), '(clears)') + stepStr('Hold', 'hold', S.hold.n) + '</div>' +
-    (gear ? '<div class="pblock"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '');
+    (gear ? '<div class="pblock"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '') +
+    '<div class="pblock"><button type="button" class="btn ghost sm" data-rit="open">End the session</button></div>';
 
   var basic = MOVES.filter(function (m) { return m.g === 'basic'; }), weird = MOVES.filter(function (m) { return m.g === 'weird'; });
   var mine = S.sheet.custom.map(function (c) { return BYID['x' + c.id]; }).filter(Boolean);
@@ -2352,6 +2760,7 @@ function renderPlay() {
       (!mine.length && !pass.length ? '<p class="small muted" style="margin:0">Moves you pick in Build a hunter show up here.</p>' : '') + '</div>' +
     '<div class="card" style="margin-top:16px"><details' + (weirdOpen ? ' open' : '') + ' id="pl-weird"><summary class="lbl" style="cursor:pointer;margin:0">Weird moves and plain rolls</summary><div class="pmoves" style="margin-top:10px">' + weird.map(pmoveBtn).join('') +
       '<button type="button" class="pmove" data-pmove="plain" aria-pressed="' + (R.move === 'plain') + '"><span>Plain roll</span><small>' + STATNAME[R.stat] + ' ' + fmt(sh.stats[R.stat]) + '</small></button></div></details></div>';
+  if (rit.open) $('#play-moves').innerHTML = ritualHTML();
 
   var mv = BYID[R.move] || PLAIN, m = bonus(), f = 0, p = 0, x = 0;
   for (var i = 1; i <= 6; i++) for (var j = 1; j <= 6; j++) { var t = i + j + m; if (t >= 10) f++; else if (t >= 7) p++; else x++; }
@@ -2384,13 +2793,15 @@ function renderPlay() {
     }
     if (t.id === 'pl-take') {
       var arm = play.ignore ? 0 : armorVal(), dmg = Math.max(0, play.harm - arm), before = sh.harm;
+      evSay('Took ' + dmg + ' harm' + (arm ? ' after armor' : ''));
       sh.harm = Math.min(8, sh.harm + dmg); if (sh.harm >= 4) sh.unstable = true;
       play.wound = sh.harm - before;
       play.msg = dmg ? 'Took ' + dmg + ' harm' + (arm ? ' (' + play.harm + ' less ' + arm + ' armor)' : '') + '. You are at ' + sh.harm + '.' : 'Your armor soaked all of it.';
       renderSheet(); scheduleSave(); return;
     }
-    if (t.id === 'pl-heal1') { sh.harm = Math.max(0, sh.harm - 1); if (sh.harm < 4) sh.unstable = false; play.wound = 0; play.msg = ''; renderSheet(); scheduleSave(); return; }
+    if (t.id === 'pl-heal1') { evSay('Healed 1'); sh.harm = Math.max(0, sh.harm - 1); if (sh.harm < 4) sh.unstable = false; play.wound = 0; play.msg = ''; renderSheet(); scheduleSave(); return; }
     if (t.id === 'pl-undo' && play.wound > 0 && sh.luck > 0) {
+      evSay('Spent Luck to cancel a wound');
       sh.harm = Math.max(0, sh.harm - play.wound); if (sh.harm < 4) sh.unstable = false; setLuck(sh.luck - 1);
       play.msg = 'Luck spent. That wound is cancelled. ' + sh.luck + ' Luck left.'; play.wound = 0;
       renderSheet(); scheduleSave(); return;
@@ -2399,6 +2810,193 @@ function renderPlay() {
   });
   host.addEventListener('change', function (e) { if (e.target.id === 'pl-ign') play.ignore = e.target.checked; });
 })();
+
+/* ---------- end of the session: a short guided panel on Play ---------- */
+/* It opens in place of the moves column and changes nothing until Finish. Then: XP is marked (once per case per session), harm is healed if chosen,
+   the roller's bonuses and hold are cleared, tonight's timeline is written into the chosen case's log, and a fresh timeline starts. */
+function localDate() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+function ritCase() { return S.cases.filter(function (c) { return c.id === rit.caseId; })[0] || null; }
+/* XP was already added to this case since the timeline began, by Finish or by the case file's own button */
+function ritApplied(c) { return !!(c && c.xpApplied && (+c.xpAt || 0) > (+S.session.started || 0)); }
+function ritXp() { return ritApplied(ritCase()) ? 0 : eosXp({ eos: rit.eos }); }
+function ritPick(id) {
+  var c, none = [false, false, false, false];
+  rit.caseId = id; c = ritCase();
+  rit.eos = !c || (c.xpApplied && !ritApplied(c)) ? none : [0, 1, 2, 3].map(function (i) { return !!(c.eos && c.eos[i]); });   // answers left over from an earlier session do not carry over
+}
+function ritOpen() {
+  var first = S.cases.filter(function (c) { return !c.example; })[0];
+  rit.open = true; rit.done = null; rit.heal = 'none'; rit.clear = true; ritPick(first ? first.id : '');
+  renderPlay();
+  var h = $('#rit-h'); if (h) { h.focus(); h.scrollIntoView({ block: 'start' }); }
+}
+function ritClose() { rit.open = false; rit.done = null; renderPlay(); }
+/* what happened, oldest first, one line each */
+function ritTimeline() {
+  return evList().slice().reverse().map(function (ev) {
+    if (ev.kind === 'roll' && ev.r) { var r = ev.r, m = +r.mod || 0; return r.name + ': ' + r.total + ' (' + r.d1 + '+' + r.d2 + ' ' + (m < 0 ? '-' : '+') + Math.abs(m) + '), ' + String(TIERNAME[r.tier] || '').toLowerCase(); }
+    return evText(ev);
+  }).filter(Boolean);
+}
+function ritPlan() {
+  var sh = S.sheet, c = ritCase(), xp = ritXp(), bits = [];
+  bits.push(xp ? 'mark ' + xp + ' XP (you have ' + sh.xp + ')' : ritApplied(c) ? 'leave XP alone (already added for this case tonight)' : 'mark no XP');
+  if (sh.harm > 0 && rit.heal === 'one') bits.push('heal 1 harm');
+  if (sh.harm > 0 && rit.heal === 'all') bits.push('heal all harm');
+  if (rit.clear) bits.push('clear forward, ongoing, other and hold');
+  bits.push(c ? 'write tonight into "' + (c.title || 'Untitled mystery') + '"' : 'write no log (no case chosen)');
+  bits.push('start a fresh timeline');
+  return 'Finish will ' + bits.join(', ') + '.';
+}
+function ritualHTML() {
+  var sh = S.sheet;
+  if (rit.done) {
+    var d = rit.done;
+    return '<div class="card ritual"><h3 id="rit-h" tabindex="-1">Session ended</h3><p>' + esc(d.line) + '</p>' +
+      '<textarea id="rit-text" readonly rows="8" aria-label="What was written for tonight">' + esc(d.text) + '</textarea>' +
+      '<div class="actions" style="align-items:center"><button class="btn ghost sm" type="button" data-rit="copy">Copy this</button><span class="small muted" id="rit-msg" role="status"></span></div>' +
+      bkNudge('Session over. Save what happened tonight.') +
+      '<div class="actions"><button class="btn" type="button" data-rit="close">Close</button></div></div>';
+  }
+  var xp = ritXp(), c = ritCase();
+  var cases = '<option value="">No case: write no log</option>' + S.cases.map(function (k) { return '<option value="' + esc(k.id) + '"' + (k.id === rit.caseId ? ' selected' : '') + '>' + esc(k.title || 'Untitled mystery') + (k.example ? ' (example)' : '') + '</option>'; }).join('');
+  var qs = EOS.map(function (q, i) { return '<label><input type="checkbox" data-riteos="' + i + '"' + (rit.eos[i] ? ' checked' : '') + '><span>' + esc(q) + '</span></label>'; }).join('');
+  var hurt = sh.harm > 0, heal = function (v, label) { return '<label><input type="radio" name="ritheal" value="' + v + '"' + (rit.heal === v ? ' checked' : '') + (hurt || v === 'none' ? '' : ' disabled') + '><span>' + label + '</span></label>'; };
+  return '<div class="card ritual"><h3 id="rit-h" tabindex="-1">End the session</h3>' +
+    '<p class="small muted">Answer the Keeper\'s four questions, collect your XP, heal if the mystery is over, and write tonight into your case file. Nothing changes until you press Finish.</p>' +
+    '<div><label class="lbl" for="rit-case">1. Which case was this?</label><select id="rit-case">' + cases + '</select></div>' +
+    '<div style="margin-top:14px"><span class="lbl">2. The Keeper\'s four questions</span><div class="eos">' + qs + '</div></div>' +
+    '<div style="margin-top:14px"><span class="lbl">3. Experience</span><p style="margin:0">' + (ritApplied(c) ? 'XP for this case is already on your sheet tonight.' : 'XP to mark: <b>' + xp + '</b>. One or two yes answers is 1 XP, three or four is 2.') + '</p></div>' +
+    '<div style="margin-top:14px"><span class="lbl">4. Healing</span><p class="small muted" style="margin:0 0 6px">Healing is for when a mystery ends. ' + (hurt ? 'You have ' + sh.harm + ' harm.' : 'You are unhurt.') + '</p><div class="eos">' +
+      heal('none', 'Not now') + heal('one', 'No chance to rest: heal 1 harm') + heal('all', 'Plenty of time: heal all harm') + '</div></div>' +
+    '<div style="margin-top:14px"><span class="lbl">5. Clean up</span><div class="eos"><label><input type="checkbox" id="rit-clear"' + (rit.clear ? ' checked' : '') + '><span>Clear forward, ongoing, other and any hold</span></label></div></div>' +
+    '<p class="note" id="rit-plan" style="margin-top:14px">' + esc(ritPlan()) + '</p>' +
+    '<div class="actions"><button class="btn" type="button" data-rit="finish">Finish the session</button><button class="btn ghost" type="button" data-rit="cancel">Cancel</button></div></div>';
+}
+function ritFinish() {
+  var sh = S.sheet, R = S.roller, c = ritCase(), xp = ritXp(), did = [], yes;
+  var lines = ritTimeline(), asked = EOS.filter(function (q, i) { return rit.eos[i]; });
+  if (xp) { sh.xp = Math.min(sh.xp + xp, 9); did.push('Marked ' + xp + ' XP.'); }
+  if (sh.harm > 0 && rit.heal === 'one') { sh.harm = Math.max(0, sh.harm - 1); if (sh.harm < 4) sh.unstable = false; did.push('Healed 1 harm.'); }
+  if (sh.harm > 0 && rit.heal === 'all') { sh.harm = 0; sh.unstable = false; did.push('Healed all harm.'); }
+  if (rit.clear) { R.forward = 0; R.ongoing = 0; R.other = 0; S.hold = { n: 0, move: '', asked: [] }; did.push('Cleared forward, ongoing, other and hold.'); }
+  var head = 'Session ended ' + localDate() + (String(sh.name || '').trim() ? ' (' + String(sh.name).trim() + ')' : '') + '.';
+  yes = asked.length ? 'Yes to: ' + asked.map(function (q) { return q.replace(/^Did we /, '').replace(/\?$/, ''); }).join('; ') + '.' : 'No yes answers to the end-of-session questions.';
+  var text = [head, yes, did.join(' '), lines.length ? 'What happened, oldest first:' : 'Nothing was logged.'].concat(lines.map(function (l) { return '- ' + l; })).filter(Boolean).join('\n');
+  var again = ritApplied(c) && !lines.length;   // this session was already written into the case and nothing has happened since
+  if (c && !again) {
+    if (!ritApplied(c)) { c.eos = rit.eos.slice(); if (xp) { c.xpApplied = true; c.xpAt = Date.now(); } }
+    c.example = false; c.log = (String(c.log || '').replace(/\s+$/, '') + (c.log ? '\n\n' : '') + text);
+  }
+  evBase();   // the changes above are part of this ritual, not new lines
+  S.session = { started: 0, events: [] }; evToastShow(null);   // started stays 0 until the next event, so XP just added still counts as tonight's
+  play.wound = 0; play.msg = '';
+  rit.done = { line: !c ? 'No case was chosen, so nothing was written to a case file.' : again ? 'Nothing new to write: tonight is already in "' + (c.title || 'Untitled mystery') + '".' : 'Written into "' + (c.title || 'Untitled mystery') + '".', text: text };
+  renderSheet(); renderRoller(); renderPlay(); renderCases(); scheduleSave();
+  var h = $('#rit-h'); if (h) { h.focus(); h.scrollIntoView({ block: 'start' }); }
+}
+(function ritEvents() {
+  var host = $('#p-play');
+  host.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-rit]'); if (!b) return;
+    var k = b.dataset.rit;
+    if (k === 'open') ritOpen();
+    else if (k === 'cancel' || k === 'close') ritClose();
+    else if (k === 'finish') ritFinish();
+    else if (k === 'copy') {
+      var t = rit.done && rit.done.text || '', m = $('#rit-msg');
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(function () { if (m) m.textContent = 'Copied.'; }, function () { if (m) m.textContent = 'Copying was blocked here. Select the text and copy it.'; });
+      else if (m) m.textContent = 'Copying is not available here. Select the text and copy it.';
+    }
+  });
+  host.addEventListener('change', function (e) {
+    var t = e.target, back;   // back: how to find the same control again, because the panel redraws
+    if (t.id === 'rit-case') { ritPick(t.value); back = '#rit-case'; }
+    else if (t.dataset && t.dataset.riteos != null) { rit.eos[+t.dataset.riteos] = t.checked; back = '[data-riteos="' + t.dataset.riteos + '"]'; }
+    else if (t.name === 'ritheal') { rit.heal = t.value; back = 'input[name="ritheal"][value="' + t.value + '"]'; }
+    else if (t.id === 'rit-clear') { rit.clear = t.checked; back = '#rit-clear'; }
+    else return;
+    renderPlay();
+    var f = $(back); if (f) f.focus();   // keep the keyboard where it was
+  });
+})();
+
+/* ---------- more than one hunter ---------- */
+/* The hunter in play is always S.sheet and S.hold, so nothing else in the page has to know there can be more. Spare hunters sit on S.bench as
+   { id, sheet, hold, parked, ended }, where ended is null or { how, note, date } for a hunter who died, retired or was lost.
+   Per hunter: the sheet and the hold. Per player, and left alone when hunters change: dice, settings, cases, bestiary, the timeline, backups. */
+var hn = { retiring: false, del: '' };
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+/* a bench entry made from the hunter in play: a copy, so the swap can never lose anything */
+function benchOf(ended) { return { id: uid(), sheet: clone(S.sheet), hold: clone(S.hold), parked: Date.now(), ended: ended || null }; }
+function benchFind(id) { for (var i = 0; i < S.bench.length; i++) if (S.bench[i].id === id) return i; return -1; }
+/* Anything that came from a saved file or a backup is checked and filled in with the current defaults, so an old or odd entry can still be played. */
+function benchClean() {
+  var list = Array.isArray(S.bench) ? S.bench : [];
+  S.bench = list.filter(function (e) { return e && typeof e === 'object' && e.sheet && typeof e.sheet === 'object' && !Array.isArray(e.sheet); }).slice(0, 40).map(function (e) {
+    var en = e.ended && typeof e.ended === 'object' ? { how: ['died', 'retired', 'lost'].indexOf(e.ended.how) >= 0 ? e.ended.how : 'lost', note: String(e.ended.note || '').slice(0, 200), date: String(e.ended.date || '').slice(0, 10) } : null;
+    return { id: typeof e.id === 'string' && /^[\w-]{1,40}$/.test(e.id) ? e.id : uid(), sheet: merge(defaults().sheet, e.sheet), hold: merge(defaults().hold, e.hold && typeof e.hold === 'object' ? e.hold : {}), parked: +e.parked || 0, ended: en };
+  });
+}
+function takeHunter(h, build) {
+  S.sheet = h.sheet; S.hold = h.hold;
+  var R = S.roller; R.forward = 0; R.ongoing = 0; R.other = 0;
+  last = null; play.wound = 0; play.msg = ''; rit.open = false; rit.done = null;
+  evList().forEach(function (e) { e.nu = true; });   // a line about the old hunter must not undo anything on the new one
+  evBase();
+  S.wiz = 0; S.hv = build ? 'build' : 'sheet';
+}
+function hunterChanged() {
+  hn.retiring = false; hn.del = '';
+  renderBuild(); renderSheet(); renderPortrait(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderPlay(); renderParty(); renderStart(); renderHunters(); setHV(S.hv);
+  scheduleSave(); window.scrollTo(0, 0);
+}
+function newHunter() { if (rolling) return; S.bench.unshift(benchOf(null)); takeHunter({ sheet: defaults().sheet, hold: defaults().hold }, true); hunterChanged(); }
+function switchHunter(id) {
+  var i = benchFind(id); if (i < 0 || rolling) return;
+  var e = S.bench.splice(i, 1)[0]; e.ended = null;   // bringing back a hunter who was marked gone clears that
+  S.bench.unshift(benchOf(null)); takeHunter(e, false); hunterChanged();
+}
+/* the hunter in play goes to the shelf; the next spare takes over, or a blank one if there is none */
+function retireHunter(how, note) {
+  if (rolling) return;
+  var gone = benchOf({ how: ['died', 'retired', 'lost'].indexOf(how) >= 0 ? how : 'lost', note: String(note || '').replace(/\s+/g, ' ').trim().slice(0, 200), date: localDate() });
+  var next = S.bench.filter(function (e) { return !e.ended; })[0];
+  S.bench.unshift(gone);
+  if (next) { S.bench.splice(benchFind(next.id), 1); takeHunter(next, false); } else takeHunter({ sheet: defaults().sheet, hold: defaults().hold }, true);
+  hunterChanged();
+}
+var ENDHOW = { died: 'Died', retired: 'Retired', lost: 'Lost' };
+function renderHunters() {
+  var el = $('#hbar'); if (!el) return;
+  var sh = S.sheet, spare = S.bench.filter(function (e) { return !e.ended; }), gone = S.bench.filter(function (e) { return e.ended; });
+  function nm(h) { return esc(String(h.sheet.name || '').trim() || 'Unnamed hunter'); }
+  function sub(h) { return esc(h.sheet.playbook || 'No playbook yet') + ' &middot; Level ' + (+h.sheet.level || 0); }
+  function del(e) { return '<button type="button" class="btn ghost sm" data-hn="del" data-id="' + esc(e.id) + '">' + (hn.del === e.id ? 'Press again to delete for good' : 'Delete') + '</button>'; }
+  var h = '<div class="card hunters"><div class="hwho"><span class="lbl" style="margin:0">Playing</span><b>' + esc(String(sh.name || '').trim() || 'Unnamed hunter') + '</b><span class="muted small">' + esc(sh.playbook || 'No playbook yet') + '</span></div>';
+  if (hn.retiring) {
+    h += '<div class="hret"><label class="lbl" for="hn-how">What happened to them?</label><select id="hn-how"><option value="died">Died</option><option value="retired">Retired</option><option value="lost">Lost (missing or gone)</option></select>' +
+      '<label class="lbl" for="hn-note">A line to remember them by (optional)</label><input type="text" id="hn-note" maxlength="200" placeholder="Saved the town, and paid for it">' +
+      '<div class="actions"><button type="button" class="btn sm" data-hn="retire-go">Confirm</button><button type="button" class="btn ghost sm" data-hn="retire-no">Cancel</button></div>' +
+      '<p class="small muted" style="margin:0">They move to the shelf below and your next hunter takes over, or a blank one if you have none. You can bring them back.</p></div>';
+  } else h += '<div class="actions"><button type="button" class="btn ghost sm" data-hn="new">New hunter</button><button type="button" class="btn ghost sm" data-hn="retire">Retire or mark lost</button></div>';
+  if (spare.length) h += '<span class="lbl" style="margin-top:14px">Other hunters</span><ul class="hlist">' + spare.map(function (e) { return '<li><span class="htxt"><b>' + nm(e) + '</b><p class="small muted">' + sub(e) + '</p></span><span class="hbtns"><button type="button" class="btn sm" data-hn="switch" data-id="' + esc(e.id) + '">Play this hunter</button>' + del(e) + '</span></li>'; }).join('') + '</ul>';
+  if (gone.length) h += '<span class="lbl" style="margin-top:14px">Gone but not forgotten</span><ul class="hlist">' + gone.map(function (e) { return '<li><span class="htxt"><b>' + nm(e) + '</b> <span class="muted small">' + esc(ENDHOW[e.ended.how] || 'Gone') + (e.ended.date ? ' &middot; ' + esc(e.ended.date) : '') + '</span><p class="small muted">' + sub(e) + (e.ended.note ? ' &middot; ' + esc(e.ended.note) : '') + '</p></span><span class="hbtns"><button type="button" class="btn ghost sm" data-hn="back" data-id="' + esc(e.id) + '">Bring back</button>' + del(e) + '</span></li>'; }).join('') + '</ul>';
+  el.innerHTML = h + '</div>';
+}
+$('#hbar').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-hn]'); if (!b) return;
+  var k = b.dataset.hn, id = b.dataset.id;
+  if (k === 'new') newHunter();
+  else if (k === 'retire') { hn.retiring = true; renderHunters(); var f = $('#hn-how'); if (f) f.focus(); }
+  else if (k === 'retire-no') { hn.retiring = false; renderHunters(); }
+  else if (k === 'retire-go') retireHunter($('#hn-how').value, $('#hn-note').value);
+  else if (k === 'switch' || k === 'back') switchHunter(id);
+  else if (k === 'del') {
+    if (hn.del === id) { var i = benchFind(id); if (i >= 0) S.bench.splice(i, 1); hn.del = ''; renderHunters(); scheduleSave(); }
+    else { hn.del = id; renderHunters(); setTimeout(function () { if (hn.del === id) { hn.del = ''; renderHunters(); } }, 4000); }
+  }
+});
 $('#photo').addEventListener('change', function (e) {
   var f = e.target.files && e.target.files[0]; e.target.value = '';
   if (!f) return;
@@ -2499,7 +3097,7 @@ function caseHTML(c, idx, total) {
     ta('log', 'Session log', 'What happened, in order') +
     (caps.sample || c.recap ? '<div class="recap"><label class="lbl" for="' + c.id + 'recap">Previously on... (a cold open for your next session)</label><textarea id="' + c.id + 'recap" data-f="recap" placeholder="Press the button and Claude writes a cold open from your notes. You can edit it.">' + esc(c.recap) + '</textarea>' + (caps.sample ? '<div class="actions" style="align-items:center"><button class="btn sm" type="button" data-recap>Write a recap</button><button class="btn ghost sm" type="button" data-recapstop hidden>Stop</button><span class="small muted" data-recapmsg role="status"></span></div>' : '') + '</div>' : '') +
     '<div><span class="lbl">The clock (how far the mystery has gone)</span><div class="clock">' + clock + '</div></div>' +
-    '<div><span class="lbl">End of session</span><div class="eos">' + eos + '</div><div class="actions" style="align-items:center"><span>XP for this session: <b>' + xp + '</b></span><button class="btn sm" type="button" data-applyxp ' + (c.xpApplied || !xp ? 'disabled' : '') + '>' + (c.xpApplied ? 'Added to my sheet' : 'Add to my sheet') + '</button></div>' + (c.xpApplied ? bkNudge('Session over? Save what happened tonight.') : '') + '</div>' +
+    '<div><span class="lbl">End of session</span><div class="eos">' + eos + '</div><div class="actions" style="align-items:center"><span>XP for this session: <b>' + xp + '</b></span><button class="btn sm" type="button" data-applyxp ' + (c.xpApplied || !xp ? 'disabled' : '') + '>' + (c.xpApplied ? 'Added to my sheet' : 'Add to my sheet') + '</button></div>' + '</div>' +
     '<div class="actions"><button class="btn ghost sm" type="button" data-tobest>Add a monster to the Bestiary</button><button class="btn ghost sm" type="button" data-del>Delete this case</button></div></div></details>';
 }
 function renderCases() {
@@ -2538,7 +3136,7 @@ $('#cases').addEventListener('click', function (e) {
   }
   var ck = e.target.closest('[data-clock]');
   if (ck) { var v = +ck.dataset.clock; c.clock = c.clock === v ? v - 1 : v; rerenderCase(c); scheduleSave(); return; }
-  if (e.target.hasAttribute('data-applyxp')) { c.xpApplied = true; S.sheet.xp = Math.min(S.sheet.xp + eosXp(c), 9); renderSheet(); rerenderCase(c); scheduleSave(); return; }
+  if (e.target.hasAttribute('data-applyxp')) { evSay('XP from the end of a session'); c.xpApplied = true; c.xpAt = Date.now(); S.sheet.xp = Math.min(S.sheet.xp + eosXp(c), 9); renderSheet(); rerenderCase(c); scheduleSave(); return; }
   if (e.target.hasAttribute('data-del')) {
     if (delArm === c.id) { S.cases = S.cases.filter(function (x) { return x.id !== c.id; }); delArm = null; renderCases(); scheduleSave(); }
     else { delArm = c.id; e.target.textContent = 'Press again to delete'; setTimeout(function () { if (delArm === c.id) { delArm = null; if (e.target.isConnected) e.target.textContent = 'Delete this case'; } }, 3000); }
@@ -2799,7 +3397,7 @@ function renderParty() {
   var dl = $('#partynames');
   if (dl) dl.innerHTML = party.docs.filter(function (d) { return d.id !== store.uid && d.name; }).map(function (d) { return '<option value="' + esc(d.name) + '">'; }).join('');
   if (!store.db || !store.uid) {
-    host.innerHTML = '<div class="empty"><b>The table needs a signed-in view of this page.</b><br>Open the journal from claude.ai while signed in and your whole group can see each other here.</div>';
+    host.innerHTML = '<div class="empty"><b>The shared table is not switched on yet.</b><br>When it is, everyone\'s hunters will show up here as the game goes. Until then, make a hunter card and drop it in your group chat.<br><button class="btn sm" type="button" data-hcard style="margin-top:12px">Save hunter card</button></div>';
     return;
   }
   var docs = party.docs.slice().sort(function (a, b) { return (a.id === store.uid ? -1 : b.id === store.uid ? 1 : 0) || String(a.name || '').localeCompare(String(b.name || '')); });
@@ -2881,7 +3479,31 @@ function fxPlay(kind) {
 var caps = { dl: null, sample: null };
 function bkMsg(t) { $('#bk-msg').textContent = t || ''; }
 function backupText() { return JSON.stringify({ app: 'hunters-journal', v: 1, exported: new Date().toISOString(), journal: S }, null, 1); }
+/* Look: light or dark, and an ink. The colors themselves are CSS (see the inks near the top); this only sets two attributes on the page.
+   l and d are the swatch colors and must match each ink's accent in the CSS: tests/t18.js checks that they do. */
+var INKS = [
+  { id: '', name: 'Oxblood', l: '#8c1d2b', d: '#e0675b' }, { id: 'moss', name: 'Graveyard moss', l: '#2f6b3a', d: '#7fcf8e' }, { id: 'midnight', name: 'Midnight blue', l: '#28509a', d: '#86abf2' },
+  { id: 'brass', name: 'Brass', l: '#7a5a0e', d: '#e2b955' }, { id: 'rust', name: 'Rust', l: '#a3410d', d: '#f0894a' }, { id: 'dust', name: 'Dust', l: '#6b5630', d: '#d9bf8f' }
+];
+function applyLook() {
+  var st = S.settings, root = document.documentElement, th = st.theme === 'light' || st.theme === 'dark' ? st.theme : 'auto';
+  var ink = INKS.filter(function (i) { return i.id && i.id === st.ink; })[0] ? st.ink : '';
+  if (th === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', th);
+  if (ink) root.setAttribute('data-ink', ink); else root.removeAttribute('data-ink');
+  $$('[data-look]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.look === th)); });
+  var box = $('#inks');
+  if (box && !box.firstChild) box.innerHTML = INKS.map(function (i) { return '<button type="button" class="inkbtn" data-ink="' + i.id + '" style="--sl:' + i.l + ';--sd:' + i.d + '"><i></i>' + esc(i.name) + '</button>'; }).join('');
+  $$('.inkbtn').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.ink === ink)); });
+}
+$('#settings').addEventListener('click', function (e) {
+  var l = e.target.closest('[data-look]'), k = e.target.closest('.inkbtn');
+  if (l) S.settings.theme = l.dataset.look;
+  else if (k) S.settings.ink = k.dataset.ink;
+  else return;
+  applyLook(); scheduleSave();
+});
 function renderSettings() {
+  applyLook();
   $('#set-fx').checked = !!S.settings.fx; $('#set-snd').checked = !!S.settings.sound; $('#set-vol').value = Math.round(volNow() * 100); $('#set-3d').checked = !!S.settings.dice3d;
 }
 $('#set-fx').addEventListener('change', function (e) { S.settings.fx = e.target.checked; scheduleSave(); if (e.target.checked) fxPlay('crit'); });
@@ -2932,7 +3554,7 @@ $('#rs-check').addEventListener('click', function () { var t = $('#rs-text').val
 $('#rs-confirm').addEventListener('click', function (e) {
   if (e.target.id === 'rs-no') { restoreStaged = null; $('#rs-confirm').innerHTML = ''; bkMsg('Restore cancelled.'); return; }
   if (e.target.id === 'rs-go' && restoreStaged) {
-    S = merge(defaults(), restoreStaged); restoreStaged = null;
+    S = merge(defaults(), restoreStaged); restoreStaged = null; benchClean(); evBase();
     $('#rs-confirm').innerHTML = ''; $('#rs-text').value = '';
     renderAll(); flushNow(); showTab('hunter'); bkMsg('Journal restored.');
   }
@@ -4017,7 +4639,8 @@ function doRoll() {
     last = { move: R.move, stat: R.stat, statVal: sv, fwd: R.forward, ong: R.ongoing, oth: R.other, d1: d1, d2: d2, total: d1 + d2 + sv + R.forward + R.ongoing + R.other, luck: false, xpMarked: false };
     S.rolls.unshift({ name: mv.id === 'plain' ? STATNAME[R.stat] + ' roll' : mv.name, d1: d1, d2: d2, mod: last.total - d1 - d2, total: last.total, tier: tierOf(last.total) });
     S.rolls = S.rolls.slice(0, 30); S.start.rolled = true;
-    if (HOLDS[R.move] && tierOf(last.total) !== 'miss') { S.hold = { n: HOLDS[R.move][tierOf(last.total)], move: R.move, asked: [] }; last.hold = true; }
+    last.evid = evRoll({ name: S.rolls[0].name, d1: d1, d2: d2, mod: S.rolls[0].mod, total: last.total, tier: S.rolls[0].tier });
+    if (HOLDS[R.move] && tierOf(last.total) !== 'miss') { S.hold = { n: HOLDS[R.move][tierOf(last.total)], move: R.move, asked: [] }; last.hold = true; evSkip('hold'); }   // the hold is part of the roll's line
     R.forward = 0; R.other = 0;
     renderRoller(); scheduleSave(); popSum();
     hitTimers.forEach(clearTimeout); hitTimers = [];
@@ -4213,7 +4836,7 @@ document.addEventListener('change', function (e) {
 
 /* ---------- boot ---------- */
 function renderAll() {
-  renderGuide(); renderBuild(); renderSheet(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderDice(); renderCases(); renderBeasts(); renderSettings(); renderParty(); renderStart(); setHV(S.hv); d3Apply();
+  renderGuide(); renderBuild(); renderSheet(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderDice(); renderCases(); renderBeasts(); renderSettings(); renderParty(); renderStart(); renderHunters(); setHV(S.hv); d3Apply();
 }
 renderAll();
 var h0 = location.hash.replace('#', '');

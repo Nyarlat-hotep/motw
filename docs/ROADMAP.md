@@ -1,5 +1,7 @@
 # Roadmap: shared login and a live party table
 
+> **Partly out of date (2026-10-09).** The site now runs on Cloudflare Workers behind Cloudflare Access, not on Vercel or Netlify, and the Party tab does not work there because it still reads its table from `window.claude`. The current plan is track G of [WORKPLAN.md](WORKPLAN.md): Cloudflare first, Supabase only if the trial (G0) fails. This file is kept as the plan for the Supabase option.
+
 ## Why
 Inside claude.ai the page saved to the viewer's account and shared a Party card through `window.claude` (db, user, sample, downloads). Outside claude.ai those are absent, so the app silently falls back to localStorage and the Party tab is empty. Goal: friends sign in on a hosted site and see each other's cards.
 

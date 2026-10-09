@@ -24,10 +24,12 @@ Saves go to the browser's localStorage. Use Settings and backup in the app to do
     vendor/              three.js for the 3D dice, and licenses
     data/                the 12 playbooks as JSON (see data/SCHEMA.md)
     tools/               scripts that make the generated files (textures, sigils, sounds, lighting, embedded playbooks)
+    worker/              the shared table's Cloudflare Worker (a trial; not connected to the page yet)
     tests/               Playwright checks (npm install, then npm test)
     docs/TODO.md         the running list: what is left and who it is waiting on
     docs/SPEC.md         feature specs
-    docs/ROADMAP.md      the plan for shared login and a live party table
+    docs/WORKPLAN.md     the remaining work cut into chunks, with a proposed order
+    docs/ROADMAP.md      the older plan for shared login and a live party table (Supabase)
     CLAUDE.md            how the code is laid out
 
 `npm run build` copies what the site needs into `dist/` for hosting. Pushing `main` deploys it.
