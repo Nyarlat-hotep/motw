@@ -1,67 +1,60 @@
 # To do
 
-Last tidied 2026-10-09. Next session is around 2026-10-19. Feature details are in [SPEC.md](SPEC.md); the remaining work is cut into chunks in [WORKPLAN.md](WORKPLAN.md); this is the running list of what is left and who it is waiting on. Finished work is not listed here: it is in the git history.
+Last tidied 2026-10-09 (afternoon). **The first session moved up: it is now Wednesday 2026-10-14.** Jacob wants to share the site with the group over the weekend of 2026-10-10. Feature details are in [SPEC.md](SPEC.md); the remaining work is cut into chunks in [WORKPLAN.md](WORKPLAN.md); this is the running list of what is left and who it is waiting on. Finished work is not listed here: it is in the git history.
 
 ## Start here next time
 
-Written 2026-10-09, after the work plan was cut into chunks and a first batch of it was built.
+Written 2026-10-09, after the shared table and the Keeper's area were built against the local Worker.
 
-1. **Hear what Jacob found.** He is trying the live site: the candles, the hunter card, the Start here card and the "I want to..." list on Play are all new and none has had a second look. Fix what he reports first.
-2. **Try what was built on 2026-10-09** (committed on the branch `workplan-wave1`, not merged and not pushed, so not live). Every test passes. Say what to change before any of it goes live.
-   - On Play: Copy for chat on the result card, This session with Undo, End the session.
-   - Under Settings: the Look and ink choice (six inks, two for The Long Dry).
-   - On the Hunter tab: New hunter, Switch, Retire or mark lost, and the shelf.
-   - In the Guide: the Keeper's guide, "Running the game".
-   - In the builder: **Surprise me** now deals names from six worlds (plain, funny and over the top), and **More ideas** under Catchphrase deals new lines. **Ratings are now only the line you pick**, plus level-ups; the adjust-by-hand buttons are gone from the builder, My sheet and the Roller. The Crooked's skill perk has its own picker on the Moves step.
-3. **Backend trial (G0): the local half passed** (50 checks against a real local Worker and Durable Object, with two browsers as two players). A card change reached the other browser in 7 ms; a closed connection catches up on return; a 600 KB picture goes up and comes back with the right headers; forged identities are refused. What is left needs a Cloudflare account: a login on this machine (`npx wrangler login`), the Access team name and application audience tag from the Zero Trust dashboard, and a decision on how to test behind Access (a throwaway hostname in the Access policy, or approval to put a dormant Worker on `main`). `wrangler` is installed (yes from Jacob, 2026-10-09). Tracks G and H carry on from here once that is settled.
-4. **Carry on down the work plan** (WORKPLAN.md, "Proposed order"): the table seam (G1) needs no approvals and prepares the client for the Worker.
-
-Still blocking the first session: the other players cannot open the site until their emails are on the Cloudflare Access list (below).
+1. **Sharing the link this weekend.** The live site (`hunters-journal.jcantrell1993.workers.dev`) is behind Cloudflare Access, so a link in Discord works for exactly the people on the Access list and nobody else. **Jacob:** add each friend's email to the Access policy (Zero Trust dashboard, Access, Applications, the hunters-journal application, its policy). Each friend opens the link, types their email, and gets a one-time code by email. Nothing in the code needs to change for this.
+2. **Everything built on 2026-10-09 is on `main` and was pushed that afternoon, on Jacob's go-ahead**, so it is what the group sees: the morning's batch (copy for chat, the timeline with undo, the end-of-session ritual, looks and inks, more than one hunter, the Keeper's guide, new names, ratings only from the sheet) and the shared table with the Keeper's area. Every test passed before the push. Jacob had not tried the morning's batch first, so expect notes from him and fix those before anything new.
+3. **The shared table has not yet been seen working on the real Cloudflare account.** It passed against the local Worker (`tests/t25.js`, 84 checks, with the Keeper and two players in separate browsers); the push was the Worker's first real deploy, and the site sits behind Access where it cannot be checked from here. Still to do:
+   - **Jacob:** open the Party tab on the live site. It should say "Live" with a green dot. If it says "The shared table is not switched on yet", the Worker is not answering: look at the Worker's logs in the Cloudflare dashboard before anything else. (The Access team name and audience tag in the root `wrangler.jsonc` were read from the address the live site redirects a signed-out visitor to; if sign-in is the fault, compare them with the dashboard.)
+   - **Jacob:** say who the Keeper is. Their email goes in as a secret named `KEEPER_EMAILS` on the Worker in the Cloudflare dashboard (Workers and Pages, hunters-journal, Settings, Variables and Secrets). Until that is set nobody is the Keeper and the desk does not appear; everything else still works. Putting Jacob's own email there first is the quick way to try the desk.
+   - With a second person: both show up in the list, a hunter card follows a change, a roll lands in "At the table", and a handout with a picture reaches the player. This is gate 4 and gate 5 of the backend trial, which could not be tried locally. Afterwards, look at the Durable Object usage in the dashboard against the free daily limits.
+4. **Things only Jacob or the Keeper can judge** once it is live: the wording on the desk and the scene board, whether the bell on a new handout is welcome, and whether one table for the whole site is right (it is, until a second group wants in).
 
 ## Work plan progress
 
-Chunk IDs are defined in [WORKPLAN.md](WORKPLAN.md). Everything built on 2026-10-09 is committed on the branch `workplan-wave1` (not merged into `main`, not pushed, so not live).
+Chunk IDs are defined in [WORKPLAN.md](WORKPLAN.md).
 
 | Chunk | What | State |
 |---|---|---|
-| A1 | Make the t5 check deterministic | built and tested 2026-10-09, on branch `workplan-wave1` |
-| A4 | Honest message in the Party tab | built and tested 2026-10-09, on branch `workplan-wave1` |
-| A2 | Copy roll to chat | built and tested 2026-10-09, on branch `workplan-wave1` |
-| T1 | Session timeline | built and tested 2026-10-09, on branch `workplan-wave1` |
-| T2 | Undo | built and tested 2026-10-09, on branch `workplan-wave1` |
-| T3 | End-of-session ritual | built and tested 2026-10-09, on branch `workplan-wave1` |
-| C1 | Look setting and inks (Rust, Dust) | built and tested 2026-10-09, on branch `workplan-wave1` |
-| G0 | Backend trial | local half passed 2026-10-09 (`worker/`, tests t21 and t22). Real-account half waiting on Jacob. |
-| B1 to B3 | More than one hunter | built and tested 2026-10-09, on branch `workplan-wave1` |
-| G1 to G6 | The shared table | waits on G0 |
-| H0 | The Keeper's guide | built and tested 2026-10-09, on branch `workplan-wave1`. **Jacob:** check it against the reference sheets |
-| H1 to H3 | The Keeper's area (scene board and handouts) | waits on G2 and G6 |
-| N1 | Surprise me names from six worlds, and more catchphrases | built and tested 2026-10-09, on branch `workplan-wave1` |
-| R1 | Ratings only from the picked line and level-ups; no hand-adjusting; skill perk picker | built and tested 2026-10-09, on branch `workplan-wave1` |
+| A1, A2, A4, T1, T2, T3, C1, B1 to B3, N1, R1 | Small wins, timeline and undo, the ritual, looks and inks, more than one hunter, names, ratings | built, tested and pushed to `main` 2026-10-09. **Jacob:** try them |
+| H0 | The Keeper's guide | built, tested and pushed to `main` 2026-10-09. **Jacob:** check it against the reference sheets |
+| G0 | Backend trial | local half passed. The real-account half is the check in Start here, 3 |
+| G1, G3 | The page talks to the Worker; live hunter cards | built, tested and pushed to `main` 2026-10-09. The seam is smaller than planned: `tableOn()`, `myId()` and `tbl`, with the claude.ai code left in place beside it |
+| G2c | The Worker deploys with the site | root `wrangler.jsonc` changed and pushed 2026-10-09 |
+| G4 | Shared roll feed | built and tested, as a plain list ("At the table" on Play). Not done: each roller's own dice drawn in the feed, a screen-reader announcement with a mute, a stinger for a friend's roll |
+| G6 | Roles and the Keeper | built and tested. **Jacob:** the Keeper's email |
+| H1a, H1b, H1c | Handouts: the server, the Keeper's desk, the scene board and pinned banner | built, tested and pushed to `main` 2026-10-09 |
+| H2 | The Keeper's overview | built and tested, at the foot of the Keeper's desk |
+| H3 | Threat cards in Case files | not started. Ask the Keeper if wanted |
+| G5, G7, G8 | Discord from the server, retiring the claude.ai path, a cloud copy of each journal | not started |
 | A3, C2, D, E, F, I | See WORKPLAN.md | not started |
 
 ## Where the work is
 
 | Branch | What it holds | State |
 |---|---|---|
-| `main` | The live site: the dice work, the Luck candles, the builder and rules matched to the official sheets, the first-night pieces and the hunter card | Deployed 2026-10-08 |
-| `workplan-wave1` | Everything built on 2026-10-09: the work plan, copy for chat, the session timeline with undo, the end-of-session ritual, looks and inks, more than one hunter, the Keeper's guide, new names and catchphrases, ratings only from the sheet, and the Worker trial (`worker/`) | Committed locally on 2026-10-09, not merged, not pushed. Branches do not deploy. |
-| `first-night`, `luck-candles-v2`, `luck-candles` | Work that is now in `main`, and the first candles it replaced | Merged or replaced. Safe to delete. |
+| `main` | Everything: the dice work, the Luck candles, the first-night pieces, the hunter card, the 2026-10-09 morning batch, and the shared table with the Keeper's area (the Worker in `worker/` now deploys with the site) | Pushed 2026-10-09 |
+| `workplan-wave1`, `keeper-table`, `first-night`, `luck-candles-v2`, `luck-candles` | Work that is now in `main`, and the first candles it replaced | Merged or replaced. Safe to delete. |
 
 Pushing `main` deploys. Pushing any other branch does not.
 
-## Before the session on the 19th
+## Before the session on Wednesday 2026-10-14
 
-- [ ] **Jacob:** add the other players' emails to the Cloudflare Access list. Nobody else can open the site until this is done.
-- [ ] Have one friend open the site a few days early and run a short practice: build a hunter, roll five moves, take harm, spend Luck.
-- [ ] **Jacob:** ask the Keeper whether Use Magic keeps its name in The Long Dry or gets renamed to fit the setting.
-- [ ] **Jacob:** read the new "Running the game (for the Keeper)" section in the Guide against the Keeper's pages of the reference PDF (pages 5 and 6), and tell the Keeper it is there.
-- [ ] **Jacob:** ask the Keeper for their email (needed for the Keeper's area, G6) and whether they want the scene board and handouts (H1) and threat cards (H3).
+- [ ] **Jacob:** add the other players' emails, and the Keeper's, to the Cloudflare Access list. Nobody else can open the site until this is done.
+- [ ] **Jacob:** the Keeper's email as the `KEEPER_EMAILS` secret on the Worker (see Start here, 3).
+- [ ] With one friend: both open the Party tab, both turn on "Show my hunter and my rolls to the table", roll once each, and the Keeper shows one handout with a picture. That is the whole shared table in five minutes.
+- [ ] Have one friend run a short practice: build a hunter, roll five moves, take harm, spend Luck.
+- [ ] **Jacob:** tell the Keeper about "Running the game (for the Keeper)" in the Guide and the Keeper's desk on the Party tab, and read the guide against pages 5 and 6 of the reference PDF.
+- [ ] **Jacob:** ask the Keeper whether Use Magic keeps its name in The Long Dry or gets renamed to fit the setting, and whether threat cards (H3) are wanted.
 - [ ] **Jacob (optional, for A3):** make a test channel and webhook in Discord so a real post can be tried.
 
 ## Waiting on Jacob's eye and ear
 
-All of this is live and none of it has had his review yet. 3D dice and sound are both off until a player turns them on.
+All of this is live and none of it has had his review yet (nor has anything from 2026-10-09: see Start here). 3D dice and sound are both off until a player turns them on.
 
 - [ ] **3D dice.** Judge them in motion: the fuel swish, the three lighting moods, the finishes. Try them on a phone.
 - [ ] **Dice sounds (F1).** Nothing has been tuned by ear. A bounce is a die half and a tray half chosen separately, so there are 21 listens in all (14 finishes, 7 trays), not 98 pairs. Turn sound on and use "Hear these dice" in the dice maker, and note which are wrong. From the first, made-up pass: gem was the only die sound he liked, and leather and felt should land as more of a thud.
@@ -104,25 +97,21 @@ All of this is live and none of it has had his review yet. 3D dice and sound are
 
 The campaign is a post-apocalyptic wasteland, and the journal was styled as a gothic Appalachian field journal before that was known. The dice maker now has wasteland trays, finishes, sigils and sets; nothing else has been rethemed.
 
-- [ ] C1: Rust and Dust inks next to the existing look, plus a Look switch (device, light, dark). Reversible, touches no art or copy.
+- [ ] **Jacob:** try the Rust and Dust inks (under Settings) and say whether either becomes the default.
 - [ ] **Jacob:** decide how far to go beyond that. Candidates, most visible first: header art, name generator (Appalachian names from the 1600s to 1800s), colors.
 
 ## Features still to build
 
 Detail is in [WORKPLAN.md](WORKPLAN.md); the specs they refine are in [SPEC.md](SPEC.md).
 
-- [ ] 5. End-of-session ritual (T3)
-- [ ] 6. Session timeline (T1), and undo built on it (T2)
-- [ ] 7. Ink themes (C1) and ambient sound (C2)
-- [ ] 8. Shared roll feed and live party (G0 to G8). The Party tab does not work on the live site today: it reads its table from `window.claude`, which only exists inside claude.ai. G1 puts that behind a seam; G0 picks the backend. Cloudflare first (Access already knows who each player is; Supabase's free projects pause after 7 days idle).
-- [ ] The Keeper's area (H0 to H3): a guide for running the game, then a scene board where the Keeper posts descriptions and pictures for the table.
+- [ ] 5 to 7. The ritual, the timeline with undo, and the inks are built and pushed. Ambient sound (C2) is not.
+- [ ] 8. Shared roll feed and live party: built and pushed; waiting for its first check on the real account (see Start here). Left over: the roller's own dice in the feed, a spoken announcement with a mute, Discord from the server (G5), retiring the claude.ai path (G7).
+- [ ] The Keeper's area: the guide, the desk, the scene board and the overview are built. Left over: threat cards (H3), if the Keeper wants them.
 
 ## Later
 
-- [ ] T2: A general undo for mid-session mis-clicks on harm, XP and Luck. Level-ups are not covered in the first version.
 - [ ] I1: A "hide the hints" setting for experienced players.
 - [ ] I2: Custom and expansion playbooks.
-- [ ] H2: Something for the Keeper: at least a view of everyone's Harm and Luck. Depends on feature 8.
 - [ ] I3: An accessibility pass with a screen reader and keyboard only.
 - [ ] A3: Post rolls to a Discord channel with a webhook (optional).
 - [ ] G8: Keep a copy of each player's journal on the server (an idea, not yet asked for).
@@ -139,3 +128,5 @@ Detail is in [WORKPLAN.md](WORKPLAN.md); the specs they refine are in [SPEC.md](
 - **Ratings are not set by hand (Jacob, 2026-10-09; this replaces the 2026-10-08 decision to keep the hand-set range).** The sheet says "pick one line", so the builder offers only the playbook's lines, and after that a rating changes only through a level-up (or The Crooked's skill perk). The adjust buttons are gone from the builder, My sheet and the Roller. Once a hunter has levelled up, the lines lock, so tapping one cannot undo the level-ups. Old saves with hand-set ratings keep them and can pick a line while at level 0.
 - Sigils are one-color stamps in the pip color, not full-color pictures (Jacob, 2026-10-08).
 - 3D dice are flown along a set path to the numbers already rolled. No physics library (Jacob, 2026-10-08).
+- Players' rolls and hunter cards share one switch, "Show my hunter and my rolls to the table", off by default (2026-10-09, my choice, open to Jacob changing it): one plain consent, and a player trying dice alone at home does not fill the table's feed.
+- A player can fetch a Keeper's picture only while it is on a shown handout. A draft's picture answers "not found" to everyone but the Keeper (2026-10-09).

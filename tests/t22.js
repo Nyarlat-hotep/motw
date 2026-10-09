@@ -98,6 +98,22 @@ const ALG = { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: ne
   check('pictures: one byte over the cap is refused, at the cap is fine', C.imageType(big) === null && C.imageType(big.subarray(0, C.LIMITS.image)) === 'image/jpeg');
   check('names: tidied, cut to 30, and the fallback is used when nothing is left', C.cleanName('  Dee \n\t Ray  ') === 'Dee Ray' && C.cleanName('x'.repeat(100)).length === 30 && C.cleanName('\u0000\u0001', 'Player 1a2b') === 'Player 1a2b' && C.cleanName(42, 'F') === 'F');
 
+  // what the Keeper posts
+  const ho = C.cleanHandout({ title: '  The <b>gate</b>  ', kind: 'place', body: 'One\r\nTwo\rThree\n\n\n\n\n\nFour' + String.fromCharCode(7) + 'bell', images: [{ id: 'a'.repeat(18), alt: ' rust ' }, { id: 'A'.repeat(18) }, { id: 'b'.repeat(17) }, 'x', null, { id: 'c'.repeat(18), alt: 5 }], shown: true, pinned: true, id: 'mine', evil: 1 });
+  check('handout: known keys only; shown, pinned and id are for the room to set, not the page', Object.keys(ho).sort().join() === 'body,images,kind,title');
+  check('handout: the title is trimmed and markup stays plain text for the page to escape', ho.title === 'The <b>gate</b>' && ho.kind === 'place');
+  check('handout: line breaks are kept (and tidied), other control characters are not', ho.body === 'One\nTwo\nThree\n\n\nFour bell', JSON.stringify(ho.body));
+  check('handout: only well-formed picture ids are kept, with a description each', ho.images.length === 2 && ho.images[0].id === 'a'.repeat(18) && ho.images[0].alt === 'rust' && ho.images[1].id === 'c'.repeat(18) && ho.images[1].alt === '');
+  const fat = C.cleanHandout({ title: 't'.repeat(200), kind: 'spell', body: 'b'.repeat(9000), images: Array.from({ length: 9 }, () => ({ id: 'd'.repeat(18), alt: 'a'.repeat(900) })) });
+  check('handout: clamped to 80, 4,000, three pictures and 200; an unknown kind is a note', fat.title.length === 80 && fat.body.length === 4000 && fat.images.length === 3 && fat.images[0].alt.length === 200 && fat.kind === 'note');
+  check('handout: an empty one, or something that is not one, is refused', [{}, { title: '   ', body: '\n\n' }, null, 'x', [], 7].every((h) => C.cleanHandout(h) === null));
+  check('handout: a title is not needed if there are words or a picture', C.cleanHandout({ body: 'hello' }).title === 'Untitled' && C.cleanHandout({ images: [{ id: 'e'.repeat(18) }] }).images.length === 1);
+  // the sign-in can arrive as the cookie Access sets in the browser, checked exactly like the header
+  const tok = await sign(good);
+  const cookieReq = (headers) => new Request('https://table.example/api/me', { headers });
+  check('sign-in: the Access cookie is accepted when it holds a good token', ((await A.identify(cookieReq({ cookie: 'theme=dark; CF_Authorization=' + tok + '; other=1' }), env, NOW)) || {}).email === 'jacob@example.com');
+  check('sign-in: a cookie with a forged token is refused', (await A.identify(cookieReq({ cookie: 'CF_Authorization=' + (await sign(good, undefined, other.privateKey)) }), env, NOW)) === null && (await A.identify(cookieReq({ cookie: 'CF_Authorization=garbage' }), env, NOW)) === null && (await A.identify(cookieReq({}), env, NOW)) === null);
+
   console.log(results.map(r=>r.join(' | ')).join('\n'));
   const fails = results.filter(r=>r[0]==='FAIL').length;
   console.log('\nTOTAL', results.length, 'FAIL', fails);

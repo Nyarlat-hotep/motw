@@ -24,7 +24,7 @@ Saves go to the browser's localStorage. Use Settings and backup in the app to do
     vendor/              three.js for the 3D dice, and licenses
     data/                the 12 playbooks as JSON (see data/SCHEMA.md)
     tools/               scripts that make the generated files (textures, sigils, sounds, lighting, embedded playbooks)
-    worker/              the shared table's Cloudflare Worker (a trial; not connected to the page yet)
+    worker/              the shared table and the Keeper's handouts: a Cloudflare Worker the Party tab talks to under /api/
     tests/               Playwright checks (npm install, then npm test)
     docs/TODO.md         the running list: what is left and who it is waiting on
     docs/SPEC.md         feature specs

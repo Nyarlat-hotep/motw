@@ -17,6 +17,7 @@ self.addEventListener('fetch', function (e) {
   if (req.method !== 'GET') return;
   var url = new URL(req.url), own = url.origin === location.origin, font = /fonts\.(googleapis|gstatic)\.com$/.test(url.hostname);
   if (!own && !font) return;
+  if (own && url.pathname.indexOf('/api/') === 0) return;   // the shared table is live data: never answered from the saved copy
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).then(function (res) { return save('./', res); }).catch(function () { return caches.match('./'); }));
     return;

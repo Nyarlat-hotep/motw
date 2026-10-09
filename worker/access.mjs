@@ -57,8 +57,9 @@ export async function identify(request, env, now = Date.now(), fetchFn = fetch) 
     const as = new URL(request.url).searchParams.get('as') || request.headers.get('x-dev-user');
     if (as && /^[a-z0-9._+-]{1,40}(@[a-z0-9.-]{1,60})?$/i.test(as)) return { email: (as.includes('@') ? as : as + '@dev.test').toLowerCase(), dev: true };
   }
-  const who = await verifyAccessJwt(request.headers.get('Cf-Access-Jwt-Assertion'), env, now, fetchFn);
-  return who;
+  // Access puts its token in a header on every request it lets through, and in a cookie in the browser. Either is checked the same way.
+  const cookie = /(?:^|;\s*)CF_Authorization=([^;]+)/.exec(request.headers.get('cookie') || '');
+  return verifyAccessJwt(request.headers.get('Cf-Access-Jwt-Assertion') || (cookie && cookie[1]), env, now, fetchFn);
 }
 
 export function isKeeper(email, env) {

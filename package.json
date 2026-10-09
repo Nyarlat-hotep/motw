@@ -7,7 +7,7 @@
     "start": "npx --yes serve -l 5173 .",
     "embed": "python3 tools/embed_data.py",
     "build": "node tools/build.js",
-    "test": "node tests/t7.js && node tests/t5.js && node tests/t8.js && node tests/t9.js && node tests/t11.js && node tests/t12.js && node tests/t10.js && node tests/t13.js && node tests/t14.js && node tests/t15.js && node tests/t16.js && node tests/t17.js && node tests/t18.js && node tests/t19.js && node tests/t20.js && node tests/t22.js && node tests/t23.js && node tests/t24.js && node tests/t21.js"
+    "test": "node tests/t7.js && node tests/t5.js && node tests/t8.js && node tests/t9.js && node tests/t11.js && node tests/t12.js && node tests/t10.js && node tests/t13.js && node tests/t14.js && node tests/t15.js && node tests/t16.js && node tests/t17.js && node tests/t18.js && node tests/t19.js && node tests/t20.js && node tests/t22.js && node tests/t23.js && node tests/t24.js && node tests/t21.js && node tests/t25.js"
   },
   "devDependencies": {
     "playwright": "^1.45.0",

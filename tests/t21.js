@@ -188,8 +188,9 @@ function upgrade(base, p, origin) {
   r = await put('kay', jpg600);
   check('GATE 3: a 600 KB JPEG uploads', r.status === 201 && /^[0-9a-f]{18}$/.test(r.json.id) && r.json.mime === 'image/jpeg' && r.json.size === jpg600.length, JSON.stringify(r));
   const id = r.json.id;
-  r = await get(B, '/api/img/' + id + '?as=alice');
-  check('and comes back byte for byte to any signed-in player', r.status === 200 && r.body.equals(jpg600));
+  check('a picture that is not on a shown handout does not exist for a player (tests/t25.js follows one through draft, shown and hidden)', (await get(B, '/api/img/' + id + '?as=alice')).status === 404);
+  r = await get(B, '/api/img/' + id + '?as=kay');
+  check('and comes back byte for byte to the Keeper', r.status === 200 && r.body.equals(jpg600));
   check('with a type chosen by the server, no sniffing, and a locked-down policy', r.h.get('content-type') === 'image/jpeg' && r.h.get('x-content-type-options') === 'nosniff' && /default-src 'none'; sandbox/.test(r.h.get('content-security-policy')) && /^private/.test(r.h.get('cache-control')), [...r.h.entries()].map(x => x.join('=')).join(' | '));
   check('but not to someone who is not signed in', (await get(B, '/api/img/' + id)).status === 401);
   check('an id that does not exist, or is not an id, is a 404', (await get(B, '/api/img/000000000000000000?as=alice')).status === 404 && (await get(B, '/api/img/..%2F..%2Fetc?as=alice')).status === 404 && (await get(B, '/api/img/' + id + 'x?as=alice')).status === 404);
@@ -198,7 +199,7 @@ function upgrade(base, p, origin) {
   check('an SVG with a script in it is refused', (await put('kay', Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)"/>'), { 'content-type': 'image/jpeg' })).status === 415);
   const webp = Buffer.alloc(3000); webp.set([0x52, 0x49, 0x46, 0x46, 0, 0, 0, 0, 0x57, 0x45, 0x42, 0x50]);
   r = await put('kay', webp);
-  check('a WebP is accepted and served as WebP', r.status === 201 && (await get(B, '/api/img/' + r.json.id + '?as=alice')).h.get('content-type') === 'image/webp');
+  check('a WebP is accepted and served as WebP', r.status === 201 && (await get(B, '/api/img/' + r.json.id + '?as=kay')).h.get('content-type') === 'image/webp');
   const huge = Buffer.alloc(700 * 1024 + 1, 7); huge.set([0xff, 0xd8, 0xff]);
   r = await put('kay', huge);
   check('one byte over 700 KB is refused, and not stored', r.status === 413 || r.status === 0, r.status);
@@ -211,7 +212,7 @@ function upgrade(base, p, origin) {
     const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
     const up = await fetch('/api/img?as=kay', { method: 'PUT', body: bytes });
     const j = await up.json();
-    const img = new Image(); img.src = '/api/img/' + j.id + '?as=alice';
+    const img = new Image(); img.src = '/api/img/' + j.id + '?as=kay';
     await img.decode();
     return { w: img.naturalWidth, h: img.naturalHeight, status: up.status };
   }, fixture.toString('base64'));

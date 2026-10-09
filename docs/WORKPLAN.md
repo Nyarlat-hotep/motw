@@ -1,6 +1,6 @@
 # Work plan
 
-Written 2026-10-09. This cuts the list Jacob handed over on 2026-10-09 into chunks small enough to build, test and ship one at a time. [SPEC.md](SPEC.md) still holds the detailed specs for features 1 to 8. This file says how the remaining work is cut up, in what order, and what each piece is waiting on. [TODO.md](TODO.md) stays the running list and points here.
+Written 2026-10-09. **The first session moved from the 19th to Wednesday 2026-10-14 (Jacob, 2026-10-09), so where this file says "the 19th" read the 14th; the shared table and the Keeper's area were pulled forward and built the same day.** This cuts the list Jacob handed over on 2026-10-09 into chunks small enough to build, test and ship one at a time. [SPEC.md](SPEC.md) still holds the detailed specs for features 1 to 8. This file says how the remaining work is cut up, in what order, and what each piece is waiting on. [TODO.md](TODO.md) stays the running list and points here.
 
 ## How to read this
 
@@ -238,6 +238,8 @@ If any gate fails and cannot be fixed that day, spend the second half-day on Sup
 **Jacob:** say yes to `wrangler` as a dev dependency; log in to Cloudflare once on this machine (`npx wrangler login`) for the real-account trial; and either add a throwaway hostname to the Access policy or approve a dormant Worker on `main`. I ask before pushing `main`.
 
 ### G1. The table seam (S to M)
+**Built 2026-10-09, smaller than planned.** There is no `TBL` object with adapters. The page's table code is the `tbl` block in `index.html`; `tableOn()` and `myId()` are what the Party tab asks, and `pushParty` and `unshareParty` hand over to the Worker when `tbl.on` is set. The claude.ai code is untouched beside it and still runs inside claude.ai (G7 removes it).
+
 Put the Party tab's data layer behind one object, `TBL`: `start()`, `publish(card, dice)`, `unpublish()`, `sendRoll(roll)`, and events `members`, `roll`, `status`. The current claude.ai code moves into an adapter called `claude`. A `none` adapter is what the live site uses until G3, and tests get a fake. No visible change; every existing test passes against the unchanged stub.
 
 ### G2. Worker, sign-in and the room (split in three)
@@ -249,16 +251,22 @@ The Worker lives in `worker/`. It is its own small ES-module program that wrangl
 - **G2c, deploy and docs (S).** Wrangler config, `npm run build` unchanged for the page, a note in CLAUDE.md on how the Worker is run locally (`npx wrangler dev`) and tested.
 
 ### G3. Live hunter cards (M)
+**Built 2026-10-09** (`tests/t25.js`). As built: the page asks `/api/me` once and stays as it was if nothing answers; a status line (Joining, Live, Reconnecting, Offline); a list of who is at the table with the Keeper marked; "Your name at the table" (`S.settings.tname`); reconnects on its own with a growing wait, and a ping every 25 seconds finds a dead connection. A redraw never happens under someone typing in the Party tab.
+
 A `cloud` adapter. It publishes `partyBody()` plus the player's dice whenever it changes (debounced like `pushParty`), and the Party tab renders from the member list. The "Show my hunter to the table" switch stays, off by default. A display-name setting ("Your name at the table"), 30 characters, stored with the member. A status line: Live, Reconnecting, Offline. Play continues offline and resyncs on reconnect.
 **Everything arriving from the table is other people's data.** Check every field and length, run dice through `strictDie`, and pass every string through `esc()`, exactly as a dice code is treated. Write the Worker tests with two Playwright contexts against `wrangler dev`.
 
 ### G4. Shared roll feed (M)
+**Built 2026-10-09 as a plain list** ("At the table" on Play, last five). Rolls go out only while "Show my hunter and my rolls to the table" is on. Not built: the roller's own dice drawn in the feed, the live-region announcement and its mute, the quiet stinger. A Luck spend after the roll is not sent.
+
 `finish()` sends the roll. An "At the table" strip on Play shows the last five from everyone: name, move, total, tier, and the roller's two dice drawn with that player's own dice. That needs `cubeHTML(v, idx)` to accept a die as well as an index, with the incoming die passed through `strictDie`. A polite live region announces other players' rolls, and a mute switch silences it. If sound is on, a friend's roll can play the stinger quietly. Mismatched dice are shown as the roller set them.
 
 ### G5. Discord from the server (S, optional)
 The Keeper sets one webhook on the server and the Worker posts every roll. The client field from A3 is removed. This keeps the URL off players' machines.
 
 ### G6. Roles and the Keeper (S to M)
+**Built 2026-10-09.** `KEEPER_EMAILS` is read by the Worker and the room; on the real account it is a secret set in the dashboard, so the address is not in the repo. The member list marks the Keeper.
+
 The Keeper is identified by email on a server-side list (`KEEPER_EMAILS` as a Worker variable). The server decides; the page only reads `me.keeper` to show the controls. The Keeper has no hunter and does not have to share one. A "Keeper" badge in the member list.
 **Jacob:** the Keeper's email.
 
@@ -280,6 +288,8 @@ The ask: some way for the Keeper to post pictures and descriptions that the othe
 A "Running the game" section in the Guide for whoever is Keeper: the agenda and principles, the basic Keeper moves, how to make a mystery, the kinds of threat (monster, minion, bystander, location) with their motivations, the six-step countdown, and the end-of-session questions. Plain-English paraphrase from pages 5 and 6 of the Reference Sheets PDF; nothing pasted; the mechanical facts exact. **Jacob:** check it against the PDF the way the playbooks were checked on 2026-10-08. Can ship at any time, even before the shared table.
 
 ### H1. Handouts and the scene board (L, in three)
+**Built 2026-10-09** (`tests/t25.js`, and `cleanHandout` in `tests/t22.js`). As built it differs in three ways. A player can fetch a picture only while it is on a shown handout (stricter than "any signed-in member"). A picture no handout uses is deleted an hour after upload. Opening the Party tab with something unseen goes straight to the scene board, and new handouts carry a New mark until looked at (`S.hoseen`).
+
 A handout is `{ id, title, body, kind, images, shown, pinned, at }`. Title up to 80 characters; body up to 4,000 characters of plain text; up to three pictures; `kind` is a label (scene, clue, person, place, note). Up to 60 handouts.
 
 **H1a. Server side (M).** Depends on G2b and G6.
@@ -303,6 +313,8 @@ A handout is `{ id, title, body, kind, images, shown, pinned, at }`. Title up to
 Tests: a draft never reaches a player context (check the player's socket traffic, not just the screen); an oversized or wrong-type image is refused; a script tag in the title is shown as text; the Keeper's pin appears on a player's Play within a couple of seconds; a player cannot call a Keeper-only endpoint.
 
 ### H2. Keeper's overview (S)
+**Built 2026-10-09**, at the foot of the Keeper's desk.
+
 A dense, read-only list of every hunter's Harm, Luck, XP, unstable flag and last roll, most hurt first, for the Keeper. The data comes from the cards G3 already delivers. The Keeper cannot edit anyone's sheet.
 
 ### H3. Threat cards in Case files (M, optional)

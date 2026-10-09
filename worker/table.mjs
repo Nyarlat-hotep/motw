@@ -1,9 +1,10 @@
 // The table: one room for the whole site. It keeps who is here, each player's shared hunter card, the last 50 rolls and the Keeper's pictures in its own SQLite
-// storage, and talks to every open page over WebSockets. It sleeps between messages (WebSocket hibernation), so an idle table costs almost nothing.
+// storage, along with what the Keeper posts for the table (handouts), and talks to every open page over WebSockets. It sleeps between messages (WebSocket hibernation), so an idle table costs almost nothing.
 //
 // It is only reachable through index.mjs, which has already checked who is asking and passes that on in two internal headers.
 import { DurableObject } from 'cloudflare:workers';
-import { cleanCard, cleanDice, cleanName, cleanRoll, imageType, LIMITS } from './clean.mjs';
+import { cleanCard, cleanDice, cleanHandout, cleanName, cleanRoll, imageType, LIMITS } from './clean.mjs';
+import { isKeeper } from './access.mjs';
 
 const JSON_HEADERS = { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' };
 const json = (o, status = 200) => new Response(JSON.stringify(o), { status, headers: JSON_HEADERS });
@@ -23,10 +24,12 @@ export class Table extends DurableObject {
       CREATE TABLE IF NOT EXISTS cards (id TEXT PRIMARY KEY, card TEXT NOT NULL, dice TEXT, at INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS rolls (n INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT NOT NULL, roll TEXT NOT NULL, at INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS images (id TEXT PRIMARY KEY, mime TEXT NOT NULL, bytes BLOB NOT NULL, at INTEGER NOT NULL);
+      CREATE TABLE IF NOT EXISTS handouts (id TEXT PRIMARY KEY, h TEXT NOT NULL, shown INTEGER NOT NULL DEFAULT 0, pinned INTEGER NOT NULL DEFAULT 0, at INTEGER NOT NULL);
     `);
     // a ping from a page is answered without waking the room
     this.ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair('ping', 'pong'));
     this.rate = new Map();
+    this.env = env;
   }
 
   /* ---------- HTTP ---------- */
@@ -55,7 +58,7 @@ export class Table extends DurableObject {
       this.ctx.acceptWebSocket(server, [me.id]);
       server.serializeAttachment({ id: me.id, keeper });
       this.sendSnapshot(server, me, keeper);
-      this.broadcast({ t: 'online', id: me.id, online: true }, server);
+      this.broadcast({ t: 'online', id: me.id, online: true, name: me.name, keeper }, server);
       return new Response(null, { status: 101, webSocket: pair[0] });
     }
 
@@ -67,6 +70,7 @@ export class Table extends DurableObject {
       if (bytes.length > LIMITS.image) return json({ error: 'too big' }, 413);
       const mime = imageType(bytes);
       if (!mime) return json({ error: 'JPEG or WebP only' }, 415);
+      this.sweep();
       if (this.sql.exec('SELECT COUNT(*) AS n FROM images').one().n >= LIMITS.images) return json({ error: 'too many pictures' }, 507);
       const id = randomId();
       this.sql.exec('INSERT INTO images (id, mime, bytes, at) VALUES (?, ?, ?, ?)', id, mime, bytes, Date.now());
@@ -76,7 +80,8 @@ export class Table extends DurableObject {
     const img = url.pathname.match(/^\/api\/img\/([0-9a-f]{18})$/);
     if (img && request.method === 'GET') {
       const row = this.sql.exec('SELECT mime, bytes FROM images WHERE id = ?', img[1]).toArray()[0];
-      if (!row) return json({ error: 'not found' }, 404);
+      // A player can only fetch a picture that is on a handout the Keeper has shown. A draft's picture is the Keeper's alone, and to anyone else it does not exist.
+      if (!row || (!keeper && !this.pictures(true).has(img[1]))) return json({ error: 'not found' }, 404);
       // The type is the one the server worked out from the bytes, never one the uploader named. Nothing here can run as a page.
       return new Response(row.bytes, { headers: { 'content-type': row.mime, 'x-content-type-options': 'nosniff', 'content-security-policy': "default-src 'none'; sandbox", 'cache-control': 'private, max-age=86400, immutable', 'content-disposition': 'inline' } });
     }
@@ -105,12 +110,84 @@ export class Table extends DurableObject {
   sendSnapshot(ws, me, keeper) {
     const on = this.online(); on.add(me.id);
     const cards = new Map(this.sql.exec('SELECT id, card, dice, at FROM cards').toArray().map((r) => [r.id, r]));
-    const members = this.sql.exec('SELECT id, name FROM members').toArray().map((m) => {
+    const members = this.sql.exec('SELECT id, name, email FROM members').toArray().map((m) => {
       const c = cards.get(m.id);
-      return { id: m.id, name: m.name, online: on.has(m.id), card: c ? JSON.parse(c.card) : null, dice: c && c.dice ? JSON.parse(c.dice) : null, at: c ? c.at : 0 };
+      return { id: m.id, name: m.name, keeper: isKeeper(m.email, this.env), online: on.has(m.id), card: c ? JSON.parse(c.card) : null, dice: c && c.dice ? JSON.parse(c.dice) : null, at: c ? c.at : 0 };
     });
     const rolls = this.sql.exec('SELECT n, id, roll, at FROM rolls ORDER BY n DESC LIMIT ?', LIMITS.rolls).toArray().map((r) => ({ n: r.n, id: r.id, at: r.at, ...JSON.parse(r.roll) }));
-    ws.send(JSON.stringify({ t: 'snap', you: { id: me.id, name: me.name, keeper }, members, rolls }));
+    ws.send(JSON.stringify({ t: 'snap', you: { id: me.id, name: me.name, keeper }, members, rolls, handouts: this.handouts(keeper) }));
+  }
+
+  /* ---------- what the Keeper posts ---------- */
+  handoutOf(row) { return { id: row.id, ...JSON.parse(row.h), shown: !!row.shown, pinned: !!row.pinned, at: row.at }; }
+  /* The Keeper gets every handout. Everyone else gets only the shown ones: a draft never leaves the room for a player's page, not even hidden. */
+  handouts(keeper) {
+    return this.sql.exec('SELECT id, h, shown, pinned, at FROM handouts' + (keeper ? '' : ' WHERE shown = 1') + ' ORDER BY at DESC').toArray().map((r) => this.handoutOf(r));
+  }
+  /* the ids of every picture on a handout (only the shown ones when asked) */
+  pictures(shownOnly) {
+    const ids = new Set();
+    for (const r of this.sql.exec('SELECT h FROM handouts' + (shownOnly ? ' WHERE shown = 1' : '')).toArray()) { for (const i of JSON.parse(r.h).images || []) ids.add(i.id); }
+    return ids;
+  }
+  /* pictures no handout uses any more. An hour's grace, so one just uploaded for a handout still being written is not lost. */
+  sweep() {
+    const used = this.pictures(false), old = Date.now() - 36e5;
+    for (const r of this.sql.exec('SELECT id FROM images WHERE at < ?', old).toArray()) { if (!used.has(r.id)) this.sql.exec('DELETE FROM images WHERE id = ?', r.id); }
+  }
+  /* tell every page about one handout. The Keeper's pages get it whatever its state; a player's page gets it only while it is shown, and is told to drop it when it is hidden or deleted. */
+  tell(id, wasShown, fresh) {
+    const row = this.sql.exec('SELECT id, h, shown, pinned, at FROM handouts WHERE id = ?', id).toArray()[0];
+    const h = row ? this.handoutOf(row) : null;
+    const full = JSON.stringify(h ? { t: 'ho', h } : { t: 'ho-gone', id });
+    const pub = h && h.shown ? JSON.stringify({ t: 'ho', h, fresh: !!fresh }) : wasShown ? JSON.stringify({ t: 'ho-gone', id }) : null;
+    for (const w of this.ctx.getWebSockets()) {
+      const a = w.deserializeAttachment() || {}, text = a.keeper ? full : pub;
+      if (text) { try { w.send(text); } catch (e) { /* a closing socket */ } }
+    }
+  }
+  keeperMessage(ws, m) {
+    const say = (why) => ws.send(JSON.stringify({ t: 'err', why }));
+    const id = typeof m.id === 'string' && /^[0-9a-f]{18}$/.test(m.id) ? m.id : '';
+    const row = id ? this.sql.exec('SELECT id, shown, pinned, at FROM handouts WHERE id = ?', id).toArray()[0] : null;
+    const now = Date.now();
+    const unpinOthers = (keep) => { for (const r of this.sql.exec('SELECT id FROM handouts WHERE pinned = 1 AND id != ?', keep).toArray()) { this.sql.exec('UPDATE handouts SET pinned = 0 WHERE id = ?', r.id); this.tell(r.id, true, false); } };
+
+    if (m.t === 'ho-save') {
+      const h = cleanHandout(m.h);
+      if (!h) return say('bad handout');
+      if (m.id !== undefined && !row) return say('no such handout');
+      h.images = h.images.filter((i) => this.sql.exec('SELECT 1 AS k FROM images WHERE id = ?', i.id).toArray().length);   // only pictures that were really uploaded
+      const text = JSON.stringify(h);
+      if (row) {
+        const shown = m.show === true ? 1 : m.show === false ? 0 : row.shown;
+        this.sql.exec('UPDATE handouts SET h = ?, shown = ?, pinned = ?, at = ? WHERE id = ?', text, shown, shown ? row.pinned : 0, now, row.id);
+        this.tell(row.id, !!row.shown, shown && !row.shown);
+        ws.send(JSON.stringify({ t: 'ho-saved', id: row.id }));
+      } else {
+        if (this.sql.exec('SELECT COUNT(*) AS n FROM handouts').one().n >= LIMITS.handouts) return say('too many handouts');
+        const nid = randomId(), shown = m.show === true ? 1 : 0;
+        this.sql.exec('INSERT INTO handouts (id, h, shown, pinned, at) VALUES (?, ?, ?, 0, ?)', nid, text, shown, now);
+        this.tell(nid, false, !!shown);
+        ws.send(JSON.stringify({ t: 'ho-saved', id: nid }));
+      }
+      this.sweep();
+    } else if (!row) {
+      say('no such handout');
+    } else if (m.t === 'ho-show') {
+      const shown = m.shown === true ? 1 : 0;
+      this.sql.exec('UPDATE handouts SET shown = ?, pinned = ?, at = ? WHERE id = ?', shown, shown ? row.pinned : 0, shown && !row.shown ? now : row.at, row.id);
+      this.tell(row.id, !!row.shown, shown && !row.shown);
+    } else if (m.t === 'ho-pin') {
+      const pinned = m.pinned === true ? 1 : 0;
+      if (pinned) unpinOthers(row.id);   // one pinned at a time
+      this.sql.exec('UPDATE handouts SET pinned = ?, shown = ?, at = ? WHERE id = ?', pinned, pinned ? 1 : row.shown, pinned && !row.shown ? now : row.at, row.id);
+      this.tell(row.id, !!row.shown, pinned && !row.pinned);
+    } else if (m.t === 'ho-del') {
+      this.sql.exec('DELETE FROM handouts WHERE id = ?', row.id);
+      this.tell(row.id, !!row.shown, false);
+      this.sweep();
+    }
   }
 
   /* ---------- WebSocket ---------- */
@@ -130,7 +207,11 @@ export class Table extends DurableObject {
     let m; try { m = JSON.parse(raw); } catch (e) { ws.send(JSON.stringify({ t: 'err', why: 'not JSON' })); return; }
     if (!m || typeof m !== 'object' || typeof m.t !== 'string') return;
 
-    if (m.t === 'hello') {
+    if (m.t.slice(0, 3) === 'ho-') {
+      // Only the Keeper posts. The room decides who that is (from the sign-in, when the connection opened), never the page.
+      if (!a.keeper) { ws.send(JSON.stringify({ t: 'err', why: 'Keeper only' })); return; }
+      this.keeperMessage(ws, m);
+    } else if (m.t === 'hello') {
       const row = this.sql.exec('SELECT name FROM members WHERE id = ?', a.id).toArray()[0];
       const name = cleanName(m.name, row ? row.name : 'Player');
       this.sql.exec('UPDATE members SET name = ? WHERE id = ?', name, a.id);

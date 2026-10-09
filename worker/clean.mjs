@@ -11,10 +11,13 @@ const ci = (v, lo, hi, d) => { v = Math.round(Number(v)); return Number.isFinite
 const odd = (c) => c < 32 || c === 127 || c === 0x2028 || c === 0x2029;
 const str = (v, max) => { if (typeof v !== 'string') return ''; let o = ''; for (let i = 0; i < v.length && o.length < max; i++) o += odd(v.charCodeAt(i)) ? ' ' : v[i]; return o; };
 const strt = (v, max) => str(v, max).trim();
+// the same, but line breaks are kept (a handout's body is shown as plain text with its lines)
+const text = (v, max) => { if (typeof v !== 'string') return ''; v = v.replace(/\r\n?/g, '\n'); let o = ''; for (let i = 0; i < v.length && o.length < max; i++) { const k = v.charCodeAt(i); o += k === 10 ? '\n' : odd(k) ? ' ' : v[i]; } return o.replace(/\n{4,}/g, '\n\n\n').trim(); };
 const list = (a, n, m) => (Array.isArray(a) ? a.slice(0, n).map((x) => strt(x, m)).filter(Boolean) : []);
 const isObj = (o) => !!o && typeof o === 'object' && !Array.isArray(o);
 
-export const LIMITS = { message: 40000, card: 32000, roll: 1500, image: 700 * 1024, rolls: 50, images: 300 };
+export const LIMITS = { message: 40000, card: 32000, roll: 1500, image: 700 * 1024, rolls: 50, images: 300, handouts: 60 };
+export const KINDS = ['scene', 'clue', 'person', 'place', 'note'];
 
 export function cleanName(v, fallback) {
   const s = str(v, 60).replace(/\s+/g, ' ').trim().slice(0, 30).trim();
@@ -61,4 +64,14 @@ export function imageType(bytes) {
   if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'image/jpeg';
   if (bytes[0] === 0x52 && bytes[1] === 0x49 && bytes[2] === 0x46 && bytes[3] === 0x46 && bytes[8] === 0x57 && bytes[9] === 0x45 && bytes[10] === 0x42 && bytes[11] === 0x50) return 'image/webp';
   return null;
+}
+
+/* something the Keeper posts for the table: a title, a kind, plain text, and up to three pictures already uploaded (each with words for players who cannot see it).
+   The room checks that the pictures exist; nothing here is ever treated as markup. */
+export function cleanHandout(h) {
+  if (!isObj(h)) return null;
+  const title = strt(h.title, 80), body = text(h.body, 4000);
+  const images = (Array.isArray(h.images) ? h.images : []).filter((x) => isObj(x) && typeof x.id === 'string' && /^[0-9a-f]{18}$/.test(x.id)).slice(0, 3).map((x) => ({ id: x.id, alt: strt(x.alt, 200) }));
+  if (!title && !body && !images.length) return null;
+  return { title: title || 'Untitled', kind: KINDS.includes(h.kind) ? h.kind : 'note', body, images };
 }

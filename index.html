@@ -435,6 +435,50 @@ details.beast .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 .strip { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px; padding: 0; list-style: none; }
 .strip li { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 8px 14px; font-size: 14px; }
 .strip b { font-family: var(--display); font-size: 20px; margin-right: 6px; font-variant-numeric: tabular-nums; }
+/* the shared table: status line, who is here, the scene board, the Keeper's desk */
+.tblbar { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; color: var(--muted); }
+.tblbar i { width: 10px; height: 10px; border-radius: 50%; background: var(--muted); flex: none; }
+.tblbar.live i { background: var(--good); }
+.tblbar.retry i, .tblbar.joining i { background: var(--warn); }
+.tblbar.offline i { background: var(--bad); }
+.seg.tv { flex-wrap: wrap; max-width: 100%; }
+.seats { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; padding: 0; margin: 0 0 16px; }
+.seat { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 2px 10px; font-size: 14px; background: var(--surface); }
+.seat i { width: 8px; height: 8px; border-radius: 50%; background: var(--good); flex: none; }
+.seat.off { color: var(--muted); }
+.seat.off i { background: transparent; border: 1px solid var(--muted); }
+.seat b { color: var(--accent); }
+.hos { display: grid; gap: 16px; }
+.ho { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; min-width: 0; }
+.ho.pinned { border-color: var(--accent); }
+.ho h3 { margin: 6px 0 8px; }
+.hohead { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.hobody { white-space: pre-wrap; overflow-wrap: anywhere; margin: 10px 0 0; }
+.hoimgs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 10px; margin: 8px 0 0; }
+.hoimgs figure { margin: 0; min-width: 0; }
+.hoimgs figcaption { margin-top: 4px; }
+.hoimg { display: block; width: 100%; padding: 0; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--bg); cursor: zoom-in; }
+.hoimg img { display: block; width: 100%; max-height: 420px; object-fit: contain; }
+.hodlg img { display: block; max-width: 100%; max-height: calc(100vh - 190px); margin: 0 auto; border-radius: 4px; }
+.hodlg p { margin: 10px 0 0; }
+.pin summary { cursor: pointer; }
+.pin[open] summary { margin-bottom: 4px; }
+#play-pin:not(:empty) { margin-bottom: 16px; }
+#play-feed:not(:empty) { margin-top: 16px; }
+.kform { display: grid; gap: 6px; margin-top: 12px; }
+.kform h3 { margin: 0; }
+.kform .lbl { margin: 8px 0 0; }
+.kpic { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 12px; align-items: start; border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
+.kpic img { display: block; width: 100%; border-radius: 4px; }
+.kpic .lbl { margin-top: 0; }
+@media (max-width: 420px) { .kpic { grid-template-columns: minmax(0, 1fr); } .kpic img { max-width: 200px; } }
+.khead { margin: 24px 0 10px; }
+.khos, .kov { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.kov { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+.kho, .kov li { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; min-width: 0; }
+.kho p, .kov p { margin: 0 0 6px; }
+.kho .actions { margin-top: 6px; }
+#t-party.hasdot::after { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-left: 6px; vertical-align: middle; }
 .switch { display: flex; gap: 12px; align-items: center; cursor: pointer; }
 .switch input { width: 22px; height: 22px; accent-color: var(--accent); }
 
@@ -782,6 +826,7 @@ div.wcard { cursor: default; border-color: var(--good); }
 <div class="texture t2" aria-hidden="true"></div>
 <div id="fx" aria-hidden="true"></div>
 <div class="evtoast" id="evtoast" role="status" hidden><span id="evtoast-t"></span><button class="btn sm" type="button" id="evtoast-undo">Undo</button></div>
+<dialog class="hcdlg hodlg" id="hodlg" aria-label="Picture from the Keeper"><img id="hodlg-img" alt=""><p id="hodlg-cap"></p><div class="actions"><button class="btn sm" type="button" id="hodlg-close">Close</button></div></dialog>
 <dialog class="hcdlg" id="hcdlg" aria-labelledby="hc-title">
   <h2 class="sectitle" id="hc-title">Hunter card</h2>
   <p class="small muted" style="margin:0 0 10px">A picture of your hunter to drop in the group chat. It always uses the dark look, so it reads the same wherever you paste it.</p>
@@ -805,7 +850,7 @@ div.wcard { cursor: default; border-color: var(--good); }
     <button role="tab" id="t-play" aria-controls="p-play" aria-selected="false" data-tab="play">Play</button>
     <button role="tab" id="t-roll" aria-controls="p-roll" aria-selected="false" data-tab="roll">Roller</button>
     <button role="tab" id="t-hunter" aria-controls="p-hunter" aria-selected="false" data-tab="hunter">Hunter</button>
-    <button role="tab" id="t-party" aria-controls="p-party" aria-selected="false" data-tab="party">Party</button>
+    <button role="tab" id="t-party" aria-controls="p-party" aria-selected="false" data-tab="party">Party<span class="vh" id="t-party-new"></span></button>
     <button role="tab" id="t-bestiary" aria-controls="p-bestiary" aria-selected="false" data-tab="bestiary">Bestiary</button>
     <button role="tab" id="t-tips" aria-controls="p-tips" aria-selected="false" data-tab="tips">Tips</button>
     <button role="tab" id="t-notes" aria-controls="p-notes" aria-selected="false" data-tab="notes">Case files</button>
@@ -1024,10 +1069,11 @@ div.wcard { cursor: default; border-color: var(--good); }
 
   <!-- PLAY: everything you touch mid-session on one screen. The dice card (#rollkit) is moved in here from the Roller while this tab is open. -->
   <section class="panel" id="p-play" role="tabpanel" aria-labelledby="t-play" hidden>
+    <div id="play-pin"></div>
     <div class="play">
       <div class="card" id="play-status"></div>
       <div id="play-moves"></div>
-      <div><div class="card" id="play-sel" style="margin-bottom:16px"></div><div id="play-stage"></div></div>
+      <div><div class="card" id="play-sel" style="margin-bottom:16px"></div><div id="play-stage"></div><div id="play-feed"></div></div>
     </div>
   </section>
 
@@ -1391,7 +1437,7 @@ function exampleCase() {
 }
 function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.hook = c.threats = c.weakness = c.npcs = c.loose = c.log = ''; c.clock = 0; c.eos = [false, false, false, false]; c.date = new Date().toISOString().slice(0, 10); return c; }
 function defaults() {
-  return { v: 1, tab: 'guide', hv: 'build', wiz: 0, bkAt: 0, start: { hide: false, rolled: false }, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage', theme: 'auto', ink: '' }, hold: { n: 0, move: '', asked: [] }, session: { started: 0, events: [] }, bench: [], dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
+  return { v: 1, tab: 'guide', hv: 'build', wiz: 0, bkAt: 0, start: { hide: false, rolled: false }, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage', theme: 'auto', ink: '', tname: '' }, hold: { n: 0, move: '', asked: [] }, session: { started: 0, events: [] }, bench: [], hoseen: 0, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0 },
     sheet: { name: '', pronouns: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, adv: {}, moves: '', gear: '' } };   // adv: the moves marked advanced, by id
 }
@@ -1595,7 +1641,7 @@ function showTab(name, fromHash) {
   if (kit && home && kit.parentElement !== home) home.appendChild(kit);
   if (name === 'play' || name === 'roll') renderHist();
   $('.wrap').classList.toggle('wide', name === 'play');
-  if (name === 'party') renderParty();
+  if (name === 'party') { if (tblUnseen()) tbl.view = 'board'; renderParty(); }
   if (name === 'guide') renderStart();
   if (name === 'hunter' && S.hv === 'build') renderBuild();
   if (typeof applyTex === 'function') applyTex();
@@ -3339,8 +3385,9 @@ function partyBody() {
   return { name: sh.name, pronouns: String(sh.pronouns || '').slice(0, 40), playbook: sh.playbook, catchline: sh.catch, look: lookFull().slice(0, 280), photo: sh.thumb || '', stats: sh.stats, luck: sh.luck, harm: sh.harm, unstable: !!sh.unstable, xp: sh.xp, level: sh.level, armor: armorVal(), weapons: weaponsOut().map(function (i) { return i.name; }).slice(0, 6), moves: allMoveNames().slice(0, 12) };
 }
 function pushParty(force) {
-  if (!S.share || !store.db || !store.uid || party.blocked) return;
+  if (!S.share || !tableOn() || party.blocked) return;
   if (S.sheet.photo && !S.sheet.thumb) { if (!party.thumbing) { party.thumbing = true; makeThumb(S.sheet.photo, function (t) { party.thumbing = false; S.sheet.thumb = t || ' '; scheduleSave(); }); } return; }
+  if (tbl.on) { tblPush(force); return; }
   var body = partyBody(); if (body.photo === ' ') body.photo = '';
   var key = JSON.stringify(body);
   if (!force && key === party.last) return;
@@ -3354,6 +3401,7 @@ function pushParty(force) {
   }).then(function () { party.writing = false; if (party.again) { party.again = false; pushParty(); } });
 }
 function unshareParty() {
+  if (tbl.on) { party.last = ''; tblSend({ t: 'unshare' }); return; }
   if (!store.db || !store.uid) return;
   party.last = '';
   store.db.doc('party/' + store.uid).delete().then(null, function () { party.msg = 'Could not remove your hunter from the table. Try again.'; renderParty(); });
@@ -3379,13 +3427,13 @@ function ago(ts) {
 }
 function meter(n, max, cls, label) { var h = ''; for (var i = 1; i <= max; i++) h += '<i class="' + (i <= n ? 'on' : '') + '"></i>'; return '<span class="meter ' + cls + '" role="img" aria-label="' + label + ' ' + n + ' of ' + max + '">' + h + '</span>'; }
 function partyCard(d) {
-  var you = d.id === store.uid, st = d.stats || {};
+  var you = d.id === myId(), st = d.stats || {};
   var img = d.photo ? '<img src="' + esc(d.photo) + '" alt="Portrait of ' + esc(d.name || 'a hunter') + '">' : '<div class="ph">No photo</div>';
   var by = you ? 'You' : (party.names[d.id] || '');
   var stats = STATS.map(function (s) { return '<li class="chip">' + STATNAME[s] + ' ' + fmt(+st[s] || 0) + '</li>'; }).join('');
   var flags = (d.unstable ? '<li class="chip" style="color:var(--bad);border-color:var(--bad)">Unstable</li>' : '') + (d.armor ? '<li class="chip">Armor ' + (+d.armor) + '</li>' : '') + (d.weapons || []).map(function (w) { return '<li class="chip">' + esc(w) + '</li>'; }).join('');
   var mv = (d.moves || []).length ? '<ul class="chips">' + d.moves.map(function (m) { return '<li class="chip">' + esc(m) + '</li>'; }).join('') + '</ul>' : '';
-  return '<article class="pcard' + (you ? ' you' : '') + '"><div class="pimg">' + img + '</div><div class="pinfo"><h3>' + esc(d.name || 'Unnamed hunter') + (you ? '<span class="chip">You</span>' : '') + '</h3>' +
+  return '<article class="pcard' + (you ? ' you' : '') + '"><div class="pimg">' + img + '</div><div class="pinfo"><h3>' + esc(d.name || 'Unnamed hunter') + (you ? '<span class="chip">You</span>' : '') + (d.online === false ? '<span class="chip tag">Away</span>' : '') + '</h3>' +
     '<p class="small muted">' + esc(d.playbook || 'No playbook yet') + (d.pronouns ? ' · ' + esc(String(d.pronouns).slice(0, 40)) : '') + (by && !you ? ' · played by ' + esc(by) : '') + '</p>' + (d.catchline ? '<p class="catch">“' + esc(d.catchline) + '”</p>' : '') +
     '<ul class="chips" style="margin:2px 0">' + stats + '</ul>' +
     '<div class="meters"><div><span>Luck</span>' + meter(+d.luck || 0, 7, 'luck', 'Luck') + '</div><div><span>Harm</span>' + meter(+d.harm || 0, 8, 'harm', 'Harm') + '</div><div><span>XP</span>' + meter(Math.min(+d.xp || 0, 5), 5, 'xp', 'XP') + '</div></div>' +
@@ -3394,20 +3442,32 @@ function partyCard(d) {
 }
 function renderParty() {
   var host = $('#partybody'); if (!host) return;
-  var dl = $('#partynames');
-  if (dl) dl.innerHTML = party.docs.filter(function (d) { return d.id !== store.uid && d.name; }).map(function (d) { return '<option value="' + esc(d.name) + '">'; }).join('');
-  if (!store.db || !store.uid) {
+  tbl.stale = false;
+  var me = myId(), dl = $('#partynames');
+  if (dl) dl.innerHTML = party.docs.filter(function (d) { return d.id !== me && d.name; }).map(function (d) { return '<option value="' + esc(d.name) + '">'; }).join('');
+  if (!tableOn()) {
     host.innerHTML = '<div class="empty"><b>The shared table is not switched on yet.</b><br>When it is, everyone\'s hunters will show up here as the game goes. Until then, make a hunter card and drop it in your group chat.<br><button class="btn sm" type="button" data-hcard style="margin-top:12px">Save hunter card</button></div>';
     return;
   }
-  var docs = party.docs.slice().sort(function (a, b) { return (a.id === store.uid ? -1 : b.id === store.uid ? 1 : 0) || String(a.name || '').localeCompare(String(b.name || '')); });
+  if (tbl.on && tbl.view === 'desk' && !tbl.me.keeper) tbl.view = 'hunters';
+  if (tbl.on && tbl.view !== 'hunters') {
+    host.innerHTML = tblHead() + (tbl.view === 'board' ? boardHTML() : deskHTML());
+    /* looking at the board is what clears the dot on the tab */
+    if (tbl.view === 'board' && S.tab === 'party' && tblUnseen()) { S.hoseen = Math.max.apply(null, tbl.hos.map(function (h) { return h.at; })); scheduleSave(); tblDot(); }
+    return;
+  }
+  var docs = party.docs.slice().sort(function (a, b) { return (a.id === me ? -1 : b.id === me ? 1 : 0) || String(a.name || '').localeCompare(String(b.name || '')); });
   var n = docs.length, luck = docs.reduce(function (s, d) { return s + (+d.luck || 0); }, 0), hurt = docs.filter(function (d) { return (+d.harm || 0) > 0; }).length, unst = docs.filter(function (d) { return d.unstable; }).map(function (d) { return d.name || 'A hunter'; });
-  var share = '<div class="card" style="margin-bottom:16px"><label class="switch"><input type="checkbox" id="share"' + (S.share ? ' checked' : '') + '><span><b>Show my hunter to the table</b><br><span class="small muted">Shares your name, playbook, stats, Luck, Harm, XP, gear names and playbook move names with everyone who opens this page. Your notes, bonds, case files and bestiary stay private.</span></span></label>' +
-    (party.msg ? '<p class="small" role="status" style="margin:10px 0 0;color:var(--bad)">' + esc(party.msg) + '</p>' : '') +
-    '<p class="small muted" style="margin:10px 0 0">To bring your group here, share this page with them and give each person Contributor access so they can add their own hunter.</p></div>';
+  var msg = party.msg ? '<p class="small" role="status" style="margin:10px 0 0;color:var(--bad)">' + esc(party.msg) + '</p>' : '';
+  var share = tbl.on
+    ? '<div class="card" style="margin-bottom:16px"><label class="switch"><input type="checkbox" id="share"' + (S.share ? ' checked' : '') + '><span><b>Show my hunter and my rolls to the table</b><br><span class="small muted">Shares your hunter\'s name, playbook, ratings, Luck, Harm, XP, gear names, move names and dice, and each roll as you make it, with everyone who can open this site. Your notes, bonds, case files and bestiary stay private.</span></span></label>' +
+      '<label class="lbl" for="tname" style="margin-top:14px">Your name at the table</label><input type="text" id="tname" maxlength="30" autocomplete="off" value="' + esc(S.settings.tname || tbl.me.name) + '" style="max-width:320px">' +
+      '<p class="small muted" style="margin:6px 0 0">This is how the others see who is playing each hunter.' + (tbl.me.keeper ? ' You are the Keeper at this table, so you do not need to share a hunter.' : '') + '</p>' + msg + '</div>'
+    : '<div class="card" style="margin-bottom:16px"><label class="switch"><input type="checkbox" id="share"' + (S.share ? ' checked' : '') + '><span><b>Show my hunter to the table</b><br><span class="small muted">Shares your name, playbook, stats, Luck, Harm, XP, gear names and playbook move names with everyone who opens this page. Your notes, bonds, case files and bestiary stay private.</span></span></label>' + msg +
+      '<p class="small muted" style="margin:10px 0 0">To bring your group here, share this page with them and give each person Contributor access so they can add their own hunter.</p></div>';
   var strip = n ? '<ul class="strip"><li><b>' + n + '</b>' + (n === 1 ? 'hunter' : 'hunters') + ' at the table</li><li><b>' + luck + '</b>Luck in the pool</li><li><b>' + hurt + '</b>hurt</li>' + (unst.length ? '<li style="border-color:var(--bad);color:var(--bad)"><b>!</b>' + esc(unst.join(', ')) + ' unstable</li>' : '') + '</ul>' : '';
   var body = n ? '<div class="pgrid">' + docs.map(partyCard).join('') + '</div>' : '<div class="empty">' + artImg('empty-party', 'emptyimg') + (party.err ? 'Could not load the table right now.' : 'Nobody has joined the table yet. Turn on sharing above and you will be the first.') + '</div>';
-  host.innerHTML = share + strip + body;
+  host.innerHTML = (tbl.on ? tblHead() : '') + share + strip + body;
 }
 document.addEventListener('change', function (e) {
   if (e.target.id !== 'share') return;
@@ -3415,6 +3475,376 @@ document.addEventListener('change', function (e) {
   if (S.share) pushParty(true); else unshareParty();
   scheduleSave(); renderParty();
 });
+
+/* ---------- the shared table ----------
+   The Worker in worker/ keeps one table for the whole site: who is here, each shared hunter card, the last rolls, and what the Keeper posts.
+   The page asks /api/me once. If nothing answers (opened from a file, no Worker, nobody signed in) the table stays off and the journal works as it always has.
+   Everything that arrives from the table is other people's data: every field is checked and cut here, dice go through strictDie, and every string is escaped where it is shown. */
+var tbl = { on: false, state: 'off', ws: null, me: null, members: [], rolls: [], hos: [], tries: 0, timer: null, as: '', view: 'hunters', edit: null, del: '', msg: '', stale: false, pinOpen: true, pinId: '', pong: 0, back: null };
+var HOKINDS = ['scene', 'clue', 'person', 'place', 'note'], HOKIND = { scene: 'Scene', clue: 'Clue', person: 'Person', place: 'Place', note: 'Note' };
+var TBLERR = { 'Keeper only': 'Only the Keeper can do that.', 'bad handout': 'Give it a title, some words or a picture first.', 'no such handout': 'That handout is gone. It may have been deleted from another window.', 'too many handouts': 'The table holds 60 handouts. Delete an old one to make room.', 'slow down': 'That was too fast for the table. Try again in a moment.', 'too big': 'That was too big for the table to take.' };
+function tableOn() { return tbl.on || !!(store.db && store.uid); }
+function myId() { return tbl.on ? tbl.me.id : store.uid; }
+/* On your own machine the Worker can be started with DEV:1, and then ?as=name in the page's address stands in for the sign-in. A deployed Worker ignores it. */
+function tblUrl(p) { return p + (tbl.as ? (p.indexOf('?') < 0 ? '?' : '&') + 'as=' + encodeURIComponent(tbl.as) : ''); }
+function tblStr(v, max) { return typeof v === 'string' ? v.slice(0, max) : ''; }
+function tblInt(v, lo, hi, d) { v = Math.round(Number(v)); return isFinite(v) ? clamp(v, lo, hi) : d; }
+function tblList(a, n, m) { return Array.isArray(a) ? a.slice(0, n).map(function (x) { return tblStr(x, m); }).filter(Boolean) : []; }
+function tblCard(c) {
+  if (!c || typeof c !== 'object') return null;
+  var st = c.stats && typeof c.stats === 'object' ? c.stats : {};
+  var o = { name: tblStr(c.name, 60), pronouns: tblStr(c.pronouns, 40), playbook: tblStr(c.playbook, 40), catchline: tblStr(c.catchline, 200), look: tblStr(c.look, 280),
+    photo: typeof c.photo === 'string' && c.photo.length <= 24000 && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]*$/.test(c.photo) ? c.photo : '', stats: {},
+    luck: tblInt(c.luck, 0, 7, 7), harm: tblInt(c.harm, 0, 8, 0), unstable: c.unstable === true, xp: tblInt(c.xp, 0, 9, 0), level: tblInt(c.level, 0, 20, 0), armor: tblInt(c.armor, 0, 9, 0),
+    weapons: tblList(c.weapons, 6, 60), moves: tblList(c.moves, 12, 60) };
+  STATS.forEach(function (s) { o.stats[s] = tblInt(st[s], -3, 5, 0); });
+  return o;
+}
+function tblDice(d) { if (!d || typeof d !== 'object') return null; var a = strictDie(d.a), b = strictDie(d.b); return a && b ? { a: a, b: b, tray: TRAYS.indexOf(d.tray) >= 0 ? d.tray : 'leather' } : null; }
+function tblMember(m) {
+  if (!m || typeof m !== 'object' || !/^[0-9a-f]{12}$/.test(m.id)) return null;
+  return { id: m.id, name: tblStr(m.name, 30), keeper: m.keeper === true, online: m.online === true, card: tblCard(m.card), dice: tblDice(m.dice), at: tblInt(m.at, 0, 9e15, 0) };
+}
+function tblRoll(r) {
+  if (!r || typeof r !== 'object' || !/^[0-9a-f]{12}$/.test(r.id)) return null;
+  var d1 = tblInt(r.d1, 1, 6, 0), d2 = tblInt(r.d2, 1, 6, 0); if (!d1 || !d2) return null;
+  var mod = tblInt(r.mod, -15, 15, 0), luck = r.luck === true, total = luck ? 12 : d1 + d2 + mod;
+  return { n: tblInt(r.n, 0, 9e15, 0), id: r.id, at: tblInt(r.at, 0, 9e15, 0), move: tblStr(r.move, 80), d1: d1, d2: d2, mod: mod, total: total, tier: tierOf(total), luck: luck };
+}
+function tblHo(h) {
+  if (!h || typeof h !== 'object' || !/^[0-9a-f]{18}$/.test(h.id)) return null;
+  var imgs = (Array.isArray(h.images) ? h.images : []).filter(function (i) { return i && typeof i === 'object' && /^[0-9a-f]{18}$/.test(i.id); }).slice(0, 3).map(function (i) { return { id: i.id, alt: tblStr(i.alt, 200) }; });
+  return { id: h.id, title: tblStr(h.title, 80) || 'Untitled', kind: HOKINDS.indexOf(h.kind) >= 0 ? h.kind : 'note', body: tblStr(h.body, 4000), images: imgs, shown: h.shown === true, pinned: h.pinned === true, at: tblInt(h.at, 0, 9e15, 0) };
+}
+function tblFind(id) { for (var i = 0; i < tbl.members.length; i++) if (tbl.members[i].id === id) return tbl.members[i]; return null; }
+function tblHoFind(id) { for (var i = 0; i < tbl.hos.length; i++) if (tbl.hos[i].id === id) return tbl.hos[i]; return null; }
+function tblWho(id) { var m = tblFind(id); return m ? ((m.card && m.card.name) || m.name || 'Someone') : 'Someone'; }
+
+function tblStart() {
+  if (window.claude || !/^https?:$/.test(location.protocol) || !window.WebSocket || !window.fetch) return;
+  var q = /[?&]as=([a-z0-9._+-]{1,40})(?:&|$)/i.exec(location.search); tbl.as = q ? q[1] : '';
+  fetch(tblUrl('/api/me'), { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (me) {
+    if (!me || typeof me !== 'object' || !/^[0-9a-f]{12}$/.test(me.id)) return;
+    tbl.on = true; tbl.me = { id: me.id, name: tblStr(me.name, 30), keeper: me.keeper === true };
+    tblConnect(); renderParty();
+    setInterval(tblBeat, 25000);
+  }).catch(function () {});
+}
+function tblState(s) { if (tbl.state === s) return; tbl.state = s; tblDraw(); }
+function tblConnect() {
+  if (!tbl.on || tbl.ws) return;
+  clearTimeout(tbl.timer);
+  var ws;
+  try { ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + tblUrl('/api/ws')); } catch (e) { tblRetry(); return; }
+  tbl.ws = ws;
+  if (tbl.state === 'off') tblState('joining');
+  ws.onopen = function () {
+    if (tbl.ws !== ws) return;
+    tbl.tries = 0; tbl.pong = Date.now(); tblState('live');
+    if (S.settings.tname) tblSend({ t: 'hello', name: S.settings.tname });
+    party.last = ''; if (S.share) pushParty(true);
+  };
+  ws.onmessage = function (e) {
+    if (tbl.ws !== ws) return;
+    tbl.pong = Date.now();
+    if (e.data === 'pong') return;
+    var m; try { m = JSON.parse(e.data); } catch (x) { return; }
+    if (m && typeof m === 'object') tblIn(m);
+  };
+  ws.onclose = function () { if (tbl.ws !== ws) return; tbl.ws = null; tblRetry(); };
+  ws.onerror = function () { try { ws.close(); } catch (x) {} };
+}
+function tblRetry() {
+  tbl.tries++;
+  tblState(navigator.onLine === false ? 'offline' : 'retry');
+  if (tbl.tries === 4) tblDraw();   // the wording changes once it has gone on a while
+  clearTimeout(tbl.timer);
+  tbl.timer = setTimeout(tblConnect, Math.min(30000, 500 * Math.pow(2, Math.min(tbl.tries, 6))));
+}
+/* a connection can die without saying so (a laptop lid, a phone changing networks): ask for a pong now and then, and start again if none has come */
+function tblBeat() {
+  var ws = tbl.ws; if (!ws || ws.readyState !== 1) return;
+  if (Date.now() - tbl.pong > 70000) { tbl.ws = null; try { ws.close(); } catch (e) {} tblRetry(); return; }
+  try { ws.send('ping'); } catch (e) {}
+}
+function tblWake() { if (tbl.on && !tbl.ws) { clearTimeout(tbl.timer); tblConnect(); } }
+window.addEventListener('online', tblWake);
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') tblWake(); });
+function tblSend(o) { var ws = tbl.ws; if (!ws || ws.readyState !== 1) return false; try { ws.send(JSON.stringify(o)); return true; } catch (e) { return false; } }
+
+function tblIn(m) {
+  var x, h;
+  if (m.t === 'snap') {
+    if (m.you && typeof m.you === 'object' && /^[0-9a-f]{12}$/.test(m.you.id)) tbl.me = { id: m.you.id, name: tblStr(m.you.name, 30), keeper: m.you.keeper === true };
+    tbl.members = (Array.isArray(m.members) ? m.members : []).slice(0, 200).map(tblMember).filter(Boolean);
+    tbl.rolls = (Array.isArray(m.rolls) ? m.rolls : []).slice(0, 50).map(tblRoll).filter(Boolean);
+    tbl.hos = (Array.isArray(m.handouts) ? m.handouts : []).slice(0, 60).map(tblHo).filter(Boolean);
+  } else if (m.t === 'online') {
+    x = tblFind(m.id);
+    if (!x) { x = tblMember({ id: m.id, name: m.name, keeper: m.keeper }); if (!x) return; tbl.members.push(x); }
+    x.online = m.online === true;
+  } else if (m.t === 'name') {
+    x = tblFind(m.id); if (!x) return;
+    x.name = tblStr(m.name, 30); if (x.id === tbl.me.id) tbl.me.name = x.name;
+  } else if (m.t === 'card') {
+    x = tblFind(m.id); if (!x) return;
+    x.card = tblCard(m.card); x.dice = tblDice(m.dice); x.at = tblInt(m.at, 0, 9e15, 0);
+  } else if (m.t === 'gone') {
+    x = tblFind(m.id); if (!x) return;
+    x.card = null; x.dice = null;
+  } else if (m.t === 'roll') {
+    x = tblRoll(m.roll); if (!x) return;
+    tbl.rolls.unshift(x); tbl.rolls = tbl.rolls.slice(0, 50);
+  } else if (m.t === 'ho') {
+    h = tblHo(m.h); if (!h) return;
+    tbl.hos = tbl.hos.filter(function (o) { return o.id !== h.id; }); tbl.hos.push(h);
+    if (m.fresh === true && !tbl.me.keeper) tblNews(h);
+  } else if (m.t === 'ho-gone') {
+    tbl.hos = tbl.hos.filter(function (o) { return o.id !== m.id; });
+  } else if (m.t === 'ho-saved') {
+    if (tbl.edit && tbl.edit.wait) { tbl.edit = null; tbl.msg = 'Saved.'; renderParty(); }
+    return;
+  } else if (m.t === 'err') {
+    if (!TBLERR[m.why]) return;
+    tbl.msg = TBLERR[m.why]; if (tbl.edit) tbl.edit.wait = false;
+  } else return;
+  tblSync();
+}
+/* put what the table said where the Party tab already looks, then redraw */
+function tblSync() {
+  party.docs = tbl.members.filter(function (m) { return m.card; }).map(function (m) { var o = {}, k; for (k in m.card) o[k] = m.card[k]; o.id = m.id; o.updated = m.at; o.online = m.online; return o; });
+  party.names = {}; tbl.members.forEach(function (m) { party.names[m.id] = m.name; });
+  party.err = '';
+  tblDraw();
+}
+/* redraw everything the table feeds. Never under someone who is typing: that waits until they leave the field. */
+function tblDraw() {
+  tblDot(); renderTable();
+  if ($('#partybody input:focus, #partybody textarea:focus, #partybody select:focus')) tbl.stale = true; else renderParty();
+}
+document.addEventListener('focusout', function (e) {
+  if (!tbl.stale || !e.target.closest || !e.target.closest('#partybody')) return;
+  setTimeout(function () { if (tbl.stale && !$('#partybody input:focus, #partybody textarea:focus, #partybody select:focus')) renderParty(); }, 0);
+});
+function tblShown() { return tbl.hos.filter(function (h) { return h.shown; }).sort(function (a, b) { return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || b.at - a.at; }); }
+function tblUnseen() { return tbl.on && !tbl.me.keeper ? tbl.hos.filter(function (h) { return h.shown && h.at > S.hoseen; }).length : 0; }
+function tblDot() {
+  var n = tblUnseen(), t = $('#t-party'), s = $('#t-party-new');
+  if (t) t.classList.toggle('hasdot', n > 0);
+  if (s) s.textContent = n ? ', new from the Keeper' : '';
+}
+function tblNews(h) {
+  evMsg('New from the Keeper: ' + h.title);
+  if (h.pinned) tbl.pinOpen = true;
+  bell();
+}
+
+/* ---- what the table draws ---- */
+function hoPics(h) {
+  if (!h.images.length) return '';
+  return '<div class="hoimgs">' + h.images.map(function (i) {
+    return '<figure><button type="button" class="hoimg" data-hoimg="' + i.id + '" aria-label="Open the picture' + (i.alt ? ': ' + esc(i.alt) : '') + '"><img src="' + esc(tblUrl('/api/img/' + i.id)) + '" alt="' + esc(i.alt) + '" loading="lazy"></button>' + (i.alt ? '<figcaption class="small muted">' + esc(i.alt) + '</figcaption>' : '') + '</figure>';
+  }).join('') + '</div>';
+}
+function hoHTML(h, fresh) {
+  return '<article class="ho' + (h.pinned ? ' pinned' : '') + '"><p class="hohead"><span class="chip">' + HOKIND[h.kind] + '</span>' + (h.pinned ? '<span class="chip ok">Pinned</span>' : '') + (fresh ? '<span class="chip ok">New</span>' : '') + '</p><h3>' + esc(h.title) + '</h3>' + hoPics(h) +
+    (h.body ? '<p class="hobody">' + esc(h.body) + '</p>' : '') + '<p class="tiny">Shown ' + ago(h.at) + '</p></article>';
+}
+function tblHead() {
+  var words = { joining: 'Joining the table...', live: 'Live. You are connected to the table.', retry: 'Reconnecting to the table...' + (tbl.tries > 3 ? ' If this goes on, reload the page: your sign-in may have run out.' : ''), offline: 'Offline. Your journal still works, and the table catches up when you are back.' }[tbl.state] || '';
+  var n = tblUnseen();
+  function b(v, t) { return '<button type="button" data-pv="' + v + '" aria-pressed="' + (tbl.view === v) + '">' + t + '</button>'; }
+  var seats = tbl.members.slice().sort(function (x, y) { return (y.online ? 1 : 0) - (x.online ? 1 : 0) || String(x.name).localeCompare(String(y.name)); }).map(function (m) {
+    return '<li class="seat' + (m.online ? '' : ' off') + '"><i></i>' + esc(m.name || 'Player') + (m.id === tbl.me.id ? ' (you)' : '') + (m.keeper ? ' <b>Keeper</b>' : '') + (m.online ? '' : ' <span class="vh">, away</span>') + '</li>';
+  }).join('');
+  return '<p class="tblbar small ' + tbl.state + '" role="status" id="tblstate"><i></i><span>' + words + '</span></p>' +
+    '<div class="seg tv" role="group" aria-label="What to look at">' + b('hunters', 'Hunters') + b('board', 'Scene board' + (n ? ' (' + n + ' new)' : '')) + (tbl.me.keeper ? b('desk', 'Keeper\'s desk') : '') + '</div>' +
+    (seats ? '<ul class="seats" aria-label="Who is at the table">' + seats + '</ul>' : '');
+}
+function boardHTML() {
+  var hs = tblShown();
+  if (!hs.length) return '<div class="empty"><b>Nothing from the Keeper yet.</b><br>When the Keeper shows a scene, a clue or a picture, it lands here for everyone.</div>';
+  var since = S.hoseen, mine = tbl.me.keeper;
+  return '<div class="hos">' + hs.map(function (h) { return hoHTML(h, !mine && h.at > since); }).join('') + '</div>';
+}
+function deskForm(e) {
+  var kinds = HOKINDS.map(function (k) { return '<option value="' + k + '"' + (e.kind === k ? ' selected' : '') + '>' + HOKIND[k] + '</option>'; }).join('');
+  var pics = e.images.map(function (i, n) {
+    return '<div class="kpic"><img src="' + esc(tblUrl('/api/img/' + i.id)) + '" alt=""><div><label class="lbl" for="ho-alt-' + n + '">Describe this for players who cannot see it</label><input type="text" id="ho-alt-' + n + '" data-ho-alt="' + n + '" maxlength="200" value="' + esc(i.alt) + '"><button class="btn ghost sm" type="button" data-ho-rmpic="' + n + '" style="margin-top:8px">Remove this picture</button></div></div>';
+  }).join('');
+  var old = e.id ? tblHoFind(e.id) : null, dis = e.wait || e.busy ? ' disabled' : '';
+  var save = old && old.shown ? '<button class="btn sm" type="button" data-ho-save="keep"' + dis + '>Save changes</button><button class="btn ghost sm" type="button" data-ho-save="draft"' + dis + '>Save and hide from the table</button>'
+    : '<button class="btn sm" type="button" data-ho-save="show"' + dis + '>Show to the table</button><button class="btn ghost sm" type="button" data-ho-save="draft"' + dis + '>Save as a draft</button>';
+  return '<div class="kform" id="kform"><h3>' + (e.id ? 'Edit handout' : 'New handout') + '</h3>' +
+    '<label class="lbl" for="ho-title">Title</label><input type="text" id="ho-title" maxlength="80" value="' + esc(e.title) + '">' +
+    '<label class="lbl" for="ho-kind">Kind</label><select id="ho-kind">' + kinds + '</select>' +
+    '<label class="lbl" for="ho-body">What the players read</label><textarea id="ho-body" maxlength="4000" rows="6">' + esc(e.body) + '</textarea>' +
+    '<span class="lbl">Pictures (up to three)</span>' + pics +
+    '<input type="file" id="ho-file" accept="image/*" hidden>' +
+    '<div class="actions" style="margin-top:0"><button class="btn ghost sm" type="button" data-ho-addpic' + (e.images.length >= 3 || e.busy ? ' disabled' : '') + '>Add a picture</button></div>' +
+    '<p class="small" role="status" id="ho-say">' + esc(e.busy || e.say || '') + '</p>' +
+    '<div class="actions">' + save + '<button class="btn ghost sm" type="button" data-ho-cancel>Cancel</button></div></div>';
+}
+function deskHTML() {
+  var e = tbl.edit, live = tbl.state === 'live';
+  var out = '<div class="card kdesk"><h3>Keeper\'s desk</h3><p class="small muted">Write a scene, a clue or a note, add up to three pictures, and show it to the table when you are ready. A draft stays with you: nobody else can see it until you show it. One handout can be pinned, and it sits at the top of everyone\'s Play tab.</p>' +
+    (tbl.msg ? '<p class="small" role="status" id="kmsg"><b>' + esc(tbl.msg) + '</b></p>' : '') +
+    (e ? deskForm(e) : '<div class="actions"><button class="btn sm" type="button" data-ho-new' + (live ? '' : ' disabled') + '>New handout</button></div>' + (live ? '' : '<p class="small muted">The desk needs the table. It opens again when you are reconnected.</p>')) + '</div>';
+  var hs = tbl.hos.slice().sort(function (a, b) { return b.at - a.at; });
+  out += '<h3 class="khead">Your handouts</h3>' + (hs.length ? '<ul class="khos">' + hs.map(function (h) {
+    var state = h.pinned ? '<span class="chip ok">Pinned</span>' : h.shown ? '<span class="chip ok">Shown</span>' : '<span class="chip tag">Draft</span>';
+    var pics = h.images.length ? h.images.length + (h.images.length === 1 ? ' picture' : ' pictures') + ' &middot; ' : '';
+    var dis = live ? '' : ' disabled';
+    var acts = tbl.del === h.id
+      ? '<div class="confirm"><p><b>Delete "' + esc(h.title) + '"?</b> ' + (h.shown ? 'It will disappear from the table too.' : 'It cannot be brought back.') + '</p><div class="actions" style="margin-top:0"><button class="btn sm" type="button" data-ho-del-yes="' + h.id + '"' + dis + '>Delete it</button><button class="btn ghost sm" type="button" data-ho-del-no>Keep it</button></div></div>'
+      : '<div class="actions"><button class="btn sm" type="button" data-ho-show="' + h.id + '" data-on="' + (h.shown ? '0' : '1') + '"' + dis + '>' + (h.shown ? 'Hide from the table' : 'Show to the table') + '</button><button class="btn ghost sm" type="button" data-ho-pin="' + h.id + '" data-on="' + (h.pinned ? '0' : '1') + '"' + dis + '>' + (h.pinned ? 'Unpin' : 'Pin to Play') + '</button><button class="btn ghost sm" type="button" data-ho-edit="' + h.id + '"' + dis + '>Edit</button><button class="btn ghost sm" type="button" data-ho-del="' + h.id + '">Delete</button></div>';
+    return '<li class="kho"><p><b>' + esc(h.title) + '</b> <span class="chip">' + HOKIND[h.kind] + '</span> ' + state + '</p><p class="tiny">' + pics + (h.shown ? 'shown ' : 'saved ') + ago(h.at) + '</p>' + acts + '</li>';
+  }).join('') + '</ul>' : '<div class="empty">No handouts yet. Start with the opening scene: a few lines and a picture set the mood before anyone rolls.</div>');
+  /* the hunters at a glance, most hurt first. Read-only: the Keeper cannot change anyone's sheet. */
+  var hunters = tbl.members.filter(function (m) { return m.card; }).sort(function (a, b) { return b.card.harm - a.card.harm || (b.card.unstable ? 1 : 0) - (a.card.unstable ? 1 : 0) || a.card.luck - b.card.luck; });
+  out += '<h3 class="khead">The hunters, most hurt first</h3>' + (hunters.length ? '<ul class="kov">' + hunters.map(function (m) {
+    var c = m.card, r = null, i;
+    for (i = 0; i < tbl.rolls.length; i++) if (tbl.rolls[i].id === m.id) { r = tbl.rolls[i]; break; }
+    return '<li><p><b>' + esc(c.name || 'Unnamed hunter') + '</b> <span class="small muted">' + esc(c.playbook || 'No playbook yet') + ' &middot; ' + esc(m.name) + (m.online ? '' : ' &middot; away') + '</span>' + (c.unstable ? ' <span class="chip" style="color:var(--bad);border-color:var(--bad)">Unstable</span>' : '') + '</p>' +
+      '<div class="meters"><div><span>Harm</span>' + meter(c.harm, 8, 'harm', 'Harm') + '</div><div><span>Luck</span>' + meter(c.luck, 7, 'luck', 'Luck') + '</div><div><span>XP</span>' + meter(Math.min(c.xp, 5), 5, 'xp', 'XP') + '</div></div>' +
+      '<p class="small">' + (r ? 'Last roll: ' + esc(r.move || 'A roll') + ', <b>' + r.total + '</b>, <span class="tag ' + r.tier + '">' + TIERNAME[r.tier] + '</span>' : '<span class="muted">No rolls yet.</span>') + '</p></li>';
+  }).join('') + '</ul>' : '<div class="empty">No hunters are showing yet. Each player turns on "Show my hunter and my rolls to the table" on their own Party tab.</div>');
+  return out;
+}
+/* Play: the pinned handout as a banner that folds down to its title, and the last five rolls from everyone */
+function renderTable() {
+  var pin = $('#play-pin'), feed = $('#play-feed'), h = null, i;
+  for (i = 0; i < tbl.hos.length; i++) if (tbl.hos[i].pinned && tbl.hos[i].shown) h = tbl.hos[i];
+  if (pin) {
+    if (h && h.id !== tbl.pinId) tbl.pinOpen = true;
+    tbl.pinId = h ? h.id : '';
+    pin.innerHTML = h ? '<details class="card pin" id="pin-d"' + (tbl.pinOpen ? ' open' : '') + '><summary><span class="chip">From the Keeper</span> <b>' + esc(h.title) + '</b></summary>' + hoPics(h) + (h.body ? '<p class="hobody">' + esc(h.body) + '</p>' : '') + '</details>' : '';
+  }
+  if (feed) {
+    var rs = tbl.rolls.slice(0, 5);
+    feed.innerHTML = tbl.on && rs.length ? '<div class="card"><h3 style="margin-top:0">At the table</h3><ul class="hist">' + rs.map(function (r) {
+      return '<li><b>' + r.total + '</b><span>' + esc(tblWho(r.id)) + ': ' + esc(r.move || 'A roll') + ' <span class="muted">(' + r.d1 + '+' + r.d2 + ' ' + fmt(r.mod) + (r.luck ? ', Luck' : '') + ')</span></span><span class="tag ' + r.tier + '">' + TIERNAME[r.tier] + '</span></li>';
+    }).join('') + '</ul></div>' : '';
+  }
+}
+document.addEventListener('toggle', function (e) { if (e.target && e.target.id === 'pin-d') tbl.pinOpen = e.target.open; }, true);
+
+/* ---- sending ---- */
+function tblPush(force) {
+  if (!S.share) return;
+  var body = partyBody(); if (body.photo === ' ') body.photo = '';
+  var dice = { a: curDie(0), b: curDie(1), tray: S.dice.tray }, key = JSON.stringify([body, dice]);
+  if (!force && key === party.last) return;
+  if (tblSend({ t: 'card', card: body, dice: dice })) party.last = key;
+}
+function tblRollOut(r) {
+  if (tbl.on && S.share) tblSend({ t: 'roll', roll: { move: r.name, d1: r.d1, d2: r.d2, mod: r.mod, luck: false, dice: { a: curDie(0), b: curDie(1), tray: S.dice.tray } } });
+}
+/* A picture is redrawn on a canvas before it leaves this machine: that drops what a camera hides inside the file (where and when it was taken),
+   shrinks it to 1600 across at most, and lowers the quality until it is under the table's 700 KB. */
+function tblPrep(file, cb) {
+  var url = URL.createObjectURL(file), im = new Image();
+  im.onload = function () {
+    URL.revokeObjectURL(url);
+    var side = 1600, qs = [.86, .74, .62, .5], qi = 0, tries = 0;
+    function go() {
+      var sc = Math.min(1, side / Math.max(im.width, im.height)), c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(im.width * sc)); c.height = Math.max(1, Math.round(im.height * sc));
+      var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height);
+      c.toBlob(function (b) {
+        if (b && b.size <= 700 * 1024) { cb(b); return; }
+        if (++tries > 14 || !b) { cb(null); return; }
+        if (++qi >= qs.length) { qi = 0; side = Math.round(side * .75); }
+        go();
+      }, 'image/jpeg', qs[qi]);
+    }
+    go();
+  };
+  im.onerror = function () { URL.revokeObjectURL(url); cb(null); };
+  im.src = url;
+}
+/* When the table refuses a picture early it hangs up without reading it, and the next try on the same connection can fail: so one more go on a fresh one. */
+function tblUpload(blob, cb, again) {
+  fetch(tblUrl('/api/img'), { method: 'PUT', body: blob, credentials: 'same-origin' }).then(function (r) {
+    return r.json().then(function (j) { return r.status === 201 && j && /^[0-9a-f]{18}$/.test(j.id) ? j.id : ''; }, function () { return ''; });
+  }).then(function (id) { cb(id); }, function () { if (again) cb(''); else tblUpload(blob, cb, true); });
+}
+function tblEditSay(e, t) { e.busy = ''; e.say = t; tblDraw(); }
+document.addEventListener('click', function (e) {
+  var t = e.target.closest ? e.target.closest('[data-pv], [data-ho-new], [data-ho-edit], [data-ho-cancel], [data-ho-save], [data-ho-show], [data-ho-pin], [data-ho-del], [data-ho-del-yes], [data-ho-del-no], [data-ho-addpic], [data-ho-rmpic], [data-hoimg]') : null;
+  if (!t || !tbl.on) return;
+  var d = t.dataset, ed = tbl.edit, h, i;
+  if (d.hoimg) {
+    var dlg = $('#hodlg'), alt = '';
+    tbl.hos.forEach(function (o) { o.images.forEach(function (x) { if (x.id === d.hoimg) alt = x.alt; }); });
+    $('#hodlg-img').src = tblUrl('/api/img/' + d.hoimg); $('#hodlg-img').alt = alt; $('#hodlg-cap').textContent = alt;
+    tbl.back = t;
+    if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', '');
+    $('#hodlg-close').focus();
+    return;
+  }
+  if (d.pv) {
+    tbl.view = d.pv === 'board' || (d.pv === 'desk' && tbl.me.keeper) ? d.pv : 'hunters';
+    renderParty(); var again = $('#partybody [data-pv="' + tbl.view + '"]'); if (again) again.focus();
+    return;
+  }
+  if (!tbl.me.keeper) return;
+  tbl.msg = '';
+  if ('hoNew' in d) tbl.edit = { id: '', title: '', kind: 'scene', body: '', images: [], wait: false, busy: '', say: '' };
+  else if (d.hoEdit) { h = tblHoFind(d.hoEdit); if (h) tbl.edit = { id: h.id, title: h.title, kind: h.kind, body: h.body, images: h.images.map(function (x) { return { id: x.id, alt: x.alt }; }), wait: false, busy: '', say: '' }; }
+  else if ('hoCancel' in d) tbl.edit = null;
+  else if ('hoAddpic' in d) { var f = $('#ho-file'); if (f) f.click(); return; }
+  else if (d.hoRmpic && ed) ed.images.splice(+d.hoRmpic, 1);
+  else if (d.hoSave && ed) {
+    if (!ed.title.trim() && !ed.body.trim() && !ed.images.length) ed.say = 'Give it a title, some words or a picture first.';
+    else {
+      var msg = { t: 'ho-save', h: { title: ed.title, kind: ed.kind, body: ed.body, images: ed.images } };
+      if (ed.id) msg.id = ed.id;
+      if (d.hoSave === 'show') msg.show = true; else if (d.hoSave === 'draft') msg.show = false;
+      if (tblSend(msg)) { ed.wait = true; ed.say = 'Saving...'; } else ed.say = 'Not connected to the table. Your words are still here: try again in a moment.';
+    }
+  }
+  else if (d.hoShow) { if (!tblSend({ t: 'ho-show', id: d.hoShow, shown: d.on === '1' })) tbl.msg = 'Not connected to the table. Try again in a moment.'; }
+  else if (d.hoPin) { if (!tblSend({ t: 'ho-pin', id: d.hoPin, pinned: d.on === '1' })) tbl.msg = 'Not connected to the table. Try again in a moment.'; }
+  else if (d.hoDel) tbl.del = d.hoDel;
+  else if ('hoDelNo' in d) tbl.del = '';
+  else if (d.hoDelYes) { if (tblSend({ t: 'ho-del', id: d.hoDelYes })) { tbl.del = ''; if (ed && ed.id === d.hoDelYes) tbl.edit = null; } else tbl.msg = 'Not connected to the table. Try again in a moment.'; }
+  renderParty();
+  if (('hoNew' in d || d.hoEdit) && $('#ho-title')) $('#ho-title').focus();
+});
+document.addEventListener('input', function (e) {
+  var ed = tbl.edit, t = e.target; if (!ed || !t.id) return;
+  if (t.id === 'ho-title') ed.title = t.value; else if (t.id === 'ho-body') ed.body = t.value; else if (t.id === 'ho-kind') ed.kind = HOKINDS.indexOf(t.value) >= 0 ? t.value : 'note';
+  else if (t.dataset && t.dataset.hoAlt && ed.images[+t.dataset.hoAlt]) ed.images[+t.dataset.hoAlt].alt = t.value;
+});
+document.addEventListener('change', function (e) {
+  var t = e.target, ed = tbl.edit;
+  if (t.id === 'tname') {
+    S.settings.tname = String(t.value || '').replace(/\s+/g, ' ').trim().slice(0, 30); scheduleSave();
+    if (S.settings.tname) tblSend({ t: 'hello', name: S.settings.tname });
+    return;
+  }
+  if (t.id === 'ho-kind' && ed) { ed.kind = HOKINDS.indexOf(t.value) >= 0 ? t.value : 'note'; return; }
+  if (t.id !== 'ho-file' || !ed || !t.files || !t.files[0]) return;
+  var file = t.files[0];
+  if (ed.images.length >= 3) return;
+  if (!/^image\//.test(file.type)) { tblEditSay(ed, 'That file is not a picture.'); return; }
+  ed.busy = 'Getting the picture ready...'; ed.say = ''; renderParty();
+  tblPrep(file, function (blob) {
+    if (tbl.edit !== ed) return;
+    if (!blob) { tblEditSay(ed, 'That picture could not be read. Try a JPEG or PNG.'); return; }
+    ed.busy = 'Sending the picture to the table...'; tblDraw();
+    tblUpload(blob, function (id) {
+      if (tbl.edit !== ed) return;
+      if (!id) { tblEditSay(ed, 'The table did not take that picture. Check you are connected and try again.'); return; }
+      if (ed.images.length < 3) ed.images.push({ id: id, alt: '' });
+      tblEditSay(ed, 'Picture added. Describe it for players who cannot see it.');
+    });
+  });
+});
+$('#hodlg-close').addEventListener('click', function () { var dlg = $('#hodlg'); if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); });
+$('#hodlg').addEventListener('close', function () { var b = tbl.back; tbl.back = null; if (b && document.contains(b)) b.focus(); });
+window.__journal.tbl = function () { return tbl; };
 
 /* ---------- big moments ---------- */
 var ac = null, master = null;
@@ -4640,6 +5070,7 @@ function doRoll() {
     S.rolls.unshift({ name: mv.id === 'plain' ? STATNAME[R.stat] + ' roll' : mv.name, d1: d1, d2: d2, mod: last.total - d1 - d2, total: last.total, tier: tierOf(last.total) });
     S.rolls = S.rolls.slice(0, 30); S.start.rolled = true;
     last.evid = evRoll({ name: S.rolls[0].name, d1: d1, d2: d2, mod: S.rolls[0].mod, total: last.total, tier: S.rolls[0].tier });
+    tblRollOut(S.rolls[0]);
     if (HOLDS[R.move] && tierOf(last.total) !== 'miss') { S.hold = { n: HOLDS[R.move][tierOf(last.total)], move: R.move, asked: [] }; last.hold = true; evSkip('hold'); }   // the hold is part of the roll's line
     R.forward = 0; R.other = 0;
     renderRoller(); scheduleSave(); popSum();
@@ -4845,7 +5276,7 @@ initArt(); initCaps();
 /* offline copy: only when served over http(s), never from a file or inside claude.ai */
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !window.claude) { try { navigator.serviceWorker.register('sw.js').catch(function () {}); } catch (e) {} }
 initStore().then(function () {
-  renderAll(); startParty();
+  renderAll(); startParty(); tblStart();
   var h = location.hash.replace('#', '');
   showTab(TABS.indexOf(h) >= 0 ? h : S.tab, true);
 });
