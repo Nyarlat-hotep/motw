@@ -43,7 +43,8 @@ The first pass was made entirely in code. Real recordings, sorted by die and by 
 - [ ] Finishes still worth adding: copper or brass with patina, sandstone, obsidian, a second wood. Give the new finishes sounds of their own when the sounds are tuned.
 - [ ] A wasteland color palette for bodies and pips (rust, sand, hazard yellow, oil black, coolant green).
 - [x] Scuffed glass: in as `img/die-glass.jpg`, drawn as scratches on the Fuel shell (2026-10-08).
-- [ ] The dice maker's preview is still the flat dice. Show the 3D dice there when 3D is on.
+- [x] The dice maker's preview shows the real 3D dice when 3D is on (2026-10-08): same scene, light and tray, both dice six up so the sigil shows.
+- [ ] Let the preview dice be turned by dragging, to look at every face.
 - [ ] Bring back the dimmed look before the first roll (lost when the tray moved into the 3D scene).
 - [ ] Check speed on a mid-range phone. If clear dice are slow, fall back to the cheaper glass there.
 - [ ] Make hold-to-shake (on `dice-sounds`) move the 3D dice and the liquid.

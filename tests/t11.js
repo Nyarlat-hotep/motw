@@ -52,6 +52,20 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   check('the tray photo is the floor of the scene', await p.evaluate(() => __d3.floorOn && __d3.floor.visible && __d3.traySrc === 'img/tray-slate.jpg' && !__d3.sheet.visible));
   await p.locator('#tray').screenshot({ path: path.join(__dirname,'out','d3-fuel-rest.png') });
 
+  // ---- the dice maker's preview is the 3D dice too ----
+  const pv = () => p.evaluate(() => { const c = document.querySelector('#dp-tray canvas.d3cv'); if (!c || c.hidden) return null; const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data, seen = new Set(); for (let i = 0; i < d.length; i += 4 * 97) seen.add((d[i] >> 4) + ',' + (d[i + 1] >> 4) + ',' + (d[i + 2] >> 4)); return { w: c.width, h: c.height, colors: seen.size, flat: getComputedStyle(document.getElementById('dp-dice')).visibility, n: __d3.pvn }; });
+  await p.waitForFunction(() => __d3.pvn > 0, null, { timeout: 8000 }).catch(() => {});
+  let v = await pv();
+  check('preview: with 3D on it is drawn from the 3D dice, and the flat preview dice are hidden', !!v && v.colors > 12 && v.flat === 'hidden', JSON.stringify(v));
+  check('preview: it fills the preview tray', !!v && await p.evaluate(() => { const t = document.getElementById('dp-tray'), c = t.querySelector('canvas.d3cv').getBoundingClientRect(); return Math.abs(c.width - t.clientWidth) < 2 && Math.abs(c.height - t.clientHeight) < 2; }));
+  s = await d3(p);
+  check('preview: drawing it leaves the dice in the tray as they were', String(s.vals)===String(await labels(p)) && s.up.every(u => u > .99) && s.y.every(y => y === .5), JSON.stringify(s));
+  const before = v ? v.n : 0;
+  await p.click('[data-dp-set="body"][data-v="#1f6b50"]'); await p.waitForFunction((b) => __d3.pvn > b, before, { timeout: 8000 }).catch(() => {});
+  check('preview: it redraws when the dice change', (await pv()).n > before);
+  await p.locator('#dicepanel').screenshot({ path: path.join(__dirname,'out','d3-preview.png') });
+  await p.click('[data-dp-use="x:tank"]'); await p.waitForTimeout(400);
+
   // ---- a roll ----
   await p.click('#roll'); await p.waitForTimeout(450);
   s = await d3(p);
@@ -121,6 +135,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
 
   // ---- off again, and reload with it on ----
   await p.evaluate(() => document.getElementById('set-3d').click()); await p.waitForTimeout(100);
+  check('switching off brings the flat preview back too', await p.evaluate(() => getComputedStyle(document.getElementById('dp-dice')).visibility === 'visible' && document.querySelector('#dp-tray canvas.d3cv').hidden));
   check('switching off brings the regular dice back', (await p.evaluate(() => getComputedStyle(document.getElementById('dice')).visibility))==='visible' && !(await d3(p)).on);
   await p.evaluate(() => document.getElementById('set-3d').click()); await p.waitForTimeout(200);
   check('switching on again reuses the same canvas', (await p.locator('#tray canvas').count())===1 && (await d3(p)).state==='on');

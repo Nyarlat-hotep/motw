@@ -3081,7 +3081,7 @@ function useSet(st) {
 function dpSel(t) { var s = t.tagName.toLowerCase(); [].forEach.call(t.attributes, function (a) { if (/^data-/.test(a.name)) s += '[' + a.name + '="' + a.value + '"]'; }); return s; }
 function dpOpen(open) {
   $('#dicepanel').hidden = !open; $('#dp-open').setAttribute('aria-expanded', open ? 'true' : 'false');
-  if (open) { dpMsg(''); renderDice(); }
+  if (open) { dpMsg(''); renderDice(); d3Kick(0); }
 }
 $('#dp-open').addEventListener('click', function () { dpOpen($('#dicepanel').hidden); });
 $('#dp-close').addEventListener('click', function () { dpOpen(false); $('#dp-open').focus(); });
@@ -3418,6 +3418,7 @@ function d3Hide() {
   if (D3.state === 'on') D3.state = '';
   D3.anim = null; if (D3.raf) { cancelAnimationFrame(D3.raf); D3.raf = 0; }
   $('#tray').classList.remove('d3on'); if (D3.canvas) D3.canvas.hidden = true;
+  $('#dp-tray').classList.remove('d3on'); if (D3.pv) D3.pv.hidden = true;
 }
 function d3Init() {
   var T = D3.T, tray = $('#tray'), cv = document.createElement('canvas');
@@ -3502,15 +3503,19 @@ function d3Size() {
   if (D3.state !== 'on') return;
   var T = D3.T, t = $('#tray'), w = t.clientWidth, h = t.clientHeight, cam = D3.cam, x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
   if (!w || !h) return;
-  D3.renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix(); cam.updateMatrixWorld();
-  /* stretch the floor to cover exactly what the camera can see */
+  D3.renderer.setSize(w, h, false); cam.aspect = w / h; cam.updateProjectionMatrix();
+  d3Cover(cam); d3Kick(0);
+}
+/* stretch the floor to cover exactly what a camera can see */
+function d3Cover(cam) {
+  var x0 = 1e9, x1 = -1e9, z0 = 1e9, z1 = -1e9;
+  cam.updateMatrixWorld();
   [[-1, -1], [1, -1], [1, 1], [-1, 1]].forEach(function (c) {
     var d = D3.v1.set(c[0], c[1], .5).unproject(cam).sub(cam.position).normalize(), k = -cam.position.y / d.y;
     var px = cam.position.x + d.x * k, pz = cam.position.z + d.z * k;
     x0 = Math.min(x0, px); x1 = Math.max(x1, px); z0 = Math.min(z0, pz); z1 = Math.max(z1, pz);
   });
   [D3.floor, D3.sheet].forEach(function (m) { m.scale.set((x1 - x0) * 1.02, 1, (z1 - z0) * 1.02); m.position.set((x0 + x1) / 2, 0, (z0 + z1) / 2); });
-  d3Kick(0);
 }
 /* put the current tray photo on the floor. applyTray() says which one. */
 function d3Tray() {
@@ -3726,7 +3731,7 @@ function d3Throw(d1, d2, ms) {
   D3.anim = a; D3.canvas.style.opacity = ''; d3Kick(ms + 1600);
 }
 function d3Skip() { if (D3.anim) D3.anim.t0 = -1e9; }
-function d3Kick(extra) { D3.until = Math.max(D3.until, performance.now() + (extra || 0)); if (!D3.raf && D3.state === 'on') D3.raf = requestAnimationFrame(d3Frame); }
+function d3Kick(extra) { D3.pvDirty = true; D3.until = Math.max(D3.until, performance.now() + (extra || 0)); if (!D3.raf && D3.state === 'on') D3.raf = requestAnimationFrame(d3Frame); }
 /* the liquid in one fuel die: lean and swirl the surface, cut the liquid at it, and rebuild the lid on the cut */
 function d3Liquid(d, dt, spin) {
   var sl = d.sl, pos = d.g.position, vx = (pos.x - d.px) / dt, vz = (pos.z - d.pz) / dt, ax = clamp((vx - d.pvx) / dt, -80, 80), az = clamp((vz - d.pvz) / dt, -80, 80), fx, fz, i, j;
@@ -3737,6 +3742,11 @@ function d3Liquid(d, dt, spin) {
   fz = -46 * sl.z - 1.5 * sl.vz + az * .55 - 2.6 * sl.vx - (spin ? spin.x * 1.5 : 0);
   sl.vx += fx * dt; sl.vz += fz * dt; sl.vy += (-90 * sl.y - 4 * sl.vy) * dt;
   sl.x = clamp(sl.x + sl.vx * dt, -1.15, 1.15); sl.z = clamp(sl.z + sl.vz * dt, -1.15, 1.15); sl.y = clamp(sl.y + sl.vy * dt, -.12, .12);
+  d3Cut(d);
+}
+/* cut the liquid at its surface and rebuild the lid on the cut, for the die's pose right now */
+function d3Cut(d) {
+  var sl = d.sl, pos = d.g.position, i, j;
   d.g.updateMatrixWorld();
   var m = d.g.matrixWorld.elements, ext = .45 * (Math.abs(m[1]) + Math.abs(m[5]) + Math.abs(m[9]));
   var n = D3.v1.set(sl.x, -1, sl.z).normalize();
@@ -3763,6 +3773,46 @@ function d3Liquid(d, dt, spin) {
   rp.setXYZ(np, pts[0][0], pts[0][1], pts[0][2]);
   cp.needsUpdate = cn.needsUpdate = rp.needsUpdate = true;
   d.cap.geometry.setDrawRange(0, np * 3); d.rim.geometry.setDrawRange(0, np + 1);
+}
+/* contact shadow and glows under one die: they slide away from the light and fade as the die lifts */
+function d3Blobs(d) {
+  var lift = d.g.position.y - .5, fade = 1 / (1 + lift * 1.6), ox = clamp(-D3SUN[0] / D3SUN[1], -1.1, 1.1), oz = clamp(-D3SUN[2] / D3SUN[1], -1.1, 1.1);
+  d.ao.position.set(d.g.position.x + ox * lift, .004, d.g.position.z + oz * lift); d.ao.material.opacity = (d.glow ? .5 : .42) * fade; d.ao.scale.setScalar(1 + lift * .35);
+  if (d.halo) { d.halo.position.set(d.g.position.x, .008, d.g.position.z); d.halo.material.opacity = d.haloI * fade; }
+  if (d.glow) { d.glow.position.set(d.g.position.x + ox * (lift + .45), .006, d.g.position.z + oz * (lift + .45)); d.glow.material.opacity = .34 * fade; d.glow.scale.setScalar(1 + lift * .35); }
+}
+/* The dice maker's preview. With 3D on it is a picture of the very same dice in the same scene and light: both lying six up, so the sigil shows,
+   and seen a little closer. There is only one renderer, so the scene is drawn on the main canvas from the preview's point of view, copied
+   across, and then (back in d3Frame) drawn again properly. The browser shows nothing until all of that is done, so the tray never flashes.
+   It is a still picture, so it is only redrawn when d3Kick says something changed. */
+function d3Preview() {
+  var host = $('#dp-tray'), cv = D3.pv, T = D3.T;
+  if ($('#dicepanel').hidden || D3.dice.length < 2) return;
+  var w = host.clientWidth, h = host.clientHeight, mh = $('#tray').clientHeight, r = Math.min(window.devicePixelRatio || 1, 2);
+  if (!w || !h || !mh || !D3.canvas.width) return;
+  if (!cv) {
+    cv = D3.pv = document.createElement('canvas'); cv.className = 'd3cv'; cv.setAttribute('aria-hidden', 'true'); host.insertBefore(cv, host.firstChild);
+    D3.pvx = cv.getContext('2d'); D3.pcam = new T.PerspectiveCamera(21, 1, .1, 60); D3.pcam.position.copy(D3.cam.position); D3.pcam.lookAt(0, .3, .1);
+  }
+  if (cv.width !== Math.round(w * r) || cv.height !== Math.round(h * r)) { cv.width = Math.round(w * r); cv.height = Math.round(h * r); }
+  cv.hidden = false; host.classList.add('d3on');
+  /* narrow the view by as much as the preview tray is shorter, so the dice come out the same size as in the tray */
+  var cam = D3.pcam; cam.fov = 2 * Math.atan(Math.tan(D3.cam.fov * Math.PI / 360) * h / mh) * 180 / Math.PI; cam.aspect = w / h; cam.updateProjectionMatrix();
+  var keep = D3.dice.map(function (d, i) {
+    var k = { p: d.g.position.clone(), q: d.g.quaternion.clone(), sl: d.sl };
+    d.g.position.set(D3REST[i].x, .5, D3REST[i].z); d3RestQ(i, 6, d.g.quaternion); d.sl = { x: 0, z: 0, y: 0, vx: 0, vz: 0, vy: 0 };
+    if (d.plane) d3Cut(d);
+    d3Blobs(d); return k;
+  });
+  d3Cover(cam); D3.renderer.render(D3.scene, cam);
+  D3.pvx.clearRect(0, 0, cv.width, cv.height); D3.pvx.drawImage(D3.canvas, 0, 0, cv.width, cv.height);
+  D3.pvn = (D3.pvn || 0) + 1; D3.pvDirty = false;
+  D3.dice.forEach(function (d, i) {
+    d.g.position.copy(keep[i].p); d.g.quaternion.copy(keep[i].q); d.sl = keep[i].sl;
+    if (d.plane) d3Cut(d);
+    d3Blobs(d);
+  });
+  d3Cover(D3.cam);
 }
 function d3Frame(now) {
   D3.raf = 0;
@@ -3793,13 +3843,10 @@ function d3Frame(now) {
       d3Liquid(d, dt, spin);
       if (Math.abs(sl.x) + Math.abs(sl.z) + Math.abs(sl.y) * 4 + (Math.abs(sl.vx) + Math.abs(sl.vz)) * .15 > .012) busy = true;
     }
-    /* contact shadow and glow slide away from the light and fade as the die lifts */
-    var lift = d.g.position.y - .5, fade = 1 / (1 + lift * 1.6), ox = clamp(-D3SUN[0] / D3SUN[1], -1.1, 1.1), oz = clamp(-D3SUN[2] / D3SUN[1], -1.1, 1.1);
-    d.ao.position.set(d.g.position.x + ox * lift, .004, d.g.position.z + oz * lift); d.ao.material.opacity = (d.glow ? .5 : .42) * fade; d.ao.scale.setScalar(1 + lift * .35);
-    if (d.halo) { d.halo.position.set(d.g.position.x, .008, d.g.position.z); d.halo.material.opacity = d.haloI * fade; }
-    if (d.glow) { d.glow.position.set(d.g.position.x + ox * (lift + .45), .006, d.g.position.z + oz * (lift + .45)); d.glow.material.opacity = .34 * fade; d.glow.scale.setScalar(1 + lift * .35); }
+    d3Blobs(d);
   });
   if (a && !flying) D3.anim = null;
+  if (D3.pvDirty && !flying) d3Preview(); /* only when something has changed, and not while dice are in the air: the roll comes first */
   D3.renderer.render(D3.scene, D3.cam);
   if (busy || now < D3.until) D3.raf = requestAnimationFrame(d3Frame); else D3.last = 0;
 }
