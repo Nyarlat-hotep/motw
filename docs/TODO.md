@@ -6,24 +6,24 @@ Last tidied 2026-10-08. Next session is around 2026-10-19. Feature details are i
 
 | Branch | What it holds | State |
 |---|---|---|
-| `main` | The live site: everything up to photo textures and the History step | Deployed |
-| `dice-sounds` | Everything since: 3D dice, lighting, 14 finishes, 7 trays, the sigil library, recorded dice sounds | Tested, waiting on Jacob's look and ear |
-| `luck-candles` | Luck drawn as seven candles | Tested, held: the look needs work |
+| `main` | The live site, with all the dice work: 3D dice, lighting, 14 finishes, 7 trays, the sigil library, recorded dice sounds | Deployed 2026-10-08 |
+| `luck-candles` | Luck drawn as seven candles | Tested, held: the look needs work. Branched before the dice work, so it will need merging with `main`. |
 
 Pushing `main` deploys. Pushing any other branch does not.
 
 ## Before the session on the 19th
 
 - [ ] **Jacob:** add the other players' emails to the Cloudflare Access list. Nobody else can open the site until this is done.
-- [ ] **Jacob:** decide when `dice-sounds` goes into `main`. Until then the live site has none of the new dice work.
 - [ ] Have one friend open the site a few days early and run a short practice: build a hunter, roll five moves, take harm, spend Luck.
 - [ ] **Jacob:** ask the Keeper whether Use Magic keeps its name in The Long Dry or gets renamed to fit the setting.
 
 ## Waiting on Jacob's eye and ear
 
+The dice work below is live, but none of it has had his review yet. 3D dice and sound are both off until a player turns them on.
+
 - [ ] **3D dice.** Judge them in motion: the fuel swish, the three lighting moods, the finishes. Try them on a phone.
 - [ ] **Dice sounds.** Nothing has been tuned by ear. Turn sound on and use "Hear these dice" in the dice maker to try each die on each tray, and note which pairs are wrong. From the first, made-up pass: gem was the only die sound he liked, and leather and felt should land as more of a thud.
-- [ ] **Luck candles** (`luck-candles`). "The look could use some improvements." Not part of `dice-sounds`; it will need merging in afterwards.
+- [ ] **Luck candles** (`luck-candles`). "The look could use some improvements." Not on the live site.
 
 ## Dice maker
 
