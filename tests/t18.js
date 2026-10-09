@@ -35,12 +35,12 @@ const INKS = ['', 'moss', 'midnight', 'brass', 'rust', 'dust'];
 
   // ---- light and dark ----
   await look(p, 'light'); t = await tok(p);
-  check('Light on a dark device gives the light colors', t.bg === '#e8d9b8' && t.attrs[0] === 'light', t.bg);
+  check('Light on a dark device gives the light colors', t.bg === '#f1e7cf' && t.attrs[0] === 'light', t.bg);
   await look(p, 'auto'); t = await tok(p);
   check('My device goes back to following the device', t.bg === '#110c0e' && t.attrs[0] === null);
   p = await open('light');
   t = await tok(p);
-  check('default on a light device: the light colors', t.bg === '#e8d9b8' && t.accent === '#8c1d2b', t.bg);
+  check('default on a light device: the light colors', t.bg === '#f1e7cf' && t.accent === '#8c1d2b', t.bg);
   await look(p, 'dark'); t = await tok(p);
   check('Dark on a light device gives the dark colors', t.bg === '#110c0e' && t.attrs[0] === 'dark', t.bg);
 
