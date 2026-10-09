@@ -22,7 +22,7 @@
   --accent: #8c1d2b; --accent-ink: #fff8f0; --brass: #85601a;
   --good: #0b6b57; --good-bg: #d3eadf; --warn: #855200; --warn-bg: #f2dfb4; --bad: #a82424; --bad-bg: #f3d3cf;
   --die: #f6efe1; --pip: #22171a;
-  --radius: 16px; --page: 1280px;
+  --radius: 16px; --radius-btn: 8px; --page: 1280px;
   --cw-a: #b09a70; --cw-b: #f7ecd0; --cw-c: #dccba3; --cw-d: #c4b189; --cw-pd: #dccba3; --cw-rim: #f3e6c6; --cw-pool: #cdbb92; --cw-smoke: #6d625c; --cw-dk: 0; --cw-sh: .16; --cw-ledge: .2;
   --cw-out: saturate(.35) brightness(.96); --cw-outo: .6; --cw-edge: drop-shadow(0 0 .5px #c25600) drop-shadow(0 0 1.6px rgba(232, 120, 20, .55)); --cw-tint: brightness(.35);
   --display: 'IM Fell English SC', 'IM Fell English', 'Palatino Linotype', Georgia, serif;
@@ -825,10 +825,10 @@ div.wcard { cursor: default; border-color: var(--good); }
    Nested art (thumbnails, portraits in a card) keeps its smaller radius, and
    pills, pips, badges, inputs and the dice keep their own shapes. */
 .card, details.sect, details.case, details.beast, .pcard, .move, .pb, .tip, .cm,
-.item, .strip li, .sstat, .statbtn, .tier, .empty, .confirm, .levelup,
+.item, .strip li, .sstat, .tier, .empty, .confirm, .levelup,
 .ho, .kho, .kov li, .kpic, .mast.has-banner, .hcdlg, .hero, .portrait,
 .wgroup, .wstat, .witem, .wlist > li:not(.witem):not(.empty),
-.wopt, .wmove, .wcard, .levelpick, .pmove { border-radius: var(--radius); }
+.wmove, .levelpick { border-radius: var(--radius); }
 .note { border-radius: 0 var(--radius) var(--radius) 0; }
 .item .note { border-radius: 0; }
 /* ---- icons: Phosphor (MIT), bold weight ----
@@ -852,6 +852,11 @@ div.wcard { cursor: default; border-color: var(--good); }
 details.sect > summary::after { content: ""; display: block; width: 20px; height: 20px; flex: none; background: var(--accent);
   --i: var(--i-plus); -webkit-mask: var(--i) center / contain no-repeat; mask: var(--i) center / contain no-repeat; }
 details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
+/* ---- buttons: one corner for every button ----
+   Round controls (pips, swatches, step pills), the underline tabs, the joined
+   segmented control and the candles keep their own shape. */
+.btn, .inkbtn, .step .ctl button, .prow .ctl button, .item .qty button, .wctl button,
+.hist .evx, .clock button, button.chip, .statbtn, .pmove, .wopt, .wcard { border-radius: var(--radius-btn); }
 </style>
 
 <svg class="cdefs" aria-hidden="true" focusable="false"><defs>
