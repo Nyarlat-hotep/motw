@@ -36,7 +36,7 @@ const STUB = () => {
   const rolls = (p) => p.evaluate(()=>{ window.dispatchEvent(new Event('pagehide')); const j=JSON.parse(localStorage.getItem('hunters-journal-v1')||'{}'); return (j.rolls||[]).length; });
   const landed = async (p, n) => { await p.waitForFunction((n)=>{ window.dispatchEvent(new Event('pagehide')); const j=JSON.parse(localStorage.getItem('hunters-journal-v1')||'{}'); return (j.rolls||[]).length>=n && !document.getElementById('roll').disabled; }, n, { timeout: 5000 }); await p.waitForTimeout(150); };
   const total = (p) => p.evaluate(()=>parseInt(document.querySelector('#sum').firstChild.textContent, 10));
-  const sndOn = async (p) => { await p.evaluate(()=>{ document.getElementById('settings').open = true; }); await p.check('#set-snd'); await p.waitForTimeout(50); };
+  const sndOn = async (p) => { await p.evaluate(()=>{ location.hash = 'settings'; }); await p.check('#set-snd'); await p.evaluate(()=>{ location.hash = 'roll'; }); await p.waitForTimeout(50); };
 
   // ---- sound off: nothing is ever created ----
   let p = await open();
@@ -122,10 +122,10 @@ const STUB = () => {
 
   // ---- phone width ----
   const c3 = await b.newContext({ viewport: { width: 390, height: 800 } }); const m = await c3.newPage();
-  await m.goto(URL+'#roll'); await m.waitForTimeout(400); await m.evaluate(()=>{ document.getElementById('settings').open = true; });
+  await m.goto(URL+'#roll'); await m.waitForTimeout(400); await m.evaluate(()=>{ location.hash = 'settings'; });
   const ov = await m.evaluate(()=>document.documentElement.scrollWidth - document.documentElement.clientWidth);
   check('no sideways scroll at 390px with settings open', ov<=0, ov);
-  await m.locator('#settings').screenshot({ path: path.join(__dirname,'out','sound-settings.png') });
+  await m.locator('#p-settings').screenshot({ path: path.join(__dirname,'out','sound-settings.png') });
 
   console.log(results.map(r=>r.join(' | ')).join('\n'));
   const fails = results.filter(r=>r[0]==='FAIL').length;

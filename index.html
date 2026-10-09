@@ -90,8 +90,19 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .sync { font-size: 13px; color: var(--muted); font-family: var(--type); min-height: 1.2em; }
 
 /* tabs */
-.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); display: flex; gap: 4px; overflow-x: auto; border-bottom: 2px solid var(--line); margin-bottom: 20px; scrollbar-width: thin; }
-.tabs button { background: none; border: 0; border-bottom: 4px solid transparent; margin-bottom: -2px; padding: 12px 14px 8px; font-family: var(--display); font-size: 18px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); cursor: pointer; white-space: nowrap; min-height: 44px; }
+.tabs { position: fixed; top: 0; left: 0; right: 0; z-index: 10; display: flex; gap: 4px; padding: env(safe-area-inset-top, 0px) max(16px, calc((100% - var(--page)) / 2)) 0; background: none; transition: background-color .25s ease, -webkit-backdrop-filter .25s ease, backdrop-filter .25s ease; }
+.tabs.frost { background-color: color-mix(in srgb, var(--bg) 55%, transparent); -webkit-backdrop-filter: blur(12px) saturate(1.2); backdrop-filter: blur(12px) saturate(1.2); }
+@media (prefers-reduced-motion: reduce) { .tabs { transition: none; } }
+.tabrow { display: flex; gap: 4px; flex: 1; min-width: 0; overflow-x: auto; scrollbar-width: none; }
+.tabrow::-webkit-scrollbar { display: none; }
+.tabend { display: flex; gap: 2px; flex: none; margin-left: auto; }
+.tabs .tabend button, .tabs .tabout { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; padding-inline: 10px; }
+.tabs .tabout { box-sizing: border-box; min-height: 44px; padding-block: 12px 8px; border-bottom: 4px solid transparent; color: var(--muted); }
+.tabs .tabout:hover { color: var(--ink); }
+.tabico { display: block; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+html { scroll-padding-top: calc(var(--navh, 56px) + 8px); }
+body { padding-top: var(--navh, 56px); }
+.tabs button { background: none; border: 0; border-bottom: 4px solid transparent; padding: 12px 14px 8px; font-family: var(--display); font-size: 18px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); cursor: pointer; white-space: nowrap; min-height: 44px; }
 .tabs button[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .tabs button:hover { color: var(--ink); }
 .panel[hidden] { display: none; }
@@ -513,7 +524,6 @@ h1, h2, h3, h4, .tabs button, .rollbtn, .sum, .rollas .who, details.case .ttl, d
 .stamp { font-family: var(--display); text-transform: none; font-size: 16px; letter-spacing: .1em; }
 .sync { font-size: 15px; font-style: italic; }
 .tabs button { font-size: 19px; letter-spacing: .06em; text-transform: none; }
-.tabs { border-bottom: 3px double var(--line); }
 details.sect > summary { font-size: 23px; }
 .sectitle { font-size: 26px; text-transform: none; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
 .body h3 { font-family: var(--display); font-size: 21px; text-transform: none; color: var(--accent); letter-spacing: .04em; }
@@ -560,6 +570,8 @@ details.sect > .body > p:first-child::first-letter, .dropcap::first-letter { fon
 details.sect > .body > p:first-child { text-align: left; }
 .note { font-style: italic; border-left-width: 3px; }
 .foot { font-style: italic; text-align: center; border-top: 1px solid var(--line); padding-top: 16px; }
+.foot p { max-width: 72ch; margin: 0 auto 10px; }
+.foot p:last-child { margin-bottom: 0; }
 .foot::before { content: "\2766"; display: block; font-size: 26px; color: var(--accent); margin-bottom: 4px; font-style: normal; }
 .seg button, .pips.harm button { font-family: var(--display); }
 .seg button { font-size: 18px; font-weight: 400; }
@@ -881,6 +893,22 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
   <p class="small" id="hc-msg" role="status" style="margin:10px 0 0;min-height:1.4em"></p>
   <div class="actions"><button class="btn" type="button" id="hc-save">Download picture</button><button class="btn ghost" type="button" id="hc-copy" hidden>Copy picture</button><button class="btn ghost" type="button" id="hc-close">Close</button></div>
 </dialog>
+<nav class="tabs" aria-label="Journal sections">
+<div class="tabrow" role="tablist" aria-label="Journal sections" aria-owns="t-settings">
+  <button role="tab" id="t-guide" aria-controls="p-guide" aria-selected="true" data-tab="guide">Guide</button>
+  <button role="tab" id="t-play" aria-controls="p-play" aria-selected="false" data-tab="play">Play</button>
+  <button role="tab" id="t-roll" aria-controls="p-roll" aria-selected="false" data-tab="roll">Roller</button>
+  <button role="tab" id="t-hunter" aria-controls="p-hunter" aria-selected="false" data-tab="hunter">Hunter</button>
+  <button role="tab" id="t-party" aria-controls="p-party" aria-selected="false" data-tab="party">Party<span class="vh" id="t-party-new"></span></button>
+  <button role="tab" id="t-bestiary" aria-controls="p-bestiary" aria-selected="false" data-tab="bestiary">Bestiary</button>
+  <button role="tab" id="t-tips" aria-controls="p-tips" aria-selected="false" data-tab="tips">Tips</button>
+  <button role="tab" id="t-notes" aria-controls="p-notes" aria-selected="false" data-tab="notes">Case files</button>
+</div>
+<div class="tabend">
+  <button role="tab" id="t-settings" aria-controls="p-settings" aria-selected="false" data-tab="settings" aria-label="Settings" title="Settings"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  <a class="tabout" id="logout" href="/cdn-cgi/access/logout" aria-label="Log out" title="Log out"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5"/><path d="M21 12H9"/></svg></a>
+</div>
+</nav>
 <div class="wrap">
   <header class="mast">
     <div>
@@ -892,16 +920,6 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
     </div>
   </header>
 
-  <nav class="tabs" role="tablist" aria-label="Journal sections">
-    <button role="tab" id="t-guide" aria-controls="p-guide" aria-selected="true" data-tab="guide">Guide</button>
-    <button role="tab" id="t-play" aria-controls="p-play" aria-selected="false" data-tab="play">Play</button>
-    <button role="tab" id="t-roll" aria-controls="p-roll" aria-selected="false" data-tab="roll">Roller</button>
-    <button role="tab" id="t-hunter" aria-controls="p-hunter" aria-selected="false" data-tab="hunter">Hunter</button>
-    <button role="tab" id="t-party" aria-controls="p-party" aria-selected="false" data-tab="party">Party<span class="vh" id="t-party-new"></span></button>
-    <button role="tab" id="t-bestiary" aria-controls="p-bestiary" aria-selected="false" data-tab="bestiary">Bestiary</button>
-    <button role="tab" id="t-tips" aria-controls="p-tips" aria-selected="false" data-tab="tips">Tips</button>
-    <button role="tab" id="t-notes" aria-controls="p-notes" aria-selected="false" data-tab="notes">Case files</button>
-  </nav>
 
   <!-- GUIDE -->
   <section class="panel" id="p-guide" role="tabpanel" aria-labelledby="t-guide">
@@ -1336,43 +1354,50 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
     <div id="cases"></div>
   </section>
 
-  <details class="sect slim" id="settings" style="margin-top:28px">
-    <summary>Settings and backup</summary>
-    <div class="body">
-      <h3>Look</h3>
-      <div class="seg" role="group" aria-label="Light or dark" style="margin-bottom:0"><button type="button" data-look="auto">My device</button><button type="button" data-look="light">Light</button><button type="button" data-look="dark">Dark</button></div>
-      <div class="inks" id="inks" role="group" aria-label="Ink color"></div>
-      <p class="small muted" style="margin:8px 0 0">The ink colors the buttons, tabs and links. It does not change any of the art.</p>
-      <h3>Big moments</h3>
-      <label class="switch"><input type="checkbox" id="set-fx"><span>Lightning on a 12+, a shake on a miss, a glow on level-up</span></label>
-      <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-snd"><span>Sound: dice that sound like what they are made of, a bell on a 10+, thunder on a 12+ and a low thud on a miss</span></label>
-      <label class="volrow"><span>Volume</span><input type="range" id="set-vol" min="0" max="100" step="5"></label>
-      <p class="small muted" style="margin:6px 0 0">Sound is off unless you turn it on, because on a call your microphone may pick it up. Hold the Roll button to shake the dice, let go to throw.</p>
-      <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-3d"><span>3D dice (new): the dice tumble in real 3D, and Fuel dice show their liquid. Best on a recent phone or computer.</span></label>
-      <p class="small muted" id="d3msg" role="status" style="margin:6px 0 0"></p>
-      <h3>Backup</h3>
-      <p class="small muted">Your journal saves on its own. A backup file is a second copy you control, handy before you try something big or want to move devices.</p>
-      <div class="actions">
-        <button class="btn sm" id="bk-save" type="button">Download backup</button>
-        <button class="btn ghost sm" id="bk-copy" type="button">Copy backup text</button>
-        <label class="btn ghost sm filebtn" for="rs-file"><span>Restore from file</span><input class="vh" type="file" id="rs-file" accept=".json,application/json"></label>
+  <!-- SETTINGS -->
+  <section class="panel" id="p-settings" role="tabpanel" aria-labelledby="t-settings" hidden>
+    <h2 class="sectitle" style="margin-top:0">Settings</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3 style="margin-top:0">Look</h3>
+        <div class="seg" role="group" aria-label="Light or dark" style="margin-bottom:0"><button type="button" data-look="auto">My device</button><button type="button" data-look="light">Light</button><button type="button" data-look="dark">Dark</button></div>
+        <div class="inks" id="inks" role="group" aria-label="Ink color"></div>
+        <p class="small muted" style="margin:8px 0 0">The ink colors the buttons, tabs and links. It does not change any of the art.</p>
       </div>
-      <label class="lbl" for="rs-text" style="margin-top:14px">Or paste backup text here</label>
-      <textarea id="rs-text" style="min-height:70px" placeholder="Paste a backup, then press Check"></textarea>
-      <div class="actions"><button class="btn ghost sm" id="rs-check" type="button">Check pasted backup</button></div>
-      <p class="small" id="bk-msg" role="status" style="margin:10px 0 0"></p>
-      <div id="rs-confirm"></div>
+      <div class="card">
+        <h3 style="margin-top:0">Big moments</h3>
+        <label class="switch"><input type="checkbox" id="set-fx"><span>Lightning on a 12+, a shake on a miss, a glow on level-up</span></label>
+        <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-snd"><span>Sound: dice that sound like what they are made of, a bell on a 10+, thunder on a 12+ and a low thud on a miss</span></label>
+        <label class="volrow"><span>Volume</span><input type="range" id="set-vol" min="0" max="100" step="5"></label>
+        <p class="small muted" style="margin:6px 0 0">Sound is off unless you turn it on, because on a call your microphone may pick it up. Hold the Roll button to shake the dice, let go to throw.</p>
+        <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-3d"><span>3D dice (new): the dice tumble in real 3D, and Fuel dice show their liquid. Best on a recent phone or computer.</span></label>
+        <p class="small muted" id="d3msg" role="status" style="margin:6px 0 0"></p>
+      </div>
     </div>
-  </details>
+    <div class="grid" style="margin-top:16px">
+      <div class="card">
+        <h3 style="margin-top:0">Backup</h3>
+        <p class="small muted">Your journal saves on its own. A backup file is a second copy you control, handy before you try something big or want to move devices.</p>
+        <div class="actions">
+          <button class="btn sm" id="bk-save" type="button">Download backup</button>
+          <button class="btn ghost sm" id="bk-copy" type="button">Copy backup text</button>
+          <label class="btn ghost sm filebtn" for="rs-file"><span>Restore from file</span><input class="vh" type="file" id="rs-file" accept=".json,application/json"></label>
+        </div>
+        <label class="lbl" for="rs-text" style="margin-top:14px">Or paste backup text here</label>
+        <textarea id="rs-text" style="min-height:70px" placeholder="Paste a backup, then press Check"></textarea>
+        <div class="actions"><button class="btn ghost sm" id="rs-check" type="button">Check pasted backup</button></div>
+        <p class="small" id="bk-msg" role="status" style="margin:10px 0 0"></p>
+        <div id="rs-confirm"></div>
+      </div>
+    </div>
+  </section>
 
-  <details class="sect slim" id="credits">
-    <summary>Credits</summary>
-    <div class="body">
-      <p>Some dice sigils are icons made by <span id="sigcredit">their authors</span>, from <a href="https://game-icons.net" rel="noopener">game-icons.net</a>, used under the Creative Commons Attribution 3.0 license. Runes and alchemical signs are drawn from the Noto fonts, under the SIL Open Font License.</p>
-      <p>3D dice lighting, trays and die materials come from <a href="https://polyhaven.com" rel="noopener">Poly Haven</a> and <a href="https://ambientcg.com" rel="noopener">ambientCG</a>, and some dice sounds and the candle flames from <a href="https://kenney.nl" rel="noopener">Kenney</a>, all released into the public domain. Other dice sounds come from the dice-box-threejs project. The 3D dice are drawn with three.js.</p>
-    </div>
-  </details>
-  <p class="foot">Rules and playbooks are summarized here in plain English. Your printed playbook sheet and your Keeper have the final word.</p>
+
+  <footer class="foot" id="credits">
+    <p>Rules and playbooks are summarized here in plain English. Your printed playbook sheet and your Keeper have the final word.</p>
+    <p>Some dice sigils are icons made by <span id="sigcredit">their authors</span>, from <a href="https://game-icons.net" rel="noopener">game-icons.net</a>, used under the Creative Commons Attribution 3.0 license. Runes and alchemical signs are drawn from the Noto fonts, under the SIL Open Font License.</p>
+    <p>3D dice lighting, trays and die materials come from <a href="https://polyhaven.com" rel="noopener">Poly Haven</a> and <a href="https://ambientcg.com" rel="noopener">ambientCG</a>, and some dice sounds and the candle flames from <a href="https://kenney.nl" rel="noopener">Kenney</a>, all released into the public domain. Other dice sounds come from the dice-box-threejs project. The 3D dice are drawn with three.js.</p>
+  </footer>
 </div>
 
 <script src="sigils.js"></script>
@@ -1644,6 +1669,12 @@ function evMsg(t) {
   $('#evtoast-t').textContent = t; $('#evtoast-undo').hidden = true; el.hidden = false;
   evToastTimer = setTimeout(function () { el.hidden = true; }, 4500);
 }
+$('#logout').addEventListener('click', function (e) {
+  // Only the live site has a sign-in (Cloudflare Access) to end; elsewhere say so instead of opening a missing page.
+  if (tbl.on && !tbl.as) return;
+  e.preventDefault();
+  evMsg('You are not signed in on this copy, so there is nothing to log out of. On the live site this signs you out.');
+});
 function evUndo(id) {
   var evs = evList(), i, ev = null;
   for (i = 0; i < evs.length; i++) if (evs[i].id === id) { ev = evs[i]; break; }
@@ -1683,7 +1714,7 @@ function renderSession(el) {
 }
 
 /* ---------- tabs ---------- */
-var TABS = ['guide', 'play', 'roll', 'hunter', 'party', 'bestiary', 'tips', 'notes'];
+var TABS = ['guide', 'play', 'roll', 'hunter', 'party', 'bestiary', 'tips', 'notes', 'settings'];
 function showTab(name, fromHash) {
   if (TABS.indexOf(name) < 0) name = 'guide';
   S.tab = name;
@@ -1702,6 +1733,16 @@ function showTab(name, fromHash) {
   if (!fromHash) { try { history.replaceState(null, '', '#' + name); } catch (e) {} }
 }
 $$('.tabs button').forEach(function (b) { b.addEventListener('click', function () { showTab(b.dataset.tab); }); });
+(function () {
+  // The tab bar is fixed, so pad the page by its height (it changes with fonts and safe areas).
+  var nav = $('.tabs');
+  function fit() { document.documentElement.style.setProperty('--navh', nav.offsetHeight + 'px'); }
+  fit(); window.addEventListener('resize', fit);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  // Clear at the top of the page, frosted once the page scrolls under it.
+  function frost() { nav.classList.toggle('frost', (window.pageYOffset || 0) > 0); }
+  frost(); window.addEventListener('scroll', frost, { passive: true });
+})();
 window.addEventListener('hashchange', function () { var h = location.hash.replace('#', ''); if (TABS.indexOf(h) >= 0) showTab(h, true); });
 
 /* ---------- guide: moves, lists ---------- */
@@ -3580,6 +3621,7 @@ function tblStart() {
   fetch(tblUrl('/api/me'), { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (me) {
     if (!me || typeof me !== 'object' || !/^[0-9a-f]{12}$/.test(me.id)) return;
     tbl.on = true; tbl.me = { id: me.id, name: tblStr(me.name, 30), keeper: me.keeper === true };
+    var out = $('#logout'); if (out) { out.title = 'Log out' + (tbl.me.name ? ' (' + tbl.me.name + ')' : ''); }
     tblConnect(); renderParty();
     setInterval(tblBeat, 25000);
   }).catch(function () {});
@@ -3979,7 +4021,7 @@ function applyLook() {
   if (box && !box.firstChild) box.innerHTML = INKS.map(function (i) { return '<button type="button" class="inkbtn" data-ink="' + i.id + '" style="--sl:' + i.l + ';--sd:' + i.d + '"><i></i>' + esc(i.name) + '</button>'; }).join('');
   $$('.inkbtn').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.ink === ink)); });
 }
-$('#settings').addEventListener('click', function (e) {
+$('#p-settings').addEventListener('click', function (e) {
   var l = e.target.closest('[data-look]'), k = e.target.closest('.inkbtn');
   if (l) S.settings.theme = l.dataset.look;
   else if (k) S.settings.ink = k.dataset.ink;
@@ -4002,7 +4044,7 @@ $('#set-vol').addEventListener('change', function () { hit(curDie(0), .5); });
 $('#set-3d').addEventListener('change', function (e) { S.settings.dice3d = e.target.checked; scheduleSave(); d3Apply(); renderDice(); });
 /* say(text) reports how it went, wherever the button was */
 function bkSave(say) {
-  var d = new Date().toISOString().slice(0, 10), fail = 'Could not save a file here. Use Copy backup text under Settings and backup instead.';
+  var d = new Date().toISOString().slice(0, 10), fail = 'Could not save a file here. Use Copy backup text in Settings instead.';
   function ok(msg) { S.bkAt = Date.now(); scheduleSave(); renderStart(); $$('[data-bkago]').forEach(function (b) { b.textContent = bkAgo(); }); say(msg); }
   if (!caps.dl) {
     try {

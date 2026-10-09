@@ -184,16 +184,16 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   check('unsharing removes your card', await p.evaluate(()=>!('party/me123' in window.__store)));
 
   // ---- SETTINGS / BACKUP ----
-  await p.click('#settings > summary');
+  await p.click('#t-settings');
   await p.uncheck('#set-fx'); await p.click('#t-roll'); await p.evaluate(()=>{document.getElementById('fx').className='';});
   for (let i=0;i<6;i++){ await p.click('#roll'); await p.waitForTimeout(1400); }
   check('effects off: no flash class set', await p.evaluate(()=>document.getElementById('fx').className)==='');
-  await p.check('#set-fx');
+  await p.click('#t-settings'); await p.check('#set-fx');
   await p.click('#bk-save'); await p.waitForTimeout(200);
   const saved = await p.evaluate(()=>window.__saved[0]);
   check('backup file offered with journal', !!saved && /hunters-journal-backup-.*\.json/.test(saved.filename) && JSON.parse(saved.data).journal.sheet.name==='Dee Ray');
   await p.click('#t-hunter'); await p.click('#seg-sheet'); await p.fill('#f-name','Someone Else');
-  await p.fill('#rs-text','not json'); await p.click('#rs-check'); check('bad backup rejected', /not a readable backup/.test(await T('#bk-msg')));
+  await p.click('#t-settings'); await p.fill('#rs-text','not json'); await p.click('#rs-check'); check('bad backup rejected', /not a readable backup/.test(await T('#bk-msg')));
   await p.fill('#rs-text', JSON.stringify({app:'other'})); await p.click('#rs-check'); check('wrong app rejected', /not a Hunter/.test(await T('#bk-msg')));
   await p.fill('#rs-text', saved.data); await p.click('#rs-check'); check('valid backup asks to confirm', /Replace your journal/.test(await T('#rs-confirm')));
   await p.click('#rs-no'); check('cancel leaves journal alone', (await p.inputValue('#f-name'))==='Someone Else');
