@@ -29,7 +29,7 @@
   --black: 'UnifrakturCook', 'Old English Text MT', 'IM Fell English SC', serif;
   --num: 'EB Garamond', Garamond, Georgia, serif;
   --body: 'EB Garamond', Garamond, 'Palatino Linotype', Georgia, serif;
-  --type: 'IM Fell English SC', 'IM Fell English', 'Palatino Linotype', Georgia, serif;
+  --type: var(--body);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -87,7 +87,10 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .mast h1 { font-family: var(--display); text-transform: uppercase; letter-spacing: .02em; font-size: clamp(44px, 10vw, 84px); line-height: .95; }
 .mast .sub { color: var(--muted); margin: 8px 0 0; max-width: 46ch; }
 .stamp { font-family: var(--type); border: 2px solid var(--accent); color: var(--accent); padding: 6px 10px; transform: rotate(-3deg); text-transform: uppercase; letter-spacing: .1em; font-size: 13px; white-space: nowrap; }
-.sync { font-size: 13px; color: var(--muted); font-family: var(--type); min-height: 1.2em; }
+.savetoast { position: fixed; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 19; display: flex; align-items: center; gap: 10px; max-width: min(calc(100vw - 32px), 360px); background: var(--surface2); border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; font-family: var(--body); font-size: 14px; font-style: italic; color: var(--muted); box-shadow: 0 6px 24px rgba(0, 0, 0, .3); transform: translateX(calc(100% + 40px)); visibility: hidden; transition: transform .35s ease, visibility 0s .35s; }
+.savetoast.on { transform: none; visibility: visible; transition: transform .35s ease; }
+.savetoast.warn { color: var(--ink); font-style: normal; border-left: 4px solid var(--accent); }
+@media (prefers-reduced-motion: reduce) { .savetoast, .savetoast.on { transition: none; } }
 
 /* tabs */
 .tabs { position: fixed; top: 0; left: 0; right: 0; z-index: 10; display: flex; gap: 4px; padding: env(safe-area-inset-top, 0px) max(16px, calc((100% - var(--page)) / 2)) 0; background: none; transition: background-color .25s ease, -webkit-backdrop-filter .25s ease, backdrop-filter .25s ease; }
@@ -360,7 +363,7 @@ details.case .ttl, details.beast .ttl { font-size: 17px; }
 .texture.on { opacity: .13; }
 .wrap { position: relative; z-index: 1; }
 .mast.has-banner { background: linear-gradient(90deg, rgba(12, 8, 10, .92) 0%, rgba(12, 8, 10, .66) 42%, rgba(12, 8, 10, .1) 82%), var(--banner) right 22% / cover no-repeat; border: 1px solid var(--line); border-radius: 10px; padding: 28px 20px 22px; min-height: 190px; align-items: flex-end; margin-bottom: 14px; color: #f0e7dc; }
-.mast.has-banner .sub, .mast.has-banner .sync { color: #d6c9ba; }
+.mast.has-banner .sub { color: #d6c9ba; }
 .mast.has-banner .kicker { color: #ee8277; }
 .mast.has-banner .stamp { color: #e3bd5f; border-color: #e3bd5f; }
 /* lantern glow: two SVG layers sized and placed exactly like the picture under them (same viewBox, same cover crop), so the light stays on the lantern at any width.
@@ -521,8 +524,7 @@ h1, h2, h3, h4, .tabs button, .rollbtn, .sum, .rollas .who, details.case .ttl, d
 .mast h1 { text-transform: none; font-family: var(--black); font-weight: 700; font-size: clamp(42px, 10vw, 82px); line-height: 1; letter-spacing: 0; text-shadow: 0 2px 0 color-mix(in srgb, var(--bg) 40%, transparent); }
 .mast .kicker { font-family: var(--display); text-transform: none; font-size: 19px; letter-spacing: .14em; }
 .mast .sub { font-style: italic; font-size: 20px; }
-.stamp { font-family: var(--display); text-transform: none; font-size: 16px; letter-spacing: .1em; }
-.sync { font-size: 15px; font-style: italic; }
+.stamp { font-family: var(--type); text-transform: none; font-size: 16px; letter-spacing: .1em; }
 .tabs button { font-size: 19px; letter-spacing: .06em; text-transform: none; }
 details.sect > summary { font-size: 23px; }
 .sectitle { font-size: 26px; text-transform: none; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
@@ -544,7 +546,7 @@ details.case .ttl, details.beast .ttl { font-size: 21px; text-transform: none; }
 input[type=text], input[type=date], input[type=search], input[type=number], select, textarea { border-radius: 3px; font-size: 18px; }
 .lbl { font-size: 16px; letter-spacing: .08em; text-transform: none; color: var(--accent); }
 th { font-size: 15px; letter-spacing: .08em; text-transform: none; }
-.move .stat, .move dt, details.case .no, details.beast .no, .st, .example, .tag, .clock button, .item .val span, .statbtn span, .pips button, .portrait.ph, .pimg .ph { font-family: var(--display); text-transform: none; }
+.move .stat, .move dt, details.case .no, details.beast .no, .st, .example, .tag, .clock button, .item .val span, .statbtn span, .pips button, .portrait.ph, .pimg .ph { font-family: var(--type); text-transform: none; }
 .move .stat, details.case .no, details.beast .no { font-size: 16px; letter-spacing: .08em; }
 .move dt { font-size: 17px; }
 .st, .example, .tag { font-size: 14px; }
@@ -559,7 +561,7 @@ th { font-size: 15px; letter-spacing: .08em; text-transform: none; }
 /* numbers stay lining and even so dice totals and stats scan at a glance */
 .sum, .statbtn b, .sstat output, .strip b, .step .ctl output, .qty output, .hist b, .odds b, .combat output { font-family: var(--num); font-weight: 500; font-variant-numeric: lining-nums tabular-nums; letter-spacing: 0; }
 .sum { font-size: 64px; }
-.sum small { font-family: var(--display); font-size: 16px; text-transform: none; font-weight: 400; }
+.sum small { font-family: var(--type); font-size: 16px; text-transform: none; font-weight: 400; }
 .statbtn b { font-size: 26px; }
 .sstat output { font-size: 32px; }
 
@@ -758,7 +760,7 @@ details.sect > .body > p:first-child { text-align: left; }
 .wmove .trig { font-style: italic; }
 .wmove .btn { margin-top: auto; }
 .wdl { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; margin: 0; font-size: 16px; }
-.wdl dt { font-family: var(--display); color: var(--accent); }
+.wdl dt { font-family: var(--type); color: var(--accent); }
 .wdl dd { margin: 0; }
 .chip.ok { color: var(--good); border-color: var(--good); }
 .chip.tag { color: var(--muted); }
@@ -812,7 +814,7 @@ div.wcard { cursor: default; border-color: var(--good); }
 .pmove { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; text-align: left; border: 2px solid var(--line); background: var(--bg); color: var(--ink); border-radius: 4px; padding: 8px 10px; cursor: pointer; font: inherit; font-size: 17px; min-height: 44px; min-width: 0; }
 .pmove:hover { border-color: var(--accent); }
 .pmove[aria-pressed="true"] { border-color: var(--accent); background: var(--surface2); box-shadow: inset 4px 0 0 var(--accent); }
-.pmove small { font-family: var(--display); font-size: 14px; color: var(--muted); white-space: nowrap; }
+.pmove small { font-family: var(--type); font-size: 14px; color: var(--muted); white-space: nowrap; }
 .ppass { border-left: 3px solid var(--line); padding: 2px 0 2px 10px; margin-top: 8px; }
 .ppass summary { cursor: pointer; }
 .ppass p { margin: 4px 0 0; font-size: 16px; }
@@ -884,6 +886,7 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
 <div class="texture" aria-hidden="true"></div>
 <div class="texture t2" aria-hidden="true"></div>
 <div id="fx" aria-hidden="true"></div>
+<div class="savetoast" id="sync" role="status" aria-live="polite"><span id="sync-t"></span><button class="btn ghost sm" type="button" id="sync-x" hidden>Close</button></div>
 <div class="evtoast" id="evtoast" role="status" hidden><span id="evtoast-t"></span><button class="btn sm" type="button" id="evtoast-undo">Undo</button></div>
 <dialog class="hcdlg hodlg" id="hodlg" aria-label="Picture from the Keeper"><img id="hodlg-img" alt=""><p id="hodlg-cap"></p><div class="actions"><button class="btn sm" type="button" id="hodlg-close">Close</button></div></dialog>
 <dialog class="hcdlg" id="hcdlg" aria-labelledby="hc-title">
@@ -914,9 +917,6 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
     <div>
       <p class="kicker">Monster of the Week</p>
       <h1>Hunter's Journal</h1>
-    </div>
-    <div>
-      <div class="sync" id="sync" role="status" aria-live="polite"></div>
     </div>
   </header>
 
@@ -1528,7 +1528,19 @@ var LS_KEY = 'hunters-journal-v1';
 var store = { ref: null, loaded: false, mode: 'local', timer: null, writing: false, again: false };
 function lsRead() { try { var t = localStorage.getItem(LS_KEY); return t ? JSON.parse(t) : null; } catch (e) { return null; } }
 function lsWrite() { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); return true; } catch (e) { return false; } }
-function setSync(msg) { var el = document.getElementById('sync'); if (el) el.textContent = /^Saving|^Saved to your account/.test(msg) ? '' : msg; }
+/* Save status: a toast in the corner, at most once every 30 seconds. A failed save stays until closed. */
+var syncAt = 0, syncTimer = null;
+function setSync(msg) {
+  var el = document.getElementById('sync'); if (!el || /^Saving|^Saved to your account/.test(msg)) return;
+  var warn = /^NOT saved/.test(msg), now = Date.now();
+  if (!warn && !el.classList.contains('warn') && now - syncAt < 30000) return;
+  syncAt = now; clearTimeout(syncTimer);
+  $('#sync-t').textContent = msg; $('#sync-x').hidden = !warn;
+  el.classList.toggle('warn', warn); el.classList.add('on');
+  if (!warn) syncTimer = setTimeout(syncHide, 3000);
+}
+function syncHide() { var el = document.getElementById('sync'); if (el) el.classList.remove('on', 'warn'); }
+document.getElementById('sync-x').addEventListener('click', syncHide);
 function scheduleSave() {
   if (!store.loaded) return;
   evTrack();
