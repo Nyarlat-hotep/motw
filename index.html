@@ -899,8 +899,6 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
 <nav class="tabs" aria-label="Journal sections">
 <div class="tabrow" role="tablist" aria-label="Journal sections" aria-owns="t-settings">
   <button role="tab" id="t-guide" aria-controls="p-guide" aria-selected="true" data-tab="guide">Guide</button>
-  <button role="tab" id="t-play" aria-controls="p-play" aria-selected="false" data-tab="play">Play</button>
-  <button role="tab" id="t-roll" aria-controls="p-roll" aria-selected="false" data-tab="roll">Roller</button>
   <button role="tab" id="t-hunter" aria-controls="p-hunter" aria-selected="false" data-tab="hunter">Hunter</button>
   <button role="tab" id="t-party" aria-controls="p-party" aria-selected="false" data-tab="party">Party<span class="vh" id="t-party-new"></span></button>
   <button role="tab" id="t-bestiary" aria-controls="p-bestiary" aria-selected="false" data-tab="bestiary">Bestiary</button>
@@ -1132,41 +1130,23 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
     </details>
   </section>
 
-  <!-- PLAY: everything you touch mid-session on one screen. The dice card (#rollkit) is moved in here from the Roller while this tab is open. -->
-  <section class="panel" id="p-play" role="tabpanel" aria-labelledby="t-play" hidden>
-    <div id="play-pin"></div>
-    <div class="play">
-      <div class="card" id="play-status"></div>
-      <div id="play-moves"></div>
-      <div><div class="card" id="play-sel" style="margin-bottom:16px"></div><div id="play-stage"></div><div id="play-feed"></div></div>
+  <!-- HUNTER -->
+  <section class="panel" id="p-hunter" role="tabpanel" aria-labelledby="t-hunter" hidden>
+    <div class="hero" id="hero-hunter" hidden></div>
+    <div id="hbar"></div>
+    <div class="seg" role="group" aria-label="Hunter view">
+      <button type="button" id="seg-play" aria-pressed="false">Play</button>
+      <button type="button" id="seg-sheet" aria-pressed="false">Sheet</button>
+      <button type="button" id="seg-build" aria-pressed="true">Build</button>
     </div>
-  </section>
 
-  <!-- ROLLER -->
-  <section class="panel" id="p-roll" role="tabpanel" aria-labelledby="t-roll" hidden>
-    <div class="hero" id="hero-roll" hidden></div>
-    <div class="card rollas" id="rollas"></div>
-    <div class="roller">
-      <div class="card">
-        <label class="lbl" for="mv">Move</label>
-        <select id="mv"></select>
-
-        <span class="lbl" style="margin-top:14px">Stat</span>
-        <div class="statrow" id="statrow" role="group" aria-label="Stat to roll"></div>
-        <p class="small muted" style="margin:8px 0 0">Ratings come from the line you picked on your Hunter sheet, and go up when you level up.</p>
-
-        <div class="steppers">
-          <div class="step"><span>+1 forward <span class="muted small">(clears after the roll)</span></span><span class="ctl"><button type="button" data-adj="forward" data-d="-1" aria-label="Lower forward"><span class="i i-minus" aria-hidden="true"></span></button><output id="o-forward">0</output><button type="button" data-adj="forward" data-d="1" aria-label="Raise forward"><span class="i i-plus" aria-hidden="true"></span></button></span></div>
-          <div class="step"><span>+1 ongoing</span><span class="ctl"><button type="button" data-adj="ongoing" data-d="-1" aria-label="Lower ongoing"><span class="i i-minus" aria-hidden="true"></span></button><output id="o-ongoing">0</output><button type="button" data-adj="ongoing" data-d="1" aria-label="Raise ongoing"><span class="i i-plus" aria-hidden="true"></span></button></span></div>
-          <div class="step"><span>Other <span class="muted small">(help, harm, gear; clears)</span></span><span class="ctl"><button type="button" data-adj="other" data-d="-1" aria-label="Lower other"><span class="i i-minus" aria-hidden="true"></span></button><output id="o-other">0</output><button type="button" data-adj="other" data-d="1" aria-label="Raise other"><span class="i i-plus" aria-hidden="true"></span></button></span></div>
-        </div>
-        <label class="step" style="margin-top:12px"><span>My hunter has the Advanced version of this move</span><input type="checkbox" id="adv" style="width:22px;height:22px;accent-color:var(--accent)"></label>
-
-        <span class="lbl" style="margin-top:16px">Odds with this bonus</span>
-        <div class="odds" id="odds"></div>
-      </div>
-
-      <div id="roll-home"><div id="rollkit">
+    <!-- PLAY: everything you touch mid-session on one screen -->
+    <div id="hv-play" hidden>
+      <div id="play-pin"></div>
+      <div class="play">
+        <div><div class="card" id="play-status"></div><div id="lvlup"></div></div>
+        <div id="play-moves"></div>
+        <div><div class="card" id="play-sel" style="margin-bottom:16px"></div><div id="play-stage"><div id="rollkit">
         <div class="card">
           <div class="tray" id="tray" aria-hidden="true"><div class="dice" id="dice"></div><span class="hintskip">Tap to skip</span></div>
           <div class="stage">
@@ -1174,21 +1154,6 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
           </div>
           <button class="btn rollbtn" id="roll" type="button">Roll 2d6</button>
           <div id="result" aria-live="polite"></div>
-          <div class="dicebar"><button class="btn ghost sm" id="dp-open" type="button" aria-expanded="false" aria-controls="dicepanel">Customize dice</button></div>
-        </div>
-        <div class="card dicepanel" id="dicepanel" style="margin-top:16px" hidden>
-          <div class="dp-head"><h3>Customize dice</h3><button class="btn ghost sm" id="dp-close" type="button">Done</button></div>
-          <div class="tray mini" id="dp-tray" aria-hidden="true"><div class="dice" id="dp-dice"></div></div>
-          <div id="dp-warn" aria-live="polite"></div>
-          <div id="dp-opts"></div>
-          <span class="lbl">Sets</span>
-          <div id="dp-sets"></div>
-          <div class="dp-row"><input type="text" id="dp-name" maxlength="40" placeholder="Name these dice" aria-label="Name for this set"><button class="btn sm" id="dp-save" type="button">Save as my set</button></div>
-          <span class="lbl">Dice code</span>
-          <p class="small muted" style="margin:4px 0 0">Trade dice with a friend. Copy your code and send it, or paste theirs here.</p>
-          <div class="dp-row"><input type="text" id="dp-code" placeholder="Paste a code" aria-label="Dice code" autocomplete="off" spellcheck="false"><button class="btn sm" id="dp-load" type="button">Use this code</button><button class="btn ghost sm" id="dp-copy" type="button">Copy code</button></div>
-          <p class="small" id="dp-msg" aria-live="polite" style="margin:10px 0 0; min-height:1.2em"></p>
-          <div class="actions"><button class="btn ghost sm" id="dp-reset" type="button">Reset to Bone and Oxblood</button></div>
         </div>
         <div class="card" style="margin-top:16px">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px">
@@ -1197,17 +1162,8 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
           </div>
           <ul class="hist" id="hist"></ul>
         </div>
-      </div></div>
-    </div>
-  </section>
-
-  <!-- HUNTER -->
-  <section class="panel" id="p-hunter" role="tabpanel" aria-labelledby="t-hunter" hidden>
-    <div class="hero" id="hero-hunter" hidden></div>
-    <div id="hbar"></div>
-    <div class="seg" role="group" aria-label="Hunter view">
-      <button type="button" id="seg-build" aria-pressed="true">Build a hunter</button>
-      <button type="button" id="seg-sheet" aria-pressed="false">My sheet</button>
+        </div></div><div id="play-feed"></div></div>
+      </div>
     </div>
 
     <div id="hv-build">
@@ -1238,34 +1194,6 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
       </div>
 
       <div class="card" style="margin-top:16px">
-        <span class="lbl">Stats</span>
-        <div class="sheetstats" id="sheetstats"></div>
-        <p class="small muted" style="margin:10px 0 0">Your ratings are the line you picked in Build a hunter. They only go up when you level up.</p>
-      </div>
-
-      <div class="grid g3" style="margin-top:16px">
-        <div class="card">
-          <span class="lbl">Luck</span>
-          <div class="pips candles" id="luck" role="group" aria-label="Luck points"></div>
-          <p class="lucknote" id="lucktxt"></p>
-          <p class="small muted" style="margin:10px 0 0">Spend one to cut a wound to 0 harm, or turn a roll into a 12. The Roller tab has a button for the second.</p>
-        </div>
-        <div class="card">
-          <span class="lbl">Harm</span>
-          <div class="pips harm" id="harm" role="group" aria-label="Harm"></div>
-          <p class="small" id="harmtxt" style="margin:10px 0 0"></p>
-          <label style="display:flex; gap:8px; align-items:center; margin-top:8px"><input type="checkbox" id="unstable" style="width:20px;height:20px;accent-color:var(--accent)"> Unstable</label>
-          <div class="actions"><button class="btn ghost sm" id="heal1" type="button">Heal 1</button><button class="btn ghost sm" id="healall" type="button">Heal all</button></div>
-        </div>
-        <div class="card">
-          <span class="lbl">Experience</span>
-          <div class="pips" id="xp" role="group" aria-label="Experience marks"></div>
-          <p class="small muted" style="margin:10px 0 0">Level <b id="lvl">0</b>. Mark one on any roll of 6 or less.</p>
-          <div id="lvlup"></div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:16px">
         <div class="invhead"><span class="lbl" style="margin:0">Inventory</span><ul class="chips" id="invsum" style="margin:0"></ul></div>
         <form id="addform" class="addrow" autocomplete="off">
           <input type="text" id="newname" placeholder="Add gear, like Crowbar or Silver knife" aria-label="New item name">
@@ -1276,7 +1204,7 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
         <ul class="chips" id="quick"></ul>
         <ul class="inv" id="inv"></ul>
         <p class="small" id="invundo" role="status" style="margin:10px 0 0"></p>
-        <p class="small muted" style="margin:6px 0 0">Mark weapons and armor as equipped and the Roller will show them on fight rolls. Check with your Keeper on harm and armor values, and whether armor stacks.</p>
+        <p class="small muted" style="margin:6px 0 0">Mark weapons and armor as equipped and Play will show them on fight rolls. Check with your Keeper on harm and armor values, and whether armor stacks.</p>
       </div>
 
 
@@ -1291,7 +1219,7 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
       <div class="card" id="pbcard" style="margin-top:16px"></div>
 
       <div class="card" style="margin-top:16px">
-        <div class="invhead"><span class="lbl" style="margin:0">Other moves</span><span class="small muted">Anything you add here shows up in the Roller</span></div>
+        <div class="invhead"><span class="lbl" style="margin:0">Other moves</span><span class="small muted">Anything you add here shows up in Play</span></div>
         <label class="lbl" for="mvpaste">Paste a move from your playbook sheet</label>
         <textarea id="mvpaste" style="min-height:84px" placeholder="Paste the move text, like: Tough as nails: When you take harm, roll +Tough. On a 10+, ... On a 7-9, ..."></textarea>
         <div class="actions"><button class="btn sm" id="mvparse" type="button">Fill in a move from this text</button><button class="btn ghost sm" id="mvadd" type="button">Add a blank move</button></div>
@@ -1372,6 +1300,23 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
         <p class="small muted" style="margin:6px 0 0">Sound is off unless you turn it on, because on a call your microphone may pick it up. Hold the Roll button to shake the dice, let go to throw.</p>
         <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-3d"><span>3D dice (new): the dice tumble in real 3D, and Fuel dice show their liquid. Best on a recent phone or computer.</span></label>
         <p class="small muted" id="d3msg" role="status" style="margin:6px 0 0"></p>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="card dicepanel" id="dicepanel">
+        <h3 style="margin-top:0">Dice</h3>
+        <p class="small muted" style="margin:0 0 12px">Pick the look and sound of your dice, save sets, and trade codes with friends.</p>
+        <div class="tray mini" id="dp-tray" aria-hidden="true"><div class="dice" id="dp-dice"></div></div>
+        <div id="dp-warn" aria-live="polite"></div>
+        <div id="dp-opts"></div>
+        <span class="lbl">Sets</span>
+        <div id="dp-sets"></div>
+        <div class="dp-row"><input type="text" id="dp-name" maxlength="40" placeholder="Name these dice" aria-label="Name for this set"><button class="btn sm" id="dp-save" type="button">Save as my set</button></div>
+        <span class="lbl">Dice code</span>
+        <p class="small muted" style="margin:4px 0 0">Trade dice with a friend. Copy your code and send it, or paste theirs here.</p>
+        <div class="dp-row"><input type="text" id="dp-code" placeholder="Paste a code" aria-label="Dice code" autocomplete="off" spellcheck="false"><button class="btn sm" id="dp-load" type="button">Use this code</button><button class="btn ghost sm" id="dp-copy" type="button">Copy code</button></div>
+        <p class="small" id="dp-msg" aria-live="polite" style="margin:10px 0 0; min-height:1.2em"></p>
+        <div class="actions"><button class="btn ghost sm" id="dp-reset" type="button">Reset to Bone and Oxblood</button></div>
       </div>
     </div>
     <div class="grid" style="margin-top:16px">
@@ -1726,8 +1671,11 @@ function renderSession(el) {
 }
 
 /* ---------- tabs ---------- */
-var TABS = ['guide', 'play', 'roll', 'hunter', 'party', 'bestiary', 'tips', 'notes', 'settings'];
+var TABS = ['guide', 'hunter', 'party', 'bestiary', 'tips', 'notes', 'settings'];
+/* Play and the Roller were tabs of their own; old links and saves land on Hunter's Play view */
+function tabOK(h) { return TABS.indexOf(h) >= 0 || h === 'play' || h === 'roll'; }
 function showTab(name, fromHash) {
+  if (name === 'play' || name === 'roll') { name = 'hunter'; setHV('play'); }
   if (TABS.indexOf(name) < 0) name = 'guide';
   S.tab = name;
   TABS.forEach(function (t) {
@@ -1735,9 +1683,8 @@ function showTab(name, fromHash) {
     $('#t-' + t).setAttribute('aria-selected', on ? 'true' : 'false');
     $('#p-' + t).hidden = !on;
   });
-  var kit = $('#rollkit'), home = $(name === 'play' ? '#play-stage' : '#roll-home');
-  if (kit && home && kit.parentElement !== home) home.appendChild(kit);
-  if (name === 'play' || name === 'roll') renderHist();
+  if (name === 'hunter' && S.hv === 'play') renderHist();
+  if (name === 'settings') dpOpen(true);
   if (name === 'party') { if (tblUnseen()) tbl.view = 'board'; renderParty(); }
   if (name === 'guide') renderStart();
   if (name === 'hunter' && S.hv === 'build') renderBuild();
@@ -1755,7 +1702,7 @@ $$('.tabs button').forEach(function (b) { b.addEventListener('click', function (
   function frost() { nav.classList.toggle('frost', (window.pageYOffset || 0) > 0); }
   frost(); window.addEventListener('scroll', frost, { passive: true });
 })();
-window.addEventListener('hashchange', function () { var h = location.hash.replace('#', ''); if (TABS.indexOf(h) >= 0) showTab(h, true); });
+window.addEventListener('hashchange', function () { var h = location.hash.replace('#', ''); if (tabOK(h)) showTab(h, true); });
 
 /* ---------- guide: moves, lists ---------- */
 function moveCard(m) {
@@ -1779,7 +1726,7 @@ document.addEventListener('click', function (e) {
   var b = e.target.closest('[data-roll]');
   if (!b) return;
   S.roller.move = b.dataset.roll; S.roller.stat = BYID[b.dataset.roll].stat;
-  renderRoller(); showTab('roll'); scheduleSave(); window.scrollTo(0, 0);
+  renderRoller(); showTab('play'); scheduleSave(); window.scrollTo(0, 0);
 });
 
 /* ---------- roller ---------- */
@@ -1790,24 +1737,9 @@ function bonus() { var R = S.roller; return S.sheet.stats[R.stat] + R.forward + 
 function tierOf(t) { return t >= 10 ? 'full' : t >= 7 ? 'part' : 'miss'; }
 var TIERNAME = { full: 'Full success', part: 'Partial success', miss: 'Miss' };
 function renderRoller() {
-  var R = S.roller;
   syncCustom();
-  var sel = $('#mv');
-  {
-    sel.innerHTML = '<optgroup label="Basic moves">' + MOVES.filter(function (m) { return m.g === 'basic'; }).map(function (m) { return '<option value="' + m.id + '">' + esc(m.name) + ' (+' + STATNAME[m.stat] + ')</option>'; }).join('') + '</optgroup><optgroup label="Weird moves">' + MOVES.filter(function (m) { return m.g === 'weird'; }).map(function (m) { return '<option value="' + m.id + '">' + esc(m.name) + '</option>'; }).join('') + '</optgroup><optgroup label="Other"><option value="plain">Playbook move or plain roll</option></optgroup>' + selCustom();
-  }
-  if (!BYID[R.move]) R.move = 'kick';
-  sel.value = R.move;
-  $('#statrow').innerHTML = STATS.map(function (s) { return '<button type="button" class="statbtn" data-stat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmtI(S.sheet.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('');
-  $('#o-forward').innerHTML = fmtI(R.forward);
-  $('#o-ongoing').innerHTML = fmtI(R.ongoing);
-  $('#o-other').innerHTML = fmtI(R.other);
-  $('#adv').checked = !!S.sheet.adv[R.move];
-  var m = bonus(), f = 0, p = 0, x = 0;
-  for (var a = 1; a <= 6; a++) for (var b = 1; b <= 6; b++) { var t = a + b + m; if (t >= 10) f++; else if (t >= 7) p++; else x++; }
-  function pct(n) { return Math.round(n / 36 * 100); }
-  $('#odds').innerHTML = '<div class="f"><span>10+</span><span class="bar"><span style="width:' + pct(f) + '%"></span></span><b>' + pct(f) + '%</b></div><div class="p"><span>7-9</span><span class="bar"><span style="width:' + pct(p) + '%"></span></span><b>' + pct(p) + '%</b></div><div class="m"><span>6 or less</span><span class="bar"><span style="width:' + pct(x) + '%"></span></span><b>' + pct(x) + '%</b></div>';
-  renderRollas();
+  if (!BYID[S.roller.move]) S.roller.move = 'kick';
+  renderPlay();
   renderStage();
   renderHist();
 }
@@ -1869,16 +1801,12 @@ function copyRoll() {
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(line).then(function () { say('Copied. Paste it in the chat.'); }, byHand); else byHand();
 }
 function renderHist() {
-  var el = $('#hist'), onPlay = S.tab === 'play';
-  $('#histttl').textContent = onPlay ? 'This session' : 'Recent rolls';   // the same card sits on both tabs: Play lists everything that happened, the Roller only the last ten rolls
-  if (onPlay) { renderSession(el); return; }
-  if (!S.rolls.length) { el.innerHTML = '<li class="muted"><span></span>No rolls yet. Your last ten show up here.<span></span></li>'; return; }
-  el.innerHTML = S.rolls.slice(0, 10).map(function (r) { return '<li><b>' + r.total + '</b><span>' + esc(r.name) + ' <span class="muted">(' + r.d1 + '+' + r.d2 + ' ' + fmt(r.mod) + ')</span></span><span class="tag ' + r.tier + '">' + TIERNAME[r.tier] + '</span></li>'; }).join('');
+  var el = $('#hist'); if (!el) return;
+  $('#histttl').textContent = 'This session';
+  renderSession(el);
 }
 $('#roll').addEventListener('click', function () { if (Date.now() - shake.ended < 400) return; doRoll(); });
-$('#mv').addEventListener('change', function (e) { S.roller.move = e.target.value; S.roller.stat = BYID[e.target.value].stat; renderRoller(); scheduleSave(); });
-$('#adv').addEventListener('change', function (e) { if (e.target.checked) S.sheet.adv[S.roller.move] = true; else delete S.sheet.adv[S.roller.move]; renderStage(); renderPlay(); scheduleSave(); });
-$('#statrow').addEventListener('click', function (e) { var b = e.target.closest('[data-stat]'); if (!b) return; S.roller.stat = b.dataset.stat; renderRoller(); scheduleSave(); });
+$('#hv-play').addEventListener('change', function (e) { if (e.target.id !== 'adv') return; if (e.target.checked) S.sheet.adv[S.roller.move] = true; else delete S.sheet.adv[S.roller.move]; renderStage(); renderPlay(); scheduleSave(); });
 /* moves that hand you hold: how much on a 10+ and on a 7-9 */
 var HOLDS = { inv: { full: 2, part: 1 }, read: { full: 3, part: 1 } };
 function rollClicks(e) {
@@ -1900,11 +1828,9 @@ function rollClicks(e) {
   if (e.target.id === 'markxp' && last && !last.xpMarked) { evSay('Marked XP on a miss', true); last.xpMarked = true; S.sheet.xp = Math.min(S.sheet.xp + 1, 9); renderSheet(); renderStage(); scheduleSave(); }
   if (e.target.id === 'spendluck' && last && !last.luck && S.sheet.luck > 0) { evSay('Spent Luck: made the roll a 12', true); last.luck = true; last.total = 12; setLuck(S.sheet.luck - 1); evRollUpdate(); if (S.rolls[0]) { S.rolls[0].total = 12; S.rolls[0].tier = 'full'; S.rolls[0].name += ' (Luck)'; } if (HOLDS[last.move]) { var was = last.hold && S.hold.move === last.move ? S.hold.asked : []; S.hold = { n: Math.max(0, HOLDS[last.move].full - was.length), move: last.move, asked: was }; last.hold = true; evSkip('hold'); } renderSheet(); renderRoller(); fxPlay('crit'); stinger(12); scheduleSave(); }
 }
-$('#p-roll').addEventListener('click', rollClicks);
-$('#p-play').addEventListener('click', rollClicks);
+$('#hv-play').addEventListener('click', rollClicks);
 $('#clearhist').addEventListener('click', function () {
-  if (S.tab === 'play') { S.session.events = []; S.session.started = 0; evToastShow(null); renderHist(); scheduleSave(); return; }   // the timeline; the sheet is untouched
-  S.rolls = []; last = null; renderRoller(); scheduleSave();
+  S.session.events = []; S.session.started = 0; evToastShow(null); renderHist(); scheduleSave();   // the timeline; the sheet is untouched
 });
 $('#hist').addEventListener('click', function (e) {
   var u = e.target.closest('[data-evundo]'), x = e.target.closest('[data-evrm]');
@@ -1916,10 +1842,12 @@ $('#evtoast-undo').addEventListener('click', function () { evUndo($('#evtoast').
 
 /* ---------- hunter ---------- */
 function setHV(v) {
+  if (['play', 'sheet', 'build'].indexOf(v) < 0) v = 'play';
   S.hv = v;
-  $('#hv-build').hidden = v !== 'build'; $('#hv-sheet').hidden = v !== 'sheet';
-  $('#seg-build').setAttribute('aria-pressed', v === 'build'); $('#seg-sheet').setAttribute('aria-pressed', v === 'sheet');
+  ['play', 'sheet', 'build'].forEach(function (k) { $('#hv-' + k).hidden = v !== k; $('#seg-' + k).setAttribute('aria-pressed', v === k); });
+  if (v === 'play') renderHist();
 }
+$('#seg-play').addEventListener('click', function () { setHV('play'); scheduleSave(); });
 $('#seg-build').addEventListener('click', function () { setHV('build'); renderBuild(); scheduleSave(); });
 $('#seg-sheet').addEventListener('click', function () { setHV('sheet'); scheduleSave(); });
 
@@ -2349,7 +2277,7 @@ function wizMoves() {
   var st = pbState(), n = countOn(st.moves);
   var auto = d.moves.auto.length ? '<span class="lbl">You get these automatically</span><div class="wmoves">' + d.moves.auto.map(function (m) { return wizMoveCard(m, true, true); }).join('') + '</div>' : '';
   var choices = d.moves.pick ? '<span class="lbl" style="margin-top:16px">Pick ' + d.moves.pick + ' of these</span>' + cnt(n, d.moves.pick) + '<p class="wmsg" id="wmsg" role="status"></p><div class="wmoves">' + d.moves.choices.map(function (m) { return wizMoveCard(m, false, !!st.moves[m.id]); }).join('') + '</div>' : '';
-  return '<h2 class="sectitle" tabindex="-1">Special moves</h2><p>' + esc(d.moves.intro) + ' Moves with a roll show up in the Roller automatically.</p>' + auto + choices + wizSkill(d, st) +
+  return '<h2 class="sectitle" tabindex="-1">Special moves</h2><p>' + esc(d.moves.intro) + ' Moves with a roll show up in Play automatically.</p>' + auto + choices + wizSkill(d, st) +
     '<details class="wex"><summary>Add a move from another playbook, or your own</summary><div class="wfield"><label class="lbl" for="w-mvpaste">Paste a move from a sheet</label><textarea id="w-mvpaste" placeholder="Paste the move text, like: Tough as nails: When you take harm, roll +Tough. On a 10+, ... On a 7-9, ..."></textarea>' +
     '<div class="actions"><button class="btn sm" type="button" id="wmvparse">Add this move</button></div><p class="small muted" id="wmvmsg" role="status" style="margin:8px 0 0"></p></div></details>';
 }
@@ -2587,7 +2515,7 @@ function wizToggle(map, key, limit, what) {
       var txt = $('#w-mvpaste').value, msg = $('#wmvmsg');
       if (!txt.trim()) { msg.textContent = 'Paste a move first.'; return; }
       var m = parseMove(txt); S.sheet.custom.push(m); syncCustom(); renderCustom(); renderRoller(); scheduleSave();
-      $('#w-mvpaste').value = ''; msg.textContent = 'Added "' + (m.name || 'Untitled move') + '". You can fix the details on My sheet if the text was split oddly.'; return;
+      $('#w-mvpaste').value = ''; msg.textContent = 'Added "' + (m.name || 'Untitled move') + '". You can fix the details on the Sheet if the text was split oddly.'; return;
     }
     if ((g = t.closest('[data-wq]'))) { var qi = QUICK[+g.dataset.wq]; addItem(qi[0], qi[1]); wizGearList(); wizPills(); return; }
     if (t.hasAttribute('data-wirm')) {
@@ -2601,7 +2529,7 @@ function wizToggle(map, key, limit, what) {
       var hp = curPB().history[+g.dataset.whist]; $('#w-bnote').value = hp.slice(0, 200); $('#w-bwho').focus(); return;
     }
     if (t.id === 'wtosheet') { setHV('sheet'); scheduleSave(); window.scrollTo(0, 0); return; }
-    if (t.id === 'wtoplay') { showTab('play'); window.scrollTo(0, 0); return; }
+    if (t.id === 'wtoplay') { setHV('play'); scheduleSave(); window.scrollTo(0, 0); return; }
   });
   host.addEventListener('submit', function (e) {
     e.preventDefault();
@@ -2772,19 +2700,8 @@ function renderSheet() {
   var sel = $('#f-pb');
   if (!sel.options.length) sel.innerHTML = '<option value="">Not chosen yet</option>' + PLAYBOOKS.map(function (p) { return '<option>' + esc(p[0]) + '</option>'; }).join('');
   $$('[data-bind]').forEach(function (el) { var v = getPath(S, el.dataset.bind); if (el.value !== v && document.activeElement !== el) el.value = v == null ? '' : v; });
-  $('#sheetstats').innerHTML = STATS.map(function (s) {
-    return '<div class="sstat"><span class="lbl" style="margin:0">' + STATNAME[s] + '</span><output>' + fmtI(sh.stats[s]) + '</output></div>';
-  }).join('');
-  $('#luck').innerHTML = luckPips(sh.luck); $('#luck').className = 'pips candles' + (sh.luck < 3 ? ' low' : '');
-  $('#lucktxt').textContent = luckNote(sh.luck); $('#lucktxt').className = 'lucknote' + (sh.luck < 3 ? ' low' : '');
-  pips($('#harm'), 8, sh.harm, 'Harm');
-  pips($('#xp'), 5, Math.min(sh.xp, 5), 'XP');
-  $('#harmtxt').textContent = harmText(sh.harm);
-  $('#unstable').checked = !!sh.unstable;
-  $('#lvl').textContent = sh.level;
   $('#lvlup').innerHTML = sh.xp >= 5 ? '<div class="levelup">' + artImg('levelup', 'lvlimg') + '<span><b>Level up ready.</b> Pick an improvement.</span><button class="btn sm" type="button" id="dolevel">Level up</button></div>' : '';
-  renderPortrait(); renderRollas(); renderPbCard(); renderHistPicks();
-  if ($('#statrow').children.length) renderRoller();
+  renderPortrait(); renderPbCard(); renderHistPicks(); renderPlay();
 }
 document.addEventListener('input', function (e) {
   var b = e.target.dataset && e.target.dataset.bind;
@@ -2796,19 +2713,8 @@ document.addEventListener('input', function (e) {
 });
 $('#p-hunter').addEventListener('click', function (e) {
   var t = e.target, sh = S.sheet;
-  var pb = t.closest('.pips button');
-  if (pb) {
-    var n = +pb.dataset.n, host = pb.parentElement.id;
-    if (host === 'luck') setLuck(sh.luck === n ? n - 1 : n);
-    if (host === 'harm') { sh.harm = sh.harm === n ? n - 1 : n; if (sh.harm >= 4) sh.unstable = true; if (sh.harm === 0) sh.unstable = false; }
-    if (host === 'xp') sh.xp = sh.xp === n ? n - 1 : n;
-    renderSheet(); scheduleSave(); return;
-  }
-  if (t.id === 'heal1') { evSay('Healed 1'); sh.harm = Math.max(0, sh.harm - 1); if (sh.harm < 4) sh.unstable = false; renderSheet(); scheduleSave(); }
-  if (t.id === 'healall') { evSay('Healed all harm'); sh.harm = 0; sh.unstable = false; renderSheet(); scheduleSave(); }
   if (t.id === 'dolevel') { levelPanel(); }
 });
-$('#unstable').addEventListener('change', function (e) { S.sheet.unstable = e.target.checked; scheduleSave(); });
 
 
 /* ---------- portrait, rollas, inventory ---------- */
@@ -2838,14 +2744,7 @@ function renderPortrait() {
   $('#photolbl').textContent = sh.photo ? 'Change photo' : 'Upload photo';
   $('#rmphoto').hidden = !sh.photo;
 }
-function renderRollas() {
-  var sh = S.sheet, host = $('#rollas');
-  if (!host) return;
-  var av0 = sh.photo || artFor(sh.playbook), av = av0 ? '<img src="' + esc(av0) + '" alt="">' : '<span class="av"></span>';
-  var a = armorVal();
-  renderPlay();
-  host.innerHTML = av + '<span class="who">' + esc(sh.name || 'Your hunter') + '</span>' + (sh.playbook ? '<span class="muted small">' + esc(sh.playbook) + '</span>' : '') + '<span class="stats"><span class="chip">Luck ' + sh.luck + '</span><span class="chip">Harm ' + sh.harm + '</span>' + (a ? '<span class="chip">Armor ' + a + '</span>' : '') + '</span>';
-}
+function renderRollas() { renderPlay(); }
 function photoMsg(t) { $('#photomsg').textContent = t || ''; }
 
 /* ---------- play screen ---------- */
@@ -2891,11 +2790,12 @@ function renderPlay() {
     '<div class="pblock"><span class="lbl">Ratings</span><div class="statrow" role="group" aria-label="Stat to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmtI(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div></div>' +
     '<div class="pblock"><span class="lbl">Harm</span>' + pipStr('pl-harm', 'harm', 8, sh.harm, 'Harm') + '<p class="small' + (sh.harm >= 4 ? '' : ' muted') + '" style="margin:6px 0 0">' + (sh.unstable ? '<b style="color:var(--bad)">Unstable.</b> ' : '') + esc(harmText(sh.harm)) + '</p>' +
       '<div class="prow"><span>Take harm</span><span class="ctl"><button type="button" data-ph="-1" aria-label="Less harm"><span class="i i-minus" aria-hidden="true"></span></button><output>' + play.harm + '</output><button type="button" data-ph="1" aria-label="More harm"><span class="i i-plus" aria-hidden="true"></span></button></span><button type="button" class="btn sm" id="pl-take">Apply</button></div>' +
-      '<div class="prow"><label><input type="checkbox" id="pl-ign"' + (play.ignore ? ' checked' : '') + '> Ignores armor</label><button type="button" class="btn ghost sm" id="pl-heal1"' + (sh.harm < 1 ? ' disabled' : '') + '>Heal 1</button></div>' +
+      '<div class="prow"><label><input type="checkbox" id="pl-ign"' + (play.ignore ? ' checked' : '') + '> Ignores armor</label><span><button type="button" class="btn ghost sm" id="pl-heal1"' + (sh.harm < 1 ? ' disabled' : '') + '>Heal 1</button> <button type="button" class="btn ghost sm" id="pl-healall"' + (sh.harm < 1 ? ' disabled' : '') + '>Heal all</button></span></div>' +
+      '<div class="prow"><label><input type="checkbox" id="pl-unst"' + (sh.unstable ? ' checked' : '') + '> Unstable</label></div>' +
       '<p class="pmsg" role="status">' + esc(play.msg) + '</p>' +
       (play.wound > 0 && sh.luck > 0 ? '<button type="button" class="btn ghost sm" id="pl-undo">Spend Luck: cancel that wound</button>' : '') + '</div>' +
     '<div class="pblock"><span class="lbl">Luck</span>' + '<div class="pips candles' + (sh.luck < 3 ? ' low' : '') + '" id="pl-luck" role="group" aria-label="Luck">' + luckPips(sh.luck) + '</div><p class="lucknote' + (sh.luck < 3 ? ' low' : '') + '">' + luckNote(sh.luck) + '</p>' + (d ? '<p class="small muted" style="margin:6px 0 0"><b>When you spend Luck:</b> ' + esc(d.luckSpecial) + '</p>' : '') + '</div>' +
-    '<div class="pblock"><span class="lbl">Experience</span>' + pipStr('pl-xp', '', 5, Math.min(sh.xp, 5), 'XP') + (sh.xp >= 5 ? '<div class="prow"><b>Level up ready.</b><button type="button" class="btn sm" data-pgo="sheet">Pick an improvement</button></div>' : '') + '</div>' +
+    '<div class="pblock"><span class="lbl">Experience</span>' + pipStr('pl-xp', '', 5, Math.min(sh.xp, 5), 'XP') + '</div>' +
     '<div class="pblock"><span class="lbl">This roll</span>' + stepStr('+1 forward', 'forward', fmtI(R.forward), '(clears)') + stepStr('+1 ongoing', 'ongoing', fmtI(R.ongoing)) + stepStr('Other', 'other', fmtI(R.other), '(clears)') + stepStr('Hold', 'hold', S.hold.n) + '</div>' +
     (gear ? '<div class="pblock"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '') +
     '<div class="pblock"><button type="button" class="btn ghost sm" data-rit="open">End the session</button></div>';
@@ -2923,10 +2823,11 @@ function renderPlay() {
   $('#play-sel').className = 'card psel';
   $('#play-sel').innerHTML = '<h3>' + esc(mv.id === 'plain' ? 'Plain roll' : mv.name) + '</h3>' + (mv.trig ? '<p class="muted"><i>' + esc(mv.trig) + '</i></p>' : '') +
     '<p>Roll 2d6 <b>' + fmt(m) + '</b> <span class="muted small">(' + esc(parts.join(', ')) + ')</span></p>' +
-    '<p class="small"><span class="tag full">10+ ' + pct(f) + '%</span> &middot; <span class="tag part">7-9 ' + pct(p) + '%</span> &middot; <span class="tag miss">Miss ' + pct(x) + '%</span></p>';
+    '<p class="small"><span class="tag full">10+ ' + pct(f) + '%</span> &middot; <span class="tag part">7-9 ' + pct(p) + '%</span> &middot; <span class="tag miss">Miss ' + pct(x) + '%</span></p>' +
+    (mv.adv ? '<label class="small" style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="adv"' + (S.sheet.adv[R.move] ? ' checked' : '') + ' style="width:20px;height:20px;accent-color:var(--accent)"> My hunter has the Advanced version</label>' : '');
 }
 (function playEvents() {
-  var host = $('#p-play');
+  var host = $('#hv-play');
   host.addEventListener('click', function (e) {
     var t = e.target, sh = S.sheet, R = S.roller, g;
     if ((g = t.closest('[data-pmove]'))) { play.want = ''; R.move = g.dataset.pmove; if (R.move !== 'plain') R.stat = BYID[R.move].stat; renderRoller(); scheduleSave(); return; }
@@ -2952,6 +2853,7 @@ function renderPlay() {
       play.msg = dmg ? 'Took ' + dmg + ' harm' + (arm ? ' (' + play.harm + ' less ' + arm + ' armor)' : '') + '. You are at ' + sh.harm + '.' : 'Your armor soaked all of it.';
       renderSheet(); scheduleSave(); return;
     }
+    if (t.id === 'pl-healall') { evSay('Healed all harm'); sh.harm = 0; sh.unstable = false; play.wound = 0; play.msg = ''; renderSheet(); scheduleSave(); return; }
     if (t.id === 'pl-heal1') { evSay('Healed 1'); sh.harm = Math.max(0, sh.harm - 1); if (sh.harm < 4) sh.unstable = false; play.wound = 0; play.msg = ''; renderSheet(); scheduleSave(); return; }
     if (t.id === 'pl-undo' && play.wound > 0 && sh.luck > 0) {
       evSay('Spent Luck to cancel a wound');
@@ -2959,9 +2861,12 @@ function renderPlay() {
       play.msg = 'Luck spent. That wound is cancelled. ' + sh.luck + ' Luck left.'; play.wound = 0;
       renderSheet(); scheduleSave(); return;
     }
-    if ((g = t.closest('[data-pgo]'))) { setHV(g.dataset.pgo === 'sheet' ? 'sheet' : 'build'); showTab('hunter'); if (g.dataset.pgo === 'sheet') { var lv = $('#lvlup'); if (lv) lv.scrollIntoView({ block: 'center' }); } scheduleSave(); return; }
+    if ((g = t.closest('[data-pgo]'))) { if (g.dataset.pgo === 'build') { setHV('build'); renderBuild(); window.scrollTo(0, 0); } else { var lv = $('#lvlup'); if (lv) lv.scrollIntoView({ block: 'center' }); } scheduleSave(); return; }
   });
-  host.addEventListener('change', function (e) { if (e.target.id === 'pl-ign') play.ignore = e.target.checked; });
+  host.addEventListener('change', function (e) {
+    if (e.target.id === 'pl-ign') play.ignore = e.target.checked;
+    if (e.target.id === 'pl-unst') { S.sheet.unstable = e.target.checked; renderPlay(); scheduleSave(); }
+  });
 })();
 
 /* ---------- end of the session: a short guided panel on Play ---------- */
@@ -3049,7 +2954,7 @@ function ritFinish() {
   var h = $('#rit-h'); if (h) { h.focus(); h.scrollIntoView({ block: 'start' }); }
 }
 (function ritEvents() {
-  var host = $('#p-play');
+  var host = $('#hv-play');
   host.addEventListener('click', function (e) {
     var b = e.target.closest('[data-rit]'); if (!b) return;
     var k = b.dataset.rit;
@@ -3097,7 +3002,7 @@ function takeHunter(h, build) {
   last = null; play.wound = 0; play.msg = ''; rit.open = false; rit.done = null;
   evList().forEach(function (e) { e.nu = true; });   // a line about the old hunter must not undo anything on the new one
   evBase();
-  S.wiz = 0; S.hv = build ? 'build' : 'sheet';
+  S.wiz = 0; S.hv = build ? 'build' : 'play';
 }
 function hunterChanged() {
   hn.retiring = false; hn.del = '';
@@ -4387,12 +4292,7 @@ function useSet(st) {
   scheduleSave(); renderDice();
 }
 function dpSel(t) { var s = t.tagName.toLowerCase(); [].forEach.call(t.attributes, function (a) { if (/^data-/.test(a.name)) s += '[' + a.name + '="' + a.value + '"]'; }); return s; }
-function dpOpen(open) {
-  $('#dicepanel').hidden = !open; $('#dp-open').setAttribute('aria-expanded', open ? 'true' : 'false');
-  if (open) { dpMsg(''); renderDice(); d3Kick(0); }
-}
-$('#dp-open').addEventListener('click', function () { dpOpen($('#dicepanel').hidden); });
-$('#dp-close').addEventListener('click', function () { dpOpen(false); $('#dp-open').focus(); });
+function dpOpen(open) { if (open) { dpMsg(''); renderDice(); d3Kick(0); } }   // the dice maker lives on Settings: draw it fresh when that page opens
 $('#dicepanel').addEventListener('click', function (e) {
   var t = e.target.closest('button'), D = S.dice, a, sel, f, st;
   if (!t || dpSel(t) === 'button') return;
@@ -5095,7 +4995,7 @@ function d3Blobs(d) {
    It is a still picture, so it is only redrawn when d3Kick says something changed. */
 function d3Preview() {
   var host = $('#dp-tray'), cv = D3.pv, T = D3.T;
-  if ($('#dicepanel').hidden || D3.dice.length < 2) return;
+  if (S.tab !== 'settings' || D3.dice.length < 2) return;
   var w = host.clientWidth, h = host.clientHeight, mh = $('#tray').clientHeight, r = Math.min(window.devicePixelRatio || 1, 2);
   if (!w || !h || !mh || !D3.canvas.width) return;
   if (!cv) {
@@ -5344,7 +5244,7 @@ function renderStart() {
   var built = wizDone().slice(0, 6).filter(Boolean).length;
   var steps = [
     [built === 6, 'Build your hunter', built === 6 ? 'Done. You can change anything later.' : built ? built + ' of 6 builder steps done so far.' : 'About ten minutes. Pick a playbook and the builder walks you through the rest.', '<button class="btn sm" type="button" data-sgo="build">' + (built === 6 ? 'Open the builder' : built ? 'Carry on building' : 'Build a hunter') + '</button>'],
-    [S.start.rolled, 'Try one roll', 'Open Play, pick a move and roll it once, so you know where everything is before the first session.', '<button class="btn ' + (built === 6 && !S.start.rolled ? '' : 'ghost ') + 'sm" type="button" data-sgo="play">Open Play</button>'],
+    [S.start.rolled, 'Try one roll', 'Open Play on the Hunter tab, pick a move and roll it once, so you know where everything is before the first session.', '<button class="btn ' + (built === 6 && !S.start.rolled ? '' : 'ghost ') + 'sm" type="button" data-sgo="play">Open Play</button>'],
     [S.bkAt > 0, 'Download a backup', 'Your journal is saved in this browser, on this device only. A backup file means a cleared browser or a new laptop cannot lose it. Last backup: ' + bkAgo() + '.', '<button class="btn ghost sm" type="button" data-bk>Download backup</button>']
   ];
   var all = steps.every(function (s) { return s[0]; });
@@ -5379,14 +5279,14 @@ function renderAll() {
 }
 renderAll();
 var h0 = location.hash.replace('#', '');
-showTab(TABS.indexOf(h0) >= 0 ? h0 : 'guide', true);
+showTab(tabOK(h0) ? h0 : 'guide', true);
 initArt(); initCaps();
 /* offline copy: only when served over http(s), never from a file or inside claude.ai */
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !window.claude) { try { navigator.serviceWorker.register('sw.js').catch(function () {}); } catch (e) {} }
 initStore().then(function () {
   renderAll(); startParty(); tblStart();
   var h = location.hash.replace('#', '');
-  showTab(TABS.indexOf(h) >= 0 ? h : S.tab, true);
+  showTab(tabOK(h) ? h : S.tab, true);
 });
 })();
 </script>

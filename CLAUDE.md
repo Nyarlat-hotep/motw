@@ -27,8 +27,8 @@ A vanilla JS companion app for a Monster of the Week campaign, almost all of it 
 - State `S` (defaults in `defaults()`), merged with saved data by `merge(defaults(), saved)`, which keeps only keys that `defaults()` has. An empty-object base field takes the saved value wholesale. Saved to localStorage key `hunters-journal-v1` via `scheduleSave()` / `flush()`.
 - `initStore()` also tries `window.claude` (db, user) for a claude.ai-hosted copy. Elsewhere it falls back to localStorage. See docs/ROADMAP.md for replacing that with a shared backend.
 - Helpers: `$`, `$$`, `esc`, `clamp`, `fmt`, `getPath`/`setPath`, `uid`.
-- Tabs: guide, play, roll, hunter, party, bestiary, tips, notes. Play (`renderPlay`) is the mid-session screen; the dice card `#rollkit` is moved between `#roll-home` and `#play-stage` by `showTab`, so roller ids stay unique. Hold from Investigate and Read a Bad Situation lives in `S.hold`.
-- Hunter has two views: Build (the wizard) and My sheet.
+- Tabs: guide, hunter, party, bestiary, tips, notes, settings (`TABS`). The old `#play` and `#roll` links land on Hunter's Play view (`tabOK`, `showTab`). Play (`renderPlay`, in `#hv-play`) is the mid-session screen and holds the only dice card (`#rollkit`); the dice maker (`#dicepanel`) is on Settings. Hold from Investigate and Read a Bad Situation lives in `S.hold`.
+- Hunter has three views (`S.hv`, `setHV`): Play (ratings, harm, Luck, XP and level-up, roll bonuses, moves, dice), Sheet (profile, inventory, bonds, playbook card, custom moves, notes) and Build (the wizard). Each control lives in one view only.
 - Wizard: `WSTEPS` (8 steps), `renderWiz`, per-playbook picks in `S.sheet.pbs[playbookName]` = {rating, look, moves, gear, build, extras, imp, skill}.
 - Picked roll moves sync into `S.sheet.custom` and picked gear into `S.sheet.inventory`, each tagged with a `pbk` field so removal cleans up. See `syncPbMoves`, `syncPbGear`, `onPlaybookChange`.
 - Roller: `BYID` holds basic and custom moves; `renderStage` shows the result tier and the move `note`.
