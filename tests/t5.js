@@ -218,7 +218,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   check('play: dice card moves into Play', await pp.evaluate(()=>document.getElementById('rollkit').parentElement.id)==='play-stage');
   check('play: three columns on a laptop', await pp.evaluate(()=>getComputedStyle(document.querySelector('.play')).gridTemplateColumns.split(' ').length)===3);
   check('play: no sideways scroll', await pp.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth)<=0);
-  check('play: 8 basic move buttons', (await pp.locator('#play-moves .card').first().locator('.pmove').count())===8);
+  check('play: 8 basic move buttons', (await pp.locator('#play-moves .card:not(.want)').first().locator('.pmove').count())===8);
   await pp.click('[data-pmove="inv"]');
   check('play: picking a move selects it and its stat', (await pp.getAttribute('[data-pmove="inv"]','aria-pressed'))==='true' && (await pp.getAttribute('[data-pstat="sharp"]','aria-pressed'))==='true' && /Investigate a Mystery/.test(await PT('#play-sel')));
   await pp.click('[data-padj="other"][data-d="1"]'); await pp.click('[data-padj="other"][data-d="1"]'); await pp.click('[data-padj="other"][data-d="1"]'); await pp.click('[data-padj="other"][data-d="1"]'); await pp.click('[data-padj="other"][data-d="1"]');

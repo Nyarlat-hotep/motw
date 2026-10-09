@@ -76,4 +76,5 @@ Weapon builder (only when the sheet has you design a weapon from parts):
 { "text":"Take a move from another playbook", "kind":"othermove" }
 { "text":"Gain an ally", "kind":"other" }                                       // everything else (haven options, allies, retire, change type ...)
  - kind "luck" is for "get back one used Luck point" / "erase one used Luck mark" (restores 1 Luck).
+ - kind "advance" is for "mark two of the basic moves as advanced": the page asks which two, and the Roller then shows their 12+ result.
  - "text" is the improvement in plain English, shortened a little but with all numbers/caps. For "+1 to any rating, max +3" use kind "stat" with "stat":"any".
