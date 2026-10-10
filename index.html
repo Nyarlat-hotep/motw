@@ -767,10 +767,20 @@ details.sect > .body > p:first-child { text-align: left; }
 .emptyimg { display: block; max-width: 240px; width: 100%; margin: 0 auto 12px; border-radius: 3px; }
 .lvlimg { width: 56px; height: 56px; object-fit: cover; border-radius: 3px; }
 .wtop { margin-bottom: 4px; }
-.wpills { list-style: none; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; margin: 0 0 6px; }
-.wpills button { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--line); background: var(--bg); color: var(--muted); font-family: var(--display); font-size: 17px; cursor: pointer; padding: 0; }
-.wpills button.done { border-color: var(--good); color: var(--good); }
-.wpills button[aria-current="step"] { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+/* builder steps: a numbered dot with its name under it, joined by a line; done steps turn green with a check */
+.wpills { list-style: none; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 0; padding: 0; margin: 0 0 14px; }
+.wpills li { position: relative; display: flex; justify-content: center; min-width: 0; }
+.wpills li + li::before { content: ""; position: absolute; top: 20px; right: calc(50% + 24px); left: calc(-50% + 24px); height: 2px; background: var(--line); }
+.wpills li:has(button.done) + li::before { background: var(--good); }
+.wpills button { display: flex; flex-direction: column; align-items: center; gap: 6px; background: none; border: 0; padding: 0; cursor: pointer; color: var(--muted); min-width: 0; max-width: 100%; }
+.wdot { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--line); background: var(--bg); font-family: var(--display); font-size: 17px; transition: background-color .2s ease, border-color .2s ease; }
+.wlab { font-size: 14px; line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
+.wpills button:hover .wdot { border-color: var(--accent); }
+.wpills button.done .wdot { border-color: var(--good); background: var(--good); color: var(--bg); }
+.wpills button.done .wlab { color: var(--good); }
+.wpills button[aria-current="step"] .wdot { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.wpills button[aria-current="step"] .wlab { color: var(--ink); font-weight: 700; }
+@media (max-width: 620px) { .wpills { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 14px; } .wpills li:nth-child(5)::before { content: none; } }
 .wstep { margin: 6px 0 18px; color: var(--muted); }
 .wstep b { color: var(--ink); }
 #wiz { scroll-margin-top: 76px; }
@@ -998,8 +1008,8 @@ div.wcard { cursor: default; border-color: var(--good); }
 /* where an icon is the whole of a control, centre it on the box rather than on the
    baseline: a baseline nudge leaves it a pixel high and off to one side. */
 .step .ctl button, .prow .ctl button, .item .qty button, .wctl button,
-.wpills button, .chip.del { display: inline-flex; align-items: center; justify-content: center; }
-.step .ctl button, .prow .ctl button, .item .qty button, .wctl button, .wpills button { padding: 0; }
+.chip.del { display: inline-flex; align-items: center; justify-content: center; }
+.step .ctl button, .prow .ctl button, .item .qty button, .wctl button { padding: 0; }
 
 /* ---- corners: every card, accordion, panel and dialog shares one radius ----
    Nested art (thumbnails, portraits in a card) keeps its smaller radius, and
@@ -2344,7 +2354,7 @@ function wizPillsHTML() {
   var d = wizDone(), cur = clamp(S.wiz | 0, 0, WSTEPS.length - 1);
   return WSTEPS.map(function (n, i) {
     var cls = d[i] ? 'done' : '';
-    return '<li><button type="button" class="' + cls + '" data-wgo="' + i + '"' + (i === cur ? ' aria-current="step"' : '') + ' aria-label="Step ' + (i + 1) + ': ' + n + (d[i] ? ', done' : '') + '">' + (d[i] && i !== cur ? '<span class="i i-check" aria-hidden="true"></span>' : (i + 1)) + '</button></li>';
+    return '<li><button type="button" class="' + cls + '" data-wgo="' + i + '"' + (i === cur ? ' aria-current="step"' : '') + ' aria-label="Step ' + (i + 1) + ': ' + n + (d[i] ? ', done' : '') + '"><span class="wdot">' + (d[i] && i !== cur ? '<span class="i i-check" aria-hidden="true"></span>' : (i + 1)) + '</span><span class="wlab" aria-hidden="true">' + n + '</span></button></li>';
   }).join('');
 }
 function wizPills() { var p = $('#wpills'); if (p) p.innerHTML = wizPillsHTML(); }
