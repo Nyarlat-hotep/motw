@@ -191,6 +191,13 @@ details.sect > .body { padding: 0 16px 16px; }
 .hist .evx { background: none; border: 0; border-radius: 6px; color: var(--muted); cursor: pointer; font-size: 22px; line-height: 1; min-width: 40px; min-height: 40px; }
 .hist .evx:hover { color: var(--ink); }
 .hist .evmore { border-bottom: 0; }
+.hvrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 16px; }
+.hvrow .seg { margin-bottom: 0; }
+.hicons { display: flex; gap: 4px; }
+.hicon { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 10px; background: none; border: 1px solid transparent; border-radius: 8px; color: var(--muted); cursor: pointer; }
+.hicon:hover, .hicon[aria-expanded="true"] { color: var(--ink); border-color: var(--line); }
+.hicon .tabico { width: 24px; height: 24px; }
+@media (max-width: 420px) { .hvrow { gap: 8px; } .hvrow .seg button { padding-inline: 14px; } .hicons { gap: 0; } .hicon { min-width: 40px; padding: 0 8px; } }
 .hunters { margin-bottom: 16px; }
 .hunters .hwho { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; }
 .hunters .hwho b { font-size: 20px; overflow-wrap: anywhere; }
@@ -1133,11 +1140,20 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
 
   <!-- HUNTER -->
   <section class="panel" id="p-hunter" role="tabpanel" aria-labelledby="t-hunter" hidden>
-    <div id="hbar"></div>
-    <div class="seg" role="group" aria-label="Hunter view">
-      <button type="button" id="seg-play" aria-pressed="false">Play</button>
-      <button type="button" id="seg-sheet" aria-pressed="false">Sheet</button>
-      <button type="button" id="seg-build" aria-pressed="true">Build</button>
+    <div id="hhead">
+      <div class="hvrow">
+        <div class="seg" role="group" aria-label="Hunter view">
+          <button type="button" id="seg-play" aria-pressed="false">Play</button>
+          <button type="button" id="seg-sheet" aria-pressed="false">Sheet</button>
+          <button type="button" id="seg-build" aria-pressed="true">Build</button>
+        </div>
+        <div class="hicons">
+          <button type="button" class="hicon" id="hn-list" data-hn="list" aria-expanded="false" aria-controls="hbar" aria-label="My hunters" title="My hunters"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></button>
+          <button type="button" class="hicon" data-hn="new" aria-label="New hunter" title="New hunter"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg></button>
+          <button type="button" class="hicon" id="hn-ret" data-hn="retire" aria-expanded="false" aria-controls="hbar" aria-label="Retire or mark lost" title="Retire or mark lost"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/></svg></button>
+        </div>
+      </div>
+      <div id="hbar"></div>
     </div>
 
     <!-- PLAY: everything you touch mid-session on one screen -->
@@ -2984,7 +3000,7 @@ function ritFinish() {
 /* The hunter in play is always S.sheet and S.hold, so nothing else in the page has to know there can be more. Spare hunters sit on S.bench as
    { id, sheet, hold, parked, ended }, where ended is null or { how, note, date } for a hunter who died, retired or was lost.
    Per hunter: the sheet and the hold. Per player, and left alone when hunters change: dice, settings, cases, bestiary, the timeline, backups. */
-var hn = { retiring: false, del: '' };
+var hn = { retiring: false, list: false, del: '' };
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 /* a bench entry made from the hunter in play: a copy, so the swap can never lose anything */
 function benchOf(ended) { return { id: uid(), sheet: clone(S.sheet), hold: clone(S.hold), parked: Date.now(), ended: ended || null }; }
@@ -3006,7 +3022,7 @@ function takeHunter(h, build) {
   S.wiz = 0; S.hv = build ? 'build' : 'play';
 }
 function hunterChanged() {
-  hn.retiring = false; hn.del = '';
+  hn.retiring = false; hn.list = false; hn.del = '';
   renderBuild(); renderSheet(); renderPortrait(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderPlay(); renderParty(); renderStart(); renderHunters(); setHV(S.hv); applyMast();
   scheduleSave(); window.scrollTo(0, 0);
 }
@@ -3032,22 +3048,29 @@ function renderHunters() {
   function nm(h) { return esc(String(h.sheet.name || '').trim() || 'Unnamed hunter'); }
   function sub(h) { return esc(h.sheet.playbook || 'No playbook yet') + ' &middot; Level ' + (+h.sheet.level || 0); }
   function del(e) { return '<button type="button" class="btn ghost sm" data-hn="del" data-id="' + esc(e.id) + '">' + (hn.del === e.id ? 'Press again to delete for good' : 'Delete') + '</button>'; }
-  var h = '<div class="card hunters"><div class="hwho"><span class="lbl" style="margin:0">Playing</span><b>' + esc(String(sh.name || '').trim() || 'Unnamed hunter') + '</b><span class="muted small">' + esc(sh.playbook || 'No playbook yet') + '</span></div>';
+  $('#hn-list').setAttribute('aria-expanded', String(hn.list)); $('#hn-ret').setAttribute('aria-expanded', String(hn.retiring));
+  if (!hn.list && !hn.retiring) { el.innerHTML = ''; return; }
+  var h = '<div class="card hunters">';
   if (hn.retiring) {
+    h += '<b>Retire ' + esc(String(sh.name || '').trim() || 'this hunter') + '</b>';
     h += '<div class="hret"><label class="lbl" for="hn-how">What happened to them?</label><select id="hn-how"><option value="died">Died</option><option value="retired">Retired</option><option value="lost">Lost (missing or gone)</option></select>' +
       '<label class="lbl" for="hn-note">A line to remember them by (optional)</label><input type="text" id="hn-note" maxlength="200" placeholder="Saved the town, and paid for it">' +
       '<div class="actions"><button type="button" class="btn sm" data-hn="retire-go">Confirm</button><button type="button" class="btn ghost sm" data-hn="retire-no">Cancel</button></div>' +
-      '<p class="small muted" style="margin:0">They move to the shelf below and your next hunter takes over, or a blank one if you have none. You can bring them back.</p></div>';
-  } else h += '<div class="actions"><button type="button" class="btn ghost sm" data-hn="new">New hunter</button><button type="button" class="btn ghost sm" data-hn="retire">Retire or mark lost</button></div>';
+      '<p class="small muted" style="margin:0">They move to My hunters and your next hunter takes over, or a blank one if you have none. You can bring them back.</p></div>';
+    el.innerHTML = h + '</div>'; return;
+  }
+  h += '<b>My hunters</b>';
+  if (!spare.length && !gone.length) h += '<p class="small muted" style="margin:6px 0 0">No other hunters yet. The new hunter button starts one, and this one waits here for you.</p>';
   if (spare.length) h += '<span class="lbl" style="margin-top:14px">Other hunters</span><ul class="hlist">' + spare.map(function (e) { return '<li><span class="htxt"><b>' + nm(e) + '</b><p class="small muted">' + sub(e) + '</p></span><span class="hbtns"><button type="button" class="btn sm" data-hn="switch" data-id="' + esc(e.id) + '">Play this hunter</button>' + del(e) + '</span></li>'; }).join('') + '</ul>';
   if (gone.length) h += '<span class="lbl" style="margin-top:14px">Gone but not forgotten</span><ul class="hlist">' + gone.map(function (e) { return '<li><span class="htxt"><b>' + nm(e) + '</b> <span class="muted small">' + esc(ENDHOW[e.ended.how] || 'Gone') + (e.ended.date ? ' &middot; ' + esc(e.ended.date) : '') + '</span><p class="small muted">' + sub(e) + (e.ended.note ? ' &middot; ' + esc(e.ended.note) : '') + '</p></span><span class="hbtns"><button type="button" class="btn ghost sm" data-hn="back" data-id="' + esc(e.id) + '">Bring back</button>' + del(e) + '</span></li>'; }).join('') + '</ul>';
   el.innerHTML = h + '</div>';
 }
-$('#hbar').addEventListener('click', function (e) {
+$('#hhead').addEventListener('click', function (e) {
   var b = e.target.closest('[data-hn]'); if (!b) return;
   var k = b.dataset.hn, id = b.dataset.id;
   if (k === 'new') newHunter();
-  else if (k === 'retire') { hn.retiring = true; renderHunters(); var f = $('#hn-how'); if (f) f.focus(); }
+  else if (k === 'list') { hn.list = !hn.list; hn.retiring = false; renderHunters(); }
+  else if (k === 'retire') { hn.retiring = !hn.retiring; hn.list = false; renderHunters(); var f = $('#hn-how'); if (f) f.focus(); }
   else if (k === 'retire-no') { hn.retiring = false; renderHunters(); }
   else if (k === 'retire-go') retireHunter($('#hn-how').value, $('#hn-note').value);
   else if (k === 'switch' || k === 'back') switchHunter(id);
