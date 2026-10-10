@@ -205,6 +205,12 @@ details.sect > .body { padding: 0 16px 16px; }
 .hicon { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 10px; background: none; border: 1px solid transparent; border-radius: 8px; color: var(--muted); cursor: pointer; }
 .hicon:hover, .hicon[aria-expanded="true"] { color: var(--ink); border-color: var(--line); }
 .hicon .tabico { width: 24px; height: 24px; }
+.btn.ib { display: inline-flex; align-items: center; justify-content: center; position: relative; width: 42px; min-width: 42px; min-height: 42px; padding: 0; flex: none; }
+.btn.ib svg, .chip.del svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+.chip.del svg { width: 16px; height: 16px; }
+.btn.ib[data-tip]::after { content: attr(data-tip); position: absolute; top: calc(100% + 6px); right: 0; z-index: 6; white-space: nowrap; pointer-events: none; background: var(--ink); color: var(--bg); font-family: var(--body); font-size: 14px; font-weight: 400; letter-spacing: 0; text-transform: none; line-height: 1.3; padding: 4px 10px; border-radius: 6px; opacity: 0; transform: translateY(-2px); transition: opacity .15s ease, transform .15s ease; }
+.btn.ib[data-tip]:hover::after, .btn.ib[data-tip]:focus-visible::after { opacity: 1; transform: none; transition-delay: .25s; }
+@media (prefers-reduced-motion: reduce) { .btn.ib[data-tip]::after { transition: none; } }
 .hicon { position: relative; }
 .hicon[data-tip]::after { content: attr(data-tip); position: absolute; top: calc(100% + 6px); right: 0; z-index: 6; white-space: nowrap; pointer-events: none; background: var(--ink); color: var(--bg); font-family: var(--body); font-size: 14px; line-height: 1.3; padding: 4px 10px; border-radius: 6px; opacity: 0; transform: translateY(-2px); transition: opacity .15s ease, transform .15s ease; }
 .hicon[data-tip]:hover::after, .hicon[data-tip]:focus-visible::after, .hicon.filebtn:focus-within::after { opacity: 1; transform: none; transition-delay: .25s; }
@@ -358,7 +364,8 @@ details.case .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 .foot { margin-top: 36px; color: var(--muted); font-size: 14px; }
 
 /* hunter card + inventory */
-.hcard { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 20px; align-items: start; }
+.hcard { display: grid; grid-template-columns: 440px minmax(0, 1fr); gap: 28px; align-items: start; }
+@media (max-width: 1100px) { .hcard { grid-template-columns: 300px minmax(0, 1fr); } }
 @media (max-width: 640px) { .hcard { grid-template-columns: minmax(0, 1fr); } .pcol { max-width: 240px; margin: 0 auto; width: 100%; } }
 .hfields { display: grid; gap: 12px; min-width: 0; }
 .portrait { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 8px; border: 2px solid var(--line); background: var(--bg); margin-bottom: 10px; }
@@ -373,8 +380,8 @@ details.case .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 .rollas .who { font-family: var(--display); font-size: 20px; letter-spacing: .04em; text-transform: uppercase; }
 .rollas .stats { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
 .invhead { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.addrow { display: grid; grid-template-columns: minmax(0, 1fr) 150px auto; gap: 8px; }
-@media (max-width: 520px) { .addrow { grid-template-columns: minmax(0, 1fr) auto; } .addrow select { grid-column: 1 / -1; grid-row: 2; } }
+.addrow { display: grid; grid-template-columns: 170px minmax(0, 1fr) auto; gap: 8px; }
+@media (max-width: 520px) { .addrow { grid-template-columns: minmax(0, 1fr) auto; } .addrow select { grid-column: 1 / -1; } }
 .chips button { font: inherit; color: inherit; cursor: pointer; }
 .chips button.chip:hover { border-color: var(--accent); }
 .inv { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
@@ -1290,7 +1297,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
           <div class="actions" style="justify-content:center">
             <label class="hicon filebtn" id="photobtn" for="photo" data-tip="Upload photo"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg><span class="vh" id="photolbl">Upload photo</span><input class="vh" type="file" id="photo" accept="image/*"></label>
             <button type="button" class="hicon" data-hcard aria-label="Share hunter card" data-tip="Share hunter card"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
-            <button class="btn ghost sm" id="rmphoto" type="button" hidden>Remove</button>
+            <button class="btn ghost sm ib" type="button" aria-label="Remove photo" data-tip="Remove photo" id="rmphoto" hidden><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
           </div>
           <p class="small muted" id="photomsg" role="status" style="text-align:center;margin:8px 0 0"></p>
         </div>
@@ -1309,9 +1316,9 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
       <div class="card" style="margin-top:16px">
         <div class="invhead"><span class="lbl" style="margin:0">Inventory</span><ul class="chips" id="invsum" style="margin:0"></ul></div>
         <form id="addform" class="addrow" autocomplete="off">
-          <input type="text" id="newname" placeholder="Add gear, like Crowbar or Silver knife" aria-label="New item name">
           <select id="newtype" aria-label="Item type"></select>
-          <button class="btn" type="submit">Add</button>
+          <input type="text" id="newname" placeholder="Name the weapon, like Crowbar or Silver knife" aria-label="New item name">
+          <button class="btn sm ib" type="submit" aria-label="Add to inventory" data-tip="Add to inventory"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></button>
         </form>
         <div class="small muted" style="margin-top:10px">Quick add</div>
         <ul class="chips" id="quick"></ul>
@@ -1322,7 +1329,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 
 
       <div class="card" style="margin-top:16px">
-        <div class="invhead"><span class="lbl" style="margin:0">History and bonds</span><button class="btn ghost sm" id="addbond" type="button">Add a bond</button></div>
+        <div class="invhead"><span class="lbl" style="margin:0">History and bonds</span><button class="btn ghost sm ib" type="button" aria-label="Add a bond" data-tip="Add a bond" id="addbond"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></button></div>
         <p class="small muted" style="margin:0">In the first session you go round the table. You pick one history from your playbook for each other hunter, and each of them picks one for you. Write both down here. Bonds with other people fit here too.</p>
         <ul class="bonds" id="bonds"></ul>
         <div id="histideas"></div>
@@ -1335,7 +1342,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
         <div class="invhead"><span class="lbl" style="margin:0">Other moves</span><span class="small muted">Anything you add here shows up in Play</span></div>
         <label class="lbl" for="mvpaste">Paste a move from your playbook sheet</label>
         <textarea id="mvpaste" style="min-height:84px" placeholder="Paste the move text, like: Tough as nails: When you take harm, roll +Tough. On a 10+, ... On a 7-9, ..."></textarea>
-        <div class="actions"><button class="btn sm" id="mvparse" type="button">Fill in a move from this text</button><button class="btn ghost sm" id="mvadd" type="button">Add a blank move</button></div>
+        <div class="actions"><button class="btn sm" id="mvparse" type="button">Fill in a move from this text</button><button class="btn ghost sm ib" type="button" aria-label="Add a blank move" data-tip="Add a blank move" id="mvadd"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></button></div>
         <p class="small muted" id="mvmsg" role="status" style="margin:8px 0 0"></p>
         <div class="cmlist" id="custom"></div>
       </div>
@@ -1657,6 +1664,9 @@ function fmt(n) { return (n >= 0 ? '+' : '−') + Math.abs(n); }
    the sign for a screen reader.
    fmt() keeps the plain text for prose, the roll breakdown and the canvas card. */
 function sgnI(c) { var n = c === '+' ? 'plus' : 'minus'; return '<span class="i sgn i-' + n + '" role="img" aria-label="' + n + '"></span><span class="sgnt" aria-hidden="true">' + c + '</span>'; }
+/* icon-only add and remove buttons: the words go in the tooltip and the accessible name */
+var ICO = { plus: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>', trash: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>' };
+function ib(kind, label, attrs, cls, type) { return '<button class="btn ' + (cls || 'ghost') + ' sm ib" type="' + (type || 'button') + '" aria-label="' + label + '" data-tip="' + label + '"' + (attrs ? ' ' + attrs : '') + '>' + ICO[kind] + '</button>'; }
 function fmtI(n) { return sgnI(fmt(n).charAt(0)) + Math.abs(n); }
 var ROLLP = 'Roll ' + sgnI('+');
 function getPath(o, p) { return p.split('.').reduce(function (a, k) { return a == null ? a : a[k]; }, o); }
@@ -2383,7 +2393,7 @@ function wizMoves() {
   var choices = d.moves.pick ? '<span class="lbl" style="margin-top:16px">Pick ' + d.moves.pick + ' of these</span>' + cnt(n, d.moves.pick) + '<p class="wmsg" id="wmsg" role="status"></p><div class="wmoves">' + d.moves.choices.map(function (m) { return wizMoveCard(m, false, !!st.moves[m.id]); }).join('') + '</div>' : '';
   return '<h2 class="sectitle" tabindex="-1">Special moves</h2><p>' + esc(d.moves.intro) + ' Moves with a roll show up in Play automatically.</p>' + auto + choices + wizSkill(d, st) +
     '<details class="wex"><summary>Add a move from another playbook, or your own</summary><div class="wfield"><label class="lbl" for="w-mvpaste">Paste a move from a sheet</label><textarea id="w-mvpaste" placeholder="Paste the move text, like: Tough as nails: When you take harm, roll +Tough. On a 10+, ... On a 7-9, ..."></textarea>' +
-    '<div class="actions"><button class="btn sm" type="button" id="wmvparse">Add this move</button></div><p class="small muted" id="wmvmsg" role="status" style="margin:8px 0 0"></p></div></details>';
+    '<div class="actions">' + ib('plus', 'Add this move', 'id="wmvparse"', 'x') + '</div><p class="small muted" id="wmvmsg" role="status" style="margin:8px 0 0"></p></div></details>';
 }
 
 /* ----- step 6: gear ----- */
@@ -2419,7 +2429,7 @@ function wizGear() {
   return '<h2 class="sectitle" tabindex="-1">Pack your gear</h2>' +
     '<p>These are the weapons, armor and items your playbook offers. Weapons list their harm, and armor takes that much off the harm you suffer. Whatever you pick goes into your pack, ready to use in the Roller.</p><p class="wmsg" id="wmsg" role="status"></p>' + groups +
     '<h3 style="margin-top:20px">Anything else in your pack?</h3><span class="lbl">Ideas</span><ul class="chips" style="margin-top:0">' + QUICK.map(function (g, n) { return '<li><button type="button" class="chip" data-wq="' + n + '">+ ' + esc(g[0]) + '</button></li>'; }).join('') + '</ul>' +
-    '<form id="wgearform" class="wrow2" autocomplete="off" style="margin-top:12px"><input type="text" id="w-newname" placeholder="Or type your own" aria-label="New item name"><select id="w-newtype" aria-label="Item type">' + ITYPES.map(function (t) { return '<option>' + t + '</option>'; }).join('') + '</select><button class="btn" type="submit">Add</button></form>' +
+    '<form id="wgearform" class="wrow2" autocomplete="off" style="margin-top:12px"><input type="text" id="w-newname" placeholder="Or type your own" aria-label="New item name"><select id="w-newtype" aria-label="Item type">' + ITYPES.map(function (t) { return '<option>' + t + '</option>'; }).join('') + '</select>' + ib('plus', 'Add to your pack', '', 'x', 'submit') + '</form>' +
     '<ul class="wlist" id="wgearlist" style="margin-top:12px">' + pack + '</ul>' +
     '<p class="small muted">Check the harm and armor numbers with your Keeper. Different tables handle them a little differently.</p>';
 }
@@ -2428,7 +2438,7 @@ function wizGearItem(i) {
   var opts = ITYPES.map(function (t) { return '<option' + (t === i.type ? ' selected' : '') + '>' + t + '</option>'; }).join('');
   return '<li class="witem" data-iid="' + i.id + '"><input type="text" data-wi="name" value="' + esc(i.name) + '" aria-label="Item name"><select data-wi="type" aria-label="Type">' + opts + '</select>' +
     (gt ? '<label class="wval"><span>' + (i.type === 'Weapon' ? 'Harm' : 'Armor') + '</span><input type="number" data-wi="val" min="0" max="9" value="' + esc(i.val) + '" inputmode="numeric"></label><label class="weq"><input type="checkbox" data-wi="eq"' + (i.eq ? ' checked' : '') + '><span>Equipped</span></label>' : '') +
-    (i.pbk ? '<span class="chip ok">From playbook</span>' : '<button class="btn ghost sm" type="button" data-wirm aria-label="Remove ' + esc(i.name || 'item') + '">Remove</button>') + '</li>';
+    (i.pbk ? '<span class="chip ok">From playbook</span>' : '' + ib('trash', 'Remove ' + esc(i.name || 'item'), 'data-wirm') + '') + '</li>';
 }
 function wizGearList() { var el = $('#wgearlist'); if (el) el.innerHTML = S.sheet.inventory.length ? S.sheet.inventory.map(wizGearItem).join('') : '<li class="empty">Your pack is empty.</li>'; }
 
@@ -2455,14 +2465,14 @@ function wizDetails() {
 /* ----- step 7: bonds ----- */
 function wizBondList() {
   var b = S.sheet.bonds;
-  return b.length ? b.map(function (x) { return '<li><span><b>' + esc(x.who || 'Someone') + '</b> <span class="chip">' + esc(x.tie) + '</span>' + (x.note ? ' <span class="muted small">' + esc(x.note) + '</span>' : '') + (x.theirs ? ' <span class="muted small"><b>They picked:</b> ' + esc(x.theirs) + '</span>' : '') + '</span><button class="btn ghost sm" type="button" data-wrmb="' + x.id + '">Remove</button></li>'; }).join('') : '<li class="empty">No history yet.</li>';
+  return b.length ? b.map(function (x) { return '<li><span><b>' + esc(x.who || 'Someone') + '</b> <span class="chip">' + esc(x.tie) + '</span>' + (x.note ? ' <span class="muted small">' + esc(x.note) + '</span>' : '') + (x.theirs ? ' <span class="muted small"><b>They picked:</b> ' + esc(x.theirs) + '</span>' : '') + '</span>' + ib('trash', 'Remove', 'data-wrmb="' + x.id + '"') + '</li>'; }).join('') : '<li class="empty">No history yet.</li>';
 }
 function wizBonds() {
   var d = curPB(), ties = TIES.map(function (t) { return '<option>' + t + '</option>'; }).join('');
   var hist = d ? '<span class="lbl" style="margin-top:16px">History picks for ' + esc(d.name) + '</span><p class="small muted">Pick one of these for each other hunter. Tap one to start an entry with it.</p><ul class="wlist">' + d.history.map(function (h, i) { return '<li><span>' + esc(h) + '</span><button type="button" class="btn ghost sm" data-whist="' + i + '">Use this</button></li>'; }).join('') + '</ul>' : '';
   return '<h2 class="sectitle" tabindex="-1">History with the other hunters</h2>' +
     '<p>The hunters already know each other. In the first session, wait until everyone has got this far. Go round the table once so each player can introduce their hunter by name and look and say what the others would know about them. Then go round again: you pick one history from your list below for each other hunter, and each of them picks one from their own list for you. Leave this step until then if you have not met the team yet. It is also on My sheet.</p>' +
-    '<form id="wbondform" class="wbondform" autocomplete="off"><input type="text" id="w-bwho" list="partynames" placeholder="Who?" aria-label="Who"><select id="w-btie" aria-label="Kind of bond">' + ties + '</select><input type="text" id="w-bnote" placeholder="The history you picked for them" aria-label="The history you picked for them"><input type="text" id="w-btheirs" placeholder="What they picked for you (fill in at the table)" aria-label="What they picked for you"><button class="btn" type="submit">Add</button></form>' +
+    '<form id="wbondform" class="wbondform" autocomplete="off"><input type="text" id="w-bwho" list="partynames" placeholder="Who?" aria-label="Who"><select id="w-btie" aria-label="Kind of bond">' + ties + '</select><input type="text" id="w-bnote" placeholder="The history you picked for them" aria-label="The history you picked for them"><input type="text" id="w-btheirs" placeholder="What they picked for you (fill in at the table)" aria-label="What they picked for you">' + ib('plus', 'Add this history', '', 'x', 'submit') + '</form>' +
     '<ul class="wlist" id="wbondlist" style="margin-top:12px">' + wizBondList() + '</ul>' + hist;
 }
 
@@ -2675,8 +2685,8 @@ function renderPbCard() {
   var d = curPB();
   if (!d) { el.innerHTML = '<span class="lbl" style="margin:0">Your playbook</span><p class="small muted" style="margin:8px 0 0">Pick a playbook in <b>Build a hunter</b> and its moves, details and level-up choices appear here.</p>'; return; }
   var st = pbState(), auto = d.moves.auto, picked = d.moves.choices.filter(function (m) { return st.moves[m.id]; }), left = d.moves.choices.filter(function (m) { return !st.moves[m.id]; });
-  var mv = auto.map(function (m) { return '<li><b>' + esc(m.name) + '</b> <span class="chip ok">automatic</span><br>' + pmoveLine(m) + '</li>'; }).concat(picked.map(function (m) { return '<li><b>' + esc(m.name) + '</b> <button type="button" class="btn ghost sm" data-pbrm="' + esc(m.id) + '" aria-label="Remove ' + esc(m.name) + '">Remove</button><br>' + pmoveLine(m) + '</li>'; })).join('');
-  var sel = left.length ? '<div class="wrow2" style="margin-top:10px"><select id="pbadd" aria-label="Add a move from your playbook"><option value="">Add a move from ' + esc(d.name) + '...</option>' + left.map(function (m) { return '<option value="' + esc(m.id) + '">' + esc(m.name) + '</option>'; }).join('') + '</select><button type="button" class="btn sm" id="pbaddbtn">Add</button></div>' : '';
+  var mv = auto.map(function (m) { return '<li><b>' + esc(m.name) + '</b> <span class="chip ok">automatic</span><br>' + pmoveLine(m) + '</li>'; }).concat(picked.map(function (m) { return '<li><b>' + esc(m.name) + '</b> ' + ib('trash', 'Remove ' + esc(m.name), 'data-pbrm="' + esc(m.id) + '"') + '<br>' + pmoveLine(m) + '</li>'; })).join('');
+  var sel = left.length ? '<div class="wrow2" style="margin-top:10px"><select id="pbadd" aria-label="Add a move from your playbook"><option value="">Add a move from ' + esc(d.name) + '...</option>' + left.map(function (m) { return '<option value="' + esc(m.id) + '">' + esc(m.name) + '</option>'; }).join('') + '</select>' + ib('plus', 'Add this move', 'id="pbaddbtn"', 'x') + '</div>' : '';
   var ex = extrasSummary(d, st).map(function (e) { return '<li><b>' + esc(e[0]) + ':</b> ' + esc(e[1]) + '</li>'; }).join('');
   el.innerHTML = '<div class="invhead"><span class="lbl" style="margin:0">Your playbook: ' + esc(d.name) + '</span><button type="button" class="btn ghost sm" id="pbedit">Edit in the builder</button></div>' +
     '<p class="small" style="margin:6px 0">' + esc(d.tagline) + '</p>' +
@@ -2824,6 +2834,9 @@ $('#p-hunter').addEventListener('click', function (e) {
 /* ---------- portrait, rollas, inventory ---------- */
 var ITYPES = ['Weapon', 'Armor', 'Gadget', 'Consumable', 'Other'];
 var QUICK = [['Flashlight', 'Gadget'], ['First-aid kit', 'Consumable'], ['Rope', 'Other'], ['Duct tape', 'Other'], ['Salt', 'Consumable'], ['Holy water', 'Consumable'], ['Silver knife', 'Weapon'], ['Crowbar', 'Weapon'], ['Kevlar vest', 'Armor'], ['Lockpicks', 'Gadget'], ['Burner phone', 'Gadget'], ['Camera', 'Gadget']];
+/* the gear row asks for the type first; the name box then hints at that kind of thing */
+var NEWPH = { Weapon: 'Name the weapon, like Crowbar or Silver knife', Armor: 'Name the armor, like Kevlar vest', Gadget: 'Name the gadget, like Flashlight or EMF meter', Consumable: 'Name it, like Holy water or First-aid kit', Other: 'Name it, like Rope or Duct tape' };
+function newPh() { var n = $('#newname'); if (n) n.placeholder = NEWPH[$('#newtype').value] || NEWPH.Other; }
 function armorVal() { return S.sheet.inventory.reduce(function (m, i) { return i.type === 'Armor' && i.eq ? Math.max(m, +i.val || 0) : m; }, 0); }
 function weaponsOut() { return S.sheet.inventory.filter(function (i) { return i.type === 'Weapon' && i.eq; }); }
 function gearNote(id) {
@@ -3252,7 +3265,7 @@ function renderHunters() {
   var sh = S.sheet, spare = S.bench.filter(function (e) { return !e.ended; }), gone = S.bench.filter(function (e) { return e.ended; });
   function nm(h) { return esc(String(h.sheet.name || '').trim() || 'Unnamed hunter'); }
   function sub(h) { return esc(h.sheet.playbook || 'No playbook yet') + ' &middot; Level ' + (+h.sheet.level || 0); }
-  function del(e) { return '<button type="button" class="btn ghost sm" data-hn="del" data-id="' + esc(e.id) + '">' + (hn.del === e.id ? 'Press again to delete for good' : 'Delete') + '</button>'; }
+  function del(e) { return hn.del === e.id ? '<button type="button" class="btn ghost sm" data-hn="del" data-id="' + esc(e.id) + '">Press again to delete for good</button>' : ib('trash', 'Delete', 'data-hn="del" data-id="' + esc(e.id) + '"'); }
   $('#hn-list').setAttribute('aria-expanded', String(hn.list)); $('#hn-ret').setAttribute('aria-expanded', String(hn.retiring));
   if (!hn.list && !hn.retiring) { el.innerHTML = ''; return; }
   var h = '<div class="card hunters">';
@@ -3311,7 +3324,7 @@ function itemHTML(i) {
   return '<li class="item" data-iid="' + i.id + '"><div style="display:flex;gap:10px;align-items:center;min-width:0">' + eq + '<input type="text" data-i="name" value="' + esc(i.name) + '" aria-label="Item name" style="min-width:0"></div>' +
     '<select data-i="type" aria-label="Type">' + opts + '</select>' + val +
     '<span class="qty"><button type="button" data-q="-1" aria-label="Fewer"><span class="i i-minus" aria-hidden="true"></span></button><output>' + i.qty + '</output><button type="button" data-q="1" aria-label="More"><span class="i i-plus" aria-hidden="true"></span></button></span>' +
-    '<button class="btn ghost sm" type="button" data-rm aria-label="Remove ' + esc(i.name || 'item') + '">Remove</button>' +
+    '' + ib('trash', 'Remove ' + esc(i.name || 'item'), 'data-rm') + '' +
     '<div class="note"><input type="text" data-i="note" value="' + esc(i.note) + '" placeholder="Notes or tags, like silver, close, loud" aria-label="Notes"></div></li>';
 }
 function renderInvSum() {
@@ -3321,7 +3334,7 @@ function renderInvSum() {
 }
 function renderInv() {
   var inv = S.sheet.inventory;
-  var nt = $('#newtype'); if (!nt.options.length) nt.innerHTML = ITYPES.map(function (t) { return '<option>' + t + '</option>'; }).join('');
+  var nt = $('#newtype'); if (!nt.options.length) { nt.innerHTML = ITYPES.map(function (t) { return '<option>' + t + '</option>'; }).join(''); nt.addEventListener('change', newPh); }
   var q = $('#quick'); if (!q.children.length) q.innerHTML = QUICK.map(function (g, n) { return '<li><button type="button" class="chip" data-quick="' + n + '">+ ' + esc(g[0]) + '</button></li>'; }).join('');
   $('#inv').innerHTML = inv.length ? inv.map(itemHTML).join('') : '<li class="empty">No gear yet. Add something above or tap a quick-add.</li>';
   renderInvSum();
@@ -3385,7 +3398,7 @@ function caseHTML(c, idx, total) {
     (caps.sample || c.recap ? '<div class="recap"><label class="lbl" for="' + c.id + 'recap">Previously on... (a cold open for your next session)</label><textarea id="' + c.id + 'recap" data-f="recap" placeholder="Press the button and Claude writes a cold open from your notes. You can edit it.">' + esc(c.recap) + '</textarea>' + (caps.sample ? '<div class="actions" style="align-items:center"><button class="btn sm" type="button" data-recap>Write a recap</button><button class="btn ghost sm" type="button" data-recapstop hidden>Stop</button><span class="small muted" data-recapmsg role="status"></span></div>' : '') + '</div>' : '') +
     '<div><span class="lbl">The clock (how far the mystery has gone)</span><div class="clock">' + clock + '</div></div>' +
     '<div><span class="lbl">End of session</span><div class="eos">' + eos + '</div><div class="actions" style="align-items:center"><span>XP for this session: <b>' + xp + '</b></span><button class="btn sm" type="button" data-applyxp ' + (c.xpApplied || !xp ? 'disabled' : '') + '>' + (c.xpApplied ? 'Added to my sheet' : 'Add to my sheet') + '</button></div>' + '</div>' +
-    '<div class="actions"><button class="btn ghost sm" type="button" data-tobest>Add a monster to the Bestiary</button><button class="btn ghost sm" type="button" data-del>Delete this case</button></div></div></details>';
+    '<div class="actions">' + ib('plus', 'Add a monster to the Bestiary', 'data-tobest') + '' + ib('trash', 'Delete this case', 'data-del') + '</div></div></details>';
 }
 function renderCases() {
   var q = $('#q').value.trim().toLowerCase();
@@ -3426,7 +3439,7 @@ $('#cases').addEventListener('click', function (e) {
   if (e.target.hasAttribute('data-applyxp')) { evSay('XP from the end of a session'); c.xpApplied = true; c.xpAt = Date.now(); S.sheet.xp = Math.min(S.sheet.xp + eosXp(c), 9); renderSheet(); rerenderCase(c); scheduleSave(); return; }
   if (e.target.hasAttribute('data-del')) {
     if (delArm === c.id) { S.cases = S.cases.filter(function (x) { return x.id !== c.id; }); delArm = null; renderCases(); scheduleSave(); }
-    else { delArm = c.id; e.target.textContent = 'Press again to delete'; setTimeout(function () { if (delArm === c.id) { delArm = null; if (e.target.isConnected) e.target.textContent = 'Delete this case'; } }, 3000); }
+    else { delArm = c.id; var t = e.target; t.classList.remove('ib'); t.textContent = 'Press again to delete'; setTimeout(function () { if (delArm === c.id) { delArm = null; if (t.isConnected) { t.classList.add('ib'); t.innerHTML = ICO.trash; } } }, 3000); }
   }
 });
 
@@ -3464,7 +3477,7 @@ function parseMove(raw) {
 function customHTML(c) {
   var so = STATS.map(function (s) { return '<option value="' + s + '"' + (c.stat === s ? ' selected' : '') + '>+' + STATNAME[s] + '</option>'; }).join('');
   function ta(f, l) { return '<div><label class="lbl">' + l + '</label><textarea data-m="' + f + '" aria-label="' + l + '">' + esc(c[f]) + '</textarea></div>'; }
-  return '<article class="cm" data-mid="' + c.id + '"><div class="cmtop"><div><label class="lbl">Move name</label><input type="text" data-m="name" value="' + esc(c.name) + '" autocomplete="off"></div><div><label class="lbl">Rolls</label><select data-m="stat">' + so + '</select></div>' + (c.pbk ? '<span class="chip ok">From playbook</span>' : '<button class="btn ghost sm" type="button" data-rmm>Remove</button>') + '</div>' +
+  return '<article class="cm" data-mid="' + c.id + '"><div class="cmtop"><div><label class="lbl">Move name</label><input type="text" data-m="name" value="' + esc(c.name) + '" autocomplete="off"></div><div><label class="lbl">Rolls</label><select data-m="stat">' + so + '</select></div>' + (c.pbk ? '<span class="chip ok">From playbook</span>' : '' + ib('trash', 'Remove this move', 'data-rmm') + '') + '</div>' +
     '<div><label class="lbl">When you...</label><input type="text" data-m="trig" value="' + esc(c.trig) + '" autocomplete="off"></div>' +
     '<div class="cols">' + ta('full', 'On a 10+') + ta('part', 'On a 7-9') + '</div>' + ta('miss', 'On a miss (blank uses the standard Keeper move)') + '</article>';
 }
@@ -3502,7 +3515,7 @@ $('#custom').addEventListener('click', function (e) {
 var TIES = ['Trust', 'Owe', 'Owed to me', 'Rival', 'Family', 'Love', 'Mentor', 'Enemy', 'Other'];
 function bondHTML(b) {
   var so = TIES.map(function (t) { return '<option' + (t === b.tie ? ' selected' : '') + '>' + t + '</option>'; }).join('');
-  return '<li class="bond" data-bid="' + b.id + '"><input type="text" data-b="who" list="partynames" value="' + esc(b.who) + '" placeholder="Who?" aria-label="Who" autocomplete="off"><select data-b="tie" aria-label="Kind of bond">' + so + '</select><input type="text" data-b="note" value="' + esc(b.note) + '" placeholder="The history you picked, or the story" aria-label="The history you picked, or the story" autocomplete="off"><input type="text" data-b="theirs" value="' + esc(b.theirs || '') + '" placeholder="What they picked for you" aria-label="What they picked for you" autocomplete="off"><button class="btn ghost sm" type="button" data-rmb aria-label="Remove bond">Remove</button></li>';
+  return '<li class="bond" data-bid="' + b.id + '"><input type="text" data-b="who" list="partynames" value="' + esc(b.who) + '" placeholder="Who?" aria-label="Who" autocomplete="off"><select data-b="tie" aria-label="Kind of bond">' + so + '</select><input type="text" data-b="note" value="' + esc(b.note) + '" placeholder="The history you picked, or the story" aria-label="The history you picked, or the story" autocomplete="off"><input type="text" data-b="theirs" value="' + esc(b.theirs || '') + '" placeholder="What they picked for you" aria-label="What they picked for you" autocomplete="off">' + ib('trash', 'Remove bond', 'data-rmb') + '</li>';
 }
 function renderBonds() {
   var b = S.sheet.bonds;
@@ -3559,7 +3572,7 @@ function beastHTML(b) {
     '<div class="cols"><div><label class="lbl">Motivation</label><select data-bf="motiv">' + motOpts + '</select></div><div><label class="lbl">Status</label><select data-bf="status">' + stOpts + '</select></div><div><label class="lbl">Case</label><select data-bf="caseId">' + caseOpts + '</select></div></div>' +
     cb + '<div><label class="lbl" for="' + b.id + 'p">' + pw[0] + '</label><textarea id="' + b.id + 'p" data-bf="powers" placeholder="' + esc(pw[1]) + '">' + esc(b.powers) + '</textarea></div>' + wk +
     '<div><label class="lbl" for="' + b.id + 'o">Notes</label><textarea id="' + b.id + 'o" data-bf="notes" placeholder="Sightings, quotes, theories">' + esc(b.notes) + '</textarea></div>' +
-    '<div class="actions"><button class="btn ghost sm" type="button" data-delbeast>Delete this entry</button></div></div></details>';
+    '<div class="actions">' + ib('trash', 'Delete this entry', 'data-delbeast') + '</div></div></details>';
 }
 function renderBeastFilters() {
   var k = $('#bkind'), s = $('#bstat');
@@ -3604,7 +3617,7 @@ $('#beasts').addEventListener('click', function (e) {
   if (tk) { b.taken = clamp(b.taken + +tk.dataset.taken, 0, Math.max(b.cap, 1) + 20); b.example = false; rerenderBeast(b); scheduleSave(); return; }
   if (e.target.hasAttribute('data-delbeast')) {
     if (delBeast === b.id) { S.bestiary = S.bestiary.filter(function (x) { return x !== b; }); delBeast = null; renderBeasts(); scheduleSave(); }
-    else { delBeast = b.id; var t = e.target; t.textContent = 'Press again to delete'; setTimeout(function () { if (delBeast === b.id) { delBeast = null; if (t.isConnected) t.textContent = 'Delete this entry'; } }, 3000); }
+    else { delBeast = b.id; var t = e.target; t.classList.remove('ib'); t.textContent = 'Press again to delete'; setTimeout(function () { if (delBeast === b.id) { delBeast = null; if (t.isConnected) { t.classList.add('ib'); t.innerHTML = ICO.trash; } } }, 3000); }
   }
 });
 
@@ -3912,7 +3925,7 @@ function boardHTML() {
 function deskForm(e) {
   var kinds = HOKINDS.map(function (k) { return '<option value="' + k + '"' + (e.kind === k ? ' selected' : '') + '>' + HOKIND[k] + '</option>'; }).join('');
   var pics = e.images.map(function (i, n) {
-    return '<div class="kpic"><img src="' + esc(tblUrl('/api/img/' + i.id)) + '" alt=""><div><label class="lbl" for="ho-alt-' + n + '">Describe this for players who cannot see it</label><input type="text" id="ho-alt-' + n + '" data-ho-alt="' + n + '" maxlength="200" value="' + esc(i.alt) + '"><button class="btn ghost sm" type="button" data-ho-rmpic="' + n + '" style="margin-top:8px">Remove this picture</button></div></div>';
+    return '<div class="kpic"><img src="' + esc(tblUrl('/api/img/' + i.id)) + '" alt=""><div><label class="lbl" for="ho-alt-' + n + '">Describe this for players who cannot see it</label><input type="text" id="ho-alt-' + n + '" data-ho-alt="' + n + '" maxlength="200" value="' + esc(i.alt) + '">' + ib('trash', 'Remove this picture', 'data-ho-rmpic="' + n + '" style="margin-top:8px"') + '</div></div>';
   }).join('');
   var old = e.id ? tblHoFind(e.id) : null, dis = e.wait || e.busy ? ' disabled' : '';
   var save = old && old.shown ? '<button class="btn sm" type="button" data-ho-save="keep"' + dis + '>Save changes</button><button class="btn ghost sm" type="button" data-ho-save="draft"' + dis + '>Save and hide from the table</button>'
@@ -3923,7 +3936,7 @@ function deskForm(e) {
     '<label class="lbl" for="ho-body">What the players read</label><textarea id="ho-body" maxlength="4000" rows="6">' + esc(e.body) + '</textarea>' +
     '<span class="lbl">Pictures (up to three)</span>' + pics +
     '<input type="file" id="ho-file" accept="image/*" hidden>' +
-    '<div class="actions" style="margin-top:0"><button class="btn ghost sm" type="button" data-ho-addpic' + (e.images.length >= 3 || e.busy ? ' disabled' : '') + '>Add a picture</button></div>' +
+    '<div class="actions" style="margin-top:0">' + ib('plus', 'Add a picture', 'data-ho-addpic' + (e.images.length >= 3 || e.busy ? ' disabled' : '')) + '</div>' +
     '<p class="small" role="status" id="ho-say">' + esc(e.busy || e.say || '') + '</p>' +
     '<div class="actions">' + save + '<button class="btn ghost sm" type="button" data-ho-cancel>Cancel</button></div></div>';
 }
@@ -3939,7 +3952,7 @@ function deskHTML() {
     var dis = live ? '' : ' disabled';
     var acts = tbl.del === h.id
       ? '<div class="confirm"><p><b>Delete "' + esc(h.title) + '"?</b> ' + (h.shown ? 'It will disappear from the table too.' : 'It cannot be brought back.') + '</p><div class="actions" style="margin-top:0"><button class="btn sm" type="button" data-ho-del-yes="' + h.id + '"' + dis + '>Delete it</button><button class="btn ghost sm" type="button" data-ho-del-no>Keep it</button></div></div>'
-      : '<div class="actions"><button class="btn sm" type="button" data-ho-show="' + h.id + '" data-on="' + (h.shown ? '0' : '1') + '"' + dis + '>' + (h.shown ? 'Hide from the table' : 'Show to the table') + '</button><button class="btn ghost sm" type="button" data-ho-pin="' + h.id + '" data-on="' + (h.pinned ? '0' : '1') + '"' + dis + '>' + (h.pinned ? 'Unpin' : 'Pin to Play') + '</button><button class="btn ghost sm" type="button" data-ho-edit="' + h.id + '"' + dis + '>Edit</button><button class="btn ghost sm" type="button" data-ho-del="' + h.id + '">Delete</button></div>';
+      : '<div class="actions"><button class="btn sm" type="button" data-ho-show="' + h.id + '" data-on="' + (h.shown ? '0' : '1') + '"' + dis + '>' + (h.shown ? 'Hide from the table' : 'Show to the table') + '</button><button class="btn ghost sm" type="button" data-ho-pin="' + h.id + '" data-on="' + (h.pinned ? '0' : '1') + '"' + dis + '>' + (h.pinned ? 'Unpin' : 'Pin to Play') + '</button><button class="btn ghost sm" type="button" data-ho-edit="' + h.id + '"' + dis + '>Edit</button>' + ib('trash', 'Delete', 'data-ho-del="' + h.id + '"') + '</div>';
     return '<li class="kho"><p><b>' + esc(h.title) + '</b> <span class="chip">' + HOKIND[h.kind] + '</span> ' + state + '</p><p class="tiny">' + pics + (h.shown ? 'shown ' : 'saved ') + ago(h.at) + '</p>' + acts + '</li>';
   }).join('') + '</ul>' : '<div class="empty">No handouts yet. Start with the opening scene: a few lines and a picture set the mood before anyone rolls.</div>');
   /* the hunters at a glance, most hurt first. Read-only: the Keeper cannot change anyone's sheet. */
@@ -4512,7 +4525,7 @@ function renderDice() {
   mine = mySets();
   if (mine.length) h += '<div class="chips">' + mine.map(function (st, i) {
     var nm = esc(String(st.name || 'My set').slice(0, 40));
-    return '<span class="myset">' + dpBtn('data-dp-use="my:' + i + '"', setIsOn(st), nm) + '<button class="chip del" type="button" data-dp-del="' + i + '" aria-label="Remove ' + nm + '" title="Remove"><span class="i i-x" aria-hidden="true"></span></button></span>';
+    return '<span class="myset">' + dpBtn('data-dp-use="my:' + i + '"', setIsOn(st), nm) + '<button class="chip del" type="button" data-dp-del="' + i + '" aria-label="Remove ' + nm + '" title="Remove">' + ICO.trash + '</button></span>';
   }).join('') + '</div>';
   $('#dp-sets').innerHTML = h;
   diceLive();
