@@ -878,7 +878,8 @@ div.wcard { cursor: default; border-color: var(--good); }
 .mc-opt[aria-checked="true"] { border-color: var(--accent); background: var(--surface2); }
 .mc-opt[aria-checked="true"] small { color: var(--accent); }
 .mc-prev { color: var(--muted); font-size: 15px; }
-.mc-addrow { display: flex; justify-content: center; margin-top: auto; }
+.mc-addrow { display: flex; justify-content: center; gap: 8px; margin-top: auto; }
+.mc-paste textarea { min-height: 120px; font-size: 16px; }
 .mcard.mc-edit { aspect-ratio: auto; grid-column: 1 / -1; padding: 0; border: 0; box-shadow: none; background: none; }
 .mcard.mc-edit::before { content: none; }
 .mcard.mc-edit:hover { transform: none; box-shadow: none; }
@@ -1383,10 +1384,6 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 
       <div class="card" style="margin-top:16px">
         <div class="invhead"><span class="lbl" style="margin:0">Other moves</span><span class="small muted">Moves you paste or write yourself. They show up in Play</span></div>
-        <label class="lbl" for="mvpaste">Paste a move from your playbook sheet</label>
-        <textarea id="mvpaste" style="min-height:84px" placeholder="Paste the move text, like: Tough as nails: When you take harm, roll +Tough. On a 10+, ... On a 7-9, ..."></textarea>
-        <div class="actions"><button class="btn sm" id="mvparse" type="button">Fill in a move from this text</button><button class="btn ghost sm ib" type="button" aria-label="Add a blank move" data-tip="Add a blank move" id="mvadd"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></button></div>
-        <p class="small muted" id="mvmsg" role="status" style="margin:8px 0 0"></p>
         <div class="cmlist" id="custom"></div>
       </div>
 
@@ -3558,23 +3555,32 @@ function customHTML(c) {
 }
 function renderCustom() {
   var c = S.sheet.custom.filter(function (x) { return !x.pbk; });
-  $('#custom').innerHTML = c.length ? '<ul class="mcards">' + c.map(customCard).join('') + '</ul>' : '<div class="empty">No moves of your own yet. Paste one above, or add a blank one.</div>';
+  var old = $('#mvpaste'), keep = old ? old.value : '', msg = $('#mvmsg') ? $('#mvmsg').textContent : '';
+  /* the last card: a dashed blank to paste a move onto, or to start one from scratch */
+  var add = '<li class="mcard mc-add mc-paste"><div class="mc-body"><span class="mc-kick">Your own</span><h4 class="mc-name">Add a move</h4><span class="mc-rule" aria-hidden="true"></span>' +
+    '<label class="mc-text mc-prev" for="mvpaste">Paste a move from your playbook sheet, and it is split into its parts for you.</label>' +
+    '<textarea id="mvpaste" placeholder="Tough as nails: When you take harm, roll +Tough. On a 10+, ... On a 7-9, ..."></textarea>' +
+    '<div class="mc-addrow"><button class="btn sm" id="mvparse" type="button">Fill in</button><button class="btn ghost sm ib" type="button" aria-label="Add a blank move" data-tip="Add a blank move" id="mvadd"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></button></div>' +
+    '<p class="small muted" id="mvmsg" role="status" style="margin:0;text-align:center"></p></div></li>';
+  $('#custom').innerHTML = '<ul class="mcards">' + c.map(customCard).join('') + add + '</ul>';
+  $('#mvpaste').value = keep; $('#mvmsg').textContent = msg;
 }
 function mvMsg(t) { $('#mvmsg').textContent = t || ''; }
-$('#mvparse').addEventListener('click', function () {
+$('#custom').addEventListener('click', function (e) { if (e.target.closest('#mvparse')) mvParse(); else if (e.target.closest('#mvadd')) mvBlank(); });
+function mvParse() {
   var t = $('#mvpaste').value;
   if (!t.trim()) { mvMsg('Paste a move first.'); return; }
   var m = parseMove(t);
   S.sheet.custom.push(m); cmEdit[m.id] = true; syncCustom(); renderCustom(); renderRoller(); scheduleSave();
   $('#mvpaste').value = '';
-  mvMsg(m.full || m.part || m.name ? 'Added "' + (m.name || 'Untitled move') + '". Check the fields below, the text is split by guesswork.' : 'Added a move, but I could not split it. Put the text in the fields below.');
+  mvMsg(m.full || m.part || m.name ? 'Added "' + (m.name || 'Untitled move') + '". Check its fields, the text is split by guesswork.' : 'Added a move, but I could not split it. Put the text in its fields.');
   var el = $('.cm[data-mid="' + m.id + '"] input'); if (el) el.focus();
-});
-$('#mvadd').addEventListener('click', function () {
+}
+function mvBlank() {
   var m = { id: uid(), name: '', stat: 'cool', trig: '', full: '', part: '', miss: '' };
   cmEdit[m.id] = true; S.sheet.custom.push(m); syncCustom(); renderCustom(); renderRoller(); scheduleSave(); mvMsg('');
   var el = $('.cm[data-mid="' + m.id + '"] input'); if (el) el.focus();
-});
+}
 function cmOf(el) { var a = el.closest('[data-mid]'); if (!a) return null; return S.sheet.custom.filter(function (c) { return c.id === a.dataset.mid; })[0]; }
 $('#custom').addEventListener('input', function (e) { var c = cmOf(e.target), f = e.target.dataset.m; if (!c || !f) return; c[f] = e.target.value; syncCustom(); if (f === 'name' || f === 'stat') renderRoller(); scheduleSave(); });
 $('#custom').addEventListener('change', function (e) { var c = cmOf(e.target), f = e.target.dataset.m; if (!c || !f) return; c[f] = e.target.value; syncCustom(); renderRoller(); scheduleSave(); });
