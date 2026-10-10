@@ -933,6 +933,10 @@ div.wcard { cursor: default; border-color: var(--good); }
 .mc-out { margin: 2px 0 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 10px; font-size: 15px; line-height: 1.4; }
 .mc-out dt { font-family: var(--num); font-weight: 600; color: var(--accent); }
 .mc-out dd { margin: 0; }
+span.mc-out { display: grid; }
+.mc-ol { font-family: var(--num); font-weight: 600; color: var(--accent); }
+.pbc.wmc .mc-text { font-style: italic; }
+.pbc.wmc.mc-passive .mc-text { font-style: normal; }
 .pbc { font: inherit; color: var(--ink); text-align: inherit; cursor: pointer; }
 .pbc .mc-body { margin-bottom: 30px; }
 .pbc .mc-name { display: block; }
@@ -2522,13 +2526,22 @@ function wizRatings() {
 }
 
 /* ----- step 5: moves ----- */
-function wizMoveCard(m, auto, picked) {
-  var head = '<h4>' + esc(m.name) + '</h4>' + (m.kind === 'roll' ? '<span class="chip">' + ROLLP + STATNAME[m.stat] + '</span>' : '<span class="chip">No roll</span>') + (auto ? '<span class="chip ok">You get this</span>' : '');
-  var body = m.kind === 'roll' ?
-    '<p class="trig">' + esc(m.trig) + '</p><dl class="wdl">' + (m.full ? '<dt>10+</dt><dd>' + esc(m.full) + '</dd>' : '') + (m.part ? '<dt>7-9</dt><dd>' + esc(m.part) + '</dd>' : '') + (m.miss ? '<dt>Miss</dt><dd>' + esc(m.miss) + '</dd>' : '') + '</dl>' + (m.note ? '<p class="small muted">' + esc(m.note) + '</p>' : '') :
-    '<p>' + esc(m.summary) + '</p>';
-  var btn = auto ? '' : '<button type="button" class="btn ' + (picked ? '' : 'ghost') + ' sm" data-wmv="' + esc(m.id) + '" aria-pressed="' + picked + '">' + (picked ? 'Picked (tap to undo)' : 'Pick this move') + '</button>';
-  return '<article class="wmove" data-picked="' + (!!picked || !!auto) + '">' + head + body + btn + '</article>';
+function pbMoveCap(d, st) {
+  if (!d) return 0;
+  return d.moves.pick + impList().filter(function (r) { return r.it.kind === 'move' && st.imp[r.key]; }).length;
+}
+/* a move as a playing card in the builder: the automatic ones are plain cards, the choices are cards you tap to pick */
+function wizMoveCard(m, auto, picked, full) {
+  var roll = m.kind === 'roll', idx = roll ? '+' + STATNAME[m.stat] : 'No roll';
+  var outs = roll ? [['10+', m.full], ['7-9', m.part], ['Miss', m.miss]].filter(function (x) { return x[1]; }) : [];
+  var inner = '<span class="mc-idx">' + idx + '</span><span class="mc-idx mc-b" aria-hidden="true">' + idx + '</span><span class="mc-body">' +
+    '<span class="mc-kick">' + (auto ? 'Automatic' : picked ? 'Your pick' : '&nbsp;') + '</span><span class="mc-name">' + esc(m.name) + '</span><span class="mc-rule" aria-hidden="true"></span>' +
+    '<span class="mc-text">' + esc(roll ? m.trig : m.summary) + '</span>' +
+    (outs.length ? '<span class="mc-out">' + outs.map(function (x) { return '<span class="mc-ol">' + x[0] + '</span><span>' + esc(x[1]) + '</span>'; }).join('') + '</span>' : '') +
+    (m.note ? '<span class="pbc-facts">' + esc(m.note) + '</span>' : '') +
+    (picked && !auto ? '<span class="pbc-on"><span class="i i-check" aria-hidden="true"></span> Picked</span>' : '') + '</span>';
+  if (auto) return '<li><div class="mcard' + (roll ? '' : ' mc-passive') + '">' + inner + '</div></li>';
+  return '<li><button type="button" class="mcard pbc wmc' + (roll ? '' : ' mc-passive') + '" data-wmv="' + esc(m.id) + '" aria-pressed="' + !!picked + '"' + (full && !picked ? ' disabled' : '') + '>' + inner + '</button></li>';
 }
 /* The Crooked's Deal with the Devil move: one of its perks is skill, "+1 to two ratings". It is the one place the sheet changes ratings while you build, so it gets a picker here
    rather than a hand adjuster. A rating never goes above +3, and the bonus comes off again if the move is put back. */
@@ -2543,9 +2556,9 @@ function wizSkill(d, st) {
 }
 function wizMoves() {
   var d = curPB(); if (!d) return '<h2 class="sectitle" tabindex="-1">Special moves</h2>' + needPB();
-  var st = pbState(), n = countOn(st.moves);
-  var auto = d.moves.auto.length ? '<span class="lbl">You get these automatically</span><div class="wmoves">' + d.moves.auto.map(function (m) { return wizMoveCard(m, true, true); }).join('') + '</div>' : '';
-  var choices = d.moves.pick ? '<span class="lbl" style="margin-top:16px">Pick ' + d.moves.pick + ' of these</span>' + cnt(n, d.moves.pick) + '<p class="wmsg" id="wmsg" role="status"></p><div class="wmoves">' + d.moves.choices.map(function (m) { return wizMoveCard(m, false, !!st.moves[m.id]); }).join('') + '</div>' : '';
+  var st = pbState(), n = countOn(st.moves), cap = pbMoveCap(d, st), lvl = cap - d.moves.pick, full = n >= cap;
+  var auto = d.moves.auto.length ? '<span class="lbl">You get these automatically</span><ul class="mcards">' + d.moves.auto.map(function (m) { return wizMoveCard(m, true, true); }).join('') + '</ul>' : '';
+  var choices = d.moves.pick ? '<span class="lbl" style="margin-top:24px">Pick ' + cap + ' of these</span>' + cnt(n, cap, (lvl ? ' (' + lvl + ' from levelling up)' : '') + (full ? '. Tap a picked move to swap it.' : '')) + '<p class="wmsg" id="wmsg" role="status"></p><ul class="mcards">' + d.moves.choices.map(function (m) { return wizMoveCard(m, false, !!st.moves[m.id], full); }).join('') + '</ul>' : '';
   return '<h2 class="sectitle" tabindex="-1">Special moves</h2><p>' + esc(d.moves.intro) + ' Moves with a roll show up in Play automatically.</p>' + auto + choices + wizSkill(d, st) +
     '<details class="wex"><summary>Add a move from another playbook, or your own</summary><div class="wfield"><label class="lbl" for="w-mvpaste">Paste a move from a sheet</label><textarea id="w-mvpaste" placeholder="Paste the move text, like: Tough as nails: When you take harm, roll +Tough. On a 10+, ... On a 7-9, ..."></textarea>' +
     '<div class="actions">' + ib('plus', 'Add this move', 'id="wmvparse"', 'x') + '</div><p class="small muted" id="wmvmsg" role="status" style="margin:8px 0 0"></p></div></details>';
@@ -2759,7 +2772,7 @@ function wizToggle(map, key, limit, what) {
     }
     if ((g = t.closest('[data-wmv]'))) {
       var d2 = curPB(), st2 = pbState();
-      if (wizToggle(st2.moves, g.dataset.wmv, d2.moves.pick, 'moves')) {
+      if (wizToggle(st2.moves, g.dataset.wmv, pbMoveCap(d2, st2), 'moves')) {
         if (!st2.moves[SKILLMOVE]) { skillClear(st2); wizSkillMsg = ''; renderSheet(); }   // put the move back and its skill bonus goes with it
         syncPbMoves(); renderPbCard(); scheduleSave();
       }
@@ -2875,7 +2888,7 @@ function renderPbCard() {
   if (!left.some(function (m) { return m.id === pbPick; })) pbPick = '';
   var pk = left.filter(function (m) { return m.id === pbPick; })[0];
   /* the last card in the row: a dashed blank to pick another move onto */
-  var sel = left.length ? '<li class="mcard mc-add"><div class="mc-body"><span class="mc-kick">' + esc(d.name) + '</span><h4 class="mc-name">Add a move</h4><span class="mc-rule" aria-hidden="true"></span>' +
+  var sel = left.length && countOn(st.moves) < pbMoveCap(d, st) ? '<li class="mcard mc-add"><div class="mc-body"><span class="mc-kick">' + esc(d.name) + '</span><h4 class="mc-name">Add a move</h4><span class="mc-rule" aria-hidden="true"></span>' +
     '<div class="mc-opts" role="radiogroup" aria-label="Moves you can add">' + left.map(function (m) {
       return '<button type="button" role="radio" class="mc-opt" data-pbpick="' + esc(m.id) + '" aria-checked="' + (m.id === pbPick) + '"><span>' + esc(m.name) + '</span><small>' + (m.kind === 'roll' ? '+' + STATNAME[m.stat] : 'No roll') + '</small></button>';
     }).join('') + '</div>' +
@@ -2894,7 +2907,7 @@ document.addEventListener('click', function (e) {
   if (!t.closest || !t.closest('#pbcard')) return;
   if ((g = t.closest('[data-pbrm]'))) { var st = pbState(); delete st.moves[g.dataset.pbrm]; syncPbMoves(); renderPbCard(); renderWiz(false); scheduleSave(); return; }
   if ((g = t.closest('[data-pbpick]'))) { pbPick = pbPick === g.dataset.pbpick ? '' : g.dataset.pbpick; renderPbCard(); var o = $('#pbcard [data-pbpick="' + g.dataset.pbpick + '"]'); if (o) o.focus(); return; }
-  if (t.id === 'pbaddbtn' && pbPick) { pbState().moves[pbPick] = true; pbPick = ''; syncPbMoves(); renderPbCard(); renderWiz(false); scheduleSave(); return; }
+  if (t.id === 'pbaddbtn' && pbPick && countOn(pbState().moves) < pbMoveCap(curPB(), pbState())) { pbState().moves[pbPick] = true; pbPick = ''; syncPbMoves(); renderPbCard(); renderWiz(false); scheduleSave(); return; }
   if (t.id === 'pbedit') { setHV('build'); S.wiz = WSTEPS.indexOf('Moves'); renderBuild(); window.scrollTo(0, 0); scheduleSave(); }
 });
 
