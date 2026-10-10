@@ -742,11 +742,11 @@ details.sect > .body > p:first-child { text-align: left; }
 /* the dice maker: a big tray that stays in view on the left, the options in one tidy column on the right */
 .dpwrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
 .dpstage { position: sticky; top: calc(var(--navh, 56px) + 16px); }
-.dpstage .tray.mini { height: 340px; margin-bottom: 12px; }
+.dpstage .tray.mini { height: 460px; margin-bottom: 12px; }
 .dpstage .tray.mini .dice { padding-top: 0; }
 .dpsec { font-family: var(--display); font-size: 20px; font-weight: 400; margin: 28px 0 4px; padding-top: 20px; border-top: 1px solid var(--line); }
 .dpsec[style*="margin-top:0"] { border-top: 0; padding-top: 0; }
-@media (max-width: 900px) { .dpwrap { grid-template-columns: minmax(0, 1fr); gap: 16px; } .dpstage { top: var(--navh, 56px); z-index: 4; background: var(--surface); margin: -8px -17px 0; padding: 10px 17px 10px; box-shadow: 0 8px 12px -10px rgba(0, 0, 0, .4); } .dpstage .tray.mini { height: 200px; } .dpstage h3, .dpstage > p { display: none; } }
+@media (max-width: 900px) { .dpwrap { grid-template-columns: minmax(0, 1fr); gap: 16px; } .dpstage { top: var(--navh, 56px); z-index: 4; background: var(--surface); margin: -8px -17px 0; padding: 10px 17px 10px; box-shadow: 0 8px 12px -10px rgba(0, 0, 0, .4); } .dpstage .tray.mini { height: 240px; } .dpstage h3, .dpstage > p { display: none; } }
 .tray.mini .dice { padding-top: 6px; }
 .dicebar { display: flex; justify-content: flex-end; margin-top: 12px; }
 .dicepanel .dp-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -1645,16 +1645,13 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
   <!-- SETTINGS -->
   <section class="panel" id="p-settings" role="tabpanel" aria-labelledby="t-settings" hidden>
     <h2 class="sectitle" style="margin-top:0">Settings</h2>
-    <div class="grid g2">
+    <div class="grid">
       <div class="card">
         <h3 style="margin-top:0">Look</h3>
         <div class="seg" role="group" aria-label="Light or dark" style="margin-bottom:0"><button type="button" data-look="auto">My device</button><button type="button" data-look="light">Light</button><button type="button" data-look="dark">Dark</button></div>
         <div class="inks" id="inks" role="group" aria-label="Ink color"></div>
         <p class="small muted" style="margin:8px 0 0">The ink colors the buttons, tabs and links. It does not change any of the art.</p>
-      </div>
-      <div class="card">
-        <h3 style="margin-top:0">Big moments</h3>
-        <label class="switch"><input type="checkbox" id="set-fx"><span>Lightning on a 12+, a shake on a miss, a glow on level-up</span></label>
+        <label class="switch" style="margin-top:18px"><input type="checkbox" role="switch" id="set-fx"><span><b>Big moments</b><br><span class="small muted">Lightning on a 12+, a shake on a miss, a glow on level-up.</span></span></label>
       </div>
     </div>
     <div style="margin-top:16px">
@@ -1667,11 +1664,11 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
           <div id="dp-warn" aria-live="polite"></div>
         </div>
         <div class="dpctl">
-        <div id="dp-opts"></div>
-        <h4 class="dpsec">3D and sound</h4>
         <label class="switch"><input type="checkbox" role="switch" id="set-3d"><span><b>3D dice</b><br><span class="small muted">The dice tumble in real 3D, and Fuel dice show their liquid. Best on a recent phone or computer.</span></span></label>
         <p class="small muted" id="d3msg" role="status" style="margin:6px 0 0"></p>
-        <label class="switch" style="margin-top:14px"><input type="checkbox" role="switch" id="set-snd"><span><b>Sound</b><br><span class="small muted">Dice that sound like what they are made of, a bell on a 10+, thunder on a 12+ and a low thud on a miss. Off unless you turn it on, because on a call your microphone may pick it up.</span></span></label>
+        <div id="dp-opts"></div>
+        <h4 class="dpsec">Sound</h4>
+        <label class="switch"><input type="checkbox" role="switch" id="set-snd"><span><b>Sound</b><br><span class="small muted">Dice that sound like what they are made of, a bell on a 10+, thunder on a 12+ and a low thud on a miss. Off unless you turn it on, because on a call your microphone may pick it up.</span></span></label>
         <label class="volrow"><span>Volume</span><input type="range" id="set-vol" min="0" max="100" step="5"></label>
         <h4 class="dpsec">Sets</h4>
         <div id="dp-sets"></div>
@@ -2017,6 +2014,7 @@ function showTab(name, fromHash) {
     $('#p-' + t).hidden = !on;
   });
   if (name === 'hunter' && S.hv === 'play') renderHist();
+  if (name === 'hunter' && typeof d3Size === 'function') setTimeout(d3Size, 0);   // the Settings preview may have resized the 3D view
   if (name === 'settings') dpOpen(true);
   if (name === 'party') { if (tblUnseen()) tbl.view = 'board'; renderParty(); }
   if (name === 'guide') renderStart();
@@ -4903,7 +4901,7 @@ function renderDice() {
   function cap(n) { return n.charAt(0).toUpperCase() + n.slice(1); }
   if (D.linked) dpTab = 0;
   d = curDie(dpTab);
-  h += '<h4 class="dpsec" style="margin-top:0">Look</h4><span class="lbl">Pair</span><div class="chips">' + dpBtn('data-dp-pair="1"', D.linked, 'Matched') + dpBtn('data-dp-pair="0"', !D.linked, 'Mismatched') + '</div>';
+  h += '<h4 class="dpsec">Look</h4><span class="lbl">Pair</span><div class="chips">' + dpBtn('data-dp-pair="1"', D.linked, 'Matched') + dpBtn('data-dp-pair="0"', !D.linked, 'Mismatched') + '</div>';
   if (!D.linked) h += '<div class="chips" role="group" aria-label="Which die to change">' + dpBtn('data-dp-tab="0"', !dpTab, 'Die 1') + dpBtn('data-dp-tab="1"', dpTab === 1, 'Die 2') + '</div>';
   h += '<span class="lbl">Body</span>' + dpSwatches('body', BODYSW, d.body);
   h += '<span class="lbl">Finish</span><div class="chips">' + FINISHES.map(function (f) { return dpBtn('data-dp-set="finish" data-v="' + f + '"', d.finish === f, FINLABEL[f] || cap(f)); }).join('') + '</div>';
@@ -5652,7 +5650,9 @@ function d3Preview() {
   var host = $('#dp-tray'), cv = D3.pv, T = D3.T;
   if (S.tab !== 'settings' || D3.dice.length < 2) return;
   var w = host.clientWidth, h = host.clientHeight, mh = $('#tray').clientHeight, r = Math.min(window.devicePixelRatio || 1, 2);
-  if (!w || !h || !mh || !D3.canvas.width) return;
+  if (!w || !h) return;
+  if (!mh) { mh = h; D3.renderer.setSize(w, h, false); D3.cam.aspect = w / h; D3.cam.updateProjectionMatrix(); }   // the Play tray is hidden on Settings: draw straight at the preview's size
+  if (!D3.canvas.width) return;
   if (!cv) {
     cv = D3.pv = document.createElement('canvas'); cv.className = 'd3cv'; cv.setAttribute('aria-hidden', 'true'); host.insertBefore(cv, host.firstChild);
     D3.pvx = cv.getContext('2d'); D3.pcam = new T.PerspectiveCamera(21, 1, .1, 60); D3.pcam.position.copy(D3.cam.position); D3.pcam.lookAt(0, .3, .1);
