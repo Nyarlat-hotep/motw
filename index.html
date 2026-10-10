@@ -1448,10 +1448,13 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 .hpage, .pcard.fr, .czprev .pcard { box-shadow: inset 0 0 0 7px var(--surface), inset 0 0 0 8px color-mix(in srgb, var(--pc, var(--accent)) 45%, transparent), 0 14px 34px rgba(0, 0, 0, .3); }
 .hpage { padding: 40px 34px; }
 .pcard.pcard { padding: 34px 30px; }
-.pcx { position: absolute; top: 14px; left: 16px; z-index: 3; display: grid; justify-items: center; gap: 2px; color: var(--pc, var(--accent)); pointer-events: none; }
+.pcx { position: absolute; top: 12px; left: 12px; z-index: 3; display: grid; justify-items: center; gap: 2px; color: var(--pc, var(--accent)); pointer-events: none; }
 .pcx b { font-family: var(--display); font-size: 26px; line-height: 1; font-weight: 400; }
-.pcx svg { width: 34px; height: 34px; fill: currentColor; }
-.pcx-b { top: auto; left: auto; bottom: 14px; right: 16px; transform: rotate(180deg); }
+.pcx svg { width: 48px; height: 48px; fill: currentColor; }
+.hp-head .hp-id { position: relative; }
+.hp-head .hp-id h2 .mk { position: absolute; top: 18px; right: 20px; width: 40px; height: 40px; }   /* the mark sits in the header's top right corner */
+.hp-head .hp-id h2 { padding-right: 52px; }
+.pcx-b { top: auto; left: auto; bottom: 12px; right: 12px; transform: rotate(180deg); }
 .hpage .lvplate { display: none; }
 .fr.fr-wanted::before, .fr.fr-wanted::after { display: none; }   /* no nail heads: the mark sits in the corner */
 .fr-dossier .frstamp { right: 52px !important; }   /* clear of the playing-card corner */
