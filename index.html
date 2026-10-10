@@ -22,7 +22,7 @@
   --accent: #8c1d2b; --accent-ink: #fff8f0; --brass: #85601a;
   --good: #0b6b57; --good-bg: #d3eadf; --warn: #855200; --warn-bg: #f2dfb4; --bad: #a82424; --bad-bg: #f3d3cf;
   --die: #f6efe1; --pip: #22171a;
-  --radius: 16px; --radius-btn: 8px; --page: 1280px;
+  --radius: 16px; --radius-btn: 8px; --page: 1760px;
   --cw-a: #b09a70; --cw-b: #f7ecd0; --cw-c: #dccba3; --cw-d: #c4b189; --cw-pd: #dccba3; --cw-rim: #f3e6c6; --cw-pool: #cdbb92; --cw-smoke: #6d625c; --cw-dk: 0; --cw-sh: .16; --cw-ledge: .2;
   --cw-out: saturate(.35) brightness(.96); --cw-outo: .6; --cw-edge: drop-shadow(0 0 .5px #c25600) drop-shadow(0 0 1.6px rgba(232, 120, 20, .55)); --cw-tint: brightness(.35);
   --display: 'IM Fell English SC', 'IM Fell English', 'Palatino Linotype', Georgia, serif;
@@ -196,7 +196,11 @@ details.sect > .body { padding: 0 16px 16px; }
 .hvrow .seg button { background: none; border: 1.5px solid transparent; border-radius: 999px; padding: 6px 18px; min-height: 40px; color: var(--muted); }
 .hvrow .seg button:hover { color: var(--ink); }
 .hvrow .seg button[aria-pressed="true"] { background: none; color: var(--accent); border-color: var(--accent); }
-.hicons { display: flex; gap: 4px; }
+.hicons { display: flex; align-items: center; gap: 4px; }
+.hdiv { width: 1px; align-self: stretch; margin: 6px 8px; background: var(--line); }
+.hdiv[hidden], .hend[hidden] { display: none; }
+.hicons .btn.hend { background: none; color: var(--bad); border: 1px solid var(--bad); }
+.hicons .btn.hend:hover { background: var(--bad-bg); }
 .hicon { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 10px; background: none; border: 1px solid transparent; border-radius: 8px; color: var(--muted); cursor: pointer; }
 .hicon:hover, .hicon[aria-expanded="true"] { color: var(--ink); border-color: var(--line); }
 .hicon .tabico { width: 24px; height: 24px; }
@@ -805,23 +809,22 @@ div.wcard { cursor: default; border-color: var(--good); }
 @media (max-width: 560px) { .wopts, .wmoves, .wgrid { grid-template-columns: minmax(0, 1fr); } }
 
 /* ---- play screen: status | moves | dice, built for a laptop window beside a call ---- */
-.play { display: grid; grid-template-columns: 320px minmax(0, 1fr) minmax(320px, 370px); gap: 16px; align-items: start; }
+.play { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 1.4fr) minmax(310px, 1.1fr); gap: 16px; align-items: start; }
 .ptop { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 32px; margin-bottom: 16px; }
 .ptop .pblock { margin-top: 0; }
-.ptop .pblock:has(.statrow) { flex: 0 1 380px; }
-.ptop .pend { margin-left: auto; }
+.ptop .pblock:has(.statrow) { flex: 1 1 380px; }
 .ptop .pfresh { flex-basis: 100%; order: 9; }
 .pvit { display: grid; gap: 16px; min-width: 0; }
 .pvit #lvlup:empty { display: none; }
 .pvit .levelup { margin-top: 0; }
 /* Play: room to breathe */
 #hv-play .card { padding: 24px; }
-#hv-play .play, #hv-play .pvit, #hv-play .pmid { gap: 24px; }
+#hv-play .play, #hv-play .pvit, #hv-play .pmid { gap: 16px; }
 #hv-play .pmid { display: grid; min-width: 0; }
 #hv-play .pmid > .card, #hv-play #play-moves > .card + .card { margin-top: 0 !important; }
-#hv-play #play-moves { display: grid; gap: 24px; }
-#hv-play .ptop { margin-bottom: 24px; gap: 20px 40px; }
-#hv-play #play-sel { margin-bottom: 24px !important; }
+#hv-play #play-moves { display: grid; gap: 16px; }
+#hv-play .ptop { margin-bottom: 16px; gap: 20px 40px; }
+#hv-play #play-sel { margin-bottom: 16px !important; }
 #hv-play .lbl { margin-bottom: 12px; }
 #hv-play .pblock { margin-top: 24px; }
 #hv-play .ptop .pblock { margin-top: 0; }
@@ -1184,6 +1187,8 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
           <button type="button" id="seg-build" aria-pressed="true">Build</button>
         </div>
         <div class="hicons">
+          <button type="button" class="btn sm hend" id="hn-end" data-rit="open">End the session</button>
+          <span class="hdiv" id="hn-div" aria-hidden="true"></span>
           <button type="button" class="hicon" id="hn-list" data-hn="list" aria-expanded="false" aria-controls="hbar" aria-label="My hunters" data-tip="My hunters"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></button>
           <button type="button" class="hicon" data-hn="new" aria-label="New hunter" data-tip="New hunter"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg></button>
           <button type="button" class="hicon" id="hn-ret" data-hn="retire" aria-expanded="false" aria-controls="hbar" aria-label="Retire or mark lost" data-tip="Retire or mark lost"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/></svg></button>
@@ -1900,6 +1905,7 @@ function setHV(v) {
   if (['play', 'sheet', 'build'].indexOf(v) < 0) v = 'play';
   S.hv = v;
   ['play', 'sheet', 'build'].forEach(function (k) { $('#hv-' + k).hidden = v !== k; $('#seg-' + k).setAttribute('aria-pressed', v === k); });
+  $('#hn-end').hidden = $('#hn-div').hidden = v !== 'play';
   if (v === 'play') renderHist();
 }
 $('#seg-play').addEventListener('click', function () { setHV('play'); scheduleSave(); });
@@ -2843,8 +2849,7 @@ function renderPlay() {
     '<div class="pwho">' + av + '<span><b>' + esc(sh.name || 'Your hunter') + '</b><span class="muted small">' + esc(sh.playbook || 'No playbook yet') + ' &middot; Level ' + sh.level + '</span></span></div>' +
     (fresh ? '<p class="note pfresh" style="margin:0">No hunter yet. You can still roll the basic moves. <button type="button" class="linkbtn" data-pgo="build">Build a hunter</button></p>' : '') +
     '<div class="pblock"><span class="lbl">Ratings</span><div class="statrow" role="group" aria-label="Stat to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmtI(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div>' +
-    (gear ? '<div class="pblock"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '') +
-    '<div class="pblock pend"><button type="button" class="btn ghost sm" data-rit="open">End the session</button></div>';
+    (gear ? '<div class="pblock"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '');
   $('#pv-harm').innerHTML = '<span class="lbl">Harm</span>' + pipStr('pl-harm', 'harm', 8, sh.harm, 'Harm') + '<p class="small' + (sh.harm >= 4 ? '' : ' muted') + '" style="margin:6px 0 0">' + (sh.unstable ? '<b style="color:var(--bad)">Unstable.</b> ' : '') + esc(harmText(sh.harm)) + '</p>' +
       '<div class="prow"><span>Take harm</span><span class="ctl"><button type="button" data-ph="-1" aria-label="Less harm"><span class="i i-minus" aria-hidden="true"></span></button><output>' + play.harm + '</output><button type="button" data-ph="1" aria-label="More harm"><span class="i i-plus" aria-hidden="true"></span></button></span><button type="button" class="btn sm" id="pl-take">Apply</button></div>' +
       '<div class="prow"><label><input type="checkbox" id="pl-ign"' + (play.ignore ? ' checked' : '') + '> Ignores armor</label><span><button type="button" class="btn ghost sm" id="pl-heal1"' + (sh.harm < 1 ? ' disabled' : '') + '>Heal 1</button> <button type="button" class="btn ghost sm" id="pl-healall"' + (sh.harm < 1 ? ' disabled' : '') + '>Heal all</button></span></div>' +
@@ -3009,7 +3014,7 @@ function ritFinish() {
   var h = $('#rit-h'); if (h) { h.focus(); h.scrollIntoView({ block: 'start' }); }
 }
 (function ritEvents() {
-  var host = $('#hv-play');
+  var host = $('#p-hunter');   // End the session sits in the row above the Play view
   host.addEventListener('click', function (e) {
     var b = e.target.closest('[data-rit]'); if (!b) return;
     var k = b.dataset.rit;
