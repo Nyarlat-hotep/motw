@@ -280,7 +280,7 @@ details.sect > .body { padding: 0 16px 16px; }
 .candles .fs { filter: var(--cw-edge); }
 .candles path.sm { fill: none; stroke: var(--cw-smoke); stroke-width: 1.5; stroke-linecap: round; filter: blur(.5px); }
 .candles g.sm { filter: var(--cw-tint); }
-.candles .fl { transform-origin: 0 -1px; } .candles .sm { transform-box: fill-box; transform-origin: 50% 100%; }
+.candles .fl { transform-origin: 0 -1px; } .candles .sm { transform-box: fill-box; transform-origin: 50% 100%; } .candles .em { transform-box: fill-box; transform-origin: 50% 50%; }
 .candles .sm, .candles .em, .candles button[aria-pressed="false"] .fl, .candles button[aria-pressed="false"] .hl, .candles button[aria-pressed="false"] .gw { opacity: 0; }
 .candles .bd { transition: filter .7s ease-out, opacity .7s ease-out; }
 .candles button[aria-pressed="false"] .bd { filter: var(--cw-out); opacity: var(--cw-outo); }
@@ -296,6 +296,15 @@ details.sect > .body { padding: 0 16px 16px; }
 @keyframes cframes { to { transform: translateX(-640px); } }
 @keyframes cgutter { 0%, 100% { transform: scale(.82, .7) rotate(0deg); } 22% { transform: scale(.7, .9) rotate(-6deg); } 48% { transform: scale(.88, .64) rotate(5deg); } 71% { transform: scale(.74, .84) rotate(-3deg); } }
 @keyframes snuff { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(.2); } }
+/* lighting: a spark at the wick, the flame catches, flares a little too tall and settles into its flicker while the glow comes up */
+.candles button.light[aria-pressed="true"] .fl { animation: ignite .75s cubic-bezier(.3, .7, .3, 1) var(--ln, 0s) both, cflick var(--ft, 3s) ease-in-out calc(.75s + var(--ln, 0s)) infinite; }
+.candles.low button.light[aria-pressed="true"] .fl { animation: ignite .75s cubic-bezier(.3, .7, .3, 1) var(--ln, 0s) both, cgutter 1.3s ease-in-out calc(.75s + var(--ln, 0s)) infinite; }
+.candles button.light[aria-pressed="true"] .em { animation: spark .4s ease-out var(--ln, 0s); }
+.candles button.light[aria-pressed="true"] .hl { animation: glowup 1.1s ease-out var(--ln, 0s) both, lampflicker 4.3s ease-in-out calc(1.1s + var(--ln, 0s)) infinite; }
+.candles button.light[aria-pressed="true"] .gw { animation: glowup 1s ease-out var(--ln, 0s) both; }
+@keyframes ignite { 0% { opacity: 0; transform: scale(.08, .04); } 18% { opacity: 1; transform: scale(.3, .35); } 50% { transform: scale(1.12, 1.35); } 72% { transform: scale(.94, .9); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes spark { 0% { opacity: 0; transform: scale(.5); } 25% { opacity: 1; transform: scale(1.6); } 100% { opacity: 0; transform: scale(1); } }
+@keyframes glowup { from { opacity: 0; } to { opacity: 1; } }
 @keyframes wisp { 0% { opacity: 0; transform: translateY(5px) scaleY(.5); } 25% { opacity: .85; } 100% { opacity: 0; transform: translateY(-9px) scaleY(1.15); } }
 @keyframes ember { from { opacity: 1; } to { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .candles .fl, .candles .ff, .candles .sm, .candles .em, .candles .hl { animation: none !important; } .candles .bd { transition: none; } }
@@ -894,11 +903,11 @@ div.wcard { cursor: default; border-color: var(--good); }
 
 /* ---- play screen: status | moves | dice, built for a laptop window beside a call ---- */
 .play { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 1.4fr) minmax(310px, 1.1fr); gap: 16px; align-items: start; }
-.ptop { display: grid; grid-template-columns: 220px minmax(260px, 380px) minmax(0, 1fr); gap: 20px 32px; align-items: start; margin-bottom: 16px; }
+.ptop { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; align-items: start; }
 .ptop .pblock { margin-top: 0; }
 .ptop .pfresh { grid-column: 1 / -1; order: 9; }
 .pport { display: grid; gap: 2px; min-width: 0; }
-.pport img, .pport-ph { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); margin-bottom: 10px; }
+.pport img, .pport-ph { display: block; width: 100%; aspect-ratio: 3 / 2; object-position: 50% 30%; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); margin-bottom: 10px; }
 .pport-ph { display: grid; place-content: center; gap: 4px; text-align: center; border-style: dashed; color: var(--muted); font: inherit; font-size: 15px; cursor: pointer; padding: 12px; }
 .pport-ph span { font-size: 14px; text-decoration: underline; }
 .pport-ph:hover { border-color: var(--accent); color: var(--ink); }
@@ -907,8 +916,7 @@ div.wcard { cursor: default; border-color: var(--good); }
 .ptop .pstats .statbtn { min-height: 72px; }
 .ptop .pstats .statbtn b { font-size: 28px; }
 .ptop .pstats .statbtn span { font-size: 15px; }
-@media (max-width: 1060px) { .ptop { grid-template-columns: 200px minmax(0, 1fr); } .ptop .pgear { grid-column: 1 / -1; } }
-@media (max-width: 520px) { .ptop { grid-template-columns: 120px minmax(0, 1fr); gap: 16px; } .pport b { font-size: 18px; } .ptop .pstats .statrow { gap: 8px; } .ptop .pstats .statbtn { min-height: 60px; } .ptop .pstats .statbtn b { font-size: 22px; } }
+@media (max-width: 520px) { .ptop .pstats .statrow { gap: 8px; } .ptop .pstats .statbtn { min-height: 60px; } .ptop .pstats .statbtn b { font-size: 24px; } }
 .pvit { display: grid; gap: 16px; min-width: 0; }
 .pvit #lvlup:empty { display: none; }
 .pvit .levelup { margin-top: 0; }
@@ -923,7 +931,7 @@ div.wcard { cursor: default; border-color: var(--good); }
 #hv-play .pmid { display: grid; min-width: 0; }
 #hv-play .pmid > .card, #hv-play #play-moves > .card + .card { margin-top: 0 !important; }
 #hv-play #play-moves { display: grid; gap: 16px; }
-#hv-play .ptop { margin-bottom: 16px; gap: 20px 40px; }
+#hv-play .ptop { gap: 20px; }
 #hv-play #play-sel { margin-bottom: 16px !important; }
 #hv-play .lbl { margin-bottom: 12px; }
 #hv-play .pblock { margin-top: 24px; }
@@ -936,7 +944,7 @@ div.wcard { cursor: default; border-color: var(--good); }
 #hv-play .psel p { margin-top: 8px; }
 #hv-play .psel h3 + p { margin-top: 6px; }
 #hv-play .want p { margin-top: 12px; }
-@media (max-width: 700px) { #hv-play .card { padding: 20px; } #hv-play .play, #hv-play .pvit, #hv-play .pmid, #hv-play #play-moves { gap: 16px; } #hv-play .ptop { margin-bottom: 16px; } }
+@media (max-width: 700px) { #hv-play .card { padding: 20px; } #hv-play .play, #hv-play .pvit, #hv-play .pmid, #hv-play #play-moves { gap: 16px; } }
 @media (max-width: 1060px) { .play { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .pvit { grid-column: 1 / -1; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); align-items: start; } }
 @media (max-width: 700px) { .play { grid-template-columns: minmax(0, 1fr); } }
 .play .small, .play .hint { font-size: 15px; }
@@ -1317,9 +1325,8 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
     <!-- PLAY: everything you touch mid-session on one screen -->
     <div id="hv-play" hidden>
       <div id="play-pin"></div>
-      <div class="card ptop" id="play-status"></div>
       <div class="play">
-        <div class="pvit"><div class="card" id="pv-harm"></div><div class="card" id="pv-luck"></div><div class="card" id="pv-xp"></div><div id="lvlup"></div></div>
+        <div class="pvit"><div class="card ptop" id="play-status"></div><div class="card" id="pv-harm"></div><div class="card" id="pv-luck"></div><div class="card" id="pv-xp"></div><div id="lvlup"></div></div>
         <div class="pmid"><div id="play-moves"></div>
         <details class="card sesh" id="sesh">
           <summary class="lbl" id="histttl">This session</summary>
@@ -2847,7 +2854,8 @@ var CANDLES = [
 ];
 var CANDLED = [-0.3, -2.1, -1.2, -2.8, -0.8, -1.9, -1.5], CANDLET = [3.1, 2.7, 3.4, 2.9, 3.6, 2.6, 3.2];   // each flame starts its flicker somewhere else and takes its own time
 var snuffed = null;
-function setLuck(v) { var o = S.sheet.luck; S.sheet.luck = v; snuffed = v < o ? { lo: v + 1, hi: o, t: Date.now() } : null; }
+var lit = null;
+function setLuck(v) { var o = S.sheet.luck; S.sheet.luck = v; snuffed = v < o ? { lo: v + 1, hi: o, t: Date.now() } : null; lit = v > o ? { lo: o + 1, hi: v, t: Date.now() } : null; }
 function n1(v) { return String(Math.round(v * 10) / 10); }
 function candleSVG(i) {
   var c = CANDLES[i - 1], T = 79 - c.h, L = 20 - c.w, R = 20 + c.w, flip = i % 2 ? '' : ' transform="scale(-1 1)"', k, d, y;
@@ -2870,7 +2878,9 @@ function candleSVG(i) {
 }
 function luckPips(val) {
   var h = '', age = snuffed ? (Date.now() - snuffed.t) / 1000 : 9, sn = age < 2.1 ? snuffed : null;   // a redraw part-way through carries the snuff on from where it was
-  for (var i = 1; i <= 7; i++) h += '<button type="button" data-n="' + i + '" aria-pressed="' + (i <= val) + '" aria-label="Luck ' + i + '"' + (sn && i >= sn.lo && i <= sn.hi ? ' class="snuff" style="--sn:-' + age.toFixed(2) + 's"' : '') + '>' + candleSVG(i) + '</button>';
+  var lage = lit ? (Date.now() - lit.t) / 1000 : 9, ln = lit && lage < (lit.hi - lit.lo) * .14 + 1.2 ? lit : null;   // the same for lighting; several catch one after another
+  for (var i = 1; i <= 7; i++) h += '<button type="button" data-n="' + i + '" aria-pressed="' + (i <= val) + '" aria-label="Luck ' + i + '"' +
+    (sn && i >= sn.lo && i <= sn.hi ? ' class="snuff" style="--sn:-' + age.toFixed(2) + 's"' : ln && i >= ln.lo && i <= ln.hi && i <= val ? ' class="light" style="--ln:' + ((i - ln.lo) * .14 - lage).toFixed(2) + 's"' : '') + '>' + candleSVG(i) + '</button>';
   return h;
 }
 function luckNote(v) { return v < 1 ? 'Out of Luck. Bad things find you.' : v < 3 ? 'Running low: ' + v + ' left.' : v + ' of 7 left.'; }
