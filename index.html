@@ -977,6 +977,13 @@ span.mc-out { display: grid; }
 .ptile:hover { border-color: var(--accent); transform: translateY(-2px); }
 .ptile[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--surface2); padding: 11px 9px; }
 .ptn { font-family: var(--display); font-size: 17px; line-height: 1.15; }
+.matrow { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; margin-top: 4px; }
+.matrow .ptiles.mats { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.mats .ptile { width: auto; min-width: 72px; }
+.matrow input { flex: 1 1 160px; max-width: 220px; min-height: 40px; padding: 6px 10px; font-size: 15px; }
+.mats .ptile { min-height: 40px; padding: 6px 8px; border-radius: 8px; }
+.mats .ptile[aria-pressed="true"] { padding: 5px 7px; }
+.mats .ptn { font-size: 15px; }
 .pta { font-size: 14px; color: var(--muted); }
 .pta .ladd { font-family: var(--num); font-weight: 600; color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { .ptile { transition: none; } .ptile:hover { transform: none; } }
@@ -984,10 +991,11 @@ span.mc-out { display: grid; }
 .taglegend dt { font-weight: 700; }
 .taglegend dd { margin: 0; color: var(--muted); }
 /* the forge: parts on the left, the weapon card on the right, glinting as it changes */
-.wforge { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 32px; align-items: start; }
-.wforge-card { position: sticky; top: calc(var(--navh, 56px) + 16px); }
+.wforge { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 32px; align-items: stretch; }
+.wforge-card { display: flex; }
+.wforge-card > .forge { flex: 1; aspect-ratio: auto; }
 .forge.glint { animation: slotland .42s cubic-bezier(.2, .8, .2, 1); background-image: linear-gradient(110deg, transparent 30%, rgba(255, 236, 180, .25) 48%, transparent 66%); background-size: 250% 100%; animation: slotland .42s cubic-bezier(.2, .8, .2, 1), sheen 1s ease-out .1s both; }
-@media (max-width: 760px) { .wforge { grid-template-columns: minmax(0, 1fr); } .wforge-card { position: static; max-width: 300px; } }
+@media (max-width: 760px) { .wforge { grid-template-columns: minmax(0, 1fr); } .wforge-card { max-width: 300px; } .wforge-card > .forge { aspect-ratio: 4 / 5; } }
 @media (prefers-reduced-motion: reduce) { .forge.glint, .tagc::after { animation: none; transition: none; } }
 .rlc .mc-body { margin-top: 18px; }
 .mcards > li { display: flex; }
@@ -2646,8 +2654,8 @@ function gearCard(it, g, i, on, kind, full, fixed) {
 function wizBuilder(d, g) {
   var b = pbState().build[g.id] || {}, bi = builderItem(d, g);
   var parts = g.parts.map(function (p) {
-    if (p.text) return '<span class="lbl" style="margin-top:16px">' + esc(p.title) + '</span><ul class="ptiles">' + (p.suggestions || []).map(function (s) { return '<li><button type="button" class="ptile" data-wbq="' + esc(g.id) + '|' + esc(s) + '" aria-pressed="' + (String(b.material || '').trim().toLowerCase() === s.toLowerCase()) + '"><span class="ptn">' + esc(s) + '</span></button></li>'; }).join('') + '</ul>' +
-      '<input type="text" data-wbmat="' + esc(g.id) + '" value="' + esc(b.material || '') + '" placeholder="Or write your own material" aria-label="Material" autocomplete="off" style="margin-top:10px">';
+    if (p.text) return '<span class="lbl" style="margin-top:16px">' + esc(p.title) + '</span><div class="matrow"><ul class="ptiles mats">' + (p.suggestions || []).map(function (s) { return '<li><button type="button" class="ptile" data-wbq="' + esc(g.id) + '|' + esc(s) + '" aria-pressed="' + (String(b.material || '').trim().toLowerCase() === s.toLowerCase()) + '"><span class="ptn">' + esc(s) + '</span></button></li>'; }).join('') + '</ul>' +
+      '<input type="text" data-wbmat="' + esc(g.id) + '" value="' + esc(b.material || '') + '" placeholder="Or write your own" aria-label="Material" autocomplete="off"></div>';
     var sel = p.pick === 1 ? (b[p.id] ? [b[p.id]] : []) : (b[p.id] || []);
     if (p === g.parts[0]) sel = b.form ? [b.form] : [];
     /* small cards: the part, then what it adds in plain words */
