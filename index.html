@@ -222,6 +222,15 @@ details.sect > .body { padding: 0 16px 16px; }
 .hret { margin-top: 10px; display: grid; gap: 6px; }
 .evtoast { position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 20; display: flex; align-items: center; gap: 12px; width: max-content; max-width: min(92vw, 520px); background: var(--surface2); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 8px; padding: 10px 12px; box-shadow: 0 6px 24px rgba(0, 0, 0, .35); }
 .evtoast[hidden] { display: none; }
+.restoast { position: fixed; left: 50%; bottom: calc(20px + env(safe-area-inset-bottom, 0px)); z-index: 21; width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 120px); overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; box-shadow: 0 18px 48px rgba(0, 0, 0, .4); transform: translate(-50%, calc(100% + 40px)); visibility: hidden; transition: transform .38s cubic-bezier(.2, .8, .2, 1), visibility 0s .38s; }
+.restoast.on { transform: translate(-50%, 0); visibility: visible; transition: transform .38s cubic-bezier(.2, .8, .2, 1); }
+.restoast .tier { margin-top: 0; padding-right: 52px; }
+.restoast .tier h3 { font-size: 30px; }
+.restoast .actions { margin-top: 12px; }
+.restx { position: absolute; top: 22px; right: 22px; z-index: 1; }
+.restx[data-tip]::after { top: calc(100% + 4px); }
+@media (prefers-reduced-motion: reduce) { .restoast, .restoast.on { transition: none; } }
+#copymsg:empty { display: none; }
 .evtoast span { flex: 1 1 auto; }
 .tag { font-family: var(--type); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
 .tag.full { color: var(--good); } .tag.part { color: var(--warn); } .tag.miss { color: var(--bad); }
@@ -614,12 +623,14 @@ details.sect > .body > p:first-child { text-align: left; }
 .seg button { font-size: 18px; font-weight: 400; }
 
 /* ---- dice tray: bone cubes thrown onto oxblood leather ---- */
-.stage { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.stage { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .stage .hicon[hidden] { display: none; }
 .tray { position: relative; height: 210px; overflow: hidden; border-radius: 10px; border: 7px solid #3a2a22; cursor: default;
   background: radial-gradient(ellipse at 50% 38%, #5a2a30 0%, #34161b 62%, #1d0c10 100%);
   box-shadow: inset 0 0 46px rgba(0, 0, 0, .75), 0 1px 0 var(--line); touch-action: manipulation; }
 .tray.rolling { cursor: pointer; }
+#tray { height: 300px; }
+@media (max-width: 700px) { #tray { height: 240px; } }
 .tray::after { content: ""; position: absolute; inset: 9px; border: 1.5px dashed rgba(227, 189, 95, .32); border-radius: 5px; pointer-events: none; }
 .dice { display: flex; gap: 64px; justify-content: center; align-items: center; height: 100%; padding-top: 14px; }
 .dice.blank { opacity: .6; }
@@ -968,6 +979,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 <div class="texture t2" aria-hidden="true"></div>
 <div id="fx" aria-hidden="true"></div>
 <div class="savetoast" id="sync" role="status" aria-live="polite"><span id="sync-t"></span><button class="btn ghost sm" type="button" id="sync-x" hidden>Close</button></div>
+<div class="restoast" id="restoast" role="dialog" aria-label="Roll result" aria-hidden="true"><button type="button" class="hicon restx" id="res-x" aria-label="Close" data-tip="Close"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div id="result" aria-live="polite"></div></div>
 <div class="evtoast" id="evtoast" role="status" hidden><span id="evtoast-t"></span></div>
 <dialog class="hcdlg hodlg" id="hodlg" aria-label="Picture from the Keeper"><img id="hodlg-img" alt=""><p id="hodlg-cap"></p><div class="actions"><button class="btn sm" type="button" id="hodlg-close">Close</button></div></dialog>
 <dialog class="hcdlg" id="hcdlg" aria-labelledby="hc-title">
@@ -1251,8 +1263,8 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
             <div class="sum" id="sum" aria-live="polite">&ndash;<small id="calc">Ready to roll</small></div>
             <button type="button" class="hicon" id="copyroll" aria-label="Copy for chat" data-tip="Copy for chat" hidden><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg></button>
           </div>
+          <p class="small muted" id="copymsg" role="status"></p>
           <button class="btn rollbtn" id="roll" type="button">Roll 2d6</button>
-          <div id="result" aria-live="polite"></div>
         </div>
         </div></div><div id="play-feed"></div></div>
       </div>
@@ -1825,7 +1837,7 @@ function renderStage() {
   if (!last) {
     $('#dice').className = 'dice blank'; $('#dice').innerHTML = cubeHTML(5, 0) + cubeHTML(2, 1);
     $('#sum').innerHTML = '&ndash;<small id="calc">Pick a move, then roll</small>';
-    $('#result').innerHTML = ''; $('#copyroll').hidden = true;
+    $('#result').innerHTML = ''; $('#copyroll').hidden = true; resShow(false);
     return;
   }
   $('#dice').className = 'dice'; $('#dice').innerHTML = cubeHTML(last.d1, 0) + cubeHTML(last.d2, 1);
@@ -1855,7 +1867,6 @@ function renderStage() {
   html += '</div><div class="actions">';
   if (t === 'miss' && !last.luck) html += '<button class="btn sm" type="button" id="markxp"' + (last.xpMarked ? ' disabled' : '') + '>' + (last.xpMarked ? 'XP marked' : 'Mark XP') + '</button>';
   if (last.total < 12 && !last.luck) html += '<button class="btn ghost sm" type="button" id="spendluck"' + (S.sheet.luck < 1 ? ' disabled' : '') + '>Spend Luck: make it a 12 (' + S.sheet.luck + ' left)</button>';
-  html += '<span class="small muted" id="copymsg" role="status" style="flex:1 1 100%"></span>';
   html += '</div>';
   $('#result').innerHTML = html;
   $('#copyroll').hidden = false;
@@ -1903,10 +1914,19 @@ function rollClicks(e) {
     renderRoller(); scheduleSave(); return;
   }
   if (e.target.closest('#copyroll') && last) { copyRoll(); return; }
-  if (e.target.id === 'markxp' && last && !last.xpMarked) { evSay('Marked XP on a miss', true); last.xpMarked = true; S.sheet.xp = Math.min(S.sheet.xp + 1, 9); renderSheet(); renderStage(); scheduleSave(); }
-  if (e.target.id === 'spendluck' && last && !last.luck && S.sheet.luck > 0) { evSay('Spent Luck: made the roll a 12', true); last.luck = true; last.total = 12; setLuck(S.sheet.luck - 1); evRollUpdate(); if (S.rolls[0]) { S.rolls[0].total = 12; S.rolls[0].tier = 'full'; S.rolls[0].name += ' (Luck)'; } if (HOLDS[last.move]) { var was = last.hold && S.hold.move === last.move ? S.hold.asked : []; S.hold = { n: Math.max(0, HOLDS[last.move].full - was.length), move: last.move, asked: was }; last.hold = true; evSkip('hold'); } renderSheet(); renderRoller(); fxPlay('crit'); stinger(12); scheduleSave(); }
+  if (e.target.id === 'markxp' && last && !last.xpMarked) { evSay('Marked XP on a miss', true); last.xpMarked = true; S.sheet.xp = Math.min(S.sheet.xp + 1, 9); renderSheet(); renderStage(); scheduleSave(); resShow(false); }
+  if (e.target.id === 'spendluck' && last && !last.luck && S.sheet.luck > 0) { resShow(false); evSay('Spent Luck: made the roll a 12', true); last.luck = true; last.total = 12; setLuck(S.sheet.luck - 1); evRollUpdate(); if (S.rolls[0]) { S.rolls[0].total = 12; S.rolls[0].tier = 'full'; S.rolls[0].name += ' (Luck)'; } if (HOLDS[last.move]) { var was = last.hold && S.hold.move === last.move ? S.hold.asked : []; S.hold = { n: Math.max(0, HOLDS[last.move].full - was.length), move: last.move, asked: was }; last.hold = true; evSkip('hold'); } renderSheet(); renderRoller(); fxPlay('crit'); stinger(12); scheduleSave(); }
 }
 $('#hv-play').addEventListener('click', rollClicks);
+$('#restoast').addEventListener('click', rollClicks);
+/* the roll's result: a toast at the foot of the page that stays until it is closed or acted on */
+function resShow(on) {
+  var t = $('#restoast'); if (!t) return;
+  t.classList.toggle('on', !!on); t.setAttribute('aria-hidden', String(!on));
+  if (!on && t.contains(document.activeElement)) { var r = $('#roll'); if (r) r.focus(); }
+}
+$('#res-x').addEventListener('click', function () { resShow(false); });
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && $('#restoast').classList.contains('on')) resShow(false); });
 $('#clearhist').addEventListener('click', function () {
   S.session.events = []; S.session.started = 0; evToastHide(); renderHist(); scheduleSave();   // the timeline; the sheet is untouched
 });
@@ -5214,7 +5234,7 @@ function doRoll() {
   var R = S.roller, mv = BYID[R.move];
   var d1 = rnd6(), d2 = rnd6();
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  $('#result').innerHTML = '';
+  resShow(false); var cm = $('#copymsg'); if (cm) cm.textContent = '';
   function finish() {
     if (!rolling) return;
     rolling = false; btn.disabled = false; skipAnims = null;
@@ -5228,7 +5248,7 @@ function doRoll() {
     tblRollOut(S.rolls[0]);
     if (HOLDS[R.move] && tierOf(last.total) !== 'miss') { S.hold = { n: HOLDS[R.move][tierOf(last.total)], move: R.move, asked: [] }; last.hold = true; evSkip('hold'); }   // the hold is part of the roll's line
     R.forward = 0; R.other = 0;
-    renderRoller(); scheduleSave(); popSum();
+    renderRoller(); scheduleSave(); popSum(); resShow(true);
     hitTimers.forEach(clearTimeout); hitTimers = [];
     if (last.total >= 12) fxPlay('crit'); else if (tierOf(last.total) === 'miss') fxPlay('miss');
     stinger(last.total);
