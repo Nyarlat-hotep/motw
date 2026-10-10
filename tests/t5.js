@@ -77,7 +77,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   check('Spend Luck is offered after a miss', (await p.locator('#spendluck').count())===1);
   await p.click('#spendluck'); await p.waitForTimeout(150);
   check('Spend Luck makes it a 12 and costs 1', (await T('#sum')).startsWith('12') && (await T('#rollas')).includes('Luck 6'), await T('#rollas'));
-  check('the edge burns on a 12', await p.evaluate(()=>document.getElementById('fx').className)==='fx-crit');
+  check('a 12 is marked at the dice, with no burnt edge', await p.evaluate(()=>!!document.getElementById('trayfx') && document.getElementById('fx').className===''));
   await p.click('#clearhist'); check('Clear empties history', /No rolls yet/.test(await T('#hist')));
 
   // ---- HUNTER: BUILD ----

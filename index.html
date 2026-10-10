@@ -22,7 +22,7 @@
   --accent: #8c1d2b; --accent-ink: #fff8f0; --brass: #85601a;
   --good: #0b6b57; --good-bg: #d3eadf; --warn: #855200; --warn-bg: #f2dfb4; --bad: #a82424; --bad-bg: #f3d3cf;
   --die: #f6efe1; --pip: #22171a;
-  --scorch: #8a4a0c; --scorch-miss: #a82424; --flare: #c98a12;
+  --scorch: #8a4a0c; --scorch-miss: #a82424; --flare: #c98a12; --flare-hi: #8f5d00; --puff: brightness(.42) sepia(.5);
   --cw-a: #b09a70; --cw-b: #f7ecd0; --cw-c: #dccba3; --cw-d: #c4b189; --cw-pd: #dccba3; --cw-rim: #f3e6c6; --cw-pool: #cdbb92; --cw-smoke: #6d625c; --cw-dk: 0; --cw-sh: .16; --cw-ledge: .2;
   --cw-out: saturate(.35) brightness(.96); --cw-outo: .6; --cw-edge: drop-shadow(0 0 .5px #c25600) drop-shadow(0 0 1.6px rgba(232, 120, 20, .55)); --cw-tint: brightness(.35);
   --display: 'IM Fell English SC', 'IM Fell English', 'Palatino Linotype', Georgia, serif;
@@ -35,7 +35,7 @@
   :root:not([data-theme="light"]) {
     --bg: #110c0e; --surface: #1a1215; --surface2: #26191d; --ink: #f0e7dc; --muted: #b3a496; --line: #3e2c31;
     --accent: #e0675b; --accent-ink: #1a0b0d; --brass: #d1a954;
-    --good: #62d6b0; --good-bg: #10302a; --warn: #eebb4c; --warn-bg: #392a0c; --bad: #ff8a80; --bad-bg: #3b1618; --scorch: #b8741c; --scorch-miss: #7a1616; --flare: #f2bc3c;
+    --good: #62d6b0; --good-bg: #10302a; --warn: #eebb4c; --warn-bg: #392a0c; --bad: #ff8a80; --bad-bg: #3b1618; --scorch: #b8741c; --scorch-miss: #7a1616; --flare: #f2bc3c; --flare-hi: #fff3cf; --puff: sepia(.55) brightness(.9);
     --cw-a: #7d6c4d; --cw-b: #e9dcb9; --cw-c: #bfae86; --cw-d: #a3916b; --cw-pd: #7a6a4c; --cw-rim: #e6d8b4; --cw-pool: #a3936f; --cw-smoke: #cfc6bb; --cw-dk: 1; --cw-sh: .45; --cw-ledge: .5;
     --cw-out: saturate(.4) brightness(.48); --cw-outo: 1; --cw-edge: none; --cw-tint: none;
     color-scheme: dark;
@@ -44,7 +44,7 @@
 :root[data-theme="dark"] {
   --bg: #110c0e; --surface: #1a1215; --surface2: #26191d; --ink: #f0e7dc; --muted: #b3a496; --line: #3e2c31;
   --accent: #e0675b; --accent-ink: #1a0b0d; --brass: #d1a954;
-  --good: #62d6b0; --good-bg: #10302a; --warn: #eebb4c; --warn-bg: #392a0c; --bad: #ff8a80; --bad-bg: #3b1618; --scorch: #b8741c; --scorch-miss: #7a1616; --flare: #f2bc3c;
+  --good: #62d6b0; --good-bg: #10302a; --warn: #eebb4c; --warn-bg: #392a0c; --bad: #ff8a80; --bad-bg: #3b1618; --scorch: #b8741c; --scorch-miss: #7a1616; --flare: #f2bc3c; --flare-hi: #fff3cf; --puff: sepia(.55) brightness(.9);
   --cw-a: #7d6c4d; --cw-b: #e9dcb9; --cw-c: #bfae86; --cw-d: #a3916b; --cw-pd: #7a6a4c; --cw-rim: #e6d8b4; --cw-pool: #a3936f; --cw-smoke: #cfc6bb; --cw-dk: 1; --cw-sh: .45; --cw-ledge: .5;
   --cw-out: saturate(.4) brightness(.48); --cw-outo: 1; --cw-edge: none; --cw-tint: none;
   color-scheme: dark;
@@ -553,43 +553,56 @@ details.sect.slim > summary { font-size: 16px; }
 /* big moments: a ragged, burnt edge around the screen, never a flash across the middle. #fx holds one SVG rectangle; its thick stroke is blurred and then pushed about by noise
    (the #fxrough filter, or the finer #fxrough-s on a phone), which is what makes the edge uneven. The layer is not drawn at all between moments.
    It lands hard and is gone inside a second: full strength within three frames while the drawing snaps in past its resting place and settles (fxbite), then it gutters out in
-   uneven steps (fxburn). A level-up strikes twice, the second harder. Only opacity and a transform move, so the roughened edge is painted once and never again mid-burn. */
+   uneven steps (fxburn). It is a miss's alone: good news happens where the player is looking (a 12+ at the dice, a level-up at the level, further down). Only opacity and a transform move, so the roughened edge is painted once and never again mid-burn. */
 #fx { position: fixed; inset: 0; z-index: 50; pointer-events: none; opacity: 0; visibility: hidden; overflow: hidden; }
 #fx svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 #fx rect { fill: none; stroke: var(--scorch); stroke-width: clamp(64px, 11vmin, 120px); filter: url(#fxrough); }
 #fx.fx-miss rect { stroke: var(--scorch-miss); }
-#fx.fx-crit rect, #fx.fx-level rect { stroke: var(--flare); }
-/* Good news looks different from bad (Jacob, 2026-10-10: the miss felt right, the 12+ did not). A miss burns red and shakes the page. A 12+ and a level-up glow gold at the edge instead,
-   and #fxg adds fire: flames flare up along the bottom of the screen and embers rise out of them. A flame (.fl) is a window on a strip of 20 frames (img/fx-flame.webp, made by
-   tools/make_fx.py) that steps along behind it, while the window itself grows and dies; with no picture there are embers only. fxGlory() makes them afresh each time, each with its own
-   place, size and timing in CSS variables. Everything stays in the lowest quarter of the screen, and the layer is emptied afterwards. */
-#fxg { position: fixed; inset: 0; z-index: 50; pointer-events: none; overflow: hidden; visibility: hidden; }
-#fxg.on { visibility: visible; }
-#fxg .fl { position: absolute; bottom: -1.5vh; left: var(--x); width: var(--w); height: calc(var(--w) * 2); overflow: hidden; transform-origin: 50% 100%; opacity: 0; animation: fxflare var(--d) ease-out var(--t) both; }
-#fxg .fl b { display: block; width: 2000%; height: 100%; background: url(img/fx-flame.webp) 0 0 / 100% 100% no-repeat; animation: fxframes .9s steps(20) var(--f) infinite; }
-@keyframes fxframes { to { transform: translateX(-100%); } }
-@keyframes fxflare { 0% { opacity: 0; transform: scale(var(--m), .2); } 12% { opacity: 1; transform: scale(var(--m), 1.08); } 30% { opacity: 1; transform: scale(var(--m), .96); } 62% { opacity: .95; transform: scale(var(--m), .9); } 100% { opacity: 0; transform: scale(var(--m), .35); } }
-#fxg.lv .fl { animation-name: fxflare2; }
-@keyframes fxflare2 { 0% { opacity: 0; transform: scale(var(--m), .2); } 8% { opacity: 1; transform: scale(var(--m), .8); } 20% { opacity: .9; transform: scale(var(--m), .55); } 30% { opacity: 1; transform: scale(var(--m), 1.12); } 44% { opacity: 1; transform: scale(var(--m), .98); } 70% { opacity: .95; transform: scale(var(--m), .9); } 100% { opacity: 0; transform: scale(var(--m), .35); } }
-#fxg .em { position: absolute; bottom: 0; left: var(--x); width: var(--s); height: var(--s); border-radius: 50%; background: radial-gradient(circle, #fff6d8 0, #fff6d8 22%, var(--flare) 46%, transparent 70%); opacity: 0; animation: fxember var(--d) cubic-bezier(.2, .7, .3, 1) var(--t) both; }
-@keyframes fxember { 0% { opacity: 0; transform: translate(0, 0) scale(.6); } 10% { opacity: 1; } 70% { opacity: .9; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.3); } }
 @media (max-width: 640px) { #fx rect { stroke-width: 40px; filter: url(#fxrough-s); } }
-#fx.fx-crit { animation: fxburn .8s linear; }
 #fx.fx-miss { animation: fxburn .6s linear; }
-#fx.fx-level { animation: fxburn2 1.3s linear; }
-#fx.fx-crit svg { animation: fxbite .8s ease-out; }
 #fx.fx-miss svg { animation: fxbite .6s ease-out; }
-#fx.fx-level svg { animation: fxbite2 1.3s ease-out; }
 @keyframes fxburn { 0%, 100% { opacity: 0; visibility: visible; } 6% { opacity: 1; } 18% { opacity: .92; } 28% { opacity: .56; } 36% { opacity: .8; } 52% { opacity: .34; } 60% { opacity: .46; } }
-@keyframes fxburn2 { 0%, 100% { opacity: 0; visibility: visible; } 4% { opacity: .85; } 13% { opacity: .42; } 21% { opacity: .3; } 26% { opacity: 1; } 37% { opacity: .9; } 48% { opacity: .58; } 56% { opacity: .78; } 70% { opacity: .38; } 78% { opacity: .5; } }
 @keyframes fxbite { 0% { transform: scale(1.06); } 7% { transform: scale(.972); } 22% { transform: scale(1.006); } 40%, 100% { transform: scale(1); } }
-@keyframes fxbite2 { 0% { transform: scale(1.05); } 5% { transform: scale(.985); } 14% { transform: scale(1.004); } 21% { transform: scale(1.03); } 27% { transform: scale(.965); } 40% { transform: scale(1.006); } 55%, 100% { transform: scale(1); } }
 .wrap.shake { animation: shake .36s ease-out; }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 12% { transform: translateX(-11px); } 30% { transform: translateX(9px); } 48% { transform: translateX(-6px); } 66% { transform: translateX(4px); } 84% { transform: translateX(-2px); } }
 .tier.boom { animation: boom .34s ease-out, tierglow 1.1s ease-out; }
 @keyframes boom { 0% { transform: scale(.88); } 42% { transform: scale(1.045); } 72% { transform: scale(.992); } 100% { transform: scale(1); } }
 @keyframes tierglow { 0%, 100% { box-shadow: 0 0 0 0 rgba(242, 188, 60, 0); } 14% { box-shadow: 0 0 26px 5px rgba(242, 188, 60, .6); } 45% { box-shadow: 0 0 16px 2px rgba(242, 188, 60, .3); } }
-@media (prefers-reduced-motion: reduce) { #fx, #fx svg, #fxg *, .reveal .bdg, .wrap.shake, .tier.boom, .tfeed li.new .tdice, .bdg .b-sh { animation: none !important; } .texture { transition: none; } }
+/* A 12+ happens at the dice. Jacob picked this on 2026-10-10 out of three shown to him, after the burnt edge in orange and then in gold with fire had both missed
+   ("looks cheap or pasted on", "too much, too long"). A ring and a spray of sparks leave each die (#trayfx, made afresh each time by critDice), the dice hop, and
+   the total lands gold. It is over in about half a second and never leaves the tray. */
+#trayfx { position: absolute; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+#trayfx .rng, #lvfx .rng { position: absolute; left: var(--x); top: var(--y); width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%; border: 3px solid #fff3cf; box-shadow: 0 0 14px 1px #f2bc3c, inset 0 0 10px #f2bc3c; opacity: 0; animation: cring .44s cubic-bezier(.1, .7, .2, 1) both; }
+#trayfx .rng.r2, #lvfx .rng.r2 { animation-duration: .6s; animation-delay: .07s; border-width: 1.5px; }
+@keyframes cring { 0% { opacity: 1; transform: scale(.4); } 55% { opacity: .75; } 100% { opacity: 0; transform: scale(2.4); } }
+#trayfx .spk, #lvfx .spk { position: absolute; left: var(--x); top: var(--y); width: 3px; height: var(--l); margin-left: -1.5px; border-radius: 2px; background: linear-gradient(to bottom, rgba(242, 188, 60, 0), #f2bc3c 45%, #fff7dc); transform-origin: 50% 0; opacity: 0; animation: cspark var(--d) cubic-bezier(.12, .7, .25, 1) var(--t) both; }
+@keyframes cspark { 0% { opacity: 1; transform: rotate(var(--a)) translateY(var(--r0, 24px)) scaleY(.4); } 30% { opacity: 1; transform: rotate(var(--a)) translateY(calc(var(--r0, 24px) + var(--r) * .62)) scaleY(1); } 100% { opacity: 0; transform: rotate(var(--a)) translateY(calc(var(--r0, 24px) + var(--r))) scaleY(.12); } }
+#tray.crit .slot { animation: chop .42s cubic-bezier(.2, .9, .3, 1); }
+@keyframes chop { 0% { transform: translateY(0) scale(1); } 20% { transform: translateY(-10px) scale(1.12); } 52% { transform: translateY(2px) scale(.97); } 76% { transform: translateY(-1px) scale(1.01); } 100% { transform: translateY(0) scale(1); } }
+.sum.gold { animation: sumgold .75s ease-out; }
+.sum.pop.gold { animation: sumpop .5s ease-out, sumgold .75s ease-out; }
+@keyframes sumgold { 0% { color: var(--flare-hi); text-shadow: 0 0 22px var(--flare); } 28% { color: var(--flare); text-shadow: 0 0 12px var(--flare); } }
+/* A level-up is the same idea, at the level (Jacob, 2026-10-10: "something in the same spirit of the dice burst"; until then it was a gold burnt edge with flames along the
+   bottom of the screen). levelBurst() puts #lvfx over the level number on My sheet: three rings and two sprays of sparks, the second a beat after the first, while the
+   number jumps and lands gold and its card's rule glints. A little more than a 12+, because it is rarer, and still over inside a second. The tray is always dark but a
+   sheet may be light, so here the rings and sparks take the theme's gold. */
+#lvfx { position: fixed; z-index: 50; width: 0; height: 0; pointer-events: none; --x: 0px; --y: 0px; --r0: 12px; }
+#lvfx .rng { border-color: var(--flare-hi); box-shadow: 0 0 14px 1px var(--flare), inset 0 0 10px var(--flare); animation-name: cring2; animation-duration: .52s; }
+#lvfx .rng.r2 { animation-duration: .7s; }
+#lvfx .rng.r3 { animation-duration: .6s; animation-delay: .2s; border-width: 2px; }
+@keyframes cring2 { 0% { opacity: 1; transform: scale(.25); } 55% { opacity: .75; } 100% { opacity: 0; transform: scale(3.1); } }
+#lvfx .spk { background: linear-gradient(to bottom, transparent, var(--flare) 45%, var(--flare-hi)); }
+#lvl.up { display: inline-block; animation: lvpop .62s cubic-bezier(.2, .9, .3, 1), sumgold 1s ease-out; }
+@keyframes lvpop { 0% { transform: scale(1); } 16% { transform: scale(2.5); } 46% { transform: scale(.9); } 70% { transform: scale(1.06); } 100% { transform: scale(1); } }
+.card.lvcard { animation: lvglow .9s ease-out; }
+@keyframes lvglow { 14% { border-color: var(--flare); box-shadow: inset 0 0 0 4px var(--surface), inset 0 0 0 5px var(--flare), 0 0 24px -4px var(--flare); } }
+/* Dust: eight puffs from Kenney's smoke pack (img/fx-puff.webp, made by tools/make_puff.py). They are white, and a filter (--puff) turns them the color of dust for each theme.
+   puffsHTML() scatters a few round a point, each with its own puff, drift and turn. With no picture there is no dust. A badge stamping down at the tally kicks some up (.bstamp). */
+.pf { position: absolute; left: 50%; top: 50%; width: 60px; height: 55px; margin: -27px 0 0 -30px; background: url(img/fx-puff.webp) var(--mx) 0 / 800% 100% no-repeat; filter: var(--puff); opacity: 0; pointer-events: none; animation: cpuff var(--d) cubic-bezier(.1, .7, .3, 1) var(--t, .2s) both; }
+@keyframes cpuff { 0% { opacity: 0; transform: translate(0, 0) scale(.3) rotate(0deg); } 14% { opacity: .7; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(1.6) rotate(var(--ro)); } }
+.bstamp { position: relative; display: inline-block; }
+.bstamp .bdg { position: relative; display: block; }
+@media (prefers-reduced-motion: reduce) { #fx, #fx svg, #trayfx *, #lvfx *, #lvl.up, .card.lvcard, #tray.crit .slot, .sum.gold, .pf, .reveal .bdg, .wrap.shake, .tier.boom, .tfeed li.new .tdice, .bdg .b-sh { animation: none !important; } .texture { transition: none; } }
 
 /* ---- the old book: type, paper, rules ---- */
 body { font: 19px/1.6 var(--body); font-variant-ligatures: common-ligatures discretionary-ligatures; text-rendering: optimizeLegibility;
@@ -898,6 +911,140 @@ div.wcard { cursor: default; border-color: var(--good); }
 .ppass p { margin: 4px 0 0; font-size: 16px; }
 .psel h3 { font-family: var(--display); font-size: 23px; }
 .psel p { margin: 4px 0 0; }
+
+/* ---------- the hunter's page (track L): a frame, a trim color, a mark, a background and showcases, on the Party tab's card and on the page it opens ----------
+   A page's look is choices from lists the journal knows, a few numbers and short text (pageClean): never CSS or markup from a player. pageLook() turns the choices into
+   classes and a few custom properties on the card: fr (it has a look), fr-<frame>, pal-light or pal-dark when the frame brings its own paper or metal, and
+   --pcl / --pcd, the trim color for a light and a dark surface (already made readable by trimFor). --pc is whichever of the two suits what the card is drawn on. */
+.pal-light { --bg: #efe8dc; --surface: #f8f3ea; --surface2: #e6dccb; --ink: #22171a; --muted: #65564f; --line: #cdbda8; --accent: #8c1d2b; --accent-ink: #fff8f0; --brass: #85601a; --good: #0b6b57; --good-bg: #d3eadf; --warn: #855200; --warn-bg: #f2dfb4; --bad: #a82424; --bad-bg: #f3d3cf; color: var(--ink); color-scheme: light; }
+.pal-dark { --bg: #110c0e; --surface: #1a1215; --surface2: #26191d; --ink: #f0e7dc; --muted: #b3a496; --line: #3e2c31; --accent: #e0675b; --accent-ink: #1a0b0d; --brass: #d1a954; --good: #62d6b0; --good-bg: #10302a; --warn: #eebb4c; --warn-bg: #392a0c; --bad: #ff8a80; --bad-bg: #3b1618; color: var(--ink); color-scheme: dark; }
+.fr { --pc: var(--pcl, var(--accent)); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .fr { --pc: var(--pcd, var(--accent)); } }
+:root[data-theme="dark"] .fr { --pc: var(--pcd, var(--accent)); }
+:root .fr.pal-light { --pc: var(--pcl, var(--accent)); }
+:root .fr.pal-dark { --pc: var(--pcd, var(--accent)); }
+.mk { width: 1.05em; height: 1.05em; flex: none; color: var(--pc, var(--accent)); vertical-align: -.17em; }
+.seat .mk, .tfeed .mk { width: 15px; height: 15px; vertical-align: -2px; margin-right: 3px; }
+.epi { font-family: var(--display); letter-spacing: .06em; color: var(--pc); font-size: 16px; line-height: 1.2; overflow-wrap: anywhere; }
+.pcard.fr, .hpage { position: relative; }
+.pcard.fr > *, .hp-in { position: relative; z-index: 1; }
+.pcard.fr > .frbg, .hpage > .frbg { position: absolute; inset: 0; z-index: 0; background-size: cover; background-position: center; pointer-events: none; }
+.frbg::after { content: ""; position: absolute; inset: 0; background: var(--surface); opacity: var(--dim, .6); }
+.pcard.fr { overflow: hidden; }
+.pcard .frtop, .pcard .frbot { grid-column: 1 / -1; }
+.pcard .pacts { margin-top: 2px; }
+.pimg { position: relative; align-self: start; }
+.pfr { position: absolute; left: -7%; top: -7%; width: 114%; height: 114%; max-width: none; object-fit: fill; pointer-events: none; border: 0 !important; background: none !important; border-radius: 0 !important; aspect-ratio: auto !important; filter: none !important; transform: none !important; box-shadow: none !important; }
+/* journal: the page as it always was, with the inner rule in the trim color */
+.fr.fr-journal { box-shadow: inset 0 0 0 4px var(--surface), inset 0 0 0 5px var(--pc); border-color: var(--line); }
+.pcard.you.fr { border-color: var(--line); }
+/* wanted: a parchment poster, nailed up */
+.fr.fr-wanted { --surface: #ecdcb4; --surface2: #e0cc9c; --bg: #e3d0a2; --line: #a58a58; --muted: #5a452c; --ink: #2a1a0c; color: var(--ink); background: radial-gradient(ellipse at 50% 40%, #f1e3bf 0%, #ead9b0 55%, #d6bd88 100%); border: 3px solid #4a3018; border-radius: 2px; box-shadow: inset 0 0 0 3px #ead9b0, inset 0 0 0 4px rgba(74, 48, 24, .6), 0 2px 0 rgba(0, 0, 0, .3); }
+.fr-wanted .frtop { text-align: center; font-family: var(--display); font-size: 32px; letter-spacing: .34em; text-indent: .34em; line-height: 1; color: #3b2412; text-transform: uppercase; padding: 6px 0 7px; border-bottom: 2px solid #4a3018; }
+.fr-wanted .frtop small { display: block; font-family: var(--type); font-size: 11px; letter-spacing: .3em; text-indent: .3em; margin-top: 5px; }
+.fr-wanted .frbot { text-align: center; border-top: 2px solid #4a3018; font-family: var(--display); letter-spacing: .2em; text-transform: uppercase; font-size: 14px; padding-top: 7px; color: #3b2412; }
+.fr-wanted .pimg img:not(.pfr), .fr-wanted .hp-por img.ph0 { filter: sepia(.8) contrast(1.06) brightness(.97); border: 2px solid #4a3018; border-radius: 0; }
+.fr.fr-wanted::before, .fr.fr-wanted::after { content: ""; position: absolute; top: 8px; width: 7px; height: 7px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #9a9a9a, #262626); z-index: 2; }
+.fr.fr-wanted::before { left: 10px; } .fr.fr-wanted::after { right: 10px; }
+/* dossier: a manila case file, typed, with a stamp that says how the hunter is doing */
+.fr.fr-dossier { --surface: #ece0c2; --surface2: #e0d2ae; --bg: #e4d6b4; --line: #b09a6c; --muted: #5b4a30; --ink: #241a10; color: var(--ink); background: repeating-linear-gradient(180deg, transparent 0 25px, rgba(70, 50, 20, .1) 25px 26px), #ece0c2; border: 1px solid #8f7a4e; border-radius: 3px 12px 3px 3px; box-shadow: 3px 3px 0 #d9c99f, 4px 4px 0 #8f7a4e; }
+.fr-dossier .frtop { display: flex; justify-content: space-between; gap: 10px; font-family: "Courier New", Courier, monospace; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #3a2c18; border-bottom: 1.5px solid #3a2c18; padding-bottom: 4px; }
+.fr-dossier .frstamp { position: absolute; right: 12px; bottom: 12px; z-index: 2; transform: rotate(-8deg); border: 3px solid var(--sc, #a82424); color: var(--sc, #a82424); padding: 1px 9px 2px; font-family: "Courier New", Courier, monospace; font-weight: 700; font-size: 15px; letter-spacing: .16em; text-transform: uppercase; border-radius: 3px; filter: url(#inkworn); opacity: .82; pointer-events: none; }
+.fr-dossier .frstamp.ok { --sc: #0b6b57; }
+.fr-dossier .pimg img:not(.pfr), .fr-dossier .hp-por img.ph0 { border: 5px solid #fbf7ee; border-bottom-width: 14px; border-radius: 1px; box-shadow: 0 1px 4px rgba(0, 0, 0, .4); transform: rotate(-2deg); }
+.fr-dossier .pinfo h3, .fr-dossier .hp-id h2 { font-family: "Courier New", Courier, monospace; font-weight: 700; letter-spacing: 0; text-transform: uppercase; }
+.fr-dossier .hp-id h2, .fr-tag .hp-id h2 { font-size: 25px; }
+/* tarot: a card from the deck, numbered by level and titled with the playbook */
+.fr.fr-tarot { --surface: #17142b; --surface2: #221e3d; --bg: #100e20; --line: #3c3562; --muted: #b5abc9; --ink: #f1ebdc; --accent: #e7a59c; color: var(--ink); background: radial-gradient(1px 1px at 18% 22%, rgba(255, 255, 255, .6) 50%, transparent 51%), radial-gradient(1px 1px at 72% 12%, rgba(255, 255, 255, .5) 50%, transparent 51%), radial-gradient(1.5px 1.5px at 86% 58%, rgba(255, 255, 255, .45) 50%, transparent 51%), radial-gradient(1px 1px at 34% 82%, rgba(255, 255, 255, .5) 50%, transparent 51%), radial-gradient(1.5px 1.5px at 8% 64%, rgba(255, 255, 255, .35) 50%, transparent 51%), radial-gradient(1px 1px at 58% 44%, rgba(255, 255, 255, .3) 50%, transparent 51%), linear-gradient(180deg, #1c1838, #100e20); border: 2px solid var(--pc); border-radius: 14px; box-shadow: inset 0 0 0 4px #17142b, inset 0 0 0 5px var(--pc); }
+:root .fr.fr-tarot { --pc: var(--pcd, #d9b75f); }
+.fr-tarot .frtop { text-align: center; font-family: var(--display); font-size: 21px; letter-spacing: .22em; text-indent: .22em; line-height: 1.1; color: var(--pc); }
+.fr-tarot .frtop::before, .fr-tarot .frtop::after { content: ""; display: inline-block; width: 7px; height: 7px; background: var(--pc); transform: rotate(45deg); margin: 0 12px 3px; }
+.fr-tarot .frbot { text-align: center; font-family: var(--display); font-size: 17px; letter-spacing: .28em; text-indent: .28em; text-transform: uppercase; color: var(--pc); border-top: 1px solid var(--pc); padding-top: 7px; }
+.fr-tarot .pimg img:not(.pfr), .fr-tarot .hp-por img.ph0 { border-radius: 999px 999px 5px 5px; border: 1px solid var(--pc); }
+/* tag: stamped steel on a chain */
+.fr.fr-tag { --surface: #30343a; --surface2: #3d4249; --bg: #24272b; --line: #5b6169; --muted: #c3c6cb; --ink: #eef0f2; --accent: #f3aaa1; color: var(--ink); background: repeating-linear-gradient(90deg, rgba(255, 255, 255, .03) 0 1px, transparent 1px 3px), linear-gradient(170deg, #40444b, #2a2d32 62%, #353940); border: 1px solid #17191c; border-radius: 28px; box-shadow: inset 0 0 0 3px #474c53, inset 0 0 0 4px #1b1d20, inset 0 3px 2px 4px rgba(255, 255, 255, .1), 0 2px 5px rgba(0, 0, 0, .5); }
+.fr-tag .frtop { height: 22px; }
+.fr-tag .frtop::before { content: ""; position: absolute; left: 50%; top: 1px; width: 17px; height: 17px; margin-left: -8.5px; border-radius: 50%; background: #0c0d0f; box-shadow: inset 0 2px 3px #000, 0 0 0 2px #5b6169, 0 1px 0 3px rgba(255, 255, 255, .12); }
+.fr-tag .pinfo h3, .fr-tag .hp-id h2 { font-family: "Courier New", Courier, monospace; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; text-shadow: 0 1px 0 rgba(255, 255, 255, .13), 0 -1px 0 rgba(0, 0, 0, .65); }
+.fr-tag .pimg img:not(.pfr), .fr-tag .hp-por img.ph0 { border-radius: 10px; border: 2px solid #1b1d20; box-shadow: 0 1px 0 rgba(255, 255, 255, .14); }
+/* scrap: a rusted plate with cut corners, rivets and a hazard stripe */
+.fr.fr-scrap { --surface: #2b1a12; --surface2: #3a2418; --bg: #1c110c; --line: #6a4530; --muted: #d0bca9; --ink: #f3e8da; --accent: #f5ab6b; color: var(--ink); background: linear-gradient(rgba(36, 20, 12, .84), rgba(26, 14, 8, .93)), url(img/tray-rust.jpg) center / cover, #2b1a12; border: 2px solid #7a4a2a; border-radius: 0; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .6), inset 0 0 26px rgba(0, 0, 0, .55); clip-path: polygon(14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px), 0 14px); }
+:root .fr.fr-scrap { --pc: var(--pcd, #e2b13a); }
+.fr-scrap .frtop { height: 9px; margin: 0 8px 2px; background: repeating-linear-gradient(-45deg, var(--pc) 0 10px, #17110d 10px 20px); box-shadow: 0 1px 0 rgba(0, 0, 0, .6); }
+.fr.fr-scrap::before { content: ""; position: absolute; inset: 9px; z-index: 2; pointer-events: none; background: radial-gradient(circle, #d2ab87 0 1.5px, #4a2c1b 2px 4.5px, transparent 5px) 0 0 / 10px 10px no-repeat, radial-gradient(circle, #d2ab87 0 1.5px, #4a2c1b 2px 4.5px, transparent 5px) 100% 0 / 10px 10px no-repeat, radial-gradient(circle, #d2ab87 0 1.5px, #4a2c1b 2px 4.5px, transparent 5px) 0 100% / 10px 10px no-repeat, radial-gradient(circle, #d2ab87 0 1.5px, #4a2c1b 2px 4.5px, transparent 5px) 100% 100% / 10px 10px no-repeat; }
+.fr-scrap .pimg img:not(.pfr), .fr-scrap .hp-por img.ph0 { border-radius: 0; border: 2px solid #7a4a2a; }
+/* own: the player's own artwork as the border. The picture has a clear middle; --fw says how much of it is border, the edges stretch and the corners keep their shape. */
+.fr.fr-own { border: 22px solid var(--line); border-image-source: var(--fimg, none); border-image-slice: var(--fw, 18%); border-image-width: 22px; border-image-repeat: stretch; box-shadow: none; border-radius: 0; }
+.hpage.fr.fr-own { border-width: 34px; border-image-width: 34px; }
+
+/* the page a card opens */
+.hpdlg { width: min(860px, calc(100vw - 24px)); overflow-y: auto; padding: 12px; }
+.hpage { border: 1px solid var(--line); border-radius: 4px; background: var(--surface); color: var(--ink); padding: 18px; overflow: hidden; }
+.hp-in { display: grid; gap: 14px; }
+.hp-head { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 18px; align-items: start; }
+.hp-por { position: relative; }
+.hp-por img.ph0, .hp-por .ph { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); }
+.hp-por .ph { display: grid; place-items: center; color: var(--muted); font-family: var(--type); font-size: 14px; }
+.hp-id { min-width: 0; display: grid; gap: 7px; align-content: start; }
+.hp-id p { margin: 0; }
+.hp-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.hp-id h2 { margin: 0; font-size: 32px; line-height: 1.08; overflow-wrap: anywhere; }
+.hp-id .epi { font-size: 19px; margin-top: 3px; }
+.lvplate { flex: none; width: 58px; height: 58px; border-radius: 50%; border: 3px solid var(--pc); display: grid; place-items: center; align-content: center; font-family: var(--num); font-size: 24px; line-height: 1; background: var(--surface); box-shadow: inset 0 0 0 2px var(--surface), inset 0 0 0 3px var(--line); }
+.lvplate small { display: block; font-family: var(--type); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1px; }
+.hp-case { background: var(--surface); background: color-mix(in srgb, var(--surface) 90%, transparent); border: 1px solid var(--line); border-radius: 4px; padding: 12px 14px; min-width: 0; }
+.hp-case > h3 { margin: 0 0 8px; font-size: 18px; color: var(--pc); }
+.hp-case p { margin: 0; }
+.hp-head.hp-case { padding: 14px; }
+.hp-badges { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 10px 16px; }
+.hp-badges li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 10px; align-items: center; }
+.hp-sig { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); gap: 10px; margin: 0; }
+.hp-sig div { border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; background: var(--bg); min-width: 0; }
+.hp-sig dt { font-family: var(--type); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.hp-sig dd { margin: 2px 0 0; font-size: 18px; overflow-wrap: anywhere; }
+.hp-about { white-space: pre-line; overflow-wrap: anywhere; }
+.hp-tray { height: 120px; max-width: 320px; }
+.hp-tray .dice { gap: 40px; padding-top: 6px; }
+.hp-tray .mdie { width: 64px; height: 64px; }
+.hp-tray .mdie .slot { transform: none; }
+.hp-gal { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr)); gap: 10px; }
+.hp-gal button { padding: 0; border: 1px solid var(--line); border-radius: 4px; background: var(--bg); cursor: zoom-in; overflow: hidden; }
+.hp-gal img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.hp-hint { color: var(--muted); font-style: italic; }
+@media (max-width: 520px) { .hpage { padding: 12px; } .hp-head { grid-template-columns: 96px minmax(0, 1fr); gap: 12px; } .hp-id h2 { font-size: 24px; } .lvplate { width: 48px; height: 48px; font-size: 20px; } .hpage.fr.fr-own { border-width: 22px; border-image-width: 22px; } }
+
+/* Customize: the page on one side, the choices on the other; on a phone the page sits on top */
+.czwrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.czprev { position: sticky; top: 64px; display: grid; gap: 12px; min-width: 0; }
+.czopts { display: grid; gap: 14px; min-width: 0; }
+.czopts .card > .lbl:first-child { margin-top: 0; }
+.czfr { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+.czfr button { display: grid; gap: 5px; justify-items: center; padding: 8px 4px 6px; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; cursor: pointer; color: inherit; font: inherit; font-size: 14px; line-height: 1.15; min-height: 44px; }
+.czfr button[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); background: var(--surface2); }
+.czfr .sw { width: 64px; height: 44px; padding: 0; display: block; clip-path: none; border-width: 2px; border-radius: 3px; overflow: hidden; }
+.czfr .sw.fr-tag { border-radius: 12px; } .czfr .sw.fr-tarot { border-radius: 7px; } .czfr .sw.fr-own { border: 2px dashed var(--line); background: var(--surface); }
+.czfr .sw::before, .czfr .sw::after { display: none; }
+.czsw { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 1px solid var(--line); vertical-align: -2px; margin-right: 5px; background: var(--sl); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .czsw { background: var(--sd); } }
+:root[data-theme="dark"] .czsw { background: var(--sd); }
+.czmarks { display: grid; grid-template-columns: repeat(auto-fill, minmax(44px, 1fr)); gap: 5px; max-height: 232px; overflow-y: auto; margin-top: 8px; padding: 2px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); }
+.czmarks button { min-height: 44px; display: grid; place-items: center; background: none; border: 1px solid transparent; border-radius: 6px; cursor: pointer; color: var(--ink); padding: 0; }
+.czmarks button svg { width: 28px; height: 28px; }
+.czmarks button:hover { border-color: var(--line); } .czmarks button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+.czcases { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.czcases li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px 6px 10px; background: var(--bg); }
+.czcases label { display: flex; gap: 10px; align-items: flex-start; min-width: 0; }
+.czcases input { width: 20px; height: 20px; flex: none; margin-top: 3px; accent-color: var(--accent); }
+.czcases .mv { display: flex; gap: 4px; }
+.czcases .mv button { min-width: 44px; min-height: 44px; padding: 0; }
+.czart { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; }
+.czart li { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 12px; align-items: start; border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: var(--bg); }
+.czart img { display: block; width: 96px; height: 72px; object-fit: cover; border-radius: 3px; background: repeating-conic-gradient(var(--surface2) 0 25%, var(--surface) 0 50%) 0 0 / 16px 16px; }
+.czart .actions { margin-top: 6px; gap: 6px; }
+.kart { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr)); gap: 10px; }
+.kart li { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 10px; align-items: center; border: 1px solid var(--line); border-radius: 6px; padding: 8px; background: var(--surface); }
+.kart img { display: block; width: 72px; height: 54px; object-fit: cover; border-radius: 3px; }
+@media (max-width: 860px) { .czwrap { grid-template-columns: minmax(0, 1fr); } .czprev { position: static; } }
 </style>
 
 <svg class="cdefs" aria-hidden="true" focusable="false"><defs>
@@ -913,10 +1060,10 @@ div.wcard { cursor: default; border-color: var(--good); }
 <div class="texture" aria-hidden="true"></div>
 <div class="texture t2" aria-hidden="true"></div>
 <div id="tbl-say" class="vh" aria-live="polite"></div>
-<div id="fxg" aria-hidden="true"></div>
-<div id="fx" aria-hidden="true"><svg focusable="false"><defs><filter id="fxrough" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="4" result="n"/><feGaussianBlur in="SourceGraphic" stdDeviation="16" result="b"/><feDisplacementMap in="b" in2="n" scale="46" xChannelSelector="R" yChannelSelector="G"/></filter><filter id="fxrough-s" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="4" result="n"/><feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b"/><feDisplacementMap in="b" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"/></filter></defs><rect width="100%" height="100%"/></svg></div>
+<div id="fx" aria-hidden="true"><svg focusable="false"><defs><filter id="fxrough" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="4" result="n"/><feGaussianBlur in="SourceGraphic" stdDeviation="16" result="b"/><feDisplacementMap in="b" in2="n" scale="46" xChannelSelector="R" yChannelSelector="G"/></filter><filter id="inkworn" x="-6%" y="-10%" width="112%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="2" seed="11" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -7 4.7" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in"/></filter><filter id="fxrough-s" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="4" result="n"/><feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b"/><feDisplacementMap in="b" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"/></filter></defs><rect width="100%" height="100%"/></svg></div>
 <div class="evtoast" id="evtoast" role="status" hidden><span id="evtoast-t"></span><button class="btn sm" type="button" id="evtoast-undo">Undo</button></div>
 <dialog class="hcdlg hodlg" id="hodlg" aria-label="Picture from the Keeper"><img id="hodlg-img" alt=""><p id="hodlg-cap"></p><div class="actions"><button class="btn sm" type="button" id="hodlg-close">Close</button></div></dialog>
+<dialog class="hcdlg hpdlg" id="hpdlg" aria-label="A hunter's page"><div id="hpdlg-body"></div><div class="actions"><button class="btn sm" type="button" id="hpdlg-close">Close</button><button class="btn ghost sm" type="button" id="hpdlg-edit" hidden>Customize my page</button></div></dialog>
 <dialog class="hcdlg sessdlg" id="sessdlg" aria-labelledby="sessdlg-h"><div id="sessdlg-body"></div></dialog>
 <dialog class="hcdlg" id="hcdlg" aria-labelledby="hc-title">
   <h2 class="sectitle" id="hc-title">Hunter card</h2>
@@ -1235,10 +1382,15 @@ div.wcard { cursor: default; border-color: var(--good); }
     <div class="seg" role="group" aria-label="Hunter view">
       <button type="button" id="seg-build" aria-pressed="true">Build a hunter</button>
       <button type="button" id="seg-sheet" aria-pressed="false">My sheet</button>
+      <button type="button" id="seg-page" aria-pressed="false">My page</button>
     </div>
 
     <div id="hv-build">
       <div id="wiz"></div>
+    </div>
+
+    <div id="hv-page" hidden>
+      <div class="czwrap"><div class="czprev" id="czprev"></div><div class="czopts" id="czopts"></div></div>
     </div>
 
     <div id="hv-sheet" hidden>
@@ -1400,7 +1552,7 @@ div.wcard { cursor: default; border-color: var(--good); }
       <div class="inks" id="inks" role="group" aria-label="Ink color"></div>
       <p class="small muted" style="margin:8px 0 0">The ink colors the buttons, tabs and links. It does not change any of the art.</p>
       <h3>Big moments</h3>
-      <label class="switch"><input type="checkbox" id="set-fx"><span>A burning edge around the screen on a 12+ and on a level-up, a red one and a shake on a miss</span></label>
+      <label class="switch"><input type="checkbox" id="set-fx"><span>Gold sparks at the dice on a 12+ and at your level when you level up, and a red burnt edge and a shake on a miss</span></label>
       <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-snd"><span>Sound: dice that sound like what they are made of, a bell on a 10+, thunder on a 12+ and a low thud on a miss</span></label>
       <label class="volrow"><span>Volume</span><input type="range" id="set-vol" min="0" max="100" step="5"></label>
       <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-tnote"><span>When someone else at the table rolls: a soft clatter of their dice if sound is on, and a spoken line for screen readers</span></label>
@@ -1543,7 +1695,7 @@ function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.h
 function defaults() {
   return { v: 1, tab: 'guide', hv: 'build', wiz: 0, bkAt: 0, start: { hide: false, rolled: false }, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage', theme: 'dark', ink: '', tname: '', tnote: true }, hold: { n: 0, move: '', asked: [] }, session: { started: 0, events: [] }, bench: [], hoseen: 0, tseen: 0, prev: '', night: { k: '', since: 0, end: 0, by: {} }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0 },
-    sheet: { name: '', pronouns: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', tv: 0, crop: { x: 50, y: 30, z: 1 }, hid: '', badges: {}, pins: [], tal: [], career: { sessions: 0, rolls: 0, misses: 0, harm: 0, lvls: 0 }, bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, adv: {}, moves: '', gear: '' } };   // adv: the moves marked advanced, by id
+    sheet: { name: '', pronouns: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', tv: 0, crop: { x: 50, y: 30, z: 1 }, hid: '', page: {}, badges: {}, pins: [], tal: [], career: { sessions: 0, rolls: 0, misses: 0, harm: 0, lvls: 0 }, bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, adv: {}, moves: '', gear: '' } };   // adv: the moves marked advanced, by id
 }
 var S = defaults();
 function merge(base, saved) {
@@ -1748,6 +1900,7 @@ function showTab(name, fromHash) {
   if (name === 'party') { if (tblUnseen()) tbl.view = 'board'; renderParty(); }
   if (name === 'guide') renderStart();
   if (name === 'hunter' && S.hv === 'build') renderBuild();
+  if (name === 'hunter' && S.hv === 'page') renderPageEd();
   if (typeof applyTex === 'function') applyTex();
   if (!fromHash) { try { history.replaceState(null, '', '#' + name); } catch (e) {} }
 }
@@ -1913,9 +2066,11 @@ $('#evtoast-undo').addEventListener('click', function () { evUndo($('#evtoast').
 
 /* ---------- hunter ---------- */
 function setHV(v) {
+  if (v !== 'sheet' && v !== 'page') v = 'build';
   S.hv = v;
-  $('#hv-build').hidden = v !== 'build'; $('#hv-sheet').hidden = v !== 'sheet';
-  $('#seg-build').setAttribute('aria-pressed', v === 'build'); $('#seg-sheet').setAttribute('aria-pressed', v === 'sheet');
+  $('#hv-build').hidden = v !== 'build'; $('#hv-sheet').hidden = v !== 'sheet'; $('#hv-page').hidden = v !== 'page';
+  $('#seg-build').setAttribute('aria-pressed', v === 'build'); $('#seg-sheet').setAttribute('aria-pressed', v === 'sheet'); $('#seg-page').setAttribute('aria-pressed', v === 'page');
+  if (v === 'page') renderPageEd();   // My page: the hunter's page and the choices that lay it out
 }
 $('#seg-build').addEventListener('click', function () { setHV('build'); renderBuild(); scheduleSave(); });
 $('#seg-sheet').addEventListener('click', function () { setHV('sheet'); scheduleSave(); });
@@ -3560,7 +3715,7 @@ function makeThumb(url, cb) {
 }
 function partyBody() {
   var sh = S.sheet;
-  return { name: sh.name, pronouns: String(sh.pronouns || '').slice(0, 40), playbook: sh.playbook, catchline: sh.catch, look: lookFull().slice(0, 280), photo: sh.thumb || '', stats: sh.stats, luck: sh.luck, harm: sh.harm, unstable: !!sh.unstable, xp: sh.xp, level: sh.level, armor: armorVal(), weapons: weaponsOut().map(function (i) { return i.name; }).slice(0, 6), moves: allMoveNames().slice(0, 12), hid: hidOf(sh), pins: sh.pins.slice(0, 5) };
+  return { name: sh.name, pronouns: String(sh.pronouns || '').slice(0, 40), playbook: sh.playbook, catchline: sh.catch, look: lookFull().slice(0, 280), photo: sh.thumb || '', stats: sh.stats, luck: sh.luck, harm: sh.harm, unstable: !!sh.unstable, xp: sh.xp, level: sh.level, armor: armorVal(), weapons: weaponsOut().map(function (i) { return i.name; }).slice(0, 6), moves: allMoveNames().slice(0, 12), hid: hidOf(sh), pins: sh.pins.slice(0, 5), pinn: sh.pins.slice(0, 5).map(function (b) { return sh.badges[b] ? sh.badges[b].n : 1; }), career: sh.career, page: pageOf(sh) };
 }
 function pushParty(force) {
   if (!S.share || !tableOn() || party.blocked) return;
@@ -3605,20 +3760,21 @@ function ago(ts) {
 }
 function meter(n, max, cls, label) { var h = ''; for (var i = 1; i <= max; i++) h += '<i class="' + (i <= n ? 'on' : '') + '"></i>'; return '<span class="meter ' + cls + '" role="img" aria-label="' + label + ' ' + n + ' of ' + max + '">' + h + '</span>'; }
 function partyCard(d) {
-  var you = d.id === myId(), st = d.stats || {};
-  var img = d.photo ? '<img src="' + esc(d.photo) + '" alt="Portrait of ' + esc(d.name || 'a hunter') + '">' : '<div class="ph">No photo</div>';
+  var you = d.id === myId(), st = d.stats || {}, look = pageLook(d, d.dice), p = look.p;   // the look the player chose: frame, trim color, mark, title, background
+  var img = (d.photo ? '<img src="' + esc(d.photo) + '" alt="Portrait of ' + esc(d.name || 'a hunter') + '">' : '<div class="ph">No photo</div>') + pfrHTML(p);
   var by = you ? 'You' : (party.names[d.id] || '');
   var stats = STATS.map(function (s) { return '<li class="chip">' + STATNAME[s] + ' ' + fmt(+st[s] || 0) + '</li>'; }).join('');
   var flags = (d.unstable ? '<li class="chip" style="color:var(--bad);border-color:var(--bad)">Unstable</li>' : '') + (d.armor ? '<li class="chip">Armor ' + (+d.armor) + '</li>' : '') + (d.weapons || []).map(function (w) { return '<li class="chip">' + esc(w) + '</li>'; }).join('');
   var mv = (d.moves || []).length ? '<ul class="chips">' + d.moves.map(function (m) { return '<li class="chip">' + esc(m) + '</li>'; }).join('') + '</ul>' : '';
   var pins = (Array.isArray(d.pins) ? d.pins : []).filter(badgeHas).slice(0, 5);   // the badges this hunter shows off; my own carry their count
-  var pinned = pins.length ? '<ul class="pins" aria-label="Pinned badges">' + pins.map(function (id) { var e = you ? S.sheet.badges[id] : null; return '<li title="' + esc(BADGE[id].name + ': ' + BADGE[id].line) + '">' + badgeSVG(id, { cls: 'b-sm', n: e ? e.n : 0 }) + '</li>'; }).join('') + '</ul>' : '';
-  return '<article class="pcard' + (you ? ' you' : '') + '"><div class="pimg">' + img + '</div><div class="pinfo"><h3>' + esc(d.name || 'Unnamed hunter') + (you ? '<span class="chip">You</span>' : '') + (d.online === false ? '<span class="chip tag">Away</span>' : '') + '</h3>' +
+  var pinned = pins.length ? '<ul class="pins" aria-label="Pinned badges">' + pins.map(function (id, i) { return '<li title="' + esc(BADGE[id].name + ': ' + BADGE[id].line) + '">' + badgeSVG(id, { cls: 'b-sm', n: pinCount(d, id, i, you) }) + '</li>'; }).join('') + '</ul>' : '';
+  return '<article class="pcard ' + look.cls + (you ? ' you' : '') + '"' + frStyle(look) + '>' + frBg(look, true) + frameTop(look, d) + '<div class="pimg">' + img + '</div><div class="pinfo"><h3>' + esc(d.name || 'Unnamed hunter') + markHTML(p.mark) + (you ? '<span class="chip">You</span>' : '') + (d.online === false ? '<span class="chip tag">Away</span>' : '') + '</h3>' + (p.epithet.trim() ? '<p class="epi">' + esc(p.epithet.trim()) + '</p>' : '') +
     '<p class="small muted">' + esc(d.playbook || 'No playbook yet') + (d.pronouns ? ' · ' + esc(String(d.pronouns).slice(0, 40)) : '') + (by && !you ? ' · played by ' + esc(by) : '') + '</p>' + (d.catchline ? '<p class="catch">“' + esc(d.catchline) + '”</p>' : '') + pinned +
     '<ul class="chips" style="margin:2px 0">' + stats + '</ul>' +
     '<div class="meters"><div><span>Luck</span>' + meter(+d.luck || 0, 7, 'luck', 'Luck') + '</div><div><span>Harm</span>' + meter(+d.harm || 0, 8, 'harm', 'Harm') + '</div><div><span>XP</span>' + meter(Math.min(+d.xp || 0, 5), 5, 'xp', 'XP') + '</div></div>' +
     '<ul class="chips" style="margin:2px 0"><li class="chip">Level ' + (+d.level || 0) + '</li>' + flags + '</ul>' + mv +
-    (d.look ? '<p class="small">' + esc(d.look) + '</p>' : '') + (d.updated ? '<p class="tiny">Updated ' + ago(d.updated) + '</p>' : '') + '</div></article>';
+    (d.look ? '<p class="small">' + esc(d.look) + '</p>' : '') + (d.updated ? '<p class="tiny">Updated ' + ago(d.updated) + '</p>' : '') +
+    '<div class="actions pacts"><button class="btn ghost sm" type="button" data-hpage="' + esc(d.id) + '">Open page</button></div></div>' + frameBot(look, d) + frameStamp(look, d) + '</article>';
 }
 function renderParty() {
   var host = $('#partybody'); if (!host) return;
@@ -3660,7 +3816,7 @@ document.addEventListener('change', function (e) {
    The Worker in worker/ keeps one table for the whole site: who is here, each shared hunter card, the last rolls, and what the Keeper posts.
    The page asks /api/me once. If nothing answers (opened from a file, no Worker, nobody signed in) the table stays off and the journal works as it always has.
    Everything that arrives from the table is other people's data: every field is checked and cut here, dice go through strictDie, and every string is escaped where it is shown. */
-var tbl = { on: false, state: 'off', ws: null, me: null, members: [], rolls: [], hos: [], tries: 0, timer: null, as: '', view: 'hunters', edit: null, del: '', msg: '', stale: false, pinOpen: true, pinId: '', pong: 0, back: null, fresh: 0, sess: null, found: [], tallies: [], sform: null };
+var tbl = { art: null, artAll: null, artDel: '', on: false, state: 'off', ws: null, me: null, members: [], rolls: [], hos: [], tries: 0, timer: null, as: '', view: 'hunters', edit: null, del: '', msg: '', stale: false, pinOpen: true, pinId: '', pong: 0, back: null, fresh: 0, sess: null, found: [], tallies: [], sform: null };
 var HOKINDS = ['scene', 'clue', 'person', 'place', 'note'], HOKIND = { scene: 'Scene', clue: 'Clue', person: 'Person', place: 'Place', note: 'Note' };
 var TBLERR = { 'Keeper only': 'Only the Keeper can do that.', 'bad handout': 'Give it a title, some words or a picture first.', 'no such handout': 'That handout is gone. It may have been deleted from another window.', 'too many handouts': 'The table holds 60 handouts. Delete an old one to make room.', 'slow down': 'That was too fast for the table. Try again in a moment.', 'too big': 'That was too big for the table to take.', 'no session': 'There is no session to do that to.', 'already paused': 'That episode has already ended. The next roll starts the next part.', 'no such part': 'That part of the session is gone.' };
 function tableOn() { return tbl.on || !!(store.db && store.uid); }
@@ -3677,7 +3833,10 @@ function tblCard(c) {
     photo: typeof c.photo === 'string' && c.photo.length <= 48000 && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]*$/.test(c.photo) ? c.photo : '', stats: {},
     luck: tblInt(c.luck, 0, 7, 7), harm: tblInt(c.harm, 0, 8, 0), unstable: c.unstable === true, xp: tblInt(c.xp, 0, 9, 0), level: tblInt(c.level, 0, 20, 0), armor: tblInt(c.armor, 0, 9, 0),
     weapons: tblList(c.weapons, 6, 60), moves: tblList(c.moves, 12, 60),
-    hid: HIDRX.test(c.hid || '') ? c.hid : '', pins: (Array.isArray(c.pins) ? c.pins : []).filter(function (b, i, a) { return badgeHas(b) && a.indexOf(b) === i; }).slice(0, 5) };
+    hid: HIDRX.test(c.hid || '') ? c.hid : '', pins: (Array.isArray(c.pins) ? c.pins : []).filter(function (b, i, a) { return badgeHas(b) && a.indexOf(b) === i; }).slice(0, 5),
+    pinn: (Array.isArray(c.pinn) ? c.pinn : []).slice(0, 5).map(function (n) { return tblInt(n, 1, 999, 1); }), career: {}, page: pageClean(c.page) };
+  var cr = c.career && typeof c.career === 'object' ? c.career : {};
+  ['sessions', 'rolls', 'misses', 'harm', 'lvls'].forEach(function (k) { o.career[k] = tblInt(cr[k], 0, 1e7, 0); });
   STATS.forEach(function (s) { o.stats[s] = tblInt(st[s], -3, 5, 0); });
   return o;
 }
@@ -3762,7 +3921,7 @@ function tblIn(m) {
     tbl.hos = (Array.isArray(m.handouts) ? m.handouts : []).slice(0, 60).map(tblHo).filter(Boolean);
     tbl.sess = tblSess(m.sess); tbl.found = tblFound(m.found);
     tbl.tallies = (Array.isArray(m.tallies) ? m.tallies : []).slice(0, 20).map(tblPast).filter(Boolean);
-    x = nightSync(); tallyCatchUp(); renderBadges();
+    x = nightSync(); tallyCatchUp(); renderBadges(); artLoad();
     if (x) scheduleSave();
     if (S.share) { party.last = ''; pushParty(true); }   // the first card went out before the table said where the session is: send this part's numbers now
   } else if (m.t === 'sess') {
@@ -3804,6 +3963,9 @@ function tblIn(m) {
     x = tblRoll(m.roll); if (!x) return;
     tbl.rolls.unshift(x); tbl.rolls = tbl.rolls.slice(0, 50); tbl.fresh = x.n;
     if (!tbl.me || x.id !== tbl.me.id) tblHeard(x);
+  } else if (m.t === 'art-gone') {
+    if (typeof m.id !== 'string' || !ARTRX.test(m.id)) return;
+    artGone(m.id);
   } else if (m.t === 'ho') {
     h = tblHo(m.h); if (!h) return;
     tbl.hos = tbl.hos.filter(function (o) { return o.id !== h.id; }); tbl.hos.push(h);
@@ -3821,7 +3983,7 @@ function tblIn(m) {
 }
 /* put what the table said where the Party tab already looks, then redraw */
 function tblSync() {
-  party.docs = tbl.members.filter(function (m) { return m.card; }).map(function (m) { var o = {}, k; for (k in m.card) o[k] = m.card[k]; o.id = m.id; o.updated = m.at; o.online = m.online; return o; });
+  party.docs = tbl.members.filter(function (m) { return m.card; }).map(function (m) { var o = {}, k; for (k in m.card) o[k] = m.card[k]; o.id = m.id; o.updated = m.at; o.online = m.online; o.dice = m.dice; o.who = m.name; return o; });
   party.names = {}; tbl.members.forEach(function (m) { party.names[m.id] = m.name; });
   party.err = '';
   tblDraw();
@@ -3832,7 +3994,7 @@ function tblSync() {
 var tblPress = 0;
 function tblBusy() { return Date.now() - tblPress < 3000 || !!$('#partybody input:focus, #partybody textarea:focus, #partybody select:focus'); }
 function tblDraw() {
-  tblDot(); renderTable();
+  tblDot(); renderTable(); hpDraw();
   if (tblBusy()) tbl.stale = true; else renderParty();
 }
 function tblCatchUp() { setTimeout(function () { if (tbl.stale && !tblBusy()) renderParty(); }, 0); }
@@ -3868,7 +4030,7 @@ function tblHead() {
   var n = tblUnseen();
   function b(v, t) { return '<button type="button" data-pv="' + v + '" aria-pressed="' + (tbl.view === v) + '">' + t + '</button>'; }
   var seats = tbl.members.slice().sort(function (x, y) { return (y.online ? 1 : 0) - (x.online ? 1 : 0) || String(x.name).localeCompare(String(y.name)); }).map(function (m) {
-    return '<li class="seat' + (m.online ? '' : ' off') + '"><i></i>' + esc(m.name || 'Player') + (m.id === tbl.me.id ? ' (you)' : '') + (m.keeper ? ' <b>Keeper</b>' : '') + (m.online ? '' : ' <span class="vh">, away</span>') + '</li>';
+    return '<li class="seat' + (m.online ? '' : ' off') + '"><i></i>' + markOf(m.card, m.dice) + esc(m.name || 'Player') + (m.id === tbl.me.id ? ' (you)' : '') + (m.keeper ? ' <b>Keeper</b>' : '') + (m.online ? '' : ' <span class="vh">, away</span>') + '</li>';
   }).join('');
   return '<p class="tblbar small ' + tbl.state + '" role="status" id="tblstate"><i></i><span>' + words + '</span></p>' +
     '<div class="seg tv" role="group" aria-label="What to look at">' + b('hunters', 'Hunters') + b('board', 'Scene board' + (n ? ' (' + n + ' new)' : '')) + (tbl.me.keeper ? b('desk', 'Keeper\'s desk') : '') + '</div>' +
@@ -3923,7 +4085,7 @@ function deskHTML() {
       '<div class="meters"><div><span>Harm</span>' + meter(c.harm, 8, 'harm', 'Harm') + '</div><div><span>Luck</span>' + meter(c.luck, 7, 'luck', 'Luck') + '</div><div><span>XP</span>' + meter(Math.min(c.xp, 5), 5, 'xp', 'XP') + '</div></div>' +
       '<p class="small">' + (r ? 'Last roll: ' + esc(r.move || 'A roll') + ', <b>' + r.total + '</b>, <span class="tag ' + r.tier + '">' + TIERNAME[r.tier] + '</span>' : '<span class="muted">No rolls yet.</span>') + '</p></li>';
   }).join('') + '</ul>' : '<div class="empty">No hunters are showing yet. Each player turns on "Show my hunter and my rolls to the table" on their own Party tab.</div>');
-  return out;
+  return out + kartHTML();
 }
 /* Play: the pinned handout as a banner that folds down to its title, and the last five rolls from everyone */
 function renderTable() {
@@ -3939,7 +4101,7 @@ function renderTable() {
     var rs = tbl.rolls.slice(0, 5);
     feed.innerHTML = tbl.on && rs.length ? '<div class="card"><h3 style="margin-top:0">At the table</h3><ul class="hist tfeed">' + rs.map(function (r) {
       var d = r.dice || { a: die0(), b: die0() };
-      return '<li' + (r.n && r.n === tbl.fresh ? ' class="new"' : '') + '><span class="tdice" role="img" aria-label="Dice showing ' + r.d1 + ' and ' + r.d2 + '">' + miniDie(r.d1, d.a) + miniDie(r.d2, d.b) + '</span><b>' + r.total + '</b><span>' + esc(tblWho(r.id)) + ': ' + esc(r.move || 'A roll') + ' <span class="muted">(' + r.d1 + '+' + r.d2 + ' ' + fmt(r.mod) + (r.luck ? ', Luck' : '') + ')</span></span><span class="tag ' + r.tier + '">' + TIERNAME[r.tier] + '</span></li>';
+      return '<li' + (r.n && r.n === tbl.fresh ? ' class="new"' : '') + '><span class="tdice" role="img" aria-label="Dice showing ' + r.d1 + ' and ' + r.d2 + '">' + miniDie(r.d1, d.a) + miniDie(r.d2, d.b) + '</span><b>' + r.total + '</b><span>' + tblMark(r.id) + esc(tblWho(r.id)) + ': ' + esc(r.move || 'A roll') + ' <span class="muted">(' + r.d1 + '+' + r.d2 + ' ' + fmt(r.mod) + (r.luck ? ', Luck' : '') + ')</span></span><span class="tag ' + r.tier + '">' + TIERNAME[r.tier] + '</span></li>';
     }).join('') + '</ul></div>' : '';
     tbl.fresh = 0;
   }
@@ -4012,6 +4174,7 @@ document.addEventListener('click', function (e) {
   }
   if (d.pv) {
     tbl.view = d.pv === 'board' || (d.pv === 'desk' && tbl.me.keeper) ? d.pv : 'hunters';
+    if (tbl.view === 'desk') artAllLoad();
     renderParty(); var again = $('#partybody [data-pv="' + tbl.view + '"]'); if (again) again.focus();
     return;
   }
@@ -4096,6 +4259,7 @@ function sheetClean(sh) {
   sh.tal = (Array.isArray(sh.tal) ? sh.tal : []).map(function (v) { return n(v, 1e9); }).filter(Boolean).slice(-60);
   sh.career = { sessions: n(c.sessions, 1e5), rolls: n(c.rolls, 1e7), misses: n(c.misses, 1e7), harm: n(c.harm, 1e7), lvls: n(c.lvls, 1e5) };
   if (!HIDRX.test(sh.hid || '')) sh.hid = '';
+  sh.page = pageClean(sh.page);   // how the hunter's page looks
 }
 function saveClean() {
   var N = S.night && typeof S.night === 'object' ? S.night : {}, by = {}, src = N.by && typeof N.by === 'object' ? N.by : {};
@@ -4248,7 +4412,7 @@ function sessDlgDraw() {
   } else if (sdlg.step >= 0 && sdlg.step < sdlg.order.length) {
     var a = sdlg.order[sdlg.step], b = BADGE[a.b];
     h = '<h2 class="sectitle" id="sessdlg-h" tabindex="-1">' + esc(sessName(d)) + '</h2><p class="sub">The awards &middot; ' + (sdlg.step + 1) + ' of ' + sdlg.order.length + '</p>' +
-      '<div class="reveal" aria-live="polite">' + badgeSVG(a.b, { cls: 'b-lg', label: false }) + '<p class="small muted" style="margin:10px 0 0">' + esc(BDGK[b.kind].name) + (d.fresh.indexOf(a.b) >= 0 ? ' &middot; a secret, found for the first time' : '') + '</p><h3>' + esc(b.name) + '</h3><p class="who"><b>' + esc(awardWho(d, a)) + '</b></p><p class="line">' + esc(b.line) + '</p></div>' +
+      '<div class="reveal" aria-live="polite"><span class="bstamp">' + puffsHTML(8, 96, 58, .2) + badgeSVG(a.b, { cls: 'b-lg', label: false }) + '</span><p class="small muted" style="margin:10px 0 0">' + esc(BDGK[b.kind].name) + (d.fresh.indexOf(a.b) >= 0 ? ' &middot; a secret, found for the first time' : '') + '</p><h3>' + esc(b.name) + '</h3><p class="who"><b>' + esc(awardWho(d, a)) + '</b></p><p class="line">' + esc(b.line) + '</p></div>' +
       '<div class="actions" style="justify-content:center"><button class="btn ghost sm" type="button" data-ss="next">Next</button><button class="btn ghost sm" type="button" data-ss="skip">Skip to the end</button></div>';
   } else {
     var me = tbl.me ? tbl.me.id : '', sh = S.sheet, mine = d.awards.filter(function (x) { return x.id === me && x.hid === sh.hid; }).map(function (x) { return x.b; });
@@ -4484,27 +4648,62 @@ function fxPlay(kind) {
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
   var f = $('#fx'), w = $('.wrap');
   if (!reduce) {
-    f.className = ''; void f.offsetWidth; f.className = 'fx-' + kind;
+    f.className = ''; void f.offsetWidth; if (kind === 'miss') f.className = 'fx-miss';   // the burnt edge is a miss's alone; a 12+ happens at the dice and a level-up at the level
     if (kind === 'miss') { w.classList.remove('shake'); void w.offsetWidth; w.classList.add('shake'); setTimeout(function () { w.classList.remove('shake'); }, 600); }
     if (kind === 'crit') { var t = $('#result .tier'); if (t) { t.classList.add('boom'); } }
-    if (kind === 'miss') fxGloryOff(); else fxGlory(kind === 'level');
+    fxCritOff(); fxLevelOff();
+    if (kind === 'crit') { critDice(); fxCritT = setTimeout(fxCritOff, 1200); }
+    else if (kind === 'level') { levelBurst(); fxLevelT = setTimeout(fxLevelOff, 1500); }
   }
   if (kind === 'level') sound(kind);
 }
-/* the fire for good news: a row of flames across the bottom of the screen and embers rising out of it. Twice over for a level-up, to go with the edge striking twice. */
-var FXFLAME = 20, fxTimer = null;
 function fxRand(a, b) { return a + Math.random() * (b - a); }
-function fxGloryOff() { var g = $('#fxg'); clearTimeout(fxTimer); g.className = ''; g.innerHTML = ''; }
-function fxGlory(level) {
-  var g = $('#fxg'), W = window.innerWidth, H = window.innerHeight, h = '', i, n, w, step;
-  if (ART.fxflame) {
-    w = Math.max(54, Math.min(120, H * (level ? .15 : .12))); step = w * .6; n = Math.ceil(W / step) + 1;
-    for (i = 0; i < n; i++) h += '<i class="fl" style="--x:' + Math.round(i * step - w * .5 + fxRand(-8, 8)) + 'px;--w:' + Math.round(w * fxRand(.8, 1.25)) + 'px;--m:' + (Math.random() < .5 ? -1 : 1) + ';--d:' + fxRand(level ? 1.25 : .8, level ? 1.6 : 1.1).toFixed(2) + 's;--t:' + fxRand(0, .1).toFixed(2) + 's;--f:-' + (Math.floor(Math.random() * FXFLAME) * .045).toFixed(3) + 's"><b></b></i>';
-  }
-  n = Math.round(Math.min(48, Math.max(16, W / 24)) * (level ? 1.4 : 1));
-  for (i = 0; i < n; i++) h += '<i class="em" style="--x:' + fxRand(0, 100).toFixed(1) + '%;--s:' + Math.round(fxRand(4, 9)) + 'px;--dx:' + Math.round(fxRand(-40, 40)) + 'px;--dy:-' + fxRand(8, 24).toFixed(1) + 'vh;--d:' + fxRand(.7, level ? 1.6 : 1.3).toFixed(2) + 's;--t:' + fxRand(0, level ? .55 : .25).toFixed(2) + 's"></i>';
-  clearTimeout(fxTimer); g.innerHTML = h; g.className = level ? 'on lv' : 'on';
-  fxTimer = setTimeout(fxGloryOff, level ? 2400 : 1800);
+
+/* A 12+: a ring and a spray of sparks from each die, a hop, and the total in gold (the CSS headed "A 12+ happens at the dice"). Jacob chose it on 2026-10-10 from three;
+   the other two (a stamp beside the total, a band of light across the page) and the picker they sat behind are gone. */
+var FXPUFF = 8, fxCritT = null;
+function fxCritOff() {
+  var t = $('#trayfx'), s = $('#sum');
+  clearTimeout(fxCritT);
+  if (t) t.parentNode.removeChild(t);
+  $('#tray').classList.remove('crit');
+  if (s) s.classList.remove('gold');
+}
+function critDice() {
+  var tray = $('#tray'), tb = tray.getBoundingClientRect(), h = '', sum = $('#sum'), box = document.createElement('div');
+  $$('#dice .slot').forEach(function (sl) {
+    var b = sl.getBoundingClientRect(), at = '--x:' + Math.round(b.left + b.width / 2 - tb.left - tray.clientLeft) + 'px;--y:' + Math.round(b.top + b.height / 2 - tb.top - tray.clientTop) + 'px', i, n = 14;
+    h += '<i class="rng" style="' + at + '"></i><i class="rng r2" style="' + at + '"></i>';
+    for (i = 0; i < n; i++) h += '<i class="spk" style="' + at + ';--a:' + Math.round(i * 360 / n + fxRand(-11, 11)) + 'deg;--l:' + Math.round(fxRand(9, 22)) + 'px;--r:' + Math.round(fxRand(30, 92)) + 'px;--d:' + fxRand(.26, .48).toFixed(2) + 's;--t:' + fxRand(0, .05).toFixed(2) + 's"></i>';
+  });
+  box.id = 'trayfx'; box.innerHTML = h; tray.appendChild(box); tray.classList.add('crit');
+  if (sum) { void sum.offsetWidth; sum.classList.add('gold'); }
+}
+/* A level-up: the same burst, at the level number on My sheet (the CSS headed "A level-up is the same idea"). If the sheet is not on screen there is only the sound. */
+var fxLevelT = null;
+function fxLevelOff() {
+  var b = $('#lvfx'), el = $('#lvl');
+  clearTimeout(fxLevelT);
+  if (b) b.parentNode.removeChild(b);
+  if (el) el.classList.remove('up');
+  $$('.card.lvcard').forEach(function (c) { c.classList.remove('lvcard'); });
+}
+function levelBurst() {
+  var el = $('#lvl'), r = el ? el.getBoundingClientRect() : null, box = document.createElement('div'), h = '<i class="rng"></i><i class="rng r2"></i><i class="rng r3"></i>', card, i;
+  if (!r || !r.width) return;
+  function spray(n, t0, lo, hi) { for (i = 0; i < n; i++) h += '<i class="spk" style="--a:' + Math.round(i * 360 / n + fxRand(-12, 12)) + 'deg;--l:' + Math.round(fxRand(10, 24)) + 'px;--r:' + Math.round(fxRand(lo, hi)) + 'px;--d:' + fxRand(.3, .52).toFixed(2) + 's;--t:' + (t0 + fxRand(0, .05)).toFixed(2) + 's"></i>'; }
+  spray(18, 0, 44, 128); spray(12, .2, 30, 92);
+  box.id = 'lvfx'; box.setAttribute('aria-hidden', 'true'); box.style.left = Math.round(r.left + r.width / 2) + 'px'; box.style.top = Math.round(r.top + r.height / 2) + 'px';
+  box.innerHTML = h; document.body.appendChild(box);
+  void el.offsetWidth; el.classList.add('up');
+  card = el.closest('.card'); if (card) card.classList.add('lvcard');
+}
+/* n puffs of dust scattered round a point, out to rx across and ry up and down, starting t seconds in. Nothing when the picture is not there. */
+function puffsHTML(n, rx, ry, t) {
+  var h = '', i, a;
+  if (!ART.fxpuff) return h;
+  for (i = 0; i < n; i++) { a = i * 6.283 / n + fxRand(-.3, .3); h += '<i class="pf" style="--mx:' + (Math.floor(Math.random() * FXPUFF) / (FXPUFF - 1) * 100).toFixed(2) + '%;--dx:' + Math.round(Math.cos(a) * fxRand(rx * .55, rx)) + 'px;--dy:' + Math.round(Math.sin(a) * fxRand(ry * .55, ry)) + 'px;--ro:' + Math.round(fxRand(-50, 50)) + 'deg;--d:' + fxRand(.42, .64).toFixed(2) + 's;--t:' + (t || .2) + 's"></i>'; }
+  return h;
 }
 
 /* ---------- backup + restore ---------- */
@@ -4625,7 +4824,7 @@ function startRecap(c) {
 }
 
 /* ---------- art hooks ---------- */
-var ART = window.__art = { pb: {}, misc: {}, tex1: false, tex2: false, tray: false, trays: {}, flame: false, smoke: false, fxflame: false }; /* on window so tests can look in */
+var ART = window.__art = { pb: {}, misc: {}, tex1: false, tex2: false, tray: false, trays: {}, flame: false, smoke: false, fxpuff: false }; /* on window so tests can look in */
 function artImg(name, cls) { return ART.misc[name] ? '<img class="' + cls + '" src="img/' + name + '.jpg" alt="">' : ''; }
 function applyTex() {
   var b = ['party', 'bestiary', 'notes'].indexOf(S.tab) >= 0, useB = ART.tex2 && (b || !ART.tex1), useA = ART.tex1 && !useB;
@@ -4640,7 +4839,7 @@ function initArt() {
   probe('img/texture2.jpg', function () { $('.texture.t2').style.backgroundImage = 'url(img/texture2.jpg)'; ART.tex2 = true; applyTex(); });
   probe('img/tray.jpg', function () { ART.tray = true; applyTray(); });
   probe('img/candle-flame.png', function () { ART.flame = true; renderSheet(); });
-  probe('img/fx-flame.webp', function () { ART.fxflame = true; });
+  probe('img/fx-puff.webp', function () { ART.fxpuff = true; });
   probe('img/candle-smoke.png', function () { ART.smoke = true; renderSheet(); });
   probe('img/die-glass.jpg', function (im) { D3.scuffImg = im; D3.sig = ''; d3Sync(); });
   probe('img/env.jpg', function (im) { D3.envImg = im; if (D3.renderer) { d3Env(); d3Mood(); } });
@@ -5828,7 +6027,7 @@ function doRoll() {
   var R = S.roller, mv = BYID[R.move];
   var d1 = rnd6(), d2 = rnd6();
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  $('#result').innerHTML = '';
+  $('#result').innerHTML = ''; fxCritOff();   // a throw straight after a 12 does not carry its sparks along
   function finish() {
     if (!rolling) return;
     rolling = false; btn.disabled = false; skipAnims = null;
@@ -5899,8 +6098,9 @@ function hcT(c, s, x, y, max, align) {
   HC.boxes.push({ t: s, x: align === 'center' ? x - w / 2 : align === 'right' ? x - w : x, y: y, w: w, max: max });
   c.textAlign = align || 'left'; c.fillText(s, x, y);
 }
-function hcDraw(cv, img) {
+function hcDraw(cv, img, ex) {
   var c = cv.getContext('2d'), d = partyBody(), W = HC.W, H = HC.H, x0 = 440, mw = 700, y, i, size;
+  ex = ex || {}; var npin = ex.pins ? ex.pins.length : 0; HC.pins = npin; HC.mark = !!ex.mark; HC.trim = ex.trim || '';
   HC.boxes = []; HC.photo = !!img; c.textBaseline = 'alphabetic';
   /* the page: a panel with a double rule and a little lamplight in one corner */
   c.fillStyle = HCC.bg; c.fillRect(0, 0, W, H);
@@ -5918,14 +6118,23 @@ function hcDraw(cv, img) {
   } else {
     var who = String(d.playbook || '').replace(/^The\s+/, '') || String(d.name || '').trim();
     c.fillStyle = HCC.accent; hcFont(c, '700', 250, 'black'); hcT(c, (who.charAt(0) || '?').toUpperCase(), px + pw / 2, py + ph / 2 + 78, pw, 'center');
-    if (d.playbook) { c.fillStyle = HCC.muted; hcFont(c, '', 24, 'display'); hcT(c, hcClip(c, d.playbook, pw - 40), px + pw / 2, py + ph - 36, pw - 40, 'center'); }
+    if (d.playbook) { c.fillStyle = HCC.muted; hcFont(c, '', 24, 'display'); hcT(c, hcClip(c, d.playbook, pw - 40), px + pw / 2, py + ph - 36 - (npin ? 84 : 0), pw - 40, 'center'); }
   }
-  c.strokeStyle = HCC.brass; c.lineWidth = 2; c.strokeRect(px, py, pw, ph); c.strokeStyle = HCC.line; c.lineWidth = 1; c.strokeRect(px + 6.5, py + 6.5, pw - 13, ph - 13);
+  if (npin) {   /* the pinned badges, like medals along the foot of the portrait */
+    var bs = 58, bg0 = 6, bx0 = px + (pw - (npin * bs + (npin - 1) * bg0)) / 2, by0 = py + ph - bs - 16, shade = c.createLinearGradient(0, by0 - 34, 0, py + ph);
+    shade.addColorStop(0, 'rgba(10, 6, 7, 0)'); shade.addColorStop(.42, 'rgba(10, 6, 7, .8)'); shade.addColorStop(1, 'rgba(10, 6, 7, .92)');
+    c.fillStyle = shade; c.fillRect(px, by0 - 34, pw, py + ph - (by0 - 34));
+    ex.pins.forEach(function (im, n) { c.drawImage(im, bx0 + n * (bs + bg0), by0, bs, bs); });
+  }
+  c.strokeStyle = ex.trim || HCC.brass; c.lineWidth = 2; c.strokeRect(px, py, pw, ph); c.strokeStyle = HCC.line; c.lineWidth = 1; c.strokeRect(px + 6.5, py + 6.5, pw - 13, ph - 13);
   /* who they are */
-  c.fillStyle = HCC.accent; hcFont(c, '', 20, 'display'); hcT(c, 'Monster of the Week', x0, 84, mw);
+  /* the hunter's title stands where the game's name would, in their trim color, and their mark sits at the end of the name's row */
+  var epi = d.page.epithet.trim(), nw = ex.mark ? mw - 78 : mw;
+  c.fillStyle = epi ? (ex.trim || HCC.accent) : HCC.accent; hcFont(c, '', 20, 'display'); hcT(c, epi ? hcClip(c, epi, nw) : 'Monster of the Week', x0, 84, nw);
+  if (ex.mark) c.drawImage(ex.mark, x0 + mw - 64, 80, 64, 64);
   var name = String(d.name || '').trim() || 'Unnamed hunter';
-  for (size = 60; size > 36; size -= 2) { hcFont(c, '', size, 'display'); if (c.measureText(name).width <= mw) break; }
-  hcFont(c, '', size, 'display'); c.fillStyle = HCC.ink; hcT(c, hcClip(c, name, mw), x0, 140, mw);
+  for (size = 60; size > 36; size -= 2) { hcFont(c, '', size, 'display'); if (c.measureText(name).width <= nw) break; }
+  hcFont(c, '', size, 'display'); c.fillStyle = HCC.ink; hcT(c, hcClip(c, name, nw), x0, 140, nw);
   hcFont(c, '', 26, 'body'); c.fillStyle = HCC.muted;
   var dot = '  ·  ', pb = d.playbook || 'No playbook yet', lv = 'Level ' + d.level;   // long pronouns give way so the level stays in view
   var pro = d.pronouns ? hcClip(c, d.pronouns, Math.max(60, mw - c.measureText(pb + dot + dot + lv).width)) : '';
@@ -5971,9 +6180,22 @@ function hcOpen() {
   var faces = document.fonts && document.fonts.load ? Promise.all(['700 40px UnifrakturCook', '40px "IM Fell English SC"', '24px "EB Garamond"', 'italic 24px "EB Garamond"', '500 40px "EB Garamond"'].map(function (f) { return document.fonts.load(f); })).catch(function () {}) : Promise.resolve();
   faces.then(function () {
     hcDraw(cv, null);
-    if (!src) return;
-    var im = new Image(); im.onload = function () { hcDraw(cv, im); }; im.src = src;
+    hcExtras(function (ex) {
+      hcDraw(cv, null, ex);
+      if (!src) return;
+      var im = new Image(); im.onload = function () { hcDraw(cv, im, ex); }; im.src = src;
+    });
   });
+}
+/* what the picture needs that has to be loaded first: the hunter's mark and pinned badges, each as a small picture of its own, and their trim color (the card is always dark) */
+function hcExtras(cb) {
+  var sh = S.sheet, p = pageOf(sh), ex = { mark: null, pins: [], trim: trimFor(p.col, { a: curDie(0) }, 'dark', HCC.well) }, jobs = [], left;
+  function load(svg, done) { var im = new Image(); im.onload = function () { done(im); }; im.onerror = function () { done(null); }; im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg); }
+  if (p.mark) jobs.push(function (next) { load('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="128" height="128" style="color:' + (ex.trim || HCC.accent) + '">' + SIGILS[p.mark] + '</svg>', function (im) { ex.mark = im; next(); }); });
+  sh.pins.slice(0, 5).forEach(function (id, n) { if (badgeHas(id)) jobs.push(function (next) { load(badgeSVG(id, { solo: 128, n: sh.badges[id] ? sh.badges[id].n : 0, label: false }), function (im) { ex.pins[n] = im; next(); }); }); });
+  left = jobs.length;
+  if (!left) { cb(ex); return; }
+  jobs.forEach(function (j) { j(function () { if (--left === 0) { ex.pins = ex.pins.filter(Boolean); cb(ex); } }); });
 }
 function hcBlob() { return new Promise(function (ok, no) { try { $('#hc-canvas').toBlob(function (b) { if (b) ok(b); else no(); }, 'image/png'); } catch (e) { no(); } }); }
 $('#hc-save').addEventListener('click', function () {
@@ -5989,6 +6211,453 @@ $('#hc-copy').addEventListener('click', function () {
 });
 $('#hc-close').addEventListener('click', function () { var dlg = $('#hcdlg'); if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); });
 document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-hcard]')) hcOpen(); });
+
+/* ---------- the hunter's page (track L, docs/SPEC-CARDS.md) ----------
+   Each hunter has a page the player lays out, the way a Steam profile is: a frame, a trim color, a personal mark and a title, a background, and showcases they pick
+   and order. The card on the Party tab is the top of it; Open page shows the rest. The look is sheet.page, and it travels with the card.
+   The rule that keeps it safe: a look is choices from the lists below, a few bounded numbers, short text, and the ids of pictures in that player's own locker at the table.
+   Never CSS, never markup, never a web address. pageClean() is the only way a look gets in, from a save or from another player, and everything is escaped where it is drawn. */
+var FRAMES = [
+  { id: 'journal', name: 'Journal page', pal: '' },
+  { id: 'wanted', name: 'Wanted poster', pal: 'light', sf: '#e0cc9c' },
+  { id: 'dossier', name: 'Agency dossier', pal: 'light', sf: '#e0d2ae' },
+  { id: 'tarot', name: 'Tarot card', pal: 'dark', sf: '#221e3d' },
+  { id: 'tag', name: 'Dog tag', pal: 'dark', sf: '#40444b' },
+  { id: 'scrap', name: 'Scrap plate', pal: 'dark', sf: '#3a2418' }
+], FRAME = {};
+/* the frame a hunter starts on, by playbook (pbSlug); anything else starts on the journal page */
+var PBFRAME = { professional: 'dossier', expert: 'dossier', flake: 'dossier', crooked: 'wanted', wronged: 'wanted', spooky: 'tarot', divine: 'tarot', spellslinger: 'tarot', initiate: 'tarot', monstrous: 'scrap', chosen: 'tag' };
+/* trim colors: the journal's own (each reader sees their own ink), one of the six inks (ink is its place in INKS), or the player's dice */
+var PCOLS = [{ id: '', name: 'The journal\'s', ink: -1 }, { id: 'ox', name: 'Oxblood', ink: 0 }, { id: 'moss', name: 'Graveyard moss', ink: 1 }, { id: 'midnight', name: 'Midnight blue', ink: 2 }, { id: 'brass', name: 'Brass', ink: 3 }, { id: 'rust', name: 'Rust', ink: 4 }, { id: 'dust', name: 'Dust', ink: 5 }, { id: 'dice', name: 'Match my dice', ink: -1 }], PCOL = {};
+/* backgrounds the journal has already: the dice trays' photographs */
+var PBGS = [{ id: '', name: 'None', src: '' }, { id: 'rust', name: 'Rust', src: 'img/tray-rust.jpg' }, { id: 'dust', name: 'Dust', src: 'img/tray-dust.jpg' }, { id: 'concrete', name: 'Concrete', src: 'img/tray-concrete.jpg' }, { id: 'leather', name: 'Leather', src: 'img/tray.jpg' }, { id: 'slate', name: 'Slate', src: 'img/tray-slate.jpg' }, { id: 'wood', name: 'Wood', src: 'img/tray-wood.jpg' }], PBG = {};
+var CASES = [
+  { id: 'badges', name: 'Badge case', what: 'Your pinned badges, big, with their lines.' },
+  { id: 'sig', name: 'Signature', what: 'One weapon, one move and one bond you choose to feature.' },
+  { id: 'about', name: 'About', what: 'A few lines in your own words.' },
+  { id: 'dice', name: 'The dice', what: 'Your two dice and your tray, as they are.' },
+  { id: 'career', name: 'Career', what: 'Sessions, rolls, misses, harm and level-ups so far.' },
+  { id: 'gallery', name: 'Gallery', what: 'Up to three of your own pictures.' }
+], CASEN = {}, CASE0 = ['badges', 'sig', 'about', 'dice'], ARTRX = /^[0-9a-f]{18}$/;
+FRAMES.forEach(function (f) { FRAME[f.id] = f; }); PCOLS.forEach(function (c) { PCOL[c.id] = c; }); PBGS.forEach(function (b) { PBG[b.id] = b; }); CASES.forEach(function (c) { CASEN[c.id] = c; });
+var cz = { q: '', say: '', busy: false, kind: 'pic', del: '' }, hp = { id: '', back: null };
+
+function pgHas(o, k) { return typeof k === 'string' && Object.prototype.hasOwnProperty.call(o, k); }
+/* text from a save or from another player: cut to length, control characters out (line breaks kept only where asked) */
+function pgStr(v, max, lines) {
+  var o = '', i, c;
+  if (typeof v !== 'string') return '';
+  for (i = 0; i < v.length && o.length < max; i++) { c = v.charCodeAt(i); o += c === 10 && lines ? '\n' : (c < 32 || c === 127 || c === 8232 || c === 8233) ? ' ' : v.charAt(i); }
+  return o;
+}
+function pageClean(p) {
+  p = p && typeof p === 'object' && !Array.isArray(p) ? p : {};
+  var sig = p.sig && typeof p.sig === 'object' ? p.sig : {}, art = p.art && typeof p.art === 'object' ? p.art : {};
+  var num = function (v, lo, hi, d) { v = Math.round(Number(v)); return isFinite(v) ? clamp(v, lo, hi) : d; }, id = function (v) { return typeof v === 'string' && ARTRX.test(v) ? v : ''; };
+  return { mark: p.mark && pgHas(SIGILS, p.mark) ? p.mark : '', epithet: pgStr(p.epithet, 40), frame: p.frame === 'own' || pgHas(FRAME, p.frame) ? p.frame : '', col: pgHas(PCOL, p.col) ? p.col : '', bg: p.bg === 'own' || pgHas(PBG, p.bg) ? p.bg : '',
+    dim: num(p.dim, 0, 90, 55), blur: num(p.blur, 0, 12, 0), fw: num(p.fw, 6, 40, 18), about: pgStr(p.about, 400, true),
+    cases: Array.isArray(p.cases) ? p.cases.filter(function (c, i, a) { return pgHas(CASEN, c) && a.indexOf(c) === i; }) : CASE0.slice(),
+    sig: { weapon: pgStr(sig.weapon, 60), move: pgStr(sig.move, 60), bond: pgStr(sig.bond, 60) },
+    art: { bg: id(art.bg), frame: id(art.frame), pframe: id(art.pframe), gal: (Array.isArray(art.gal) ? art.gal : []).map(id).filter(function (x, i, a) { return x && a.indexOf(x) === i; }).slice(0, 3) } };
+}
+function pageOf(sh) { if (!sh.page || !Array.isArray(sh.page.cases) || !sh.page.art) sh.page = pageClean(sh.page); return sh.page; }
+/* A trim color that can be read on the surface it will sit on: an ink's own color for that theme, or whichever of the die's two colors stands out more,
+   pushed towards black (on paper) or white (on dark) until it reaches 4.5 to 1. */
+function trimFor(col, dice, pal, sf) {
+  var c = '', i, ink;
+  if (col === 'dice') { if (!dice || !dice.a || !/^#[0-9a-f]{6}$/i.test(dice.a.body) || !/^#[0-9a-f]{6}$/i.test(dice.a.pip)) return ''; c = contrast(dice.a.body, sf) >= contrast(dice.a.pip, sf) ? dice.a.body : dice.a.pip; }
+  else if (PCOL[col] && PCOL[col].ink >= 0) { ink = INKS[PCOL[col].ink]; c = pal === 'light' ? ink.l : ink.d; }
+  if (!c) return '';
+  for (i = 0; i < 16 && contrast(c, sf) < 4.5; i++) c = mixHex(c, pal === 'light' ? 0 : 255, .14);
+  return c;
+}
+function artUrl(id) { return tblUrl('/api/art/' + id); }
+/* what a look comes to on the page: the classes, the custom properties, the background picture. d is a card (mine or another player's); its page has been through pageClean. */
+function pageLook(d, dice) {
+  var p = pageClean(d.page), start = PBFRAME[pbSlug(d.playbook)] || 'journal';
+  var own = p.frame === 'own' && !!p.art.frame && tbl.on, f = FRAME[own ? 'journal' : p.frame === 'own' ? start : (p.frame || start)] || FRAME.journal, st = '', l, k, src = '';
+  if (p.col) {
+    l = trimFor(p.col, dice, 'light', f.pal === 'light' ? f.sf : '#e6dccb'); k = trimFor(p.col, dice, 'dark', f.pal === 'dark' ? f.sf : '#26191d');
+    if (l) st += '--pcl:' + l + ';'; if (k) st += '--pcd:' + k + ';';
+  }
+  if (p.bg === 'own') { if (p.art.bg && tbl.on) src = artUrl(p.art.bg); } else if (PBG[p.bg]) src = PBG[p.bg].src;
+  if (own) st += '--fimg:url(\'' + artUrl(p.art.frame) + '\');--fw:' + p.fw + '%;';
+  return { p: p, frame: own ? 'own' : f.id, cls: 'fr fr-' + (own ? 'own' : f.id) + (f.pal && !own ? ' pal-' + f.pal : ''), style: st, bg: src, dim: p.dim, blur: p.blur };
+}
+function frStyle(look) { return look.style ? ' style="' + esc(look.style) + '"' : ''; }
+function frBg(look, small) {
+  return look.bg ? '<div class="frbg" style="background-image:url(\'' + esc(look.bg) + '\');' + (look.blur ? 'filter:blur(' + look.blur + 'px);transform:scale(1.1);' : '') + '--dim:' + (Math.min(92, look.dim + (small ? 22 : 0)) / 100) + '"></div>' : '';
+}
+function roman(n) {
+  var out = '', t = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+  n = clamp(Math.round(+n) || 0, 0, 39); if (!n) return '0';
+  t.forEach(function (x) { while (n >= x[0]) { out += x[1]; n -= x[0]; } });
+  return out;
+}
+/* what a frame writes on the card itself. It repeats what the card already says in words, so a screen reader skips it. */
+function frameTop(look, d) {
+  var f = look.frame;
+  if (f === 'wanted') return '<div class="frtop" aria-hidden="true">Wanted<small>Alive, preferably</small></div>';
+  if (f === 'dossier') return '<div class="frtop" aria-hidden="true"><span>Case file</span><span>' + esc(String(d.playbook || 'Hunter').replace(/^The\s+/i, '')) + '</span></div>';
+  if (f === 'tarot') return '<div class="frtop" aria-hidden="true">' + roman(d.level) + '</div>';
+  if (f === 'tag' || f === 'scrap') return '<div class="frtop" aria-hidden="true"></div>';
+  return '';
+}
+function frameBot(look, d) {
+  var f = look.frame;
+  if (f === 'wanted') return '<div class="frbot" aria-hidden="true">For hunting monsters</div>';
+  if (f === 'tarot') return '<div class="frbot" aria-hidden="true">' + esc(d.playbook || 'The Hunter') + '</div>';
+  return '';
+}
+function frameStamp(look, d) {
+  if (look.frame !== 'dossier') return '';
+  var hurt = d.unstable || (+d.harm || 0) >= 4;
+  return '<div class="frstamp' + (hurt ? '' : ' ok') + '" aria-hidden="true">' + (d.unstable ? 'Unstable' : hurt ? 'Wounded' : 'Active') + '</div>';
+}
+function markHTML(key) { return key && pgHas(SIGILS, key) ? '<svg class="mk" viewBox="0 0 24 24" role="img" aria-label="Their mark: ' + esc(SIGLABEL[key] || key) + '" focusable="false">' + SIGILS[key] + '</svg>' : ''; }
+/* a hunter's mark in their own trim color, for beside a name in the seat list and the roll feed */
+function markOf(card, dice) {
+  var p = card && card.page; if (!p || !p.mark) return '';
+  var look = pageLook(card, dice), st = look.style.replace(/--f(img|w):[^;]*;/g, '');
+  return '<span class="fr"' + (st ? ' style="' + esc(st) + '"' : '') + '>' + markHTML(p.mark) + '</span>';
+}
+function tblMark(id) { var m = tblFind(id); return m ? markOf(m.card, m.dice) : ''; }
+/* the Keeper's desk: every picture the players have uploaded, with a way to remove one */
+function kartHTML() {
+  if (!tbl.artAll || !tbl.artAll.length) return '';
+  return '<h3 class="khead">Pictures from the players</h3><p class="small muted">What the players have uploaded for the pages of their hunters. You can remove any that should not be here.</p><ul class="kart">' + tbl.artAll.map(function (a) {
+    return '<li><img src="' + esc(artUrl(a.id)) + '" alt="A picture from ' + esc(a.name || 'a player') + '" loading="lazy"><div><p class="small" style="margin:0"><b>' + esc(a.name || 'A player') + '</b></p><div class="actions" style="margin-top:4px">' +
+      (tbl.artDel === a.id ? '<button class="btn sm" type="button" data-kart="yes" data-id="' + a.id + '">Remove it</button><button class="btn ghost sm" type="button" data-kart="no">Keep it</button>' : '<button class="btn ghost sm" type="button" data-kart="del" data-id="' + a.id + '">Remove</button>') + '</div></div></li>';
+  }).join('') + '</ul>';
+}
+function pfrHTML(p) { return p.art.pframe && tbl.on ? '<img class="pfr" src="' + esc(artUrl(p.art.pframe)) + '" alt="">' : ''; }
+function pinCount(d, id, i, you) { var e = you ? S.sheet.badges[id] : null; return e ? e.n : (Array.isArray(d.pinn) ? +d.pinn[i] || 0 : 0); }
+
+/* one showcase. Mine get a hint when there is nothing in them yet; on anyone else's page an empty one is left out. */
+function showcaseHTML(id, d, p, you) {
+  var h = '', hint = function (t) { return you ? '<p class="hp-hint small">' + t + '</p>' : ''; }, pins, c, n, s, dd;
+  if (id === 'badges') {
+    pins = (Array.isArray(d.pins) ? d.pins : []).filter(badgeHas).slice(0, 5);
+    h = pins.length ? '<ul class="hp-badges">' + pins.map(function (b, i) { n = pinCount(d, b, i, you); return '<li>' + badgeSVG(b, { n: n, label: false }) + '<div><b>' + esc(BADGE[b].name) + '</b>' + (n > 1 ? ' <span class="muted">x' + n + '</span>' : '') + '<p class="small">' + esc(BADGE[b].line) + '</p></div></li>'; }).join('') + '</ul>'
+      : hint('No badges pinned yet. They are handed out when the Keeper ends a session; pin up to five from the Badges card on My sheet.');
+  } else if (id === 'sig') {
+    s = p.sig; dd = function (t, v) { return v ? '<div><dt>' + t + '</dt><dd>' + esc(v) + '</dd></div>' : ''; };
+    h = dd('Weapon of choice', s.weapon) + dd('Signature move', s.move) + dd('Closest bond', s.bond);
+    h = h ? '<dl class="hp-sig">' + h + '</dl>' : hint('Pick a weapon, a move and a bond to feature, under Signature.');
+  } else if (id === 'about') {
+    h = p.about.trim() ? '<p class="hp-about">' + esc(p.about.trim()) + '</p>' : hint('A few lines in your own words. Write them under About.');
+  } else if (id === 'dice') {
+    h = d.dice && d.dice.a && d.dice.b ? '<div class="tray mini hp-tray" data-tray="' + esc(d.dice.tray || 'leather') + '" role="img" aria-label="Their two dice"><span class="dice">' + miniDie(6, d.dice.a) + miniDie(5, d.dice.b) + '</span></div>' : '';
+  } else if (id === 'career') {
+    c = d.career || {};
+    h = (+c.sessions || 0) + (+c.rolls || 0) > 0 ? '<ul class="strip" style="margin:0">' + [[c.sessions, 'sessions'], [c.rolls, 'rolls'], [c.misses, 'misses'], [c.harm, 'harm taken'], [c.lvls, 'level-ups']].map(function (x) { return '<li><b>' + (+x[0] || 0) + '</b>' + x[1] + '</li>'; }).join('') + '</ul>'
+      : hint('Nothing counted yet. The numbers come from sessions the Keeper has ended.');
+  } else if (id === 'gallery') {
+    h = p.art.gal.length && tbl.on ? '<div class="hp-gal">' + p.art.gal.map(function (a, i) { return '<button type="button" data-artimg="' + a + '" aria-label="Open picture ' + (i + 1) + '"><img src="' + esc(artUrl(a)) + '" alt="Picture ' + (i + 1) + ' from ' + esc(d.name || 'this hunter') + '\'s gallery" loading="lazy"></button>'; }).join('') + '</div>'
+      : hint(tbl.on ? 'Add up to three of your pictures to the gallery, under Your pictures.' : 'The gallery shows pictures kept at the shared table, so it needs the table.');
+  }
+  return h ? '<section class="hp-case" data-case="' + id + '"><h3>' + CASEN[id].name + '</h3>' + h + '</section>' : '';
+}
+/* the whole page: the header (portrait, name, mark, title, level, pinned badges, ratings and meters) and then the showcases in the player's order */
+function pageHTML(d, you) {
+  var look = pageLook(d, d.dice), p = look.p, st = d.stats || {}, lv = +d.level || 0, by = d.who || '';
+  var img = d.photo && d.photo !== ' ' ? '<img class="ph0" src="' + esc(d.photo) + '" alt="Portrait of ' + esc(d.name || 'a hunter') + '">' : '<div class="ph">No photo</div>';
+  var pins = (Array.isArray(d.pins) ? d.pins : []).filter(badgeHas).slice(0, 5);
+  var stats = STATS.map(function (s) { return '<li class="chip">' + STATNAME[s] + ' ' + fmt(+st[s] || 0) + '</li>'; }).join('');
+  var flags = (d.unstable ? '<li class="chip" style="color:var(--bad);border-color:var(--bad)">Unstable</li>' : '') + (d.armor ? '<li class="chip">Armor ' + (+d.armor) + '</li>' : '');
+  return '<div class="hpage ' + look.cls + '"' + frStyle(look) + '>' + frBg(look, false) + '<div class="hp-in">' + frameTop(look, d) +
+    '<header class="hp-head hp-case"><div class="hp-por">' + img + pfrHTML(p) + '</div><div class="hp-id"><div class="hp-top"><div><h2>' + esc(d.name || 'Unnamed hunter') + ' ' + markHTML(p.mark) + '</h2>' + (p.epithet.trim() ? '<p class="epi">' + esc(p.epithet.trim()) + '</p>' : '') + '</div>' +
+    '<span class="lvplate" role="img" aria-label="Level ' + lv + '"><small>Level</small>' + lv + '</span></div>' +
+    '<p class="small muted">' + esc(d.playbook || 'No playbook yet') + (d.pronouns ? ' &middot; ' + esc(String(d.pronouns).slice(0, 40)) : '') + (by && !you ? ' &middot; played by ' + esc(by) : '') + '</p>' +
+    (d.catchline ? '<p class="catch">&ldquo;' + esc(d.catchline) + '&rdquo;</p>' : '') +
+    (pins.length && p.cases.indexOf('badges') < 0 ? '<ul class="pins" aria-label="Pinned badges">' + pins.map(function (b, i) { return '<li title="' + esc(BADGE[b].name + ': ' + BADGE[b].line) + '">' + badgeSVG(b, { cls: 'b-sm', n: pinCount(d, b, i, you) }) + '</li>'; }).join('') + '</ul>' : '') +
+    '<ul class="chips" style="margin:2px 0">' + stats + flags + '</ul>' +
+    '<div class="meters"><div><span>Luck</span>' + meter(+d.luck || 0, 7, 'luck', 'Luck') + '</div><div><span>Harm</span>' + meter(+d.harm || 0, 8, 'harm', 'Harm') + '</div><div><span>XP</span>' + meter(Math.min(+d.xp || 0, 5), 5, 'xp', 'XP') + '</div></div>' +
+    (d.look ? '<p class="small">' + esc(d.look) + '</p>' : '') + '</div></header>' +
+    p.cases.map(function (c) { return showcaseHTML(c, d, p, you); }).join('') + frameBot(look, d) + '</div>' + frameStamp(look, d) + '</div>';
+}
+/* my own hunter as a card, whether or not it is being shown to the table */
+function myDoc() {
+  var o = partyBody(), sh = S.sheet;
+  if (!o.photo || o.photo === ' ') o.photo = sh.photo || '';
+  o.id = myId() || 'me'; o.dice = { a: curDie(0), b: curDie(1), tray: S.dice.tray }; o.who = '';
+  return o;
+}
+
+/* ---- the page as a dialog, from Open page on a card ---- */
+function hpDoc() { for (var i = 0; i < party.docs.length; i++) if (party.docs[i].id === hp.id) return party.docs[i]; return null; }
+function hpDraw() {
+  var dlg = $('#hpdlg'), d = hpDoc(), you;
+  if (!dlg || !dlg.open) return;
+  if (!d) { $('#hpdlg-body').innerHTML = '<div class="empty">This hunter is no longer at the table.</div>'; $('#hpdlg-edit').hidden = true; return; }
+  you = d.id === myId();
+  dlg.setAttribute('aria-label', (d.name || 'A hunter') + ', their page');
+  $('#hpdlg-body').innerHTML = pageHTML(d, you); $('#hpdlg-edit').hidden = !you;
+}
+function hpOpen(id, from) {
+  var dlg = $('#hpdlg'); if (!dlg) return;
+  hp.id = id; hp.back = from || null;
+  if (!dlg.open) { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', ''); }
+  hpDraw(); $('#hpdlg-close').focus();
+}
+function hpClose() {
+  var dlg = $('#hpdlg'), back = hp.back && document.contains(hp.back) ? hp.back : $('[data-hpage="' + hp.id + '"]');   // the Party tab may have been redrawn while the page was open: find the button again
+  if (dlg.close) dlg.close(); else dlg.removeAttribute('open');
+  hp.id = ''; hp.back = null; if (back) back.focus();
+}
+
+/* ---- Customize: My page on the Hunter tab ---- */
+function czPrev() {
+  var host = $('#czprev'), d; if (!host) return;
+  d = myDoc();
+  host.innerHTML = '<p class="small muted" style="margin:0">Your page, as the others see it when they open your card.</p>' + pageHTML(d, true) +
+    '<p class="small muted" style="margin:0">And your card on the Party tab.</p>' + partyCard(d);
+  $$('#czprev [data-hpage]').forEach(function (b) { b.parentNode.removeChild(b); });
+}
+function czMarks() {
+  var p = pageOf(S.sheet), q = cz.q.trim().toLowerCase(), keys = Object.keys(SIGILS).filter(function (k) { return !q || String(SIGLABEL[k] || k).toLowerCase().indexOf(q) >= 0; });
+  return '<p class="small muted" id="czmarkn" style="margin:6px 0 0">' + (q ? keys.length + ' of ' + Object.keys(SIGILS).length + ' match' : Object.keys(SIGILS).length + ' to choose from') + '</p>' +
+    (keys.length ? '<div class="czmarks" role="group" aria-label="Marks">' + keys.map(function (k) { return '<button type="button" data-cz="mark" data-v="' + esc(k) + '" title="' + esc(SIGLABEL[k] || k) + '" aria-label="' + esc(SIGLABEL[k] || k) + '" aria-pressed="' + (p.mark === k) + '"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + SIGILS[k] + '</svg></button>'; }).join('') + '</div>' : '');
+}
+function czUses(p, id) {
+  var u = [];
+  if (p.art.bg === id && p.bg === 'own') u.push('background'); if (p.art.frame === id && p.frame === 'own') u.push('card frame'); if (p.art.pframe === id) u.push('portrait frame'); if (p.art.gal.indexOf(id) >= 0) u.push('gallery');
+  return u;
+}
+function czArt() {
+  var p = pageOf(S.sheet), list = tbl.art, h;
+  if (!tbl.on) return '<p class="small muted" style="margin:0">Your own pictures are kept at the shared table, so that everyone can see them. Open the journal from your group\'s site, signed in, to add some. Everything above works without it.</p>';
+  if (!list) return '<p class="small muted" style="margin:0">Looking in your locker...</p>';
+  h = '<p class="small muted" style="margin:0">Up to six pictures of your own, kept at the table: ' + list.length + ' of 6 used. Everyone signed in to the table can see them, and you or the Keeper can remove one. A picture is shrunk before it is sent, and anything hidden in the file is dropped.</p>' +
+    '<input type="file" id="cz-file" accept="image/*" hidden>' +
+    '<div class="actions"><button class="btn sm" type="button" data-cz="art-add" data-v="pic"' + (list.length >= 6 || cz.busy ? ' disabled' : '') + '>Upload a picture</button><button class="btn ghost sm" type="button" data-cz="art-add" data-v="frame"' + (list.length >= 6 || cz.busy ? ' disabled' : '') + '>Upload a frame</button></div>' +
+    '<p class="small muted" style="margin:6px 0 0">A frame is a picture with a clear middle (a PNG or WebP with see-through in it). It is kept as it is; a plain picture is saved as a JPEG.</p>' +
+    '<p class="small" role="status" id="cz-say" style="margin:6px 0 0">' + esc(cz.say) + '</p>';
+  if (list.length) h += '<ul class="czart">' + list.map(function (a, i) {
+    var uses = czUses(p, a.id), on = function (k) { return uses.indexOf(k) >= 0; }, b = function (k, t) { return '<button class="btn ghost sm" type="button" data-cz="art-use" data-v="' + k + '" data-id="' + a.id + '" aria-pressed="' + on(t) + '">' + t.charAt(0).toUpperCase() + t.slice(1) + '</button>'; };
+    return '<li><img src="' + esc(artUrl(a.id)) + '" alt="Your picture ' + (i + 1) + '" loading="lazy"><div><p class="small" style="margin:0"><b>Picture ' + (i + 1) + '</b> <span class="muted">' + Math.max(1, Math.round(a.size / 1024)) + ' KB' + (uses.length ? ' &middot; used as ' + uses.join(', ') : '') + '</span></p>' +
+      (cz.del === a.id ? '<div class="confirm" style="margin-top:6px"><p><b>Remove this picture?</b> It comes off your page and out of the table for good.</p><div class="actions" style="margin-top:0"><button class="btn sm" type="button" data-cz="art-del-yes" data-id="' + a.id + '">Remove it</button><button class="btn ghost sm" type="button" data-cz="art-del-no">Keep it</button></div></div>'
+        : '<div class="actions">' + b('bg', 'background') + b('frame', 'card frame') + b('pframe', 'portrait frame') + b('gal', 'gallery') + '<button class="btn ghost sm" type="button" data-cz="art-del" data-id="' + a.id + '">Remove</button></div>') + '</div></li>';
+  }).join('') + '</ul>';
+  return h;
+}
+function renderPageEd() {
+  var host = $('#czopts'); if (!host) return;
+  var sh = S.sheet, p = pageOf(sh), start = FRAME[PBFRAME[pbSlug(sh.playbook)] || 'journal'], h = '', dice = { a: curDie(0) };
+  var chip = function (k, v, on, t) { return '<button type="button" class="chip" data-cz="' + k + '" data-v="' + v + '" aria-pressed="' + on + '">' + t + '</button>'; };
+  var frb = function (v, cls, name, on) { return '<button type="button" data-cz="frame" data-v="' + v + '" aria-pressed="' + on + '"><span class="sw ' + cls + '" aria-hidden="true"></span>' + name + '</button>'; };
+  /* frame */
+  h += '<div class="card"><span class="lbl">Frame</span><div class="czfr" role="group" aria-label="Frame">' +
+    frb('', 'fr fr-' + start.id + (start.pal ? ' pal-' + start.pal : ''), 'Suits my playbook', !p.frame) +
+    FRAMES.map(function (f) { return frb(f.id, 'fr fr-' + f.id + (f.pal ? ' pal-' + f.pal : ''), f.name, p.frame === f.id); }).join('') +
+    frb('own', 'fr-own', 'My own artwork', p.frame === 'own') + '</div>' +
+    (p.frame === 'own' ? (p.art.frame && tbl.on ? '<label class="volrow" style="margin-top:10px"><span>Border</span><input type="range" id="cz-fw" min="6" max="40" step="1" value="' + p.fw + '"></label><p class="small muted" style="margin:4px 0 0">How much of your picture is border. Slide it until the corners look right.</p>'
+      : '<p class="small" style="margin:10px 0 0">Upload a frame under Your pictures and press Card frame on it. Until then your card keeps the frame that suits your playbook.</p>') : '') + '</div>';
+  /* color */
+  h += '<div class="card"><span class="lbl">Color</span><div class="chips" role="group" aria-label="Trim color">' + PCOLS.map(function (c) {
+    var sw = c.ink >= 0 ? '<i class="czsw" style="--sl:' + INKS[c.ink].l + ';--sd:' + INKS[c.ink].d + '"></i>' : c.id === 'dice' ? '<i class="czsw" style="--sl:' + (trimFor('dice', dice, 'light', '#e6dccb') || '#888') + ';--sd:' + (trimFor('dice', dice, 'dark', '#26191d') || '#888') + '"></i>' : '';
+    return chip('col', c.id, p.col === c.id, sw + esc(c.name));
+  }).join('') + '</div><p class="small muted" style="margin:8px 0 0">The color goes on the trim, your mark and your title, on everyone\'s screen. With The journal\'s, each reader sees their own ink.</p></div>';
+  /* mark and title */
+  h += '<div class="card"><label class="lbl" for="cz-epi">Title</label><div class="addrow" style="grid-template-columns:minmax(0,1fr) auto"><input type="text" id="cz-epi" maxlength="40" autocomplete="off" placeholder="the Dust Saint" value="' + esc(p.epithet) + '"><button class="btn ghost" type="button" data-cz="epi">Suggest one</button></div>' +
+    '<span class="lbl" style="margin-top:14px">Mark' + (p.mark ? ': <span class="signame">' + esc(SIGLABEL[p.mark] || p.mark) + '</span>' : '') + '</span><p class="small muted" style="margin:0 0 8px">Your emblem. It sits beside your name on your card, in the list of who is at the table, and next to every roll you make.</p>' +
+    '<div class="addrow" style="grid-template-columns:minmax(0,1fr) auto"><input type="search" id="cz-q" placeholder="Search the marks: skull, wrench, moon" aria-label="Search the marks" value="' + esc(cz.q) + '"><button class="btn ghost" type="button" data-cz="mark" data-v=""' + (p.mark ? '' : ' disabled') + '>No mark</button></div><div id="czmarkbox">' + czMarks() + '</div></div>';
+  /* background */
+  h += '<div class="card"><span class="lbl">Background</span><div class="chips" role="group" aria-label="Background">' + PBGS.map(function (b) { return chip('bg', b.id, p.bg === b.id, esc(b.name)); }).join('') + chip('bg', 'own', p.bg === 'own', 'My own picture') + '</div>' +
+    (p.bg === 'own' && !(p.art.bg && tbl.on) ? '<p class="small" style="margin:10px 0 0">Upload a picture under Your pictures and press Background on it.</p>' : '') +
+    (p.bg ? '<label class="volrow" style="margin-top:10px"><span>Dim</span><input type="range" id="cz-dim" min="0" max="90" step="5" value="' + p.dim + '"></label><label class="volrow"><span>Blur</span><input type="range" id="cz-blur" min="0" max="12" step="1" value="' + p.blur + '"></label><p class="small muted" style="margin:4px 0 0">Dim lays your card\'s own color over the picture so the words stay easy to read.</p>' : '') + '</div>';
+  /* showcases */
+  var order = p.cases.concat(CASES.map(function (c) { return c.id; }).filter(function (c) { return p.cases.indexOf(c) < 0; }));
+  h += '<div class="card"><span class="lbl">Showcases</span><p class="small muted" style="margin:0 0 8px">Tick the ones your page has, and put them in your order.</p><ul class="czcases">' + order.map(function (id) {
+    var on = p.cases.indexOf(id), c = CASEN[id];
+    return '<li><label><input type="checkbox" data-cz-case="' + id + '"' + (on >= 0 ? ' checked' : '') + '><span><b>' + c.name + '</b><br><span class="small muted">' + c.what + '</span></span></label>' +
+      '<span class="mv"><button class="btn ghost sm" type="button" data-cz="case-up" data-v="' + id + '" aria-label="Move ' + c.name + ' up"' + (on > 0 ? '' : ' disabled') + '>Up</button><button class="btn ghost sm" type="button" data-cz="case-down" data-v="' + id + '" aria-label="Move ' + c.name + ' down"' + (on >= 0 && on < p.cases.length - 1 ? '' : ' disabled') + '>Down</button></span></li>';
+  }).join('') + '</ul></div>';
+  /* signature and about */
+  var opts = function (list, cur) { var seen = {}, all = (cur && list.indexOf(cur) < 0 ? [cur] : []).concat(list).filter(function (x) { x = String(x || '').trim(); if (!x || seen[x]) return false; seen[x] = 1; return true; }); return '<option value="">None</option>' + all.map(function (x) { x = String(x).trim().slice(0, 60); return '<option' + (x === cur ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join(''); };
+  h += '<div class="card"><span class="lbl">Signature</span><div class="cols"><div><label class="small" for="cz-sw">Weapon of choice</label><select id="cz-sw" data-cz-sig="weapon">' + opts(sh.inventory.filter(function (i) { return i.type === 'Weapon'; }).map(function (i) { return i.name; }), p.sig.weapon) + '</select></div>' +
+    '<div><label class="small" for="cz-sm">Signature move</label><select id="cz-sm" data-cz-sig="move">' + opts(allMoveNames().concat(['Kick Some Ass', 'Act Under Pressure', 'Help Out', 'Investigate a Mystery', 'Manipulate Someone', 'Protect Someone', 'Read a Bad Situation', 'Use Magic']), p.sig.move) + '</select></div></div>' +
+    '<div style="margin-top:10px"><label class="small" for="cz-sb">Closest bond</label><select id="cz-sb" data-cz-sig="bond">' + opts(sh.bonds.map(function (b) { return b.who; }), p.sig.bond) + '</select></div>' +
+    '<p class="small muted" style="margin:8px 0 0">Weapons come from your inventory, moves from your sheet, and bonds from History and bonds.</p>' +
+    '<label class="lbl" for="cz-about" style="margin-top:14px">About</label><textarea id="cz-about" maxlength="400" rows="4" placeholder="What should the table know about this hunter?">' + esc(p.about) + '</textarea></div>';
+  /* the art locker */
+  h += '<div class="card" id="czartcard"><span class="lbl">Your pictures</span>' + czArt() + '</div>';
+  host.innerHTML = h;
+  czPrev();
+}
+function czSaved(again) {
+  scheduleSave(); renderPageEd();
+  if (S.tab === 'party') renderParty();
+  var b = again ? $(again) : null; if (b) b.focus();
+}
+function epiPool() { var a = NM.epi.slice(), k; for (k in NMF) if (NMF[k] && Array.isArray(NMF[k].epi)) a = a.concat(NMF[k].epi); return a; }
+
+/* ---- the art locker: my own pictures, kept at the table ---- */
+function artList(j, all) {
+  return j && Array.isArray(j.art) ? j.art.filter(function (a) { return a && typeof a === 'object' && ARTRX.test(a.id); }).slice(0, all ? 240 : 12).map(function (a) { return { id: a.id, size: tblInt(a.size, 0, 9e6, 0), owner: /^[0-9a-f]{12}$/.test(a.owner) ? a.owner : '', name: tblStr(a.name, 30) }; }) : [];
+}
+function artLoad() {
+  if (!tbl.on) return;
+  fetch(tblUrl('/api/art'), { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+    if (!j) return;
+    tbl.art = artList(j, false); artTidy();
+    if (S.hv === 'page') renderPageEd();
+  }).catch(function () {});
+}
+function artAllLoad() {
+  if (!tbl.on || !tbl.me.keeper) return;
+  fetch(tblUrl('/api/art?all=1'), { credentials: 'same-origin', cache: 'no-store' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (j) { if (j) { tbl.artAll = artList(j, true); tblDraw(); } }).catch(function () {});
+}
+/* a picture that is no longer in my locker comes off every hunter of mine */
+function artScrub(sh, keep) {
+  var p = pageOf(sh), a = p.art, before = JSON.stringify(a), ok = function (id) { return id && keep(id) ? id : ''; };
+  p.art = { bg: ok(a.bg), frame: ok(a.frame), pframe: ok(a.pframe), gal: a.gal.filter(function (id) { return keep(id); }) };
+  return JSON.stringify(p.art) !== before;
+}
+function artTidy() {
+  if (!tbl.art) return;
+  var have = {}, ch = false, keep = function (id) { return have[id] === true; };
+  tbl.art.forEach(function (a) { have[a.id] = true; });
+  if (artScrub(S.sheet, keep)) ch = true;
+  S.bench.forEach(function (e) { if (artScrub(e.sheet, keep)) ch = true; });
+  if (ch) scheduleSave();
+}
+function artGone(id) {
+  if (tbl.art) tbl.art = tbl.art.filter(function (a) { return a.id !== id; });
+  if (tbl.artAll) tbl.artAll = tbl.artAll.filter(function (a) { return a.id !== id; });
+  artTidy();
+  if (S.hv === 'page' && S.tab === 'hunter' && !$('#czopts input:focus, #czopts textarea:focus')) renderPageEd();
+}
+/* A frame keeps its clear middle, so it cannot become a JPEG: it is redrawn as a WebP where the browser can write one and as a PNG where it cannot,
+   1200 across at most, and made smaller until it is under the table's 700 KB. Redrawing also drops whatever was hidden in the file. */
+function artPrepClear(file, cb) {
+  var url = URL.createObjectURL(file), im = new Image();
+  im.onload = function () {
+    URL.revokeObjectURL(url);
+    var side = 1200, q = .9, tries = 0;
+    function go() {
+      var sc = Math.min(1, side / Math.max(im.width, im.height)), c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(im.width * sc)); c.height = Math.max(1, Math.round(im.height * sc));
+      c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      c.toBlob(function (b) {
+        if (b && b.size <= 700 * 1024) { cb(b); return; }
+        if (++tries > 14 || !b) { cb(null); return; }
+        if (b.type === 'image/webp' && q > .56) q -= .12; else side = Math.round(side * .8);
+        go();
+      }, 'image/webp', q);
+    }
+    go();
+  };
+  im.onerror = function () { URL.revokeObjectURL(url); cb(null); };
+  im.src = url;
+}
+function artUpload(blob, cb, again) {
+  fetch(tblUrl('/api/art'), { method: 'PUT', body: blob, credentials: 'same-origin' }).then(function (r) {
+    return r.json().then(function (j) { return r.status === 201 && j && ARTRX.test(j.id) ? { id: j.id } : { err: r.status === 409 ? 'full' : r.status === 413 ? 'big' : 'no' }; }, function () { return { err: 'no' }; });
+  }).then(cb, function () { if (again) cb({ err: 'no' }); else artUpload(blob, cb, true); });
+}
+function artDelete(id, cb) {
+  fetch(tblUrl('/api/art/' + id), { method: 'DELETE', credentials: 'same-origin' }).then(function (r) { cb(r.ok || r.status === 404); }, function () { cb(false); });
+}
+function czSay(t) { cz.say = t; cz.busy = false; if (S.hv === 'page') renderPageEd(); }
+function artUse(kind, id) {
+  var p = pageOf(S.sheet), a = p.art, i;
+  if (kind === 'bg') { if (a.bg === id && p.bg === 'own') { a.bg = ''; p.bg = ''; } else { a.bg = id; p.bg = 'own'; } }
+  else if (kind === 'frame') { if (a.frame === id && p.frame === 'own') { a.frame = ''; p.frame = ''; } else { a.frame = id; p.frame = 'own'; } }
+  else if (kind === 'pframe') a.pframe = a.pframe === id ? '' : id;
+  else if (kind === 'gal') {
+    i = a.gal.indexOf(id);
+    if (i >= 0) a.gal.splice(i, 1); else if (a.gal.length >= 3) { cz.say = 'The gallery holds three. Take one out first.'; return; } else { a.gal.push(id); if (p.cases.indexOf('gallery') < 0) p.cases.push('gallery'); }
+  }
+  cz.say = '';
+}
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest ? e.target.closest('[data-hpage], [data-artimg], [data-cz], [data-kart], #hpdlg-close, #hpdlg-edit, #seg-page') : null;
+  if (!t) return;
+  var d = t.dataset, p = pageOf(S.sheet), v = d.v, i, sel;
+  if (t.id === 'seg-page') { setHV('page'); scheduleSave(); return; }
+  if (t.id === 'hpdlg-close') { hpClose(); return; }
+  if (t.id === 'hpdlg-edit') { hpClose(); showTab('hunter'); setHV('page'); scheduleSave(); return; }
+  if (d.hpage) { hpOpen(d.hpage, t); return; }
+  if (d.artimg && ARTRX.test(d.artimg)) {
+    var dlg = $('#hodlg'), im = t.querySelector('img');
+    $('#hodlg-img').src = artUrl(d.artimg); $('#hodlg-img').alt = im ? im.alt : ''; $('#hodlg-cap').textContent = '';
+    tbl.back = t; if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', ''); $('#hodlg-close').focus();
+    return;
+  }
+  if (d.kart) {
+    if (d.kart === 'del') { tbl.artDel = d.id; tblDraw(); return; }
+    if (d.kart === 'no') { tbl.artDel = ''; tblDraw(); return; }
+    if (d.kart === 'yes' && ARTRX.test(d.id)) { artDelete(d.id, function (ok) { tbl.artDel = ''; tbl.msg = ok ? 'Picture removed.' : 'Could not remove that picture just now.'; if (ok) artGone(d.id); tblDraw(); }); }
+    return;
+  }
+  sel = '[data-cz="' + d.cz + '"]' + (v !== undefined ? '[data-v="' + v + '"]' : '') + (d.id ? '[data-id="' + d.id + '"]' : '');
+  if (d.cz === 'frame') { if (v !== 'own' && v && !pgHas(FRAME, v)) return; p.frame = v; }
+  else if (d.cz === 'col') { if (!pgHas(PCOL, v)) return; p.col = v; }
+  else if (d.cz === 'bg') { if (v !== 'own' && !pgHas(PBG, v)) return; p.bg = v; }
+  else if (d.cz === 'mark') { if (v && !pgHas(SIGILS, v)) return; p.mark = v; if (!v) sel = '#cz-q'; }
+  else if (d.cz === 'epi') { p.epithet = ('the ' + nmPick(epiPool())).slice(0, 40); }
+  else if (d.cz === 'case-up' || d.cz === 'case-down') {
+    i = p.cases.indexOf(v); var j = i + (d.cz === 'case-up' ? -1 : 1);
+    if (i < 0 || j < 0 || j >= p.cases.length) return;
+    p.cases.splice(j, 0, p.cases.splice(i, 1)[0]);
+    scheduleSave(); renderPageEd();
+    var b1 = $(sel); if (b1 && b1.disabled) b1 = $('[data-cz="' + (d.cz === 'case-up' ? 'case-down' : 'case-up') + '"][data-v="' + v + '"]'); if (b1) b1.focus();
+    return;
+  }
+  else if (d.cz === 'art-add') { cz.kind = v === 'frame' ? 'frame' : 'pic'; var f = $('#cz-file'); if (f) { f.value = ''; f.click(); } return; }
+  else if (d.cz === 'art-use') { if (!ARTRX.test(d.id)) return; artUse(v, d.id); }
+  else if (d.cz === 'art-del') { cz.del = d.id; renderPageEd(); var y = $('[data-cz="art-del-yes"]'); if (y) y.focus(); return; }
+  else if (d.cz === 'art-del-no') { cz.del = ''; renderPageEd(); return; }
+  else if (d.cz === 'art-del-yes') {
+    if (!ARTRX.test(d.id)) return;
+    cz.busy = true;
+    artDelete(d.id, function (ok) { cz.del = ''; if (ok) { artGone(d.id); scheduleSave(); } czSay(ok ? 'Picture removed.' : 'Could not remove it just now. Try again in a moment.'); });
+    return;
+  }
+  else return;
+  czSaved(sel);
+});
+document.addEventListener('input', function (e) {
+  var t = e.target, p; if (!t.closest || !t.closest('#czopts')) return;
+  p = pageOf(S.sheet);
+  if (t.id === 'cz-epi') p.epithet = pgStr(t.value, 40);
+  else if (t.id === 'cz-about') p.about = pgStr(t.value, 400, true);
+  else if (t.id === 'cz-dim') p.dim = clamp(Math.round(+t.value) || 0, 0, 90);
+  else if (t.id === 'cz-blur') p.blur = clamp(Math.round(+t.value) || 0, 0, 12);
+  else if (t.id === 'cz-fw') p.fw = clamp(Math.round(+t.value) || 18, 6, 40);
+  else if (t.id === 'cz-q') { cz.q = String(t.value || '').slice(0, 40); $('#czmarkbox').innerHTML = czMarks(); return; }
+  else return;
+  scheduleSave(); czPrev();
+});
+document.addEventListener('change', function (e) {
+  var t = e.target, p, i; if (!t.closest || !t.closest('#czopts')) return;
+  p = pageOf(S.sheet);
+  if (t.dataset.czCase) {
+    if (!pgHas(CASEN, t.dataset.czCase)) return;
+    i = p.cases.indexOf(t.dataset.czCase);
+    if (t.checked && i < 0) p.cases.push(t.dataset.czCase); else if (!t.checked && i >= 0) p.cases.splice(i, 1);
+    czSaved('[data-cz-case="' + t.dataset.czCase + '"]');
+  } else if (t.dataset.czSig) {
+    if (!pgHas(p.sig, t.dataset.czSig)) return;
+    p.sig[t.dataset.czSig] = pgStr(t.value, 60); scheduleSave(); czPrev();
+  } else if (t.id === 'cz-file') {
+    var file = t.files && t.files[0], kind = cz.kind;
+    if (!file) return;
+    cz.busy = true; cz.say = 'Getting the picture ready...'; renderPageEd();
+    (kind === 'frame' ? artPrepClear : tblPrep)(file, function (blob) {
+      if (!blob) { czSay('That file could not be read as a picture.'); return; }
+      cz.say = 'Sending it to the table...'; if (S.hv === 'page') renderPageEd();
+      artUpload(blob, function (r) {
+        if (!r.id) { czSay(r.err === 'full' ? 'Your locker is full. Remove a picture to make room.' : r.err === 'big' ? 'That picture is too big for the table, even shrunk.' : 'The table would not take that picture. Check you are connected and try again.'); return; }
+        tbl.art = (tbl.art || []).concat([{ id: r.id, size: blob.size, owner: '', name: '' }]);
+        czSay(kind === 'frame' ? 'Frame added. Press Card frame or Portrait frame on it.' : 'Picture added. Press Background or Gallery on it.');
+      });
+    });
+  }
+});
+window.__journal.pageClean = pageClean; window.__journal.pageLook = pageLook; window.__journal.trimFor = trimFor; window.__journal.frames = FRAMES;
 
 /* ---------- first night: start here, and a backup that is easy to reach ---------- */
 function bkAgo() {

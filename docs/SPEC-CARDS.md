@@ -207,7 +207,7 @@ One token drawn by the page (`badgeSVG`), in the metal of its kind:
 
 The icon is stamped into the middle. The wear is one of the grey texture tiles the dice already use (`img/die-*.jpg`), laid over the metal and turned a different way on different badges, so no new picture files were needed and a token still draws as plain metal if a tile is missing. A badge not yet earned is a dashed outline with a faint icon; a secret nobody has found is a blank nut with a question mark.
 
-Still to come for the look, in J4: the token **stamping down** at the reveal (a hit, a puff of dust from Kenney's smoke sprites, the scorched edge), and whether the top rank's shine is enough motion or wants real frames.
+The token **stamps down** at the reveal with a hit and, since 2026-10-10, a puff of dust from Kenney's smoke sprites. Still open: whether the top rank's shine is enough motion or wants real frames.
 
 ## Running the session (the Keeper)
 
@@ -310,7 +310,7 @@ For whoever builds it. Skip this part if you only want to know what it does.
 | J3 | **Running the session.** The desk's session card, ending an episode "to be continued", the preview, the Keeper's picks, which parts to count, and discard. | M | Only the Keeper can preview or end; a player's attempt is refused; a discarded session awards nothing; a session ended the next day awards correctly. **Built 2026-10-10** (`tests/t29.js`, `tests/t30.js`, `tests/t31.js`). |
 | J4 | **The tally.** The dialog, the token drawing, the reveal, the haul, Copy for chat, reopening, and the dot for someone who missed it. | M to L | Three browsers see the same tally within two seconds; Skip, reduced motion and Big moments off all give the plain list; it fits a phone; a player who connects afterwards gets the dot and the badges. **Built 2026-10-10** (`tests/t29.js`, `tests/t30.js`, `tests/t31.js`). |
 | J5 | **Badges on the hunter.** The Badges card, pinning, tokens on the Party card and the Keeper's overview, restore from the table. | M | Badges survive a reload, a backup and a hunter switch; five pins at most; a hostile `pins` list from another player draws nothing it should not. **Built 2026-10-10** (`tests/t29.js`, `tests/t30.js`, `tests/t31.js`). |
-| J6 | **Badges on the card picture.** | S | The picture shows the pinned row and nothing spills, checked the way `tests/t14.js` checks the rest. |
+| J6 | **Badges on the card picture.** | S | The picture shows the pinned row and nothing spills, checked the way `tests/t14.js` checks the rest. **Built 2026-10-10** (`tests/t32.js`): the pinned badges sit along the foot of the portrait like medals. |
 | J7 | **Words and icons pass.** Jacob's rewrite of the names and lines, and the final icon for each badge. | S | Jacob has read them all. |
 | J8 | *(later)* The Keeper answers the end-of-session questions for the table. | M | |
 | J9 | **Milestones.** `sheet.career`, added to when a tally is applied; the six milestone badges worked out on the page from it. | S to M | A hunter who reaches 100 rolls across several nights gets Century once, and again at 200; restoring an old backup does not hand any out twice. **Built 2026-10-10** (`tests/t29.js`, `tests/t30.js`, `tests/t31.js`). |
@@ -324,6 +324,20 @@ For whoever builds it. Skip this part if you only want to know what it does.
 Jacob, 2026-10-10: "I want full customization on the card frames so someone should be able to upload their own artwork or choose from ones drawn in code. What I am picturing here is sort of the customization level equivalent to someone's Steam Page."
 
 So a hunter stops being one fixed card and becomes **a page the player lays out**, the way a Steam profile is: a picture and a frame of your choosing, a background, your colors, a featured badge row, and a stack of showcases you pick and order. The small card on the Party tab is the top of that page; opening it shows the rest.
+
+## What is built (2026-10-10)
+
+Jacob asked for a bit of everything at once (frames, the page, uploads), so the first run built L1 to L7 together, with part of L9. It is tested in `tests/t32.js`, and described for whoever works on it next in CLAUDE.md under "The hunter's page". As built, it differs from the plan below in these ways:
+
+- **Customize is a third view on the Hunter tab, My page**, not a screen opened from My sheet.
+- **The background shows on the small card too**, dimmed more than on the page, so a picture a player chose is seen at the table without opening anything.
+- **Frames bring their own paper or metal.** A wanted poster is parchment and a dog tag is steel whatever look the reader is in, so each frame carries a full set of light or dark colors for everything inside it.
+- **A frame writes on the card**: Wanted and "Alive, preferably"; a case-file header and a stamp that reads Active, Wounded or Unstable from the hunter's harm; the level in Roman numerals and the playbook as the card's title; a punched hole; a hazard stripe and rivets.
+- **The title on the card picture stands where "Monster of the Week" was**, the mark sits at the end of the name's row, and the pinned badges sit along the foot of the portrait. The picture does not draw the frame or the background yet.
+- **Uploads are one locker of six pictures**, and each picture has four buttons (Background, Card frame, Portrait frame, Gallery), not six fixed slots. PNG is accepted as well as JPEG and WebP, for frames.
+- **The Keeper's remove button** is a list of every player's pictures at the foot of the Keeper's desk.
+- **Colors**: The journal's (each reader sees their own ink), one of the six inks, or Match my dice. Whatever is chosen is pushed until it reads at 4.5 to 1 on the frame it sits on; the test checks every pair.
+- Showcases built: Badge case, Signature, About, The dice, Career, Gallery. Not built: Bonds, Trophy kills, Fallen, Guestbook.
 
 ## What a Steam page has, and what ours has
 
@@ -376,13 +390,13 @@ A player picks which showcases their page has and in what order (up and down but
 | Chunk | What the player gets | Size | Notes |
 |---|---|---|---|
 | L0 | **Crop the round portrait.** Drag or use three sliders under the photo so the circle on Play and the Roller shows the face. | S | **Built 2026-10-10** (`tests/t28.js`) after Jacob called the circle awkward. The crop is three numbers with the hunter, ready to travel with the card. |
-| L1 | **A personal mark and an epithet.** Any sigil as your emblem, beside your name in the seat list and the roll feed, on the card and the card picture; and a title under the name ("the Dust Saint"). | S to M | Reuses the dice maker's sigil picker. The widest reach for the least work, because the mark shows every time you roll. |
-| L2 | **Your colors.** Your ink colors your page on everyone's screen, or **Match my dice** takes the trim from your dice. | S to M | Colors go on the trim and the name, never under body text; the 4.5:1 check in `tests/t18.js` is extended. |
-| L3 | **The page itself.** Tapping a hunter on the Party tab opens their page: the header (portrait, name, epithet, level, mark, pinned badges) and the showcases. The first four showcases: Badge case, Signature, About, The dice. A **Customize** screen on My sheet with a live preview. | L | The frame of everything after it. |
-| L4 | **Frames drawn in code.** The journal page there is today, a wanted poster, an agency dossier, a tarot card, a dog tag, a riveted scrap plate. Each playbook starts on one that suits it. | L | Borders, stamps and corner pieces as SVG. Two first to prove the system, then the rest. |
-| L5 | **The art locker.** Uploading, shrinking, checking, storing, serving and removing a player's pictures, and the Keeper's remove button. No new look yet. | M | The Worker half reuses the Keeper's picture path. Tested like `tests/t25.js`: another player cannot remove yours, a wrong file type is refused, the limit holds. |
-| L6 | **Your own background**, or one of the journal's textures (rust, dust, concrete, leather, slate), with a dim and a blur so the text stays readable. | S to M | After L5. The contrast check runs against the dimmed picture's darkest and lightest patch. |
-| L7 | **Your own frame**, for the card and for the portrait. | M | After L4 and L5. |
+| L1 | *(built 2026-10-10)* **A personal mark and an epithet.** Any sigil as your emblem, beside your name in the seat list and the roll feed, on the card and the card picture; and a title under the name ("the Dust Saint"). | S to M | Reuses the dice maker's sigil picker. The widest reach for the least work, because the mark shows every time you roll. |
+| L2 | *(built 2026-10-10)* **Your colors.** Your ink colors your page on everyone's screen, or **Match my dice** takes the trim from your dice. | S to M | Colors go on the trim and the name, never under body text; the 4.5:1 check in `tests/t18.js` is extended. |
+| L3 | *(built 2026-10-10)* **The page itself.** Tapping a hunter on the Party tab opens their page: the header (portrait, name, epithet, level, mark, pinned badges) and the showcases. The first four showcases: Badge case, Signature, About, The dice. A **Customize** screen on My sheet with a live preview. | L | The frame of everything after it. |
+| L4 | *(built 2026-10-10)* **Frames drawn in code.** The journal page there is today, a wanted poster, an agency dossier, a tarot card, a dog tag, a riveted scrap plate. Each playbook starts on one that suits it. | L | Borders, stamps and corner pieces as SVG. Two first to prove the system, then the rest. |
+| L5 | *(built 2026-10-10)* **The art locker.** Uploading, shrinking, checking, storing, serving and removing a player's pictures, and the Keeper's remove button. No new look yet. | M | The Worker half reuses the Keeper's picture path. Tested like `tests/t25.js`: another player cannot remove yours, a wrong file type is refused, the limit holds. |
+| L6 | *(built 2026-10-10)* **Your own background**, or one of the journal's textures (rust, dust, concrete, leather, slate), with a dim and a blur so the text stays readable. | S to M | After L5. The contrast check runs against the dimmed picture's darkest and lightest patch. |
+| L7 | *(built 2026-10-10)* **Your own frame**, for the card and for the portrait. | M | After L4 and L5. |
 | L8 | **Portrait treatments.** Shape: rectangle, circle, oval cameo, polaroid, torn photo. Finish: as it is, sepia, a two-color poster look. The crop from L0 applies to all of them. | S to M | The photo itself is never changed. |
 | L9 | **More showcases:** Bonds, Career, Gallery, Trophy kills, Fallen. | M, in two or three goes | Each waits on what its row above says it needs. |
 | L10 | **Motion.** A flame border, drifting embers and smoke as frame and background choices, made from the Unity flame flipbooks and Kenney's smoke sprites; a card that flinches on everyone's Party tab when its hunter takes harm. | M | Strips of frames stepped through the way the candle flame is. Everything stops for reduced motion and for the Big moments switch. |

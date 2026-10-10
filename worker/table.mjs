@@ -8,9 +8,12 @@
 //   - Every roll of the session is kept (who, which hunter, the dice, the modifier, the move), and each hunter's own numbers for harm and Luck, part by part.
 //     worker/awards.mjs turns those into the scoreboard and the badges. The last 20 finished tallies are kept so a page can catch up on what its hunters earned.
 //
+// And each player's art locker (track L): up to six pictures of their own, for the background, frame and gallery of their hunter's page. Any signed-in member can
+// look at one; only its owner or the Keeper can remove it.
+//
 // It is only reachable through index.mjs, which has already checked who is asking and passes that on in two internal headers.
 import { DurableObject } from 'cloudflare:workers';
-import { cleanCard, cleanDice, cleanHandout, cleanName, cleanNight, cleanNote, cleanRoll, cleanTitle, imageType, LIMITS } from './clean.mjs';
+import { artType, cleanCard, cleanDice, cleanHandout, cleanName, cleanNight, cleanNote, cleanRoll, cleanTitle, imageType, LIMITS, pageArt } from './clean.mjs';
 import { tally, GAP } from './awards.mjs';
 import { isKeeper } from './access.mjs';
 
@@ -39,6 +42,7 @@ export class Table extends DurableObject {
       CREATE TABLE IF NOT EXISTS shunters (s INTEGER NOT NULL, p INTEGER NOT NULL, id TEXT NOT NULL, hid TEXT NOT NULL, name TEXT NOT NULL, playbook TEXT NOT NULL, night TEXT, at INTEGER NOT NULL, PRIMARY KEY (s, p, id, hid));
       CREATE TABLE IF NOT EXISTS tallies (n INTEGER PRIMARY KEY, t TEXT NOT NULL, at INTEGER NOT NULL);
       CREATE TABLE IF NOT EXISTS found (b TEXT PRIMARY KEY, at INTEGER NOT NULL);
+      CREATE TABLE IF NOT EXISTS art (id TEXT PRIMARY KEY, owner TEXT NOT NULL, mime TEXT NOT NULL, bytes BLOB NOT NULL, at INTEGER NOT NULL);
     `);
     // a ping from a page is answered without waking the room
     this.ctx.setWebSocketAutoResponse(new WebSocketRequestResponsePair('ping', 'pong'));
@@ -101,7 +105,60 @@ export class Table extends DurableObject {
       // The type is the one the server worked out from the bytes, never one the uploader named. Nothing here can run as a page.
       return new Response(row.bytes, { headers: { 'content-type': row.mime, 'x-content-type-options': 'nosniff', 'content-security-policy': "default-src 'none'; sandbox", 'cache-control': 'private, max-age=86400, immutable', 'content-disposition': 'inline' } });
     }
+
+    /* ---- the art locker ---- */
+    if (url.pathname === '/api/art' && request.method === 'GET') {
+      // my own pictures; the Keeper may ask for everyone's, to be able to remove one
+      if (keeper && url.searchParams.get('all') === '1') {
+        const who = new Map(this.sql.exec('SELECT id, name FROM members').toArray().map((m) => [m.id, m.name]));
+        return json({ art: this.sql.exec('SELECT id, owner, mime, LENGTH(bytes) AS size, at FROM art ORDER BY at DESC').toArray().map((r) => ({ ...r, name: who.get(r.owner) || '' })) });
+      }
+      return json({ art: this.sql.exec('SELECT id, mime, LENGTH(bytes) AS size, at FROM art WHERE owner = ? ORDER BY at', me.id).toArray(), max: LIMITS.art });
+    }
+    if (url.pathname === '/api/art' && request.method === 'PUT') {
+      const len = Number(request.headers.get('content-length') || 0);
+      if (len > LIMITS.image) return json({ error: 'too big' }, 413);
+      if (this.sql.exec('SELECT COUNT(*) AS n FROM art WHERE owner = ?', me.id).one().n >= LIMITS.art) return json({ error: 'locker full' }, 409);
+      if (this.sql.exec('SELECT COUNT(*) AS n FROM art').one().n >= LIMITS.artAll) return json({ error: 'too many pictures' }, 507);
+      const bytes = new Uint8Array(await request.arrayBuffer());
+      if (bytes.length > LIMITS.image) return json({ error: 'too big' }, 413);
+      const mime = artType(bytes);
+      if (!mime) return json({ error: 'JPEG, WebP or PNG only' }, 415);
+      const id = randomId();
+      this.sql.exec('INSERT INTO art (id, owner, mime, bytes, at) VALUES (?, ?, ?, ?, ?)', id, me.id, mime, bytes, Date.now());
+      return json({ id, mime, size: bytes.length }, 201);
+    }
+    const art = url.pathname.match(/^\/api\/art\/([0-9a-f]{18})$/);
+    if (art && request.method === 'GET') {
+      const row = this.sql.exec('SELECT mime, bytes FROM art WHERE id = ?', art[1]).toArray()[0];
+      if (!row) return json({ error: 'not found' }, 404);
+      return new Response(row.bytes, { headers: { 'content-type': row.mime, 'x-content-type-options': 'nosniff', 'content-security-policy': "default-src 'none'; sandbox", 'cache-control': 'private, max-age=86400, immutable', 'content-disposition': 'inline' } });
+    }
+    if (art && request.method === 'DELETE') {
+      const row = this.sql.exec('SELECT owner FROM art WHERE id = ?', art[1]).toArray()[0];
+      if (!row) return json({ error: 'not found' }, 404);
+      if (row.owner !== me.id && !keeper) return json({ error: 'not yours' }, 403);
+      this.sql.exec('DELETE FROM art WHERE id = ?', art[1]);
+      // the owner's card stops naming it, and every page is told, so nobody is left drawing a hole
+      const c = this.sql.exec('SELECT card, dice, at FROM cards WHERE id = ?', row.owner).toArray()[0];
+      if (c) {
+        const card = JSON.parse(c.card);
+        if (card.page && pageArt(card.page).includes(art[1])) {
+          this.ownArt(card, row.owner);
+          this.sql.exec('UPDATE cards SET card = ? WHERE id = ?', JSON.stringify(card), row.owner);
+          this.broadcast({ t: 'card', id: row.owner, card, dice: c.dice ? JSON.parse(c.dice) : null, at: c.at });
+        }
+      }
+      this.broadcast({ t: 'art-gone', id: art[1], owner: row.owner });
+      return json({ ok: true });
+    }
     return json({ error: 'not found' }, 404);
+  }
+  /* a card may only name pictures that are in its sender's own locker: anything else is dropped from it */
+  ownArt(card, owner) {
+    if (!card.page) return;
+    const mine = new Set(this.sql.exec('SELECT id FROM art WHERE owner = ?', owner).toArray().map((r) => r.id)), a = card.page.art, keep = (id) => (mine.has(id) ? id : '');
+    card.page.art = { bg: keep(a.bg), frame: keep(a.frame), pframe: keep(a.pframe), gal: a.gal.filter((id) => mine.has(id)) };
   }
 
   async member(email) {
@@ -356,6 +413,7 @@ export class Table extends DurableObject {
     } else if (m.t === 'card') {
       const card = cleanCard(m.card), dice = cleanDice(m.dice);
       if (!card) { ws.send(JSON.stringify({ t: 'err', why: 'bad card' })); return; }
+      this.ownArt(card, a.id);
       const text = JSON.stringify(card);
       if (text.length > LIMITS.card) { ws.send(JSON.stringify({ t: 'err', why: 'too big' })); return; }
       const at = Date.now();

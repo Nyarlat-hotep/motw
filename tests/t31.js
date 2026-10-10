@@ -194,6 +194,8 @@ const VALE = hunter('Sister Vale', 'The Divine', { charm: 1, cool: 1, sharp: -1,
   j = await J(A);
   check('it starts by reading the awards out one at a time', j.dlg.kind === 'tally' && j.dlg.step === 0 && j.dlg.n > 15 && /The awards/.test(await T(A, '#sessdlg .sub')) && (await A.locator('#sessdlg .reveal .bdg.b-lg').count()) === 1, JSON.stringify(j.dlg));
   check('the token lands with a stamp', (await A.evaluate(() => getComputedStyle(document.querySelector('#sessdlg .reveal .bdg')).animationName)) === 'bdgstamp');
+  const dust = await A.evaluate(() => { const pf = [...document.querySelectorAll('#sessdlg .reveal .bstamp .pf')]; return { n: pf.length, anim: pf[0] ? getComputedStyle(pf[0]).animationName : '', under: pf[0] ? !!(pf[0].compareDocumentPosition(document.querySelector('#sessdlg .reveal .bdg')) & 4) : false, wide: document.documentElement.scrollWidth <= innerWidth }; });
+  check('and kicks up dust from under it', dust.n === 8 && dust.anim === 'cpuff' && dust.under && dust.wide, JSON.stringify(dust));
   await shot(A, '09-reveal');
   const first = await T(A, '#sessdlg .reveal h3');
   await A.click('#sessdlg [data-ss="next"]');
