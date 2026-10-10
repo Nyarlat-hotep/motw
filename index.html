@@ -977,6 +977,7 @@ span.mc-out { display: grid; }
 .ptile:hover { border-color: var(--accent); transform: translateY(-2px); }
 .ptile[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--surface2); padding: 11px 9px; }
 .ptn { font-family: var(--display); font-size: 17px; line-height: 1.15; }
+.ftags { display: block; text-align: center; font-size: 15px; line-height: 1.5; }
 .matrow { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; margin-top: 4px; }
 .matrow .ptiles.mats { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .mats .ptile { width: auto; min-width: 72px; }
@@ -2667,7 +2668,7 @@ function wizBuilder(d, g) {
   }).join('');
   var mat = String(b.material || '').trim(), fname = bi ? ((mat ? mat + ' ' : '') + b.form).replace(/^./, function (c) { return c.toUpperCase(); }) : '';
   var forged = bi ? '<div class="mcard gcard forge' + (wizForged ? ' glint' : '') + '">' + gearCorners('weapon', { harm: bi.val }) + '<span class="mc-body"><span class="mc-kick">Your weapon</span><span class="mc-name">' + esc(fname) + '</span><span class="mc-rule" aria-hidden="true"></span>' +
-      '<span class="gstat">' + bi.val + '-harm</span>' + tagChips(bi.tags) + '</span></div>'
+      '<span class="gstat">' + bi.val + '-harm</span>' + tagWords(bi.tags).replace('class="ltags"', 'class="ltags ftags"') + '</span></div>'
     : '<div class="mcard mc-add forge"><span class="mc-body"><span class="mc-kick">Your weapon</span><span class="mc-name">Not forged yet</span><span class="mc-rule" aria-hidden="true"></span><span class="mc-text mc-prev">Choose a form to start. The card fills in as you pick.</span></span></div>';
   return '<div class="wgroup"><h3>' + esc(g.title) + '</h3><p class="small">' + esc(g.intro) + '</p><div class="wforge"><div class="wforge-card">' + forged + '</div><div>' + parts + '</div></div></div>';
 }
