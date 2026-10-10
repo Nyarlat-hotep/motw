@@ -898,6 +898,20 @@ div.wcard { cursor: default; border-color: var(--good); }
 .mc-out { margin: 2px 0 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 10px; font-size: 15px; line-height: 1.4; }
 .mc-out dt { font-family: var(--num); font-weight: 600; color: var(--accent); }
 .mc-out dd { margin: 0; }
+.pbc { font: inherit; color: var(--ink); text-align: inherit; cursor: pointer; }
+.pbc .mc-body { margin-bottom: 30px; }
+.pbc .mc-name { display: block; }
+.pbc .mc-text { display: block; font-style: normal; font-size: 16px; }
+.pbc .mc-kick { min-height: 1.2em; }
+.pbc[data-rec="true"] .mc-kick { color: var(--accent); }
+.pbc-facts { display: block; margin-top: auto; text-align: center; font-size: 14px; color: var(--muted); }
+.pbc-on { display: inline-flex; align-self: center; align-items: center; gap: 6px; font-size: 15px; font-weight: 700; color: var(--accent); }
+.pbc-on .i { width: 16px; height: 16px; }
+.pbc-l0 { color: var(--good); } .pbc-l1 { color: var(--warn); } .pbc-l2 { color: var(--bad); }
+.pbc:hover { border-color: var(--accent); }
+.pbc[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--surface2); }
+.pbc[aria-pressed="true"]::before { border-color: var(--accent); opacity: .5; }
+.pbc .pbimg { width: 100%; border-radius: 6px; }
 .mcard.mc-add { background: none; border: 2px dashed var(--line); box-shadow: none; }
 .mcard.mc-add::before { content: none; }
 .mcard.mc-add:hover { transform: none; box-shadow: none; border-color: var(--accent); }
@@ -2051,7 +2065,7 @@ var PBDATA = [{"id":"chosen","name":"The Chosen","tagline":"A prophecy says you 
 var PBD = {};
 PBDATA.forEach(function (d) { PBD[d.name] = d; });
 var WSTEPS = ['Playbook', 'Who they are', 'Ratings', 'Details', 'Moves', 'Gear', 'History', 'Review'];   // the order the playbook sheets give: look, ratings, the playbook's own choices, moves, gear, then history
-var PBTAG = ['Easier to learn', 'A bit more to track', 'More rules to manage'];
+var PBTAG = ['Easy', 'Intermediate', 'Hard'];
 /*NAMEGEN*/
 /* Name ideas for the builder's Surprise me. Six worlds, each with names in three registers: plain, funny and over the top.
    The old Appalachian hollows and their folk-horror gods; the dry highways and scrap towns of the wasteland; a retro 1950s that never ended, in its bunkers;
@@ -2387,18 +2401,21 @@ function wizPlaybooks() {
   var vibes = VIBES.map(function (v, i) { return '<li><button type="button" class="chip" data-wvibe="' + i + '" aria-pressed="' + (wizVibe === i) + '">' + esc(v[0]) + '</button></li>'; }).join('');
   var cards = list.map(function (p) {
     var d = PBD[p[0]], picked = S.sheet.playbook === p[0], isRec = rec.indexOf(p[0]) >= 0, lv = d ? d.difficulty : null;
-    return '<article class="pb" data-picked="' + picked + '" data-rec="' + isRec + '">' + (artFor(p[0]) ? '<img class="pbimg" loading="lazy" src="' + artFor(p[0]) + '" alt="Portrait for ' + esc(p[0]) + '">' : '') +
-      '<h4>' + esc(p[0]) + '</h4>' + (isRec ? '<span class="wtag rec">Suggested for you</span>' : '') + (lv != null ? '<span class="wtag t' + lv + '">' + PBTAG[lv] + '</span>' : '') +
-      '<p>' + esc(d ? d.tagline : p[1]) + '</p>' + (d ? '<p class="small muted">' + pbFacts(d) + '</p>' : '') +
-      '<button class="btn ' + (picked ? '' : 'ghost') + ' sm" type="button" data-pick="' + esc(p[0]) + '" aria-pressed="' + picked + '">' + (picked ? 'Picked' : 'Pick this one') + '</button></article>';
+    /* a playing card you tap to pick: difficulty in the corners, name, a divider, the pitch and what it gives you */
+    var lvl = lv != null ? '<span class="mc-idx pbc-l' + lv + '">' + PBTAG[lv] + '</span><span class="mc-idx mc-b pbc-l' + lv + '" aria-hidden="true">' + PBTAG[lv] + '</span>' : '';
+    return '<li><button type="button" class="mcard pbc" data-pick="' + esc(p[0]) + '" aria-pressed="' + picked + '" data-rec="' + isRec + '">' + lvl +
+      '<span class="mc-body">' + (artFor(p[0]) ? '<img class="pbimg" loading="lazy" src="' + artFor(p[0]) + '" alt="">' : '') +
+      '<span class="mc-kick">' + (picked ? 'Your playbook' : isRec ? 'Suggested for you' : '&nbsp;') + '</span><span class="mc-name">' + esc(p[0]) + '</span><span class="mc-rule" aria-hidden="true"></span>' +
+      '<span class="mc-text">' + esc(d ? d.tagline : p[1]) + '</span>' + (d ? '<span class="pbc-facts">' + pbFacts(d) + '</span>' : '') +
+      (picked ? '<span class="pbc-on"><span class="i i-check" aria-hidden="true"></span> Picked</span>' : '') + '</span></button></li>';
   }).join('');
   return '<h2 class="sectitle" tabindex="-1">Pick your playbook</h2>' +
     '<p>A playbook is your hunter\'s archetype. It decides your special powers, your starting gear, and how you play at the table. Most groups give every player a different one. Everything on the next steps comes from the playbook you pick here.</p>' +
-    '<div class="note">Ask your Keeper which playbooks are in play. The summaries here are written in plain English; your printed playbook sheet is always the final word on the details.</div>' +
-    '<span class="lbl" style="margin-top:16px">Not sure? Tap what sounds fun</span><ul class="chips" style="margin-top:0">' + vibes + (wizVibe >= 0 ? '<li><button type="button" class="chip" data-wvibe="-1">Show all</button></li>' : '') + '</ul>' +
-    '<p class="small muted" style="margin:8px 0 16px">The tags are my suggestion for a first game, not an official rating.</p>' +
+    '<div class="note" style="margin-top:24px">Ask your Keeper which playbooks are in play. The summaries here are written in plain English; your printed playbook sheet is always the final word on the details.</div>' +
+    '<span class="lbl" style="margin-top:32px">Not sure? Tap what sounds fun</span><ul class="chips" style="margin-top:4px">' + vibes + (wizVibe >= 0 ? '<li><button type="button" class="chip" data-wvibe="-1">Show all</button></li>' : '') + '</ul>' +
+    '<p class="small muted" style="margin:12px 0 32px">Easy, Intermediate and Hard are my suggestion for a first game, not an official rating.</p>' +
     (wizSwitch ? '<p class="note" id="wswitch" role="status">' + esc(wizSwitch) + '</p>' : '') +
-    '<div class="grid g3" id="wcards">' + cards + '</div>';
+    '<ul class="mcards pbcards" id="wcards">' + cards + '</ul>';
 }
 
 /* ----- step 2: who they are ----- */
