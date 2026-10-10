@@ -840,6 +840,43 @@ div.wcard { cursor: default; border-color: var(--good); }
 .wmsg { margin: 6px 0; min-height: 1.2em; color: var(--warn); font-weight: 700; }
 .wlook { margin: 10px 0; }
 .wlin { margin-top: 6px; width: 100%; max-width: 100%; }
+.mcards { list-style: none; padding: 0; margin: 14px 0 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; align-items: stretch; }
+@media (max-width: 520px) { .mcards > .mcard { aspect-ratio: auto; min-height: 240px; } }
+.mcard { position: relative; width: 100%; box-sizing: border-box; aspect-ratio: 5 / 7; display: flex; flex-direction: column; min-width: 0; background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 16px; box-shadow: 0 1px 0 var(--line), 0 10px 24px rgba(0, 0, 0, .14); transition: transform .18s ease, box-shadow .18s ease; overflow-wrap: anywhere; }
+.mcard::before { content: ""; position: absolute; inset: 8px; border: 1px solid var(--line); border-radius: 9px; pointer-events: none; }
+.mcard:hover { transform: translateY(-3px); box-shadow: 0 1px 0 var(--line), 0 16px 30px rgba(0, 0, 0, .2); }
+.mc-idx { position: absolute; top: 16px; left: 18px; font-family: var(--display); font-size: 16px; line-height: 1; color: var(--accent); }
+.mc-idx.mc-b { top: auto; left: auto; bottom: 16px; right: 18px; transform: rotate(180deg); }
+.mc-passive .mc-idx { color: var(--muted); }
+.mc-acts { position: absolute; top: 10px; right: 10px; display: flex; gap: 2px; z-index: 1; }
+.mc-acts .btn.ib { width: 34px; min-width: 34px; min-height: 34px; border-color: transparent; background: none; }
+.mc-acts .btn.ib:hover { border-color: var(--line); background: var(--surface); }
+.mc-body { flex: 1; display: flex; flex-direction: column; gap: 10px; margin: 30px 6px 26px; }
+.mc-kick { font-size: 13px; letter-spacing: .1em; color: var(--muted); text-align: center; }
+.mc-name { font-family: var(--display); font-size: 23px; line-height: 1.15; text-align: center; margin: 0; }
+.mc-rule { position: relative; height: 1px; margin: 2px 22%; background: var(--line); }
+.mc-rule::after { content: ""; position: absolute; left: 50%; top: 50%; width: 7px; height: 7px; background: var(--accent); transform: translate(-50%, -50%) rotate(45deg); }
+.mc-text { margin: 0; text-align: center; font-style: italic; font-size: 16px; line-height: 1.4; }
+.mc-out { margin: 2px 0 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 10px; font-size: 15px; line-height: 1.4; }
+.mc-out dt { font-family: var(--num); font-weight: 600; color: var(--accent); }
+.mc-out dd { margin: 0; }
+.mcard.mc-add { background: none; border: 2px dashed var(--line); box-shadow: none; }
+.mcard.mc-add::before { content: none; }
+.mcard.mc-add:hover { transform: none; box-shadow: none; border-color: var(--accent); }
+.mc-add .mc-body { margin: 8px 4px 4px; }
+.mc-add .mc-name { color: var(--muted); }
+.mc-opts { display: grid; gap: 6px; }
+.mc-opt { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; cursor: pointer; font: inherit; font-size: 16px; color: var(--ink); min-height: 40px; }
+.mc-opt small { color: var(--muted); font-size: 14px; white-space: nowrap; }
+.mc-opt:hover { border-color: var(--accent); }
+.mc-opt[aria-checked="true"] { border-color: var(--accent); background: var(--surface2); }
+.mc-opt[aria-checked="true"] small { color: var(--accent); }
+.mc-prev { color: var(--muted); font-size: 15px; }
+.mc-addrow { display: flex; justify-content: center; margin-top: auto; }
+.mcard.mc-edit { aspect-ratio: auto; grid-column: 1 / -1; padding: 0; border: 0; box-shadow: none; background: none; }
+.mcard.mc-edit::before { content: none; }
+.mcard.mc-edit:hover { transform: none; box-shadow: none; }
+@media (prefers-reduced-motion: reduce) { .mcard { transition: none; } .mcard:hover { transform: none; } }
 .pbmoves { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 8px; }
 .pbmoves li { border-left: 3px solid var(--line); padding-left: 10px; overflow-wrap: anywhere; }
 .pbmoves .btn { margin-left: 6px; }
@@ -1339,7 +1376,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
       <div class="card" id="pbcard" style="margin-top:16px"></div>
 
       <div class="card" style="margin-top:16px">
-        <div class="invhead"><span class="lbl" style="margin:0">Other moves</span><span class="small muted">Anything you add here shows up in Play</span></div>
+        <div class="invhead"><span class="lbl" style="margin:0">Other moves</span><span class="small muted">Moves you paste or write yourself. They show up in Play</span></div>
         <label class="lbl" for="mvpaste">Paste a move from your playbook sheet</label>
         <textarea id="mvpaste" style="min-height:84px" placeholder="Paste the move text, like: Tough as nails: When you take harm, roll +Tough. On a 10+, ... On a 7-9, ..."></textarea>
         <div class="actions"><button class="btn sm" id="mvparse" type="button">Fill in a move from this text</button><button class="btn ghost sm ib" type="button" aria-label="Add a blank move" data-tip="Add a blank move" id="mvadd"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></button></div>
@@ -1665,7 +1702,7 @@ function fmt(n) { return (n >= 0 ? '+' : '−') + Math.abs(n); }
    fmt() keeps the plain text for prose, the roll breakdown and the canvas card. */
 function sgnI(c) { var n = c === '+' ? 'plus' : 'minus'; return '<span class="i sgn i-' + n + '" role="img" aria-label="' + n + '"></span><span class="sgnt" aria-hidden="true">' + c + '</span>'; }
 /* icon-only add and remove buttons: the words go in the tooltip and the accessible name */
-var ICO = { plus: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>', trash: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>' };
+var ICO = { edit: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>', plus: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>', trash: '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>' };
 function ib(kind, label, attrs, cls, type) { return '<button class="btn ' + (cls || 'ghost') + ' sm ib" type="' + (type || 'button') + '" aria-label="' + label + '" data-tip="' + label + '"' + (attrs ? ' ' + attrs : '') + '>' + ICO[kind] + '</button>'; }
 function fmtI(n) { return sgnI(fmt(n).charAt(0)) + Math.abs(n); }
 var ROLLP = 'Roll ' + sgnI('+');
@@ -2677,29 +2714,54 @@ function wizToggle(map, key, limit, what) {
 })();
 
 /* ----- "Your playbook" card on My sheet ----- */
+/* A move as a playing card: the roll in the corners, the name in the middle, then the trigger and what each result does.
+   o = { idx, kick, name, text, outs: [[label, text]], acts, cls } */
+function mcardHTML(o) {
+  var outs = (o.outs || []).filter(function (x) { return x[1]; });
+  return '<li class="mcard' + (o.cls ? ' ' + o.cls : '') + '"' + (o.attrs ? ' ' + o.attrs : '') + '><span class="mc-idx">' + esc(o.idx) + '</span><span class="mc-idx mc-b" aria-hidden="true">' + esc(o.idx) + '</span>' +
+    (o.acts ? '<span class="mc-acts">' + o.acts + '</span>' : '') +
+    '<div class="mc-body">' + (o.kick ? '<span class="mc-kick">' + esc(o.kick) + '</span>' : '') + '<h4 class="mc-name">' + esc(o.name || 'Untitled move') + '</h4><span class="mc-rule" aria-hidden="true"></span>' +
+    (o.text ? '<p class="mc-text">' + esc(o.text) + '</p>' : '') +
+    (outs.length ? '<dl class="mc-out">' + outs.map(function (x) { return '<dt>' + esc(x[0]) + '</dt><dd>' + esc(x[1]) + '</dd>'; }).join('') + '</dl>' : '') + '</div></li>';
+}
+function pbCard(m, auto) {
+  var roll = m.kind === 'roll';
+  return mcardHTML({ idx: roll ? '+' + STATNAME[m.stat] : 'No roll', kick: auto ? 'Automatic' : 'Your pick', name: m.name, text: roll ? m.trig : m.summary,
+    outs: roll ? [['10+', m.full], ['7-9', m.part], ['Miss', m.miss]] : [], acts: auto ? '' : ib('trash', 'Remove ' + esc(m.name), 'data-pbrm="' + esc(m.id) + '"'), cls: roll ? '' : 'mc-passive' });
+}
 function pmoveLine(m) {
   return m.kind === 'roll' ? '<span class="small muted">Roll +' + STATNAME[m.stat] + '. ' + esc(m.trig) + '</span>' : '<span class="small muted">' + esc(m.summary) + '</span>';
 }
+var pbPick = '';   // the move picked on the Add a move card (not saved)
 function renderPbCard() {
   var el = $('#pbcard'); if (!el) return;
   var d = curPB();
   if (!d) { el.innerHTML = '<span class="lbl" style="margin:0">Your playbook</span><p class="small muted" style="margin:8px 0 0">Pick a playbook in <b>Build a hunter</b> and its moves, details and level-up choices appear here.</p>'; return; }
   var st = pbState(), auto = d.moves.auto, picked = d.moves.choices.filter(function (m) { return st.moves[m.id]; }), left = d.moves.choices.filter(function (m) { return !st.moves[m.id]; });
-  var mv = auto.map(function (m) { return '<li><b>' + esc(m.name) + '</b> <span class="chip ok">automatic</span><br>' + pmoveLine(m) + '</li>'; }).concat(picked.map(function (m) { return '<li><b>' + esc(m.name) + '</b> ' + ib('trash', 'Remove ' + esc(m.name), 'data-pbrm="' + esc(m.id) + '"') + '<br>' + pmoveLine(m) + '</li>'; })).join('');
-  var sel = left.length ? '<div class="wrow2" style="margin-top:10px"><select id="pbadd" aria-label="Add a move from your playbook"><option value="">Add a move from ' + esc(d.name) + '...</option>' + left.map(function (m) { return '<option value="' + esc(m.id) + '">' + esc(m.name) + '</option>'; }).join('') + '</select>' + ib('plus', 'Add this move', 'id="pbaddbtn"', 'x') + '</div>' : '';
+  var mv = auto.map(function (m) { return pbCard(m, true); }).concat(picked.map(function (m) { return pbCard(m, false); })).join('');
+  if (!left.some(function (m) { return m.id === pbPick; })) pbPick = '';
+  var pk = left.filter(function (m) { return m.id === pbPick; })[0];
+  /* the last card in the row: a dashed blank to pick another move onto */
+  var sel = left.length ? '<li class="mcard mc-add"><div class="mc-body"><span class="mc-kick">' + esc(d.name) + '</span><h4 class="mc-name">Add a move</h4><span class="mc-rule" aria-hidden="true"></span>' +
+    '<div class="mc-opts" role="radiogroup" aria-label="Moves you can add">' + left.map(function (m) {
+      return '<button type="button" role="radio" class="mc-opt" data-pbpick="' + esc(m.id) + '" aria-checked="' + (m.id === pbPick) + '"><span>' + esc(m.name) + '</span><small>' + (m.kind === 'roll' ? '+' + STATNAME[m.stat] : 'No roll') + '</small></button>';
+    }).join('') + '</div>' +
+    '<p class="mc-text mc-prev">' + (pk ? esc(pk.kind === 'roll' ? pk.trig : pk.summary) : 'Pick one, then add it to your hand.') + '</p>' +
+    '<div class="mc-addrow">' + ib('plus', pk ? 'Add ' + esc(pk.name) : 'Add this move', 'id="pbaddbtn"' + (pk ? '' : ' disabled'), 'x') + '</div></div></li>' : '';
   var ex = extrasSummary(d, st).map(function (e) { return '<li><b>' + esc(e[0]) + ':</b> ' + esc(e[1]) + '</li>'; }).join('');
   el.innerHTML = '<div class="invhead"><span class="lbl" style="margin:0">Your playbook: ' + esc(d.name) + '</span><button type="button" class="btn ghost sm" id="pbedit">Edit in the builder</button></div>' +
     '<p class="small" style="margin:6px 0">' + esc(d.tagline) + '</p>' +
     (lookLine() ? '<p class="small" style="margin:6px 0"><b>Look:</b> ' + esc(lookLine()) + '</p>' : '') +
     '<p class="small" style="margin:6px 0"><b>Luck special:</b> ' + esc(d.luckSpecial) + '</p>' +
-    '<ul class="pbmoves">' + (mv || '<li class="muted small">No moves picked yet.</li>') + '</ul>' + sel +
+    '<ul class="mcards">' + mv + sel + '</ul>' + (mv || sel ? '' : '<p class="muted small">No moves for this playbook.</p>') +
     (ex ? '<ul class="pbmoves" style="margin-top:12px">' + ex + '</ul>' : '');
 }
 document.addEventListener('click', function (e) {
   var t = e.target, g;
   if (!t.closest || !t.closest('#pbcard')) return;
   if ((g = t.closest('[data-pbrm]'))) { var st = pbState(); delete st.moves[g.dataset.pbrm]; syncPbMoves(); renderPbCard(); renderWiz(false); scheduleSave(); return; }
-  if (t.id === 'pbaddbtn') { var v = $('#pbadd').value; if (!v) return; pbState().moves[v] = true; syncPbMoves(); renderPbCard(); renderWiz(false); scheduleSave(); return; }
+  if ((g = t.closest('[data-pbpick]'))) { pbPick = pbPick === g.dataset.pbpick ? '' : g.dataset.pbpick; renderPbCard(); var o = $('#pbcard [data-pbpick="' + g.dataset.pbpick + '"]'); if (o) o.focus(); return; }
+  if (t.id === 'pbaddbtn' && pbPick) { pbState().moves[pbPick] = true; pbPick = ''; syncPbMoves(); renderPbCard(); renderWiz(false); scheduleSave(); return; }
   if (t.id === 'pbedit') { setHV('build'); S.wiz = WSTEPS.indexOf('Moves'); renderBuild(); window.scrollTo(0, 0); scheduleSave(); }
 });
 
@@ -3474,36 +3536,45 @@ function parseMove(raw) {
   if (firstTier == null) m.full = '';
   return m;
 }
+var cmEdit = {};   // which of your own moves are open for editing (not saved)
+function customCard(c) {
+  if (cmEdit[c.id]) return '<li class="mcard mc-edit">' + customHTML(c) + '</li>';
+  return mcardHTML({ idx: '+' + STATNAME[c.stat] || '', kick: 'Your move', name: c.name, text: c.trig, outs: [['10+', c.full], ['7-9', c.part], ['Miss', c.miss]],
+    acts: ib('edit', 'Edit this move', 'data-cmedit') + ib('trash', 'Remove this move', 'data-rmm'), attrs: 'data-mid="' + esc(c.id) + '"' });
+}
 function customHTML(c) {
   var so = STATS.map(function (s) { return '<option value="' + s + '"' + (c.stat === s ? ' selected' : '') + '>+' + STATNAME[s] + '</option>'; }).join('');
   function ta(f, l) { return '<div><label class="lbl">' + l + '</label><textarea data-m="' + f + '" aria-label="' + l + '">' + esc(c[f]) + '</textarea></div>'; }
   return '<article class="cm" data-mid="' + c.id + '"><div class="cmtop"><div><label class="lbl">Move name</label><input type="text" data-m="name" value="' + esc(c.name) + '" autocomplete="off"></div><div><label class="lbl">Rolls</label><select data-m="stat">' + so + '</select></div>' + (c.pbk ? '<span class="chip ok">From playbook</span>' : '' + ib('trash', 'Remove this move', 'data-rmm') + '') + '</div>' +
     '<div><label class="lbl">When you...</label><input type="text" data-m="trig" value="' + esc(c.trig) + '" autocomplete="off"></div>' +
-    '<div class="cols">' + ta('full', 'On a 10+') + ta('part', 'On a 7-9') + '</div>' + ta('miss', 'On a miss (blank uses the standard Keeper move)') + '</article>';
+    '<div class="cols">' + ta('full', 'On a 10+') + ta('part', 'On a 7-9') + '</div>' + ta('miss', 'On a miss (blank uses the standard Keeper move)') +
+    '<div class="actions" style="justify-content:flex-end;margin-top:0"><button type="button" class="btn sm" data-cmdone>Done</button></div></article>';
 }
 function renderCustom() {
-  var c = S.sheet.custom;
-  $('#custom').innerHTML = c.length ? c.map(customHTML).join('') : '<div class="empty">No playbook moves yet. Paste one above, or add a blank one.</div>';
+  var c = S.sheet.custom.filter(function (x) { return !x.pbk; });
+  $('#custom').innerHTML = c.length ? '<ul class="mcards">' + c.map(customCard).join('') + '</ul>' : '<div class="empty">No moves of your own yet. Paste one above, or add a blank one.</div>';
 }
 function mvMsg(t) { $('#mvmsg').textContent = t || ''; }
 $('#mvparse').addEventListener('click', function () {
   var t = $('#mvpaste').value;
   if (!t.trim()) { mvMsg('Paste a move first.'); return; }
   var m = parseMove(t);
-  S.sheet.custom.push(m); syncCustom(); renderCustom(); renderRoller(); scheduleSave();
+  S.sheet.custom.push(m); cmEdit[m.id] = true; syncCustom(); renderCustom(); renderRoller(); scheduleSave();
   $('#mvpaste').value = '';
   mvMsg(m.full || m.part || m.name ? 'Added "' + (m.name || 'Untitled move') + '". Check the fields below, the text is split by guesswork.' : 'Added a move, but I could not split it. Put the text in the fields below.');
   var el = $('.cm[data-mid="' + m.id + '"] input'); if (el) el.focus();
 });
 $('#mvadd').addEventListener('click', function () {
   var m = { id: uid(), name: '', stat: 'cool', trig: '', full: '', part: '', miss: '' };
-  S.sheet.custom.push(m); syncCustom(); renderCustom(); renderRoller(); scheduleSave(); mvMsg('');
+  cmEdit[m.id] = true; S.sheet.custom.push(m); syncCustom(); renderCustom(); renderRoller(); scheduleSave(); mvMsg('');
   var el = $('.cm[data-mid="' + m.id + '"] input'); if (el) el.focus();
 });
 function cmOf(el) { var a = el.closest('[data-mid]'); if (!a) return null; return S.sheet.custom.filter(function (c) { return c.id === a.dataset.mid; })[0]; }
 $('#custom').addEventListener('input', function (e) { var c = cmOf(e.target), f = e.target.dataset.m; if (!c || !f) return; c[f] = e.target.value; syncCustom(); if (f === 'name' || f === 'stat') renderRoller(); scheduleSave(); });
 $('#custom').addEventListener('change', function (e) { var c = cmOf(e.target), f = e.target.dataset.m; if (!c || !f) return; c[f] = e.target.value; syncCustom(); renderRoller(); scheduleSave(); });
 $('#custom').addEventListener('click', function (e) {
+  var ed = e.target.closest('[data-cmedit], [data-cmdone]');
+  if (ed) { var cm = cmOf(ed); if (!cm) return; if (ed.hasAttribute('data-cmedit')) cmEdit[cm.id] = true; else delete cmEdit[cm.id]; renderCustom(); var f = $('.cm[data-mid="' + cm.id + '"] input'); if (f && cmEdit[cm.id]) f.focus(); else { var b = $('#custom [data-mid="' + cm.id + '"] [data-cmedit]'); if (b) b.focus(); } return; }
   if (!e.target.hasAttribute('data-rmm')) return;
   var c = cmOf(e.target); if (!c) return;
   S.sheet.custom = S.sheet.custom.filter(function (x) { return x !== c; });
