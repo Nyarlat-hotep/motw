@@ -182,14 +182,18 @@ details.sect > .body { padding: 0 16px 16px; }
 .odds .f .bar span { background: var(--good); } .odds .p .bar span { background: var(--warn); } .odds .m .bar span { background: var(--bad); }
 .odds b { text-align: right; font-variant-numeric: tabular-nums; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.sesh > summary { cursor: pointer; margin: 0; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+.sesh > summary::-webkit-details-marker { display: none; }
+.sesh > summary::after { content: ""; width: 9px; height: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-3px); transition: transform .15s ease; }
+.sesh[open] > summary::after { transform: rotate(-135deg) translateY(-3px); }
+@media (prefers-reduced-motion: reduce) { .sesh > summary::after { transition: none; } }
+.sesh[open] > summary { margin-bottom: 12px; }
 .hist { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
-.hist li { display: grid; grid-template-columns: 3.2em 1fr auto; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.hist li { display: grid; grid-template-columns: 4.6em 1fr auto; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); }
 .hist b { font-variant-numeric: tabular-nums; }
-.hist li.ev { align-items: center; }
+.hist li.ev { align-items: center; grid-template-columns: 4.6em 1fr; }
 .hist .evk { font-family: var(--type); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .hist .evend { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px; }
-.hist .evx { background: none; border: 0; border-radius: 6px; color: var(--muted); cursor: pointer; font-size: 22px; line-height: 1; min-width: 40px; min-height: 40px; }
-.hist .evx:hover { color: var(--ink); }
 .hist .evmore { border-bottom: 0; }
 .hvrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 16px; }
 .hvrow .seg { margin-bottom: 0; border: 0; border-radius: 0; overflow: visible; gap: 4px; background: none; }
@@ -898,7 +902,7 @@ div.wcard { cursor: default; border-color: var(--good); }
 .sgnt { display: inline-block; width: 0; overflow: hidden; vertical-align: baseline; }
 /* where an icon is the whole of a control, centre it on the box rather than on the
    baseline: a baseline nudge leaves it a pixel high and off to one side. */
-.step .ctl button, .prow .ctl button, .item .qty button, .wctl button, .hist .evx,
+.step .ctl button, .prow .ctl button, .item .qty button, .wctl button,
 .wpills button, .chip.del { display: inline-flex; align-items: center; justify-content: center; }
 .step .ctl button, .prow .ctl button, .item .qty button, .wctl button, .wpills button { padding: 0; }
 
@@ -937,7 +941,7 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
    Round controls (pips, swatches, step pills), the underline tabs, the joined
    segmented control and the candles keep their own shape. */
 .btn, .inkbtn, .step .ctl button, .prow .ctl button, .item .qty button, .wctl button,
-.hist .evx, .clock button, button.chip, .statbtn, .pmove, .wopt, .wcard { border-radius: var(--radius-btn); }
+.clock button, button.chip, .statbtn, .pmove, .wopt, .wcard { border-radius: var(--radius-btn); }
 </style>
 
 <svg class="cdefs" aria-hidden="true" focusable="false"><defs>
@@ -954,7 +958,7 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
 <div class="texture t2" aria-hidden="true"></div>
 <div id="fx" aria-hidden="true"></div>
 <div class="savetoast" id="sync" role="status" aria-live="polite"><span id="sync-t"></span><button class="btn ghost sm" type="button" id="sync-x" hidden>Close</button></div>
-<div class="evtoast" id="evtoast" role="status" hidden><span id="evtoast-t"></span><button class="btn sm" type="button" id="evtoast-undo">Undo</button></div>
+<div class="evtoast" id="evtoast" role="status" hidden><span id="evtoast-t"></span></div>
 <dialog class="hcdlg hodlg" id="hodlg" aria-label="Picture from the Keeper"><img id="hodlg-img" alt=""><p id="hodlg-cap"></p><div class="actions"><button class="btn sm" type="button" id="hodlg-close">Close</button></div></dialog>
 <dialog class="hcdlg" id="hcdlg" aria-labelledby="hc-title">
   <h2 class="sectitle" id="hc-title">Hunter card</h2>
@@ -1224,13 +1228,11 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
       <div class="play">
         <div class="pvit"><div class="card" id="pv-harm"></div><div class="card" id="pv-luck"></div><div class="card" id="pv-xp"></div><div id="lvlup"></div></div>
         <div class="pmid"><div id="play-moves"></div>
-        <div class="card" style="margin-top:16px">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px">
-            <span class="lbl" id="histttl" style="margin:0">Recent rolls</span>
-            <button class="btn ghost sm" id="clearhist" type="button">Clear</button>
-          </div>
+        <details class="card sesh" id="sesh">
+          <summary class="lbl" id="histttl">This session</summary>
           <ul class="hist" id="hist"></ul>
-        </div>
+          <div class="actions" style="justify-content:flex-end"><button class="btn ghost sm" id="clearhist" type="button">Clear</button></div>
+        </details>
         </div>
         <div><div class="card" id="play-sel" style="margin-bottom:16px"></div><div id="play-stage"><div id="rollkit">
         <div class="card">
@@ -1677,8 +1679,7 @@ function evTrack() {
     top.t = at; ev = top;
     if (!Object.keys(top.f).length) { evs.shift(); ev = null; } else top.kind = evKind(top.f);   // back where it started: no line
   } else ev = evAdd({ kind: evKind(f), why: why, f: f, nu: nu });
-  // harm, Luck and XP show on their own tracks, so they get no Undo toast (Undo stays in This session)
-  evToastShow(ev && ev.f && Object.keys(ev.f).every(function (k) { return ['harm', 'unstable', 'luck', 'xp'].indexOf(k) >= 0; }) ? null : ev); renderHist();
+  renderHist();
 }
 /* a roll goes on the timeline as it was shown; Spend Luck rewrites it with evRollUpdate() */
 function evRoll(r) { return evAdd({ kind: 'roll', r: r, nu: true }).id; }
@@ -1686,24 +1687,11 @@ function evRollUpdate() {
   if (!last || !last.evid) return;
   evList().forEach(function (e) { if (e.id === last.evid && e.r) { e.r.total = last.total; e.r.tier = tierOf(last.total); if (!/\(Luck\)$/.test(e.r.name)) e.r.name += ' (Luck)'; } });
 }
-/* an event can be undone while every field it changed still holds what the event set it to */
-function evCanUndo(ev) {
-  if (!ev || ev.nu || !ev.f) return false;
-  var ks = Object.keys(ev.f), now = evNow();
-  return ks.length > 0 && ks.every(function (k) { return EVF.indexOf(k) >= 0 && ev.f[k] && now[k] === ev.f[k].to; });
-}
-function evToastShow(ev) {
-  var el = $('#evtoast'); if (!el) return;
-  clearTimeout(evToastTimer);
-  if (!ev || !evCanUndo(ev)) { el.hidden = true; return; }
-  $('#evtoast-t').textContent = evText(ev) + '.'; $('#evtoast-undo').hidden = false;
-  el.dataset.ev = ev.id; el.hidden = false;
-  evToastTimer = setTimeout(function () { el.hidden = true; }, 8000);
-}
+function evToastHide() { var el = $('#evtoast'); if (el) { clearTimeout(evToastTimer); el.hidden = true; } }
 function evMsg(t) {
   var el = $('#evtoast'); if (!el) return;
   clearTimeout(evToastTimer);
-  $('#evtoast-t').textContent = t; $('#evtoast-undo').hidden = true; el.hidden = false;
+  $('#evtoast-t').textContent = t; el.hidden = false;
   evToastTimer = setTimeout(function () { el.hidden = true; }, 4500);
 }
 $('#logout').addEventListener('click', function (e) {
@@ -1712,38 +1700,15 @@ $('#logout').addEventListener('click', function (e) {
   e.preventDefault();
   evMsg('You are not signed in on this copy, so there is nothing to log out of. On the live site this signs you out.');
 });
-function evUndo(id) {
-  var evs = evList(), i, ev = null;
-  for (i = 0; i < evs.length; i++) if (evs[i].id === id) { ev = evs[i]; break; }
-  if (!ev || ev.nu || !ev.f) return;
-  if (!evCanUndo(ev)) { evMsg('That changed again since. Undo the newer change first.'); renderHist(); return; }
-  var sh = S.sheet, f = ev.f;
-  function from(k, max) { var v = +f[k].from; return clamp(isFinite(v) ? Math.round(v) : 0, 0, max); }
-  if (f.harm) sh.harm = from('harm', 8);
-  if (f.unstable) sh.unstable = !!f.unstable.from;
-  if (f.luck) setLuck(from('luck', 7));
-  if (f.xp) sh.xp = from('xp', 9);
-  if (f.hold) S.hold.n = from('hold', 9);
-  evs.splice(i, 1); evBase();
-  play.wound = 0; play.msg = '';
-  renderSheet(); renderPlay(); renderStage(); renderHist(); scheduleSave();
-  evMsg('Undone.');
-}
-function evRemove(id) {
-  var evs = evList(), i;
-  for (i = 0; i < evs.length; i++) if (evs[i].id === id) { evs.splice(i, 1); break; }
-  renderHist(); scheduleSave();
-}
 function evLine(ev) {
-  var act = (evCanUndo(ev) ? '<button type="button" class="btn ghost sm" data-evundo="' + esc(ev.id) + '">Undo</button>' : '') + '<button type="button" class="evx" data-evrm="' + esc(ev.id) + '" aria-label="Remove this line from the list"><span class="i i-x" aria-hidden="true"></span></button>';
   if (ev.kind === 'roll' && ev.r) {
     var r = ev.r, tier = TIERNAME[r.tier] ? r.tier : 'miss';
-    return '<li><b>' + (+r.total || 0) + '</b><span>' + esc(r.name) + ' <span class="muted">(' + (+r.d1 || 0) + '+' + (+r.d2 || 0) + ' ' + fmt(+r.mod || 0) + ')</span></span><span class="evend"><span class="tag ' + tier + '">' + TIERNAME[tier] + '</span>' + act + '</span></li>';
+    return '<li><b>' + (+r.total || 0) + '</b><span>' + esc(r.name) + ' <span class="muted">(' + (+r.d1 || 0) + '+' + (+r.d2 || 0) + ' ' + fmt(+r.mod || 0) + ')</span></span><span class="evend"><span class="tag ' + tier + '">' + TIERNAME[tier] + '</span></span></li>';
   }
-  return '<li class="ev"><span class="evk">' + esc(EVKIND[ev.kind] || 'Note') + '</span><span>' + esc(evText(ev)) + '</span><span class="evend">' + act + '</span></li>';
+  return '<li class="ev"><span class="evk">' + esc(EVKIND[ev.kind] || 'Note') + '</span><span>' + esc(evText(ev)) + '</span></li>';
 }
 /* on window so tests can look in and drive the timeline directly */
-window.__journal = { S: function () { return S; }, evAdd: evAdd, evUndo: evUndo, evBase: evBase, evList: evList, levelDone: levelDone, scheduleSave: scheduleSave };
+window.__journal = { S: function () { return S; }, evAdd: evAdd, evBase: evBase, evList: evList, levelDone: levelDone, scheduleSave: scheduleSave };
 function renderSession(el) {
   var evs = evList();
   if (!evs.length) { el.innerHTML = '<li class="muted"><span></span>Nothing yet. Rolls, harm, Luck and XP show up here as you play.<span></span></li>'; return; }
@@ -1883,7 +1848,7 @@ function copyRoll() {
 }
 function renderHist() {
   var el = $('#hist'); if (!el) return;
-  $('#histttl').textContent = 'This session';
+  var n = evList().length; $('#histttl').textContent = 'This session' + (n ? ' (' + n + ')' : '');
   renderSession(el);
 }
 $('#roll').addEventListener('click', function () { if (Date.now() - shake.ended < 400) return; doRoll(); });
@@ -1911,15 +1876,11 @@ function rollClicks(e) {
 }
 $('#hv-play').addEventListener('click', rollClicks);
 $('#clearhist').addEventListener('click', function () {
-  S.session.events = []; S.session.started = 0; evToastShow(null); renderHist(); scheduleSave();   // the timeline; the sheet is untouched
+  S.session.events = []; S.session.started = 0; evToastHide(); renderHist(); scheduleSave();   // the timeline; the sheet is untouched
 });
 $('#hist').addEventListener('click', function (e) {
-  var u = e.target.closest('[data-evundo]'), x = e.target.closest('[data-evrm]');
-  if (u) { evUndo(u.dataset.evundo); return; }
-  if (x) { evRemove(x.dataset.evrm); return; }
   if (e.target.closest('[data-evall]')) { evShown = 1000; renderHist(); }
 });
-$('#evtoast-undo').addEventListener('click', function () { evUndo($('#evtoast').dataset.ev); });
 
 /* ---------- hunter ---------- */
 function setHV(v) {
@@ -3074,7 +3035,7 @@ function ritFinish() {
     c.example = false; c.log = (String(c.log || '').replace(/\s+$/, '') + (c.log ? '\n\n' : '') + text);
   }
   evBase();   // the changes above are part of this ritual, not new lines
-  S.session = { started: 0, events: [] }; evToastShow(null);   // started stays 0 until the next event, so XP just added still counts as tonight's
+  S.session = { started: 0, events: [] }; evToastHide();   // started stays 0 until the next event, so XP just added still counts as tonight's
   play.wound = 0; play.msg = '';
   rit.done = { line: !c ? 'No case was chosen, so nothing was written to a case file.' : again ? 'Nothing new to write: tonight is already in "' + (c.title || 'Untitled mystery') + '".' : 'Written into "' + (c.title || 'Untitled mystery') + '".', text: text };
   renderSheet(); renderRoller(); renderPlay(); renderCases(); scheduleSave();
