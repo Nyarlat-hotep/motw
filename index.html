@@ -894,10 +894,21 @@ div.wcard { cursor: default; border-color: var(--good); }
 
 /* ---- play screen: status | moves | dice, built for a laptop window beside a call ---- */
 .play { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(0, 1.4fr) minmax(310px, 1.1fr); gap: 16px; align-items: start; }
-.ptop { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 32px; margin-bottom: 16px; }
+.ptop { display: grid; grid-template-columns: 220px minmax(260px, 380px) minmax(0, 1fr); gap: 20px 32px; align-items: start; margin-bottom: 16px; }
 .ptop .pblock { margin-top: 0; }
-.ptop .pblock:has(.statrow) { flex: 1 1 380px; }
-.ptop .pfresh { flex-basis: 100%; order: 9; }
+.ptop .pfresh { grid-column: 1 / -1; order: 9; }
+.pport { display: grid; gap: 2px; min-width: 0; }
+.pport img, .pport-ph { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); margin-bottom: 10px; }
+.pport-ph { display: grid; place-content: center; gap: 4px; text-align: center; border-style: dashed; color: var(--muted); font: inherit; font-size: 15px; cursor: pointer; padding: 12px; }
+.pport-ph span { font-size: 14px; text-decoration: underline; }
+.pport-ph:hover { border-color: var(--accent); color: var(--ink); }
+.pport b { font-family: var(--display); font-size: 22px; font-weight: 400; line-height: 1.15; overflow-wrap: anywhere; }
+.ptop .pstats .statrow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ptop .pstats .statbtn { min-height: 72px; }
+.ptop .pstats .statbtn b { font-size: 28px; }
+.ptop .pstats .statbtn span { font-size: 15px; }
+@media (max-width: 1060px) { .ptop { grid-template-columns: 200px minmax(0, 1fr); } .ptop .pgear { grid-column: 1 / -1; } }
+@media (max-width: 520px) { .ptop { grid-template-columns: 120px minmax(0, 1fr); gap: 16px; } .pport b { font-size: 18px; } .ptop .pstats .statrow { gap: 8px; } .ptop .pstats .statbtn { min-height: 60px; } .ptop .pstats .statbtn b { font-size: 22px; } }
 .pvit { display: grid; gap: 16px; min-width: 0; }
 .pvit #lvlup:empty { display: none; }
 .pvit .levelup { margin-top: 0; }
@@ -1383,7 +1394,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
       <div class="card" id="pbcard" style="margin-top:16px"></div>
 
       <div class="card" style="margin-top:16px">
-        <div class="invhead"><span class="lbl" style="margin:0">Other moves</span><span class="small muted">Moves you paste or write yourself. They show up in Play</span></div>
+        <span class="lbl" style="margin:0">Other moves</span>
         <div class="cmlist" id="custom"></div>
       </div>
 
@@ -3092,14 +3103,14 @@ function pmoveBtn(m) {
 function renderPlay() {
   var host = $('#play-status'); if (!host) return;
   var sh = S.sheet, R = S.roller, d = curPB(), a = armorVal(), w = weaponsOut();
-  var av0 = sh.photo || artFor(sh.playbook), av = av0 ? '<img src="' + esc(av0) + '" alt="">' : '<span class="av"></span>';
+  var av0 = sh.photo || artFor(sh.playbook), av = av0 ? '<img src="' + esc(av0) + '" alt="">' : '<button type="button" class="pport-ph" data-pgo="photo">No picture yet<br><span>Add one on the Sheet</span></button>';
   var fresh = !sh.playbook && !(sh.name && sh.name.trim());
   var gear = w.map(function (i) { return '<li class="chip">' + esc(i.name || 'Weapon') + ' ' + (+i.val || 0) + '-harm' + (i.note ? ' <span class="muted">' + esc(String(i.note).replace(/\s*\[.*\]$/, '')) + '</span>' : '') + '</li>'; }).join('') + (a ? '<li class="chip">Armor ' + a + '</li>' : '');
   host.innerHTML =
-    '<div class="pwho">' + av + '<span><b>' + esc(sh.name || 'Your hunter') + '</b><span class="muted small">' + esc(sh.playbook || 'No playbook yet') + ' &middot; Level ' + sh.level + '</span></span></div>' +
+    '<div class="pport">' + av + '<b>' + esc(sh.name || 'Your hunter') + '</b><span class="muted small">' + esc(sh.playbook || 'No playbook yet') + ' &middot; Level ' + sh.level + '</span></div>' +
     (fresh ? '<p class="note pfresh" style="margin:0">No hunter yet. You can still roll the basic moves. <button type="button" class="linkbtn" data-pgo="build">Build a hunter</button></p>' : '') +
-    '<div class="pblock"><div class="statrow" role="group" aria-label="Rating to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmtI(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div>' +
-    (gear ? '<div class="pblock"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '');
+    '<div class="pblock pstats"><div class="statrow" role="group" aria-label="Rating to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmtI(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div>' +
+    (gear ? '<div class="pblock pgear"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '');
   $('#pv-harm').innerHTML = '<span class="lbl">Harm</span>' + pipStr('pl-harm', 'harm', 8, sh.harm, 'Harm') + '<p class="small' + (sh.harm >= 4 ? '' : ' muted') + '" style="margin:6px 0 0">' + (sh.unstable ? '<b style="color:var(--bad)">Unstable.</b> ' : '') + esc(harmText(sh.harm)) + '</p>' +
       '<div class="prow"><span>Take harm</span><span class="ctl"><button type="button" data-ph="-1" aria-label="Less harm"' + (play.hit ? '' : ' disabled') + '><span class="i i-minus" aria-hidden="true"></span></button><output aria-live="polite">' + play.hit + '</output><button type="button" data-ph="1" aria-label="More harm"><span class="i i-plus" aria-hidden="true"></span></button></span></div>' +
       '<div class="prow"><span>Heal</span><span class="pbtns"><button type="button" class="btn ghost sm" id="pl-heal1" aria-label="Heal 1"' + (sh.harm < 1 ? ' disabled' : '') + '>+1</button><button type="button" class="btn ghost sm" id="pl-healall" aria-label="Heal all"' + (sh.harm < 1 ? ' disabled' : '') + '>All</button></span></div>' +
@@ -3161,7 +3172,7 @@ function renderPlay() {
       play.wound = 0;
       renderSheet(); scheduleSave(); return;
     }
-    if ((g = t.closest('[data-pgo]'))) { if (g.dataset.pgo === 'build') { setHV('build'); renderBuild(); window.scrollTo(0, 0); } else { var lv = $('#lvlup'); if (lv) lv.scrollIntoView({ block: 'center' }); } scheduleSave(); return; }
+    if ((g = t.closest('[data-pgo]'))) { if (g.dataset.pgo === 'photo') { setHV('sheet'); var pb = $('#photobtn'); if (pb) pb.scrollIntoView({ block: 'center' }); } else if (g.dataset.pgo === 'build') { setHV('build'); renderBuild(); window.scrollTo(0, 0); } else { var lv = $('#lvlup'); if (lv) lv.scrollIntoView({ block: 'center' }); } scheduleSave(); return; }
   });
   host.addEventListener('change', function (e) {
     if (e.target.id === 'pl-ign') { play.ignore = e.target.checked; if (play.hit) hitSet(play.hit); }
