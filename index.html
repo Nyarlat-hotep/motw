@@ -821,6 +821,7 @@ div.wcard { cursor: default; border-color: var(--good); }
 .pbtns { display: inline-flex; gap: 6px; }
 .pbtns .btn { min-width: 52px; font-family: var(--num); font-size: 17px; letter-spacing: 0; }
 .prow.pchecks { justify-content: flex-start; gap: 12px 16px; }
+#pl-undo { margin-top: 16px; }
 .vdiv { width: 1px; align-self: stretch; min-height: 20px; background: var(--line); }
 /* Play: room to breathe */
 #hv-play .card { padding: 24px; }
@@ -1662,7 +1663,8 @@ function evTrack() {
     top.t = at; ev = top;
     if (!Object.keys(top.f).length) { evs.shift(); ev = null; } else top.kind = evKind(top.f);   // back where it started: no line
   } else ev = evAdd({ kind: evKind(f), why: why, f: f, nu: nu });
-  evToastShow(ev); renderHist();
+  // harm, Luck and XP show on their own tracks, so they get no Undo toast (Undo stays in This session)
+  evToastShow(ev && ev.f && Object.keys(ev.f).every(function (k) { return ['harm', 'unstable', 'luck', 'xp'].indexOf(k) >= 0; }) ? null : ev); renderHist();
 }
 /* a roll goes on the timeline as it was shown; Spend Luck rewrites it with evRollUpdate() */
 function evRoll(r) { return evAdd({ kind: 'roll', r: r, nu: true }).id; }
@@ -2824,8 +2826,6 @@ function hitSet(n) {
   var arm = play.ignore ? 0 : armorVal(), dmg = Math.max(0, play.hit - arm);
   sh.harm = Math.min(8, play.base + dmg); sh.unstable = play.baseUnst || sh.harm >= 4;
   play.wound = sh.harm - play.base;
-  play.msg = !play.hit ? '' : dmg ? 'Took ' + dmg + ' harm' + (arm ? ' (' + play.hit + ' less ' + arm + ' armor)' : '') + '. You are at ' + sh.harm + '.' : 'Your armor soaked all of it.';
-  if (play.hit) evSay('Took ' + dmg + ' harm' + (arm ? ' after armor' : ''));
   clearTimeout(play.hitTimer);
   if (play.hit) play.hitTimer = setTimeout(function () { play.hit = 0; renderPlay(); }, 4000);
   renderSheet(); scheduleSave();
@@ -2875,7 +2875,6 @@ function renderPlay() {
       '<div class="prow"><span>Take harm</span><span class="ctl"><button type="button" data-ph="-1" aria-label="Less harm"' + (play.hit ? '' : ' disabled') + '><span class="i i-minus" aria-hidden="true"></span></button><output aria-live="polite">' + play.hit + '</output><button type="button" data-ph="1" aria-label="More harm"><span class="i i-plus" aria-hidden="true"></span></button></span></div>' +
       '<div class="prow"><span>Heal</span><span class="pbtns"><button type="button" class="btn ghost sm" id="pl-heal1" aria-label="Heal 1"' + (sh.harm < 1 ? ' disabled' : '') + '>+1</button><button type="button" class="btn ghost sm" id="pl-healall" aria-label="Heal all"' + (sh.harm < 1 ? ' disabled' : '') + '>All</button></span></div>' +
       '<div class="prow pchecks"><label><input type="checkbox" id="pl-ign"' + (play.ignore ? ' checked' : '') + '> Ignores armor</label><span class="vdiv" aria-hidden="true"></span><label><input type="checkbox" id="pl-unst"' + (sh.unstable ? ' checked' : '') + '> Unstable</label></div>' +
-      '<p class="pmsg" role="status">' + esc(play.msg) + '</p>' +
       (play.wound > 0 && sh.luck > 0 ? '<button type="button" class="btn ghost sm" id="pl-undo">Spend Luck: cancel that wound</button>' : '');
   $('#pv-luck').innerHTML = '<span class="lbl">Luck</span>' + '<div class="pips candles' + (sh.luck < 3 ? ' low' : '') + '" id="pl-luck" role="group" aria-label="Luck">' + luckPips(sh.luck) + '</div><p class="lucknote' + (sh.luck < 3 ? ' low' : '') + '">' + luckNote(sh.luck) + '</p>' + (d ? '<p class="small muted" style="margin:6px 0 0"><b>When you spend Luck:</b> ' + esc(d.luckSpecial) + '</p>' : '');
   $('#pv-xp').innerHTML = '<span class="lbl">Experience</span>' + pipStr('pl-xp', '', 5, Math.min(sh.xp, 5), 'XP') + '<p class="small muted" style="margin:8px 0 0">Level ' + sh.level + '. Mark one on any roll of 6 or less. At 5 you level up.</p>';
@@ -2932,7 +2931,7 @@ function renderPlay() {
       hitEnd();
       evSay('Spent Luck to cancel a wound');
       sh.harm = Math.max(0, sh.harm - play.wound); if (sh.harm < 4) sh.unstable = false; setLuck(sh.luck - 1);
-      play.msg = 'Luck spent. That wound is cancelled. ' + sh.luck + ' Luck left.'; play.wound = 0;
+      play.wound = 0;
       renderSheet(); scheduleSave(); return;
     }
     if ((g = t.closest('[data-pgo]'))) { if (g.dataset.pgo === 'build') { setHV('build'); renderBuild(); window.scrollTo(0, 0); } else { var lv = $('#lvlup'); if (lv) lv.scrollIntoView({ block: 'center' }); } scheduleSave(); return; }
