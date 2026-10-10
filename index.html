@@ -302,7 +302,7 @@ details.sect > .body { padding: 0 16px 16px; }
 .candles button.light[aria-pressed="true"] .em { animation: spark .4s ease-out var(--ln, 0s); }
 .candles button.light[aria-pressed="true"] .hl { animation: glowup 1.1s ease-out var(--ln, 0s) both, lampflicker 4.3s ease-in-out calc(1.1s + var(--ln, 0s)) infinite; }
 .candles button.light[aria-pressed="true"] .gw { animation: glowup 1s ease-out var(--ln, 0s) both; }
-@keyframes ignite { 0% { opacity: 0; transform: scale(.08, .04); } 18% { opacity: 1; transform: scale(.3, .35); } 50% { transform: scale(1.12, 1.35); } 72% { transform: scale(.94, .9); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes ignite { 0% { opacity: 0; transform: scale(.08, .04); } 20% { opacity: 1; transform: scale(.35, .4); } 60% { transform: scale(1.03, 1.08); } 100% { opacity: 1; transform: scale(1); } }
 @keyframes spark { 0% { opacity: 0; transform: scale(.5); } 25% { opacity: 1; transform: scale(1.6); } 100% { opacity: 0; transform: scale(1); } }
 @keyframes glowup { from { opacity: 0; } to { opacity: 1; } }
 @keyframes wisp { 0% { opacity: 0; transform: translateY(5px) scaleY(.5); } 25% { opacity: .85; } 100% { opacity: 0; transform: translateY(-9px) scaleY(1.15); } }
@@ -911,12 +911,12 @@ div.wcard { cursor: default; border-color: var(--good); }
 .pport-ph { display: grid; place-content: center; gap: 4px; text-align: center; border-style: dashed; color: var(--muted); font: inherit; font-size: 15px; cursor: pointer; padding: 12px; }
 .pport-ph span { font-size: 14px; text-decoration: underline; }
 .pport-ph:hover { border-color: var(--accent); color: var(--ink); }
-.pport b { font-family: var(--display); font-size: 22px; font-weight: 400; line-height: 1.15; overflow-wrap: anywhere; }
+.pclass { font-family: var(--display); font-size: 22px; line-height: 1.2; color: var(--ink); }
 .ptop .pstats .statrow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.ptop .pstats .statbtn { min-height: 72px; }
-.ptop .pstats .statbtn b { font-size: 28px; }
-.ptop .pstats .statbtn span { font-size: 15px; }
-@media (max-width: 520px) { .ptop .pstats .statrow { gap: 8px; } .ptop .pstats .statbtn { min-height: 60px; } .ptop .pstats .statbtn b { font-size: 24px; } }
+.ptop .pstats .statbtn { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px; padding: 6px 14px; text-align: left; }
+.ptop .pstats .statbtn b { order: 2; font-size: 24px; }
+.ptop .pstats .statbtn span { font-size: 16px; color: var(--ink); }
+@media (max-width: 520px) { .ptop .pstats .statrow { gap: 8px; } .ptop .pstats .statbtn { padding: 6px 10px; } .ptop .pstats .statbtn b { font-size: 22px; } }
 .pvit { display: grid; gap: 16px; min-width: 0; }
 .pvit #lvlup:empty { display: none; }
 .pvit .levelup { margin-top: 0; }
@@ -3117,7 +3117,7 @@ function renderPlay() {
   var fresh = !sh.playbook && !(sh.name && sh.name.trim());
   var gear = w.map(function (i) { return '<li class="chip">' + esc(i.name || 'Weapon') + ' ' + (+i.val || 0) + '-harm' + (i.note ? ' <span class="muted">' + esc(String(i.note).replace(/\s*\[.*\]$/, '')) + '</span>' : '') + '</li>'; }).join('') + (a ? '<li class="chip">Armor ' + a + '</li>' : '');
   host.innerHTML =
-    '<div class="pport">' + av + '<b>' + esc(sh.name || 'Your hunter') + '</b><span class="muted small">' + esc(sh.playbook || 'No playbook yet') + ' &middot; Level ' + sh.level + '</span></div>' +
+    '<div class="pport">' + av + '<span class="pclass">' + esc(sh.playbook || 'No playbook yet') + ' &middot; Level ' + sh.level + '</span></div>' +
     (fresh ? '<p class="note pfresh" style="margin:0">No hunter yet. You can still roll the basic moves. <button type="button" class="linkbtn" data-pgo="build">Build a hunter</button></p>' : '') +
     '<div class="pblock pstats"><div class="statrow" role="group" aria-label="Rating to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmtI(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div>' +
     (gear ? '<div class="pblock pgear"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '');
