@@ -199,8 +199,8 @@ details.sect > .body { padding: 0 16px 16px; }
 .hicons { display: flex; align-items: center; gap: 4px; }
 .hdiv { width: 1px; align-self: stretch; margin: 6px 8px; background: var(--line); }
 .hdiv[hidden], .hend[hidden] { display: none; }
-.hicons .btn.hend { background: none; color: var(--bad); border: 1px solid var(--bad); }
-.hicons .btn.hend:hover { background: var(--bad-bg); }
+.hicon.hend { color: var(--bad); }
+.hicon.hend:hover { color: var(--bad); border-color: var(--bad); background: var(--bad-bg); }
 .hicon { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 10px; background: none; border: 1px solid transparent; border-radius: 8px; color: var(--muted); cursor: pointer; }
 .hicon:hover, .hicon[aria-expanded="true"] { color: var(--ink); border-color: var(--line); }
 .hicon .tabico { width: 24px; height: 24px; }
@@ -595,7 +595,8 @@ details.sect > .body > p:first-child { text-align: left; }
 .foot p { max-width: 72ch; margin: 0 auto 10px; }
 .foot p:last-child { margin-bottom: 0; }
 .foot::before { content: "\2766"; display: block; font-size: 26px; color: var(--accent); margin-bottom: 4px; font-style: normal; }
-.seg button, .pips.harm button { font-family: var(--display); }
+.seg button { font-family: var(--display); }
+.pips.harm button { font-family: var(--body); }
 .seg button { font-size: 18px; font-weight: 400; }
 
 /* ---- dice tray: bone cubes thrown onto oxblood leather ---- */
@@ -817,6 +818,10 @@ div.wcard { cursor: default; border-color: var(--good); }
 .pvit { display: grid; gap: 16px; min-width: 0; }
 .pvit #lvlup:empty { display: none; }
 .pvit .levelup { margin-top: 0; }
+.pbtns { display: inline-flex; gap: 6px; }
+.pbtns .btn { min-width: 52px; font-family: var(--num); font-size: 17px; letter-spacing: 0; }
+.prow.pchecks { justify-content: flex-start; gap: 12px 16px; }
+.vdiv { width: 1px; align-self: stretch; min-height: 20px; background: var(--line); }
 /* Play: room to breathe */
 #hv-play .card { padding: 24px; }
 #hv-play .play, #hv-play .pvit, #hv-play .pmid { gap: 16px; }
@@ -1187,11 +1192,11 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
           <button type="button" id="seg-build" aria-pressed="true">Build</button>
         </div>
         <div class="hicons">
-          <button type="button" class="btn sm hend" id="hn-end" data-rit="open">End the session</button>
-          <span class="hdiv" id="hn-div" aria-hidden="true"></span>
           <button type="button" class="hicon" id="hn-list" data-hn="list" aria-expanded="false" aria-controls="hbar" aria-label="My hunters" data-tip="My hunters"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></button>
           <button type="button" class="hicon" data-hn="new" aria-label="New hunter" data-tip="New hunter"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg></button>
           <button type="button" class="hicon" id="hn-ret" data-hn="retire" aria-expanded="false" aria-controls="hbar" aria-label="Retire or mark lost" data-tip="Retire or mark lost"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/></svg></button>
+          <span class="hdiv" id="hn-div" aria-hidden="true"></span>
+          <button type="button" class="hicon hend" id="hn-end" data-rit="open" aria-label="End the session" data-tip="End the session"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 22V4"/><path d="M4 4h12l-2 4 2 4H4"/></svg></button>
         </div>
       </div>
       <div id="hbar"></div>
@@ -2809,7 +2814,23 @@ function renderRollas() { renderPlay(); applyMast(); }
 function photoMsg(t) { $('#photomsg').textContent = t || ''; }
 
 /* ---------- play screen ---------- */
-var play = { harm: 1, ignore: false, msg: '', wound: 0, want: '' };
+var play = { hit: 0, base: 0, baseUnst: false, hitTimer: null, ignore: false, msg: '', wound: 0, want: '' };
+/* Take harm: the stepper is the hit you are taking right now. Every change lands on the track at once, armor taken off the hit as a whole.
+   A few seconds after the last tap the hit is done and the stepper goes back to 0, ready for the next one. */
+function hitSet(n) {
+  var sh = S.sheet;
+  if (!play.hit) { play.base = sh.harm; play.baseUnst = !!sh.unstable; }
+  play.hit = clamp(n, 0, 12);
+  var arm = play.ignore ? 0 : armorVal(), dmg = Math.max(0, play.hit - arm);
+  sh.harm = Math.min(8, play.base + dmg); sh.unstable = play.baseUnst || sh.harm >= 4;
+  play.wound = sh.harm - play.base;
+  play.msg = !play.hit ? '' : dmg ? 'Took ' + dmg + ' harm' + (arm ? ' (' + play.hit + ' less ' + arm + ' armor)' : '') + '. You are at ' + sh.harm + '.' : 'Your armor soaked all of it.';
+  if (play.hit) evSay('Took ' + dmg + ' harm' + (arm ? ' after armor' : ''));
+  clearTimeout(play.hitTimer);
+  if (play.hit) play.hitTimer = setTimeout(function () { play.hit = 0; renderPlay(); }, 4000);
+  renderSheet(); scheduleSave();
+}
+function hitEnd() { clearTimeout(play.hitTimer); play.hit = 0; }
 var rit = { open: false, caseId: '', eos: [false, false, false, false], heal: 'none', clear: true, done: null };   // the end-of-session panel; nothing it holds is saved
 /* what a new player says they want to do: the move that covers it, or a line of advice when no move does */
 var WANTS = [
@@ -2848,12 +2869,12 @@ function renderPlay() {
   host.innerHTML =
     '<div class="pwho">' + av + '<span><b>' + esc(sh.name || 'Your hunter') + '</b><span class="muted small">' + esc(sh.playbook || 'No playbook yet') + ' &middot; Level ' + sh.level + '</span></span></div>' +
     (fresh ? '<p class="note pfresh" style="margin:0">No hunter yet. You can still roll the basic moves. <button type="button" class="linkbtn" data-pgo="build">Build a hunter</button></p>' : '') +
-    '<div class="pblock"><span class="lbl">Ratings</span><div class="statrow" role="group" aria-label="Stat to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmtI(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div>' +
+    '<div class="pblock"><div class="statrow" role="group" aria-label="Rating to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmtI(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div>' +
     (gear ? '<div class="pblock"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '');
   $('#pv-harm').innerHTML = '<span class="lbl">Harm</span>' + pipStr('pl-harm', 'harm', 8, sh.harm, 'Harm') + '<p class="small' + (sh.harm >= 4 ? '' : ' muted') + '" style="margin:6px 0 0">' + (sh.unstable ? '<b style="color:var(--bad)">Unstable.</b> ' : '') + esc(harmText(sh.harm)) + '</p>' +
-      '<div class="prow"><span>Take harm</span><span class="ctl"><button type="button" data-ph="-1" aria-label="Less harm"><span class="i i-minus" aria-hidden="true"></span></button><output>' + play.harm + '</output><button type="button" data-ph="1" aria-label="More harm"><span class="i i-plus" aria-hidden="true"></span></button></span><button type="button" class="btn sm" id="pl-take">Apply</button></div>' +
-      '<div class="prow"><label><input type="checkbox" id="pl-ign"' + (play.ignore ? ' checked' : '') + '> Ignores armor</label><span><button type="button" class="btn ghost sm" id="pl-heal1"' + (sh.harm < 1 ? ' disabled' : '') + '>Heal 1</button> <button type="button" class="btn ghost sm" id="pl-healall"' + (sh.harm < 1 ? ' disabled' : '') + '>Heal all</button></span></div>' +
-      '<div class="prow"><label><input type="checkbox" id="pl-unst"' + (sh.unstable ? ' checked' : '') + '> Unstable</label></div>' +
+      '<div class="prow"><span>Take harm</span><span class="ctl"><button type="button" data-ph="-1" aria-label="Less harm"' + (play.hit ? '' : ' disabled') + '><span class="i i-minus" aria-hidden="true"></span></button><output aria-live="polite">' + play.hit + '</output><button type="button" data-ph="1" aria-label="More harm"><span class="i i-plus" aria-hidden="true"></span></button></span></div>' +
+      '<div class="prow"><span>Heal</span><span class="pbtns"><button type="button" class="btn ghost sm" id="pl-heal1" aria-label="Heal 1"' + (sh.harm < 1 ? ' disabled' : '') + '>+1</button><button type="button" class="btn ghost sm" id="pl-healall" aria-label="Heal all"' + (sh.harm < 1 ? ' disabled' : '') + '>All</button></span></div>' +
+      '<div class="prow pchecks"><label><input type="checkbox" id="pl-ign"' + (play.ignore ? ' checked' : '') + '> Ignores armor</label><span class="vdiv" aria-hidden="true"></span><label><input type="checkbox" id="pl-unst"' + (sh.unstable ? ' checked' : '') + '> Unstable</label></div>' +
       '<p class="pmsg" role="status">' + esc(play.msg) + '</p>' +
       (play.wound > 0 && sh.luck > 0 ? '<button type="button" class="btn ghost sm" id="pl-undo">Spend Luck: cancel that wound</button>' : '');
   $('#pv-luck').innerHTML = '<span class="lbl">Luck</span>' + '<div class="pips candles' + (sh.luck < 3 ? ' low' : '') + '" id="pl-luck" role="group" aria-label="Luck">' + luckPips(sh.luck) + '</div><p class="lucknote' + (sh.luck < 3 ? ' low' : '') + '">' + luckNote(sh.luck) + '</p>' + (d ? '<p class="small muted" style="margin:6px 0 0"><b>When you spend Luck:</b> ' + esc(d.luckSpecial) + '</p>' : '');
@@ -2897,25 +2918,18 @@ function renderPlay() {
       if (k === 'hold') S.hold.n = clamp(S.hold.n + dd, 0, 9); else R[k] = clamp(R[k] + dd, -5, 5);
       renderRoller(); scheduleSave(); return;
     }
-    if ((g = t.closest('[data-ph]'))) { play.harm = clamp(play.harm + +g.dataset.ph, 1, 12); renderPlay(); return; }
+    if ((g = t.closest('[data-ph]'))) { hitSet(play.hit + +g.dataset.ph); return; }
     if ((g = t.closest('.pips button')) && /^pl-/.test(g.parentElement.id)) {
       var n = +g.dataset.n, id = g.parentElement.id;
       if (id === 'pl-luck') setLuck(sh.luck === n ? n - 1 : n);
-      if (id === 'pl-harm') { sh.harm = sh.harm === n ? n - 1 : n; if (sh.harm >= 4) sh.unstable = true; if (sh.harm === 0) sh.unstable = false; play.wound = 0; play.msg = ''; }
+      if (id === 'pl-harm') { hitEnd(); sh.harm = sh.harm === n ? n - 1 : n; if (sh.harm >= 4) sh.unstable = true; if (sh.harm === 0) sh.unstable = false; play.wound = 0; play.msg = ''; }
       if (id === 'pl-xp') sh.xp = sh.xp === n ? n - 1 : n;
       renderSheet(); scheduleSave(); return;
     }
-    if (t.id === 'pl-take') {
-      var arm = play.ignore ? 0 : armorVal(), dmg = Math.max(0, play.harm - arm), before = sh.harm;
-      evSay('Took ' + dmg + ' harm' + (arm ? ' after armor' : ''));
-      sh.harm = Math.min(8, sh.harm + dmg); if (sh.harm >= 4) sh.unstable = true;
-      play.wound = sh.harm - before;
-      play.msg = dmg ? 'Took ' + dmg + ' harm' + (arm ? ' (' + play.harm + ' less ' + arm + ' armor)' : '') + '. You are at ' + sh.harm + '.' : 'Your armor soaked all of it.';
-      renderSheet(); scheduleSave(); return;
-    }
-    if (t.id === 'pl-healall') { evSay('Healed all harm'); sh.harm = 0; sh.unstable = false; play.wound = 0; play.msg = ''; renderSheet(); scheduleSave(); return; }
-    if (t.id === 'pl-heal1') { evSay('Healed 1'); sh.harm = Math.max(0, sh.harm - 1); if (sh.harm < 4) sh.unstable = false; play.wound = 0; play.msg = ''; renderSheet(); scheduleSave(); return; }
+    if (t.id === 'pl-healall') { hitEnd(); evSay('Healed all harm'); sh.harm = 0; sh.unstable = false; play.wound = 0; play.msg = ''; renderSheet(); scheduleSave(); return; }
+    if (t.id === 'pl-heal1') { hitEnd(); evSay('Healed 1'); sh.harm = Math.max(0, sh.harm - 1); if (sh.harm < 4) sh.unstable = false; play.wound = 0; play.msg = ''; renderSheet(); scheduleSave(); return; }
     if (t.id === 'pl-undo' && play.wound > 0 && sh.luck > 0) {
+      hitEnd();
       evSay('Spent Luck to cancel a wound');
       sh.harm = Math.max(0, sh.harm - play.wound); if (sh.harm < 4) sh.unstable = false; setLuck(sh.luck - 1);
       play.msg = 'Luck spent. That wound is cancelled. ' + sh.luck + ' Luck left.'; play.wound = 0;
@@ -2924,7 +2938,7 @@ function renderPlay() {
     if ((g = t.closest('[data-pgo]'))) { if (g.dataset.pgo === 'build') { setHV('build'); renderBuild(); window.scrollTo(0, 0); } else { var lv = $('#lvlup'); if (lv) lv.scrollIntoView({ block: 'center' }); } scheduleSave(); return; }
   });
   host.addEventListener('change', function (e) {
-    if (e.target.id === 'pl-ign') play.ignore = e.target.checked;
+    if (e.target.id === 'pl-ign') { play.ignore = e.target.checked; if (play.hit) hitSet(play.hit); }
     if (e.target.id === 'pl-unst') { S.sheet.unstable = e.target.checked; renderPlay(); scheduleSave(); }
   });
 })();
