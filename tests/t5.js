@@ -1,5 +1,6 @@
 require('fs').mkdirSync(require('path').join(__dirname,'out'),{recursive:true});
 const { chromium } = require('playwright');
+const followDevice = require('./look');
 const fs = require('fs');
 const STUB = fs.readFileSync(require('path').join(__dirname,'fixtures','stub.txt'),'utf8');
 const results = []; const errs = [];
@@ -76,7 +77,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   check('Spend Luck is offered after a miss', (await p.locator('#spendluck').count())===1);
   await p.click('#spendluck'); await p.waitForTimeout(150);
   check('Spend Luck makes it a 12 and costs 1', (await T('#sum')).startsWith('12') && (await T('#rollas')).includes('Luck 6'), await T('#rollas'));
-  check('lightning flash fired on 12', await p.evaluate(()=>document.getElementById('fx').className)==='fx-crit');
+  check('the edge burns on a 12', await p.evaluate(()=>document.getElementById('fx').className)==='fx-crit');
   await p.click('#clearhist'); check('Clear empties history', /No rolls yet/.test(await T('#hist')));
 
   // ---- HUNTER: BUILD ----
@@ -187,7 +188,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await p.click('#settings > summary');
   await p.uncheck('#set-fx'); await p.click('#t-roll'); await p.evaluate(()=>{document.getElementById('fx').className='';});
   for (let i=0;i<6;i++){ await p.click('#roll'); await p.waitForTimeout(1400); }
-  check('effects off: no flash class set', await p.evaluate(()=>document.getElementById('fx').className)==='');
+  check('effects off: no effect class set', await p.evaluate(()=>document.getElementById('fx').className)==='');
   await p.check('#set-fx');
   await p.click('#bk-save'); await p.waitForTimeout(200);
   const saved = await p.evaluate(()=>window.__saved[0]);
@@ -208,7 +209,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
 
   // ---- LAYOUT / THEMES ----
   for (const [scheme,w] of [['light',1100],['dark',390],['light',390]]) {
-    const c2 = await b.newContext({ viewport: { width: w, height: 800 }, colorScheme: scheme }); await c2.addInitScript(STUB); const q = await c2.newPage();
+    const c2 = await b.newContext({ viewport: { width: w, height: 800 }, colorScheme: scheme }); await c2.addInitScript(STUB); if (scheme==='light') await followDevice(c2); const q = await c2.newPage();
     q.on('pageerror', e => errs.push('PAGEERR2 ' + e.message));
     await q.goto('file://'+require('path').join(__dirname,'..','index.html')+''); await q.waitForTimeout(500);
     let worst = 0;

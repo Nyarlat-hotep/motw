@@ -34,6 +34,29 @@ Saves go to the browser's localStorage. Use Settings and backup in the app to do
 
 `npm run build` copies what the site needs into `dist/` for hosting. Pushing `main` deploys it.
 
+## Working on it
+
+**Pushing `main` puts the site live for the whole table**, about half a minute after the push. So:
+
+1. Make a branch for your change. Pushing a branch changes nothing on the live site. (Cloudflare shows a failed "preview" check on branches; that is expected and can be ignored. A failed check on `main` is not.)
+2. Run the tests before it goes to `main`:
+
+       npm install          # once
+       npm test             # about fifteen minutes; every file prints TOTAL and FAIL counts
+       node tests/t18.js    # or just the file for what you touched; CLAUDE.md lists what each one covers
+
+3. Open a pull request, or tell Jacob, and merge when the tests pass.
+
+Things that will save you time:
+
+- Almost everything is in `index.html`, in plain ES5 (`var`, `function`, no modules). Edit it directly; there is no build step for the page.
+- `CLAUDE.md` is the map: how the state is laid out, what each part is called, and the rules that keep it working. `docs/TODO.md` is what is left to do.
+- Playbook content is in `data/*.json`. After changing it, run `python3 tools/embed_data.py`.
+- The page is dark unless a player picks Light or My device in Settings, so look at new work in dark first, and at phone width (390px).
+- To try the shared table on your own machine: `npm run build`, then `npx wrangler dev --config worker/wrangler.jsonc --var DEV:1`, and open the address it prints with `?as=yourname` on the end.
+- To check something in Safari's engine: `npx playwright install webkit` once, serve the folder, then `HJ_URL=http://localhost:5173 node -r ./tests/webkit.js tests/t18.js` (see `tests/webkit.js`).
+- Keep the repo private: see the notes on playbook text and on the dice recordings below.
+
 ## Playbook text
 
 The playbook summaries are plain-English paraphrase written for this table. Ratings, harm, armor, tags and pick counts are exact. Keep the repo private, and treat a printed playbook sheet as the final word on any detail.

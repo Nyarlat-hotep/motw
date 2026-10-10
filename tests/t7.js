@@ -1,5 +1,6 @@
 require('fs').mkdirSync(require('path').join(__dirname,'out'),{recursive:true});
 const { chromium } = require('playwright');
+const followDevice = require('./look');
 const ids=['chosen','crooked','divine','expert','flake','initiate','monstrous','mundane','professional','spellslinger','spooky','wronged'];
 const DATA=ids.map(i=>require('../data/'+i+'.json'));
 const pmin=(p,o)=>o?0:(Array.isArray(p)?p[0]:(p|0)), pmax=p=>Array.isArray(p)?p[1]:(p|0);
@@ -115,7 +116,7 @@ const pmin=(p,o)=>o?0:(Array.isArray(p)?p[0]:(p|0)), pmax=p=>Array.isArray(p)?p[
  // overflow checks both themes at phone width, step by step
  if (!only) {
   for (const theme of ['light','dark']) {
-   const ctx=await b.newContext({viewport:{width:390,height:800}, colorScheme:theme}); const p=await ctx.newPage();
+   const ctx=await b.newContext({viewport:{width:390,height:800}, colorScheme:theme}); if (theme==='light') await followDevice(ctx); const p=await ctx.newPage();
    await p.goto('file://'+require('path').join(__dirname,'..','index.html')+''); await p.waitForTimeout(700);
    await p.click('#t-hunter');
    await p.locator('.pb', {hasText:'The Chosen'}).locator('[data-pick]').click();

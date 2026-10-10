@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Hunter's Journal</title>
 <meta name="theme-color" content="#110c0e">
-<script>try { var st0 = (JSON.parse(localStorage.getItem("hunters-journal-v1")) || {}).settings || {}, r0 = document.documentElement; if (st0.theme === "light" || st0.theme === "dark") r0.setAttribute("data-theme", st0.theme); if (/^[a-z]{1,12}$/.test(st0.ink || "")) r0.setAttribute("data-ink", st0.ink); } catch (e) {}</script>
+<script>try { var st0 = {}, r0 = document.documentElement; try { st0 = (JSON.parse(localStorage.getItem("hunters-journal-v1")) || {}).settings || {}; } catch (e) {} if (st0.theme !== "device") r0.setAttribute("data-theme", st0.theme === "light" ? "light" : "dark"); if (/^[a-z]{1,12}$/.test(st0.ink || "")) r0.setAttribute("data-ink", st0.ink); } catch (e) {}</script>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="img/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="img/icon-180.png">
@@ -22,6 +22,7 @@
   --accent: #8c1d2b; --accent-ink: #fff8f0; --brass: #85601a;
   --good: #0b6b57; --good-bg: #d3eadf; --warn: #855200; --warn-bg: #f2dfb4; --bad: #a82424; --bad-bg: #f3d3cf;
   --die: #f6efe1; --pip: #22171a;
+  --scorch: #8a4a0c; --scorch-miss: #a82424;
   --cw-a: #b09a70; --cw-b: #f7ecd0; --cw-c: #dccba3; --cw-d: #c4b189; --cw-pd: #dccba3; --cw-rim: #f3e6c6; --cw-pool: #cdbb92; --cw-smoke: #6d625c; --cw-dk: 0; --cw-sh: .16; --cw-ledge: .2;
   --cw-out: saturate(.35) brightness(.96); --cw-outo: .6; --cw-edge: drop-shadow(0 0 .5px #c25600) drop-shadow(0 0 1.6px rgba(232, 120, 20, .55)); --cw-tint: brightness(.35);
   --display: 'IM Fell English SC', 'IM Fell English', 'Palatino Linotype', Georgia, serif;
@@ -34,7 +35,7 @@
   :root:not([data-theme="light"]) {
     --bg: #110c0e; --surface: #1a1215; --surface2: #26191d; --ink: #f0e7dc; --muted: #b3a496; --line: #3e2c31;
     --accent: #e0675b; --accent-ink: #1a0b0d; --brass: #d1a954;
-    --good: #62d6b0; --good-bg: #10302a; --warn: #eebb4c; --warn-bg: #392a0c; --bad: #ff8a80; --bad-bg: #3b1618;
+    --good: #62d6b0; --good-bg: #10302a; --warn: #eebb4c; --warn-bg: #392a0c; --bad: #ff8a80; --bad-bg: #3b1618; --scorch: #b8741c; --scorch-miss: #7a1616;
     --cw-a: #7d6c4d; --cw-b: #e9dcb9; --cw-c: #bfae86; --cw-d: #a3916b; --cw-pd: #7a6a4c; --cw-rim: #e6d8b4; --cw-pool: #a3936f; --cw-smoke: #cfc6bb; --cw-dk: 1; --cw-sh: .45; --cw-ledge: .5;
     --cw-out: saturate(.4) brightness(.48); --cw-outo: 1; --cw-edge: none; --cw-tint: none;
     color-scheme: dark;
@@ -43,7 +44,7 @@
 :root[data-theme="dark"] {
   --bg: #110c0e; --surface: #1a1215; --surface2: #26191d; --ink: #f0e7dc; --muted: #b3a496; --line: #3e2c31;
   --accent: #e0675b; --accent-ink: #1a0b0d; --brass: #d1a954;
-  --good: #62d6b0; --good-bg: #10302a; --warn: #eebb4c; --warn-bg: #392a0c; --bad: #ff8a80; --bad-bg: #3b1618;
+  --good: #62d6b0; --good-bg: #10302a; --warn: #eebb4c; --warn-bg: #392a0c; --bad: #ff8a80; --bad-bg: #3b1618; --scorch: #b8741c; --scorch-miss: #7a1616;
   --cw-a: #7d6c4d; --cw-b: #e9dcb9; --cw-c: #bfae86; --cw-d: #a3916b; --cw-pd: #7a6a4c; --cw-rim: #e6d8b4; --cw-pool: #a3936f; --cw-smoke: #cfc6bb; --cw-dk: 1; --cw-sh: .45; --cw-ledge: .5;
   --cw-out: saturate(.4) brightness(.48); --cw-outo: 1; --cw-edge: none; --cw-tint: none;
   color-scheme: dark;
@@ -465,6 +466,16 @@ details.beast .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 .pin[open] summary { margin-bottom: 4px; }
 #play-pin:not(:empty) { margin-bottom: 16px; }
 #play-feed:not(:empty) { margin-top: 16px; }
+/* the table's roll feed: each roll with the roller's own two dice. A small die is the full-size flat one scaled down, so every finish looks as it does in the tray. */
+.mdie { position: relative; display: inline-block; width: 26px; height: 26px; flex: none; }
+.mdie .slot { position: absolute; left: 0; top: 0; transform: scale(.40625); transform-origin: 0 0; }
+/* a face normally sits on a side of the cube; here it lies flat */
+.mdie .slot .face { transform: none; }
+.tfeed li { grid-template-columns: auto 1.6em 1fr auto; align-items: center; }
+.tfeed .tdice { display: flex; gap: 4px; }
+.tfeed li.new .tdice { animation: tland .5s cubic-bezier(.2, .9, .3, 1.3); }
+@keyframes tland { 0% { transform: translateY(-10px) rotate(-14deg); opacity: 0; } 100% { transform: none; opacity: 1; } }
+@media (max-width: 480px) { .tfeed li { grid-template-columns: auto 1.6em 1fr; } .tfeed .tag { grid-column: 3; } }
 .kform { display: grid; gap: 6px; margin-top: 12px; }
 .kform h3 { margin: 0; }
 .kform .lbl { margin: 8px 0 0; }
@@ -489,19 +500,22 @@ details.beast .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 details.sect.slim > summary { font-size: 16px; }
 .tiny { font-size: 12px; color: var(--muted); }
 
-/* big moments */
-#fx { position: fixed; inset: 0; z-index: 50; pointer-events: none; opacity: 0; }
-#fx.fx-crit { animation: fxcrit .95s ease-out; background: radial-gradient(circle at 50% 35%, #fff 0%, color-mix(in srgb, var(--brass) 60%, #fff) 22%, transparent 70%); }
-#fx.fx-miss { animation: fxmiss .7s ease-out; box-shadow: inset 0 0 160px 40px var(--bad); }
-#fx.fx-level { animation: fxlevel 1.1s ease-out; background: radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--brass) 70%, transparent) 0%, transparent 65%); }
-@keyframes fxcrit { 0% { opacity: 0; } 6% { opacity: .95; } 14% { opacity: .1; } 22% { opacity: .7; } 40% { opacity: .08; } 100% { opacity: 0; } }
-@keyframes fxmiss { 0% { opacity: 0; } 15% { opacity: .8; } 100% { opacity: 0; } }
-@keyframes fxlevel { 0% { opacity: 0; } 25% { opacity: .8; } 100% { opacity: 0; } }
+/* big moments: a ragged, burnt edge around the screen, never a flash across the middle. #fx holds one SVG rectangle; its thick stroke is blurred and then pushed about by noise
+   (the #fxrough filter, or the finer #fxrough-s on a phone), which is what makes the edge uneven. Only the layer's opacity moves, and the layer is not drawn at all between moments. */
+#fx { position: fixed; inset: 0; z-index: 50; pointer-events: none; opacity: 0; visibility: hidden; overflow: hidden; }
+#fx svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+#fx rect { fill: none; stroke: var(--scorch); stroke-width: clamp(64px, 11vmin, 120px); filter: url(#fxrough); }
+#fx.fx-miss rect { stroke: var(--scorch-miss); }
+@media (max-width: 640px) { #fx rect { stroke-width: 40px; filter: url(#fxrough-s); } }
+#fx.fx-crit { animation: fxburn 1.6s ease-in-out; }
+#fx.fx-miss { animation: fxburn 1.4s ease-in-out; }
+#fx.fx-level { animation: fxburn 2.2s ease-in-out; }
+@keyframes fxburn { 0%, 100% { opacity: 0; visibility: visible; } 30% { opacity: .9; visibility: visible; } }
 .wrap.shake { animation: shake .5s cubic-bezier(.36, .07, .19, .97); }
 @keyframes shake { 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); } 30%, 50%, 70% { transform: translateX(-7px); } 40%, 60% { transform: translateX(7px); } }
 .tier.boom { animation: boom .6s ease-out; }
 @keyframes boom { 0% { transform: scale(.96); } 40% { transform: scale(1.025); } 100% { transform: scale(1); } }
-@media (prefers-reduced-motion: reduce) { #fx, .wrap.shake, .tier.boom { animation: none !important; } .texture { transition: none; } }
+@media (prefers-reduced-motion: reduce) { #fx, .wrap.shake, .tier.boom, .tfeed li.new .tdice { animation: none !important; } .texture { transition: none; } }
 
 /* ---- the old book: type, paper, rules ---- */
 body { font: 19px/1.6 var(--body); font-variant-ligatures: common-ligatures discretionary-ligatures; text-rendering: optimizeLegibility;
@@ -824,7 +838,8 @@ div.wcard { cursor: default; border-color: var(--good); }
 </defs></svg>
 <div class="texture" aria-hidden="true"></div>
 <div class="texture t2" aria-hidden="true"></div>
-<div id="fx" aria-hidden="true"></div>
+<div id="tbl-say" class="vh" aria-live="polite"></div>
+<div id="fx" aria-hidden="true"><svg focusable="false"><defs><filter id="fxrough" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="4" result="n"/><feGaussianBlur in="SourceGraphic" stdDeviation="16" result="b"/><feDisplacementMap in="b" in2="n" scale="46" xChannelSelector="R" yChannelSelector="G"/></filter><filter id="fxrough-s" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="4" result="n"/><feGaussianBlur in="SourceGraphic" stdDeviation="9" result="b"/><feDisplacementMap in="b" in2="n" scale="26" xChannelSelector="R" yChannelSelector="G"/></filter></defs><rect width="100%" height="100%"/></svg></div>
 <div class="evtoast" id="evtoast" role="status" hidden><span id="evtoast-t"></span><button class="btn sm" type="button" id="evtoast-undo">Undo</button></div>
 <dialog class="hcdlg hodlg" id="hodlg" aria-label="Picture from the Keeper"><img id="hodlg-img" alt=""><p id="hodlg-cap"></p><div class="actions"><button class="btn sm" type="button" id="hodlg-close">Close</button></div></dialog>
 <dialog class="hcdlg" id="hcdlg" aria-labelledby="hc-title">
@@ -1293,13 +1308,14 @@ div.wcard { cursor: default; border-color: var(--good); }
     <summary>Settings and backup</summary>
     <div class="body">
       <h3>Look</h3>
-      <div class="seg" role="group" aria-label="Light or dark" style="margin-bottom:0"><button type="button" data-look="auto">My device</button><button type="button" data-look="light">Light</button><button type="button" data-look="dark">Dark</button></div>
+      <div class="seg" role="group" aria-label="Light or dark" style="margin-bottom:0"><button type="button" data-look="dark">Dark</button><button type="button" data-look="light">Light</button><button type="button" data-look="device">My device</button></div>
       <div class="inks" id="inks" role="group" aria-label="Ink color"></div>
       <p class="small muted" style="margin:8px 0 0">The ink colors the buttons, tabs and links. It does not change any of the art.</p>
       <h3>Big moments</h3>
-      <label class="switch"><input type="checkbox" id="set-fx"><span>Lightning on a 12+, a shake on a miss, a glow on level-up</span></label>
+      <label class="switch"><input type="checkbox" id="set-fx"><span>A burning edge around the screen on a 12+ and on a level-up, a red one and a shake on a miss</span></label>
       <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-snd"><span>Sound: dice that sound like what they are made of, a bell on a 10+, thunder on a 12+ and a low thud on a miss</span></label>
       <label class="volrow"><span>Volume</span><input type="range" id="set-vol" min="0" max="100" step="5"></label>
+      <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-tnote"><span>When someone else at the table rolls: a soft clatter of their dice if sound is on, and a spoken line for screen readers</span></label>
       <p class="small muted" style="margin:6px 0 0">Sound is off unless you turn it on, because on a call your microphone may pick it up. Hold the Roll button to shake the dice, let go to throw.</p>
       <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-3d"><span>3D dice (new): the dice tumble in real 3D, and Fuel dice show their liquid. Best on a recent phone or computer.</span></label>
       <p class="small muted" id="d3msg" role="status" style="margin:6px 0 0"></p>
@@ -1437,7 +1453,7 @@ function exampleCase() {
 }
 function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.hook = c.threats = c.weakness = c.npcs = c.loose = c.log = ''; c.clock = 0; c.eos = [false, false, false, false]; c.date = new Date().toISOString().slice(0, 10); return c; }
 function defaults() {
-  return { v: 1, tab: 'guide', hv: 'build', wiz: 0, bkAt: 0, start: { hide: false, rolled: false }, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage', theme: 'auto', ink: '', tname: '' }, hold: { n: 0, move: '', asked: [] }, session: { started: 0, events: [] }, bench: [], hoseen: 0, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
+  return { v: 1, tab: 'guide', hv: 'build', wiz: 0, bkAt: 0, start: { hide: false, rolled: false }, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage', theme: 'dark', ink: '', tname: '', tnote: true }, hold: { n: 0, move: '', asked: [] }, session: { started: 0, events: [] }, bench: [], hoseen: 0, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0 },
     sheet: { name: '', pronouns: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, adv: {}, moves: '', gear: '' } };   // adv: the moves marked advanced, by id
 }
@@ -1620,7 +1636,7 @@ function evLine(ev) {
   return '<li class="ev"><span class="evk">' + esc(EVKIND[ev.kind] || 'Note') + '</span><span>' + esc(evText(ev)) + '</span><span class="evend">' + act + '</span></li>';
 }
 /* on window so tests can look in and drive the timeline directly */
-window.__journal = { S: function () { return S; }, evAdd: evAdd, evUndo: evUndo, evBase: evBase, evList: evList, levelDone: levelDone, scheduleSave: scheduleSave };
+window.__journal = { S: function () { return S; }, evAdd: evAdd, evUndo: evUndo, evBase: evBase, evList: evList, levelDone: levelDone, scheduleSave: scheduleSave, fxPlay: function (k) { fxPlay(k); } };
 function renderSession(el) {
   var evs = evList();
   if (!evs.length) { el.innerHTML = '<li class="muted"><span></span>Nothing yet. Rolls, harm, Luck and XP show up here as you play.<span></span></li>'; return; }
@@ -3480,7 +3496,7 @@ document.addEventListener('change', function (e) {
    The Worker in worker/ keeps one table for the whole site: who is here, each shared hunter card, the last rolls, and what the Keeper posts.
    The page asks /api/me once. If nothing answers (opened from a file, no Worker, nobody signed in) the table stays off and the journal works as it always has.
    Everything that arrives from the table is other people's data: every field is checked and cut here, dice go through strictDie, and every string is escaped where it is shown. */
-var tbl = { on: false, state: 'off', ws: null, me: null, members: [], rolls: [], hos: [], tries: 0, timer: null, as: '', view: 'hunters', edit: null, del: '', msg: '', stale: false, pinOpen: true, pinId: '', pong: 0, back: null };
+var tbl = { on: false, state: 'off', ws: null, me: null, members: [], rolls: [], hos: [], tries: 0, timer: null, as: '', view: 'hunters', edit: null, del: '', msg: '', stale: false, pinOpen: true, pinId: '', pong: 0, back: null, fresh: 0 };
 var HOKINDS = ['scene', 'clue', 'person', 'place', 'note'], HOKIND = { scene: 'Scene', clue: 'Clue', person: 'Person', place: 'Place', note: 'Note' };
 var TBLERR = { 'Keeper only': 'Only the Keeper can do that.', 'bad handout': 'Give it a title, some words or a picture first.', 'no such handout': 'That handout is gone. It may have been deleted from another window.', 'too many handouts': 'The table holds 60 handouts. Delete an old one to make room.', 'slow down': 'That was too fast for the table. Try again in a moment.', 'too big': 'That was too big for the table to take.' };
 function tableOn() { return tbl.on || !!(store.db && store.uid); }
@@ -3509,7 +3525,7 @@ function tblRoll(r) {
   if (!r || typeof r !== 'object' || !/^[0-9a-f]{12}$/.test(r.id)) return null;
   var d1 = tblInt(r.d1, 1, 6, 0), d2 = tblInt(r.d2, 1, 6, 0); if (!d1 || !d2) return null;
   var mod = tblInt(r.mod, -15, 15, 0), luck = r.luck === true, total = luck ? 12 : d1 + d2 + mod;
-  return { n: tblInt(r.n, 0, 9e15, 0), id: r.id, at: tblInt(r.at, 0, 9e15, 0), move: tblStr(r.move, 80), d1: d1, d2: d2, mod: mod, total: total, tier: tierOf(total), luck: luck };
+  return { n: tblInt(r.n, 0, 9e15, 0), id: r.id, at: tblInt(r.at, 0, 9e15, 0), move: tblStr(r.move, 80), d1: d1, d2: d2, mod: mod, total: total, tier: tierOf(total), luck: luck, dice: tblDice(r.dice) };
 }
 function tblHo(h) {
   if (!h || typeof h !== 'object' || !/^[0-9a-f]{18}$/.test(h.id)) return null;
@@ -3594,7 +3610,8 @@ function tblIn(m) {
     x.card = null; x.dice = null;
   } else if (m.t === 'roll') {
     x = tblRoll(m.roll); if (!x) return;
-    tbl.rolls.unshift(x); tbl.rolls = tbl.rolls.slice(0, 50);
+    tbl.rolls.unshift(x); tbl.rolls = tbl.rolls.slice(0, 50); tbl.fresh = x.n;
+    if (!tbl.me || x.id !== tbl.me.id) tblHeard(x);
   } else if (m.t === 'ho') {
     h = tblHo(m.h); if (!h) return;
     tbl.hos = tbl.hos.filter(function (o) { return o.id !== h.id; }); tbl.hos.push(h);
@@ -3617,15 +3634,19 @@ function tblSync() {
   party.err = '';
   tblDraw();
 }
-/* redraw everything the table feeds. Never under someone who is typing: that waits until they leave the field. */
+/* redraw everything the table feeds. Never under someone who is typing, and never under a press: a button that is replaced between the press and the release
+   loses its click (the Keeper's Save did, whenever news had arrived while they typed). Both wait, as tbl.stale, until the field is left and the press is over.
+   A press counts for three seconds at most, in case its release happens outside the window and is never seen. */
+var tblPress = 0;
+function tblBusy() { return Date.now() - tblPress < 3000 || !!$('#partybody input:focus, #partybody textarea:focus, #partybody select:focus'); }
 function tblDraw() {
   tblDot(); renderTable();
-  if ($('#partybody input:focus, #partybody textarea:focus, #partybody select:focus')) tbl.stale = true; else renderParty();
+  if (tblBusy()) tbl.stale = true; else renderParty();
 }
-document.addEventListener('focusout', function (e) {
-  if (!tbl.stale || !e.target.closest || !e.target.closest('#partybody')) return;
-  setTimeout(function () { if (tbl.stale && !$('#partybody input:focus, #partybody textarea:focus, #partybody select:focus')) renderParty(); }, 0);
-});
+function tblCatchUp() { setTimeout(function () { if (tbl.stale && !tblBusy()) renderParty(); }, 0); }
+document.addEventListener('focusout', function (e) { if (tbl.stale && e.target.closest && e.target.closest('#partybody')) tblCatchUp(); });
+document.addEventListener('pointerdown', function () { tblPress = Date.now(); }, true);
+['pointerup', 'pointercancel'].forEach(function (n) { document.addEventListener(n, function () { tblPress = 0; if (tbl.stale) tblCatchUp(); }, true); });
 function tblShown() { return tbl.hos.filter(function (h) { return h.shown; }).sort(function (a, b) { return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || b.at - a.at; }); }
 function tblUnseen() { return tbl.on && !tbl.me.keeper ? tbl.hos.filter(function (h) { return h.shown && h.at > S.hoseen; }).length : 0; }
 function tblDot() {
@@ -3722,10 +3743,19 @@ function renderTable() {
   }
   if (feed) {
     var rs = tbl.rolls.slice(0, 5);
-    feed.innerHTML = tbl.on && rs.length ? '<div class="card"><h3 style="margin-top:0">At the table</h3><ul class="hist">' + rs.map(function (r) {
-      return '<li><b>' + r.total + '</b><span>' + esc(tblWho(r.id)) + ': ' + esc(r.move || 'A roll') + ' <span class="muted">(' + r.d1 + '+' + r.d2 + ' ' + fmt(r.mod) + (r.luck ? ', Luck' : '') + ')</span></span><span class="tag ' + r.tier + '">' + TIERNAME[r.tier] + '</span></li>';
+    feed.innerHTML = tbl.on && rs.length ? '<div class="card"><h3 style="margin-top:0">At the table</h3><ul class="hist tfeed">' + rs.map(function (r) {
+      var d = r.dice || { a: die0(), b: die0() };
+      return '<li' + (r.n && r.n === tbl.fresh ? ' class="new"' : '') + '><span class="tdice" role="img" aria-label="Dice showing ' + r.d1 + ' and ' + r.d2 + '">' + miniDie(r.d1, d.a) + miniDie(r.d2, d.b) + '</span><b>' + r.total + '</b><span>' + esc(tblWho(r.id)) + ': ' + esc(r.move || 'A roll') + ' <span class="muted">(' + r.d1 + '+' + r.d2 + ' ' + fmt(r.mod) + (r.luck ? ', Luck' : '') + ')</span></span><span class="tag ' + r.tier + '">' + TIERNAME[r.tier] + '</span></li>';
     }).join('') + '</ul></div>' : '';
+    tbl.fresh = 0;
   }
+}
+/* someone else's roll: their dice land quietly (only with sound on) and a line is read out for screen readers. One switch in Settings turns both off. */
+function tblHeard(r) {
+  if (S.settings.tnote === false) return;
+  var d = r.dice || { a: die0(), b: die0() }, say = $('#tbl-say');
+  if (say) say.textContent = tblWho(r.id) + ' rolled ' + r.total + (r.move ? ' on ' + r.move : '') + ': ' + TIERNAME[r.tier] + '.';
+  [d.a, d.b].forEach(function (die, i) { [[0, .22], [170, .1]].forEach(function (h) { setTimeout(function () { hit(die, h[1]); }, i * 80 + h[0]); }); });
 }
 document.addEventListener('toggle', function (e) { if (e.target && e.target.id === 'pin-d') tbl.pinOpen = e.target.open; }, true);
 
@@ -3909,16 +3939,17 @@ function fxPlay(kind) {
 var caps = { dl: null, sample: null };
 function bkMsg(t) { $('#bk-msg').textContent = t || ''; }
 function backupText() { return JSON.stringify({ app: 'hunters-journal', v: 1, exported: new Date().toISOString(), journal: S }, null, 1); }
-/* Look: light or dark, and an ink. The colors themselves are CSS (see the inks near the top); this only sets two attributes on the page.
+/* Look: dark (the default), light or following the device, and an ink. The colors themselves are CSS (see the inks near the top); this only sets two attributes on the page.
+   Anything that is not 'light' or 'device' is dark, which covers the 'auto' that older saves hold.
    l and d are the swatch colors and must match each ink's accent in the CSS: tests/t18.js checks that they do. */
 var INKS = [
   { id: '', name: 'Oxblood', l: '#8c1d2b', d: '#e0675b' }, { id: 'moss', name: 'Graveyard moss', l: '#2f6b3a', d: '#7fcf8e' }, { id: 'midnight', name: 'Midnight blue', l: '#28509a', d: '#86abf2' },
   { id: 'brass', name: 'Brass', l: '#7a5a0e', d: '#e2b955' }, { id: 'rust', name: 'Rust', l: '#a3410d', d: '#f0894a' }, { id: 'dust', name: 'Dust', l: '#6b5630', d: '#d9bf8f' }
 ];
 function applyLook() {
-  var st = S.settings, root = document.documentElement, th = st.theme === 'light' || st.theme === 'dark' ? st.theme : 'auto';
+  var st = S.settings, root = document.documentElement, th = st.theme === 'light' || st.theme === 'device' ? st.theme : 'dark';
   var ink = INKS.filter(function (i) { return i.id && i.id === st.ink; })[0] ? st.ink : '';
-  if (th === 'auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', th);
+  if (th === 'device') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', th);
   if (ink) root.setAttribute('data-ink', ink); else root.removeAttribute('data-ink');
   $$('[data-look]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.look === th)); });
   var box = $('#inks');
@@ -3934,8 +3965,9 @@ $('#settings').addEventListener('click', function (e) {
 });
 function renderSettings() {
   applyLook();
-  $('#set-fx').checked = !!S.settings.fx; $('#set-snd').checked = !!S.settings.sound; $('#set-vol').value = Math.round(volNow() * 100); $('#set-3d').checked = !!S.settings.dice3d;
+  $('#set-fx').checked = !!S.settings.fx; $('#set-snd').checked = !!S.settings.sound; $('#set-vol').value = Math.round(volNow() * 100); $('#set-3d').checked = !!S.settings.dice3d; $('#set-tnote').checked = S.settings.tnote !== false;
 }
+$('#set-tnote').addEventListener('change', function (e) { S.settings.tnote = e.target.checked; scheduleSave(); });
 $('#set-fx').addEventListener('change', function (e) { S.settings.fx = e.target.checked; scheduleSave(); if (e.target.checked) fxPlay('crit'); });
 $('#set-snd').addEventListener('change', function (e) {
   S.settings.sound = e.target.checked; scheduleSave();
@@ -4349,6 +4381,11 @@ function faceHTML(v, die) {
   if (v === 6 && die && SIGILS[die.sigil]) return '<div class="face v6 fc-6 sig"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + SIGILS[die.sigil] + '</svg></div>';
   for (var i = 0; i < 9; i++) h += '<i class="' + (PIPS[v].indexOf(i) >= 0 ? 'on' : '') + '"></i>';
   return '<div class="face v' + v + ' fc-' + v + '">' + h + '</div>';
+}
+/* one small flat face, for the table's roll feed. The die comes from tblDice or die0, so everything in it is from a known list or a checked hex color. */
+function miniDie(v, die) {
+  var vars = dieVars(die);
+  return '<span class="mdie"><span class="slot fin-' + die.finish + (FINLIKE[die.finish] ? ' fin-' + FINLIKE[die.finish] : '') + (die.glow ? ' glow' : '') + '"' + (vars ? ' style="' + vars + '"' : '') + '>' + faceHTML(v, die).replace(/<(\/?)div/g, '<$1span') + '</span></span>';
 }
 function cubeHTML(v, idx) {
   var f = '', die = curDie(idx), vars = dieVars(die);

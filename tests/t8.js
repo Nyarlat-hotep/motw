@@ -1,6 +1,7 @@
 // Dice maker: defaults untouched, live options, sigil, mismatched pairs, starter sets, dice codes, reload, phone width.
 require('fs').mkdirSync(require('path').join(__dirname,'out'),{recursive:true});
 const { chromium } = require('playwright');
+const followDevice = require('./look');
 const path = require('path');
 const URL = 'file://'+path.join(__dirname,'..','index.html');
 const results = []; const errs = [];
@@ -147,6 +148,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   // ---- phone width, both themes ----
   for (const scheme of ['dark','light']) {
     const c3 = await b.newContext({ viewport: { width: 390, height: 800 }, colorScheme: scheme });
+    if (scheme === 'light') await followDevice(c3);
     const m = await c3.newPage(); m.on('pageerror', e => errs.push('PAGEERR3 ' + e.message));
     await m.goto(URL+'#roll'); await m.waitForTimeout(500); await m.click('#dp-open');
     await m.click('[data-dp-pair="0"]'); await m.click('[data-dp-use="pb:spellslinger"]'); await m.fill('#dp-name','A fairly long name for a set of dice ok'); await m.click('#dp-save');

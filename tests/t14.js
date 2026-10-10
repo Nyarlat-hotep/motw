@@ -1,6 +1,7 @@
 // Hunter card: the 1200 x 630 picture for chat. A full hunter with a photo, an empty one and one with very long text; download; dark whatever the theme; phone width.
 require('fs').mkdirSync(require('path').join(__dirname,'out'),{recursive:true});
 const { chromium } = require('playwright');
+const followDevice = require('./look');
 const fs = require('fs'), path = require('path');
 const URL = 'file://'+path.join(__dirname,'..','index.html');
 const results = []; const errs = [];
@@ -19,6 +20,7 @@ const LONG = { sheet: { name: 'Bartholomew Ezekiel Montgomery-Featherstonehaugh 
   const open = async (opts, journal) => {
     const ctx = await b.newContext(Object.assign({ viewport: { width: 1100, height: 900 }, colorScheme: 'dark', acceptDownloads: true }, opts));
     if (journal) await ctx.addInitScript((j) => { if (!sessionStorage.getItem('seeded')) { localStorage.setItem('hunters-journal-v1', j); sessionStorage.setItem('seeded', '1'); } }, JSON.stringify(journal));
+    if (opts && opts.colorScheme === 'light') await followDevice(ctx);
     const p = await ctx.newPage();
     p.on('pageerror', e => errs.push('PAGEERR ' + e.message));
     p.on('console', m => { if (m.type()==='error' && !/Failed to load resource/.test(m.text())) errs.push('CONSOLE ' + m.text()); });

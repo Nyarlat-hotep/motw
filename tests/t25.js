@@ -180,6 +180,9 @@ const NASTY = '<img src=x onerror="window.__pwn=1"> The <b>gate</b>';
   await Bo.check('#share'); await until(K, () => window.__journal.tbl().members.filter(x => x.card).length === 2);
 
   // the roll feed
+  // Alice rolls her own dice (blue metal that glows), and the Keeper has sound on, counted through the audio nodes the page makes
+  await A.evaluate(() => { const J = window.__journal, d = { body: '#2244aa', finish: 'metal', pip: '#ffffff', glow: true, sigil: '' }; J.S().dice.linked = true; J.S().dice.a = d; J.S().dice.b = d; J.scheduleSave(); });
+  const canHear = await K.evaluate(() => { window.__nodes = 0; window.__journal.S().settings.sound = true; if (!window.BaseAudioContext) return false; const P = BaseAudioContext.prototype, g = P.createGain; P.createGain = function () { window.__nodes++; return g.call(this); }; return true; });
   await A.click('#t-play'); await A.evaluate(() => { window.__dice.push(4, 3); }); await A.click('#roll');
   check('ROLL FEED: a roll shows up for the Keeper', await until(K, () => window.__journal.tbl().rolls.length === 1, null, 5000));
   await K.click('#t-play');
@@ -187,6 +190,33 @@ const NASTY = '<img src=x onerror="window.__pwn=1"> The <b>gate</b>';
   check('with the hunter, the move, the dice and the result', /At the table/.test(feed) && /Dee Ray/.test(feed) && /\(4\+3/.test(feed) && /success|Miss/.test(feed), feed);
   check('and for the player who rolled', /Dee Ray/.test(await T(A, '#play-feed')));
   check('a player who is not sharing sends no rolls', await (async () => { const C = await open('carol', SECOND); await C.click('#t-play'); await C.evaluate(() => { window.__dice.push(6, 6); }); await C.click('#roll'); await C.waitForTimeout(2500); const n = (await tbl(K)).rolls.length; await C.context().close(); return n === 1; })());
+  const row = await K.evaluate(() => { const li = document.querySelector('#play-feed .tfeed li'), sl = [...li.querySelectorAll('.mdie .slot')]; return { dice: sl.length, faces: sl.map(x => x.querySelector('.face').className).join(' | '), cls: sl[0].className, style: sl[0].getAttribute('style') || '', label: li.querySelector('.tdice').getAttribute('aria-label'), size: Math.round(li.querySelector('.mdie').getBoundingClientRect().width), face: sl.map(x => { const r = x.querySelector('.face').getBoundingClientRect(); return Math.round(r.width) + 'x' + Math.round(r.height); }).join(' '), tag: [...document.querySelectorAll('#play-feed div')].length }; });
+  check('ROLL FEED: the roll is drawn with two small dice showing the faces rolled', row.dice === 2 && /v4/.test(row.faces.split(' | ')[0]) && /v3/.test(row.faces.split(' | ')[1]) && row.label === 'Dice showing 4 and 3', JSON.stringify(row));
+  check('they are the dice of whoever rolled: her finish, her glow, her colors', /fin-metal/.test(row.cls) && /glow/.test(row.cls) && /#2244aa/.test(row.style), row.cls + ' ' + row.style);
+  check('each is a 26px die with its face scaled to fit', row.size === 26 && row.face === '26x26 26x26', row.size + ' ' + row.face);
+  check('a roll by someone else is read out for screen readers, and not to the one who rolled', /^Dee Ray rolled 8 on .+: /.test(await T(K, '#tbl-say')) && (await T(A, '#tbl-say')) === '', await T(K, '#tbl-say'));
+  await K.waitForTimeout(400);
+  const heard = await K.evaluate(() => window.__nodes);
+  check('with sound on, the dice of someone else are heard landing', heard > 0 || !canHear, canHear ? heard : 'this browser has no audio');
+  await K.locator('#play-feed').scrollIntoViewIfNeeded();
+  const dbox = await K.evaluate(() => { const r = document.querySelector('#play-feed .mdie').getBoundingClientRect(); return { x: Math.round(r.left), y: Math.round(r.top), width: 26, height: 26 }; });
+  const drawn = await K.screenshot({ clip: dbox });
+  await K.evaluate(() => { document.querySelector('#play-feed .mdie').style.visibility = 'hidden'; });
+  const blank = await K.screenshot({ clip: dbox });
+  await K.evaluate(() => { document.querySelector('#play-feed .mdie').style.visibility = ''; });
+  check('and each die is really drawn, lying flat', Buffer.compare(drawn, blank) !== 0 && (await K.evaluate(() => getComputedStyle(document.querySelector('#play-feed .mdie .face')).transform)) === 'none');
+  await K.locator('#play-feed').scrollIntoViewIfNeeded(); await K.locator('#play-feed').screenshot({ path: path.join(__dirname, 'out', 'table-feed-dice.png') });
+  // switched off in Settings: the next roll is still shown, but makes no sound and is not read out
+  await K.evaluate(() => { document.querySelector('#settings').open = true; document.querySelector('#tbl-say').textContent = ''; }); await K.uncheck('#set-tnote');
+  await A.waitForSelector('#copyroll', { timeout: 5000 }); await A.evaluate(() => { window.__dice.push(4, 3); }); await A.click('#roll');
+  check('ROLL FEED: a second roll arrives', await until(K, () => window.__journal.tbl().rolls.length === 2, null, 6000));
+  await K.waitForTimeout(400);
+  check('switched off: shown, but silent and not read out', (await K.locator('#play-feed .tfeed li').count()) === 2 && (await K.evaluate(() => window.__nodes)) === heard && (await T(K, '#tbl-say')) === '', (await K.evaluate(() => window.__nodes)) + ' ' + (await T(K, '#tbl-say')));
+  check('and the choice is saved', (await K.evaluate(() => window.__journal.S().settings.tnote)) === false);
+  await K.check('#set-tnote');
+  const P = await open('pat', {}, { width: 390, height: 800 }); await P.click('#t-play'); await until(P, () => document.querySelectorAll('#play-feed .tfeed li').length === 2);
+  check('phone: the feed with dice fits the screen', (await noScroll(P)) && (await P.evaluate(() => [...document.querySelectorAll('#play-feed .tfeed li > *')].every(e => { const r = e.getBoundingClientRect(), c = document.querySelector('#play-feed .card').getBoundingClientRect(); return r.left >= c.left - 1 && r.right <= c.right + 1; }))));
+  await P.locator('#play-feed').scrollIntoViewIfNeeded(); await P.locator('#play-feed').screenshot({ path: path.join(__dirname, 'out', 'table-feed-dice-phone.png') }); await P.context().close();
   await K.click('#t-party');
 
   // the Keeper's overview
@@ -209,8 +239,9 @@ const NASTY = '<img src=x onerror="window.__pwn=1"> The <b>gate</b>';
   await until(K, () => { const m = window.__journal.tbl().members.find(x => x.card && x.card.name === 'Dee Ray'); return m && m.card.harm === 4; });
   await K.keyboard.type(' in the dust');
   check('TYPING: news from the table does not take the cursor or the words away', (await K.inputValue('#ho-alt-0')) === 'A leaning gate in the dust' && await K.evaluate(() => document.activeElement.id === 'ho-alt-0'));
-  await K.click('[data-ho-save="draft"]');
-  check('the draft is saved and listed as a draft', await until(K, () => !document.querySelector('#kform') && /Draft/.test((document.querySelector('.khos') || {}).textContent || '')), await T(K, '#partybody'));
+  // a person holds the mouse button for a moment: the form must not be redrawn under the press, or the click is lost
+  await K.click('[data-ho-save="draft"]', { delay: 150 });
+  check('the draft is saved and listed as a draft, on the first click, though news arrived while typing', await until(K, () => !document.querySelector('#kform') && /Draft/.test((document.querySelector('.khos') || {}).textContent || '')), await T(K, '#partybody'));
   const kpic = (await tbl(K)).hos[0].images[0];
   check('with its picture and description', kpic && kpic.alt === 'A leaning gate in the dust');
   const sent = await get('/api/img/' + kpic.id + '?as=kay');
