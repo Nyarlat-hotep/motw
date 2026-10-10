@@ -951,6 +951,31 @@ span.mc-out { display: grid; }
 .pbc[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--surface2); }
 .pbc[aria-pressed="true"]::before { border-color: var(--accent); opacity: .5; }
 .pbc .pbimg { width: 100%; border-radius: 6px; }
+/* gear cards: harm as pips, armor as shields, tags that explain themselves */
+.gcards { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.gcard { aspect-ratio: 4 / 5; }
+.gcard .mc-body { margin-top: 34px; }
+.gcard .mc-name { font-size: 20px; }
+.hpips { display: inline-flex; gap: 3px; }
+.hpips i { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid var(--accent); }
+.hpips i.on { background: var(--accent); }
+.ashields { display: inline-flex; gap: 2px; }
+.ashields svg { width: 14px; height: 14px; fill: var(--brass); stroke: color-mix(in srgb, #000 25%, var(--brass)); stroke-width: 1.5; }
+.mc-b .hpips, .mc-b .ashields { transform: none; }
+.gstat { text-align: center; font-family: var(--num); font-weight: 600; color: var(--accent); font-size: 15px; }
+.gtags { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.tagc { position: relative; font-size: 14px; padding: 1px 9px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); text-decoration: underline dotted color-mix(in srgb, var(--muted) 70%, transparent); text-underline-offset: 3px; }
+.tagc::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 8px); z-index: 7; width: max-content; max-width: 220px; white-space: normal; text-align: left; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 14px; line-height: 1.35; padding: 6px 10px; border-radius: 6px; opacity: 0; transform: translate(-50%, 2px); transition: opacity .15s ease, transform .15s ease; }
+.tagc:hover::after { opacity: 1; transform: translate(-50%, 0); transition-delay: .2s; }
+.taglegend { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 12px 0 4px; }
+.taglegend dt { font-weight: 700; }
+.taglegend dd { margin: 0; color: var(--muted); }
+/* the forge: parts on the left, the weapon card on the right, glinting as it changes */
+.wforge { display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 24px; align-items: start; }
+.wforge-card { position: sticky; top: calc(var(--navh, 56px) + 16px); }
+.forge.glint { animation: slotland .42s cubic-bezier(.2, .8, .2, 1); background-image: linear-gradient(110deg, transparent 30%, rgba(255, 236, 180, .25) 48%, transparent 66%); background-size: 250% 100%; animation: slotland .42s cubic-bezier(.2, .8, .2, 1), sheen 1s ease-out .1s both; }
+@media (max-width: 760px) { .wforge { grid-template-columns: minmax(0, 1fr); } .wforge-card { position: static; order: -1; max-width: 300px; } }
+@media (prefers-reduced-motion: reduce) { .forge.glint, .tagc::after { animation: none; transition: none; } }
 .rlc .mc-body { margin-top: 18px; }
 .mcards > li { display: flex; }
 .mcards > li > .mcard { flex: 1; }
@@ -2565,10 +2590,39 @@ function wizMoves() {
 }
 
 /* ----- step 6: gear ----- */
-function gearCard(it, g, i, on, kind) {
-  var stat = kind === 'weapon' && it.harm != null ? '<span class="chip">' + it.harm + '-harm</span>' : kind === 'armor' && it.armor != null ? '<span class="chip">' + it.armor + '-armor</span>' : '';
-  var tags = (it.tags || '').split(/\s+/).filter(Boolean).map(function (t) { return '<span class="chip tag">' + esc(t) + '</span>'; }).join('');
-  return '<button type="button" class="wcard" data-wgg="' + esc(g.id) + '|' + i + '" aria-pressed="' + on + '"><b>' + esc(it.name) + '</b><span class="wchips">' + stat + tags + '</span></button>';
+/* what the tags on weapons and armor mean, in plain English, for a first game */
+var TAGDESC = {
+  intimate: 'Only works up close, in a grapple or at arm\'s length.', hand: 'Reaches as far as your arm: hand-to-hand.', close: 'Reaches across a room, a few paces away.', far: 'Reaches a long way: down the street or across a field.',
+  area: 'Hits everything in an area, not just one target.', messy: 'Does its harm in a gory, destructive way. It leaves a mess.', loud: 'Everyone nearby hears it.', quiet: 'Barely makes a sound.',
+  reload: 'Once you have used it in a fight, you have to reload before using it again.', heavy: 'Big and awkward, hard to carry around or hide.', slow: 'Takes time to use, so you cannot rush it.', quick: 'Fast to get out and use.',
+  small: 'Easy to carry and hide.', hidden: 'Easy to keep out of sight.', innocuous: 'Does not look like a weapon.', stealthy: 'Good for not being noticed.', balanced: 'Steady in the hand and easy to use well.',
+  magic: 'Magical. It can hurt things that only magic can hurt.', holy: 'Blessed. It hurts creatures that holy things hurt.', silver: 'Silver, for creatures that silver hurts.', iron: 'Iron, for creatures that iron hurts.', wooden: 'Wood, for creatures that wood hurts.',
+  fire: 'Sets things alight.', stun: 'Knocks a target out instead of killing it.', unreliable: 'Might not work when you need it.', volatile: 'Might go off or break in a dangerous way.'
+};
+var tagsSeen = {};   // the tags drawn on this step, for the legend under the cards
+function tagChips(str) {
+  var words = String(str || '').replace(/\s*\[.*\]$/, '').split(/\s+/).filter(Boolean), chips = [], rest = [];
+  words.forEach(function (w) {
+    var parts = w.toLowerCase().split('/'), known = parts.every(function (x) { return TAGDESC[x]; });
+    if (!known) { rest.push(w); return; }
+    parts.forEach(function (x) { tagsSeen[x] = true; });
+    chips.push('<span class="tagc" data-tip="' + esc(parts.map(function (x) { return TAGDESC[x]; }).join(' ')) + '">' + esc(w) + '</span>');
+  });
+  return (chips.length ? '<span class="gtags">' + chips.join('') + '</span>' : '') + (rest.length > 2 ? '<span class="pbc-facts">' + esc(rest.join(' ')) + '</span>' : '');
+}
+/* harm as pips (up to 4, more for a forged weapon that goes higher) and armor as shields */
+function harmPips(n) { var h = '', max = Math.max(4, n); for (var k = 1; k <= max; k++) h += '<i class="' + (k <= n ? 'on' : '') + '"></i>'; return '<span class="hpips" role="img" aria-label="' + n + '-harm">' + h + '</span>'; }
+function armorShields(n) { var h = ''; for (var k = 0; k < n; k++) h += '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3l7 3v5c0 5-3 8.5-7 10-4-1.5-7-5-7-10V6z"/></svg>'; return '<span class="ashields" role="img" aria-label="' + n + '-armor">' + h + '</span>'; }
+function gearCorners(kind, it) {
+  var c = kind === 'weapon' && it.harm != null ? harmPips(+it.harm) : kind === 'armor' && it.armor != null ? armorShields(+it.armor) : '';
+  return c ? '<span class="mc-idx">' + c + '</span><span class="mc-idx mc-b" aria-hidden="true">' + c + '</span>' : '';
+}
+function gearCard(it, g, i, on, kind, full, fixed) {
+  var stat = kind === 'weapon' && it.harm != null ? it.harm + '-harm' : kind === 'armor' && it.armor != null ? it.armor + '-armor' : '';
+  var inner = gearCorners(kind, it) + '<span class="mc-body"><span class="mc-kick">' + (fixed ? 'You get this' : on ? 'Packed' : kind === 'weapon' ? 'Weapon' : kind === 'armor' ? 'Armor' : 'Gear') + '</span><span class="mc-name">' + esc(it.name) + '</span><span class="mc-rule" aria-hidden="true"></span>' +
+    (stat ? '<span class="gstat">' + stat + '</span>' : '') + tagChips(it.tags) + (on && !fixed ? '<span class="pbc-on"><span class="i i-check" aria-hidden="true"></span> Picked</span>' : '') + '</span>';
+  if (fixed) return '<li><div class="mcard gcard">' + inner + '</div></li>';
+  return '<li><button type="button" class="mcard pbc gcard" data-wgg="' + esc(g.id) + '|' + i + '" aria-pressed="' + on + '"' + (full && !on ? ' disabled' : '') + '>' + inner + '</button></li>';
 }
 function wizBuilder(d, g) {
   var b = pbState().build[g.id] || {}, bi = builderItem(d, g);
@@ -2577,25 +2631,31 @@ function wizBuilder(d, g) {
     var sel = p.pick === 1 ? (b[p.id] ? [b[p.id]] : []) : (b[p.id] || []);
     if (p === g.parts[0]) sel = b.form ? [b.form] : [];
     return '<span class="lbl" style="margin-top:12px">' + esc(p.title) + '</span><div class="wgrid">' + p.options.map(function (o) {
-      var bits = (p === g.parts[0] ? '<span class="chip">' + o.harm + '-harm</span>' : (o.harmBonus ? '<span class="chip">+' + o.harmBonus + ' harm</span>' : '')) + (o.tags || '').split(/\s+/).filter(Boolean).map(function (t) { return '<span class="chip tag">' + (p === g.parts[0] ? '' : '+') + esc(t) + '</span>'; }).join('');
+      var bits = (p === g.parts[0] ? '<span class="chip">' + o.harm + '-harm</span>' : (o.harmBonus ? '<span class="chip">+' + o.harmBonus + ' harm</span>' : '')) + tagChips(o.tags);
       return '<button type="button" class="wcard" data-wbp="' + esc(g.id) + '|' + esc(p.id) + '|' + esc(o.label) + '" aria-pressed="' + (sel.indexOf(o.label) >= 0) + '"><b>' + esc(o.label) + '</b><span class="wchips">' + bits + '</span></button>';
     }).join('') + '</div>';
   }).join('');
-  return '<div class="wgroup"><h3>' + esc(g.title) + '</h3><p class="small">' + esc(g.intro) + '</p>' + parts + '<p class="wresult">' + (bi ? '<b>' + esc(bi.name) + ':</b> ' + bi.val + '-harm, ' + esc(bi.tags.replace(/\s*\[.*\]$/, '')) : 'Choose a form to see your weapon.') + '</p></div>';
+  var mat = String(b.material || '').trim(), fname = bi ? ((mat ? mat + ' ' : '') + b.form).replace(/^./, function (c) { return c.toUpperCase(); }) : '';
+  var forged = bi ? '<div class="mcard gcard forge' + (wizForged ? ' glint' : '') + '">' + gearCorners('weapon', { harm: bi.val }) + '<span class="mc-body"><span class="mc-kick">Your weapon</span><span class="mc-name">' + esc(fname) + '</span><span class="mc-rule" aria-hidden="true"></span>' +
+      '<span class="gstat">' + bi.val + '-harm</span>' + tagChips(bi.tags) + '</span></div>'
+    : '<div class="mcard mc-add forge"><span class="mc-body"><span class="mc-kick">Your weapon</span><span class="mc-name">Not forged yet</span><span class="mc-rule" aria-hidden="true"></span><span class="mc-text mc-prev">Choose a form to start. The card fills in as you pick.</span></span></div>';
+  return '<div class="wgroup"><h3>' + esc(g.title) + '</h3><p class="small">' + esc(g.intro) + '</p><div class="wforge"><div>' + parts + '</div><div class="wforge-card">' + forged + '</div></div></div>';
 }
 function wizGear() {
-  var d = curPB();
+  var d = curPB(); tagsSeen = {};
   if (!d) return '<h2 class="sectitle" tabindex="-1">Pack your gear</h2>' + needPB();
   var st = pbState();
   var groups = d.gear.map(function (g) {
     if (g.kind === 'builder') return wizBuilder(d, g);
     var sel = st.gear[g.id] || {}, n = countOn(sel), max = pmax(g.pick), head = '<h3>' + esc(g.title) + '</h3><p class="small">' + esc(g.intro || '') + '</p>' + (g.note ? '<p class="small muted">' + esc(g.note) + '</p>' : '');
-    if (g.auto) return '<div class="wgroup">' + head + '<div class="wgrid">' + g.items.map(function (it, i) { return gearCard(it, g, i, true, g.kind).replace('<button type="button"', '<div').replace('</button>', '</div>').replace(' data-wgg=', ' data-x='); }).join('') + '</div><p class="small muted">You get this automatically.</p></div>';
-    return '<div class="wgroup">' + head + cnt(n, Array.isArray(g.pick) ? g.pick[0] + '-' + g.pick[1] : max, g.optional ? ' (optional)' : '') + '<div class="wgrid">' + g.items.map(function (it, i) { return gearCard(it, g, i, !!sel[i], g.kind); }).join('') + '</div></div>';
+    if (g.auto) return '<div class="wgroup">' + head + '<ul class="mcards gcards">' + g.items.map(function (it, i) { return gearCard(it, g, i, true, g.kind, false, true); }).join('') + '</ul><p class="small muted">You get this automatically.</p></div>';
+    var full = max > 0 && n >= max;
+    return '<div class="wgroup">' + head + cnt(n, Array.isArray(g.pick) ? g.pick[0] + '-' + g.pick[1] : max, (g.optional ? ' (optional)' : '') + (full ? '. Tap a picked one to swap it.' : '')) + '<ul class="mcards gcards">' + g.items.map(function (it, i) { return gearCard(it, g, i, !!sel[i], g.kind, full); }).join('') + '</ul></div>';
   }).join('');
   var pack = S.sheet.inventory.length ? S.sheet.inventory.map(function (i) { return wizGearItem(i); }).join('') : '<li class="empty">Your pack is empty.</li>';
   return '<h2 class="sectitle" tabindex="-1">Pack your gear</h2>' +
     '<p>These are the weapons, armor and items your playbook offers. Weapons list their harm, and armor takes that much off the harm you suffer. Whatever you pick goes into your pack, ready to use in the Roller.</p><p class="wmsg" id="wmsg" role="status"></p>' + groups +
+    (Object.keys(tagsSeen).length ? '<details class="wex"><summary>What the tags mean</summary><dl class="taglegend">' + Object.keys(TAGDESC).filter(function (t) { return tagsSeen[t]; }).map(function (t) { return '<dt>' + t + '</dt><dd>' + esc(TAGDESC[t]) + '</dd>'; }).join('') + '</dl></details>' : '') +
     '<h3 style="margin-top:20px">Anything else in your pack?</h3><span class="lbl">Ideas</span><ul class="chips" style="margin-top:0">' + QUICK.map(function (g, n) { return '<li><button type="button" class="chip" data-wq="' + n + '">+ ' + esc(g[0]) + '</button></li>'; }).join('') + '</ul>' +
     '<form id="wgearform" class="wrow2" autocomplete="off" style="margin-top:12px"><input type="text" id="w-newname" placeholder="Or type your own" aria-label="New item name"><select id="w-newtype" aria-label="Item type">' + ITYPES.map(function (t) { return '<option>' + t + '</option>'; }).join('') + '</select>' + ib('plus', 'Add to your pack', '', 'x', 'submit') + '</form>' +
     '<ul class="wlist" id="wgearlist" style="margin-top:12px">' + pack + '</ul>' +
@@ -2613,7 +2673,7 @@ function wizGearList() { var el = $('#wgearlist'); if (el) el.innerHTML = S.shee
 /* ----- step 4: details (playbook-specific choices) ----- */
 /* sets that pull one way or the other get a tone: brass for the good side, ember red for the bad */
 var XTONE = { heroic: 'gold', 'good-traditions': 'gold', 'agency-resources': 'gold', mission: 'gold', doom: 'doom', 'bad-traditions': 'doom', 'agency-red-tape': 'doom', curse: 'doom', 'dark-side': 'doom', heat: 'doom' };
-var wizLand = '';   // the pick that just went into a slot, so only it plays the landing
+var wizLand = '', wizForged = false;   // the pick that just went into a slot, so only it plays the landing
 function wizDetails() {
   var d = curPB(); if (!d) return '<h2 class="sectitle" tabindex="-1">Details</h2>' + needPB();
   var st = pbState();
@@ -2794,7 +2854,7 @@ function wizToggle(map, key, limit, what) {
         var arr = b[part.id] || (b[part.id] = []), ix = arr.indexOf(q[2]);
         if (ix >= 0) arr.splice(ix, 1); else if (arr.length >= part.pick) wizMsg = 'You have picked all ' + part.pick + '. Tap one to undo it first.'; else arr.push(q[2]);
       }
-      syncPbGear(); renderWiz(false); scheduleSave(); return;
+      wizForged = true; syncPbGear(); renderWiz(false); wizForged = false; scheduleSave(); return;
     }
     if ((g = t.closest('[data-wbq]'))) {
       q = g.dataset.wbq.split('|'); var st5 = pbState(); (st5.build[q[0]] || (st5.build[q[0]] = {})).material = q[1];
