@@ -16,7 +16,7 @@ const text = (v, max) => { if (typeof v !== 'string') return ''; v = v.replace(/
 const list = (a, n, m) => (Array.isArray(a) ? a.slice(0, n).map((x) => strt(x, m)).filter(Boolean) : []);
 const isObj = (o) => !!o && typeof o === 'object' && !Array.isArray(o);
 
-export const LIMITS = { message: 40000, card: 32000, roll: 1500, image: 700 * 1024, rolls: 50, images: 300, handouts: 60 };
+export const LIMITS = { message: 80000, card: 64000, roll: 1500, image: 700 * 1024, rolls: 50, images: 300, handouts: 60 };
 export const KINDS = ['scene', 'clue', 'person', 'place', 'note'];
 
 export function cleanName(v, fallback) {
@@ -29,7 +29,7 @@ export function cleanCard(c) {
   if (!isObj(c)) return null;
   const st = isObj(c.stats) ? c.stats : {};
   // a small JPEG made in the page; anything else is dropped rather than stored
-  const photo = typeof c.photo === 'string' && c.photo.length <= 24000 && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]*$/.test(c.photo) ? c.photo : '';
+  const photo = typeof c.photo === 'string' && c.photo.length <= 48000 && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]*$/.test(c.photo) ? c.photo : '';
   return {
     name: strt(c.name, 60), pronouns: strt(c.pronouns, 40), playbook: strt(c.playbook, 40), catchline: strt(c.catchline, 200), look: strt(c.look, 280), photo,
     stats: { charm: ci(st.charm, -3, 5, 0), cool: ci(st.cool, -3, 5, 0), sharp: ci(st.sharp, -3, 5, 0), tough: ci(st.tough, -3, 5, 0), weird: ci(st.weird, -3, 5, 0) },

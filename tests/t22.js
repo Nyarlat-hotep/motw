@@ -72,7 +72,7 @@ const ALG = { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: ne
   check('card: unstable is true only for true', card.unstable === false && C.cleanCard({ unstable: true }).unstable === true);
   check('card: lists are cut and emptied of junk', card.weapons.length === 6 && card.moves.join() === 'A,B' && !('extra' in card));
   check('card: a small JPEG data URL is kept', card.photo === 'data:image/jpeg;base64,AAAA');
-  check('card: other photos are dropped (a link, an SVG, a script, too big)', ['https://evil.test/x.jpg', 'data:image/svg+xml;base64,AAAA', 'data:text/html;base64,AAAA', 'javascript:alert(1)', 'data:image/jpeg;base64,' + 'A'.repeat(24001)].every((p) => C.cleanCard({ photo: p }).photo === ''));
+  check('card: other photos are dropped (a link, an SVG, a script, too big)', ['https://evil.test/x.jpg', 'data:image/svg+xml;base64,AAAA', 'data:text/html;base64,AAAA', 'javascript:alert(1)', 'data:image/jpeg;base64,' + 'A'.repeat(48001)].every((p) => C.cleanCard({ photo: p }).photo === ''));
   check('card: things that are not objects are refused', [null, undefined, 'a', 5, [], [1]].every((x) => C.cleanCard(x) === null));
   const hostile = JSON.parse('{"__proto__": {"polluted": 1}, "constructor": {"prototype": {"polluted": 2}}, "name": "x", "stats": {"__proto__": {"polluted": 3}}}');
   const clean = C.cleanCard(hostile);

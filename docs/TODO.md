@@ -15,6 +15,10 @@ Written 2026-10-09, after the shared table and the Keeper's area were built agai
    - With a second person: both show up in the list, a hunter card follows a change, a roll lands in "At the table", and a handout with a picture reaches the player. This is gate 4 and gate 5 of the backend trial, which could not be tried locally. Afterwards, look at the Durable Object usage in the dashboard against the free daily limits.
 4. **Things only Jacob or the Keeper can judge** once it is live: the wording on the desk and the scene board, whether the bell on a new handout is welcome, and whether one table for the whole site is right (it is, until a second group wants in).
 
+## For Jacob to review: session awards and card looks
+
+[SPEC-CARDS.md](SPEC-CARDS.md), written 2026-10-09. Nothing in it is built. It ends with a short "For Jacob" list: the assumptions (A1 to A9), the badge list, the roast lines, how many badges a card shows, artwork or code for frames, and the order. Chunk J1 (counting, no screen) is worth shipping before Wednesday 2026-10-14 so the first session is recorded.
+
 ## Work plan progress
 
 Chunk IDs are defined in [WORKPLAN.md](WORKPLAN.md).
@@ -33,6 +37,8 @@ Chunk IDs are defined in [WORKPLAN.md](WORKPLAN.md).
 | H3 | Threat cards in Case files | not started. Ask the Keeper if wanted |
 | G5, G7, G8 | Discord from the server, retiring the claude.ai path, a cloud copy of each journal | not started |
 | A3, C2, D, E, F, I | See WORKPLAN.md | not started |
+| J1 to J8 | Session awards: counting, the rules, ending the session, the tally, badges on the hunter | specified in SPEC-CARDS.md, waiting for Jacob's review |
+| L1 to L8 | Card looks: a personal mark, colors, frames, portrait treatments, what the card says, wear and tear | specified in SPEC-CARDS.md, waiting for Jacob's review |
 
 ## Where the work is
 
@@ -63,6 +69,7 @@ All of this is live and none of it has had his review yet (nor has anything from
 - [ ] **Big moments (the scorched edge).** He picked the style from a mock-up on 2026-10-09; judge the real thing in motion on a 12+, a miss and a level-up: how far the edge reaches in, how long it lasts, and the two colors. It draws correctly in WebKit (Safari's engine) in the tests; not yet seen on a real phone.
 - [ ] **A friend's roll.** With a second person at the table and sound on: is the quiet clatter of their dice welcome, and is it the right loudness? It can be switched off under Settings.
 - [ ] **Luck candles.** He saw them before they went live and asked for a flame with more frames, which they now have. Check the flame in motion, and what happens at 2 Luck or fewer.
+- [ ] **Portrait photos.** They were kept at 420px and sent to the table at 160px, which looked soft; from 2026-10-09 they are kept at 900px and sent at 360px. A photo added before that stays soft on My sheet and in the card picture until it is added again (the original was never kept). The copy on the Party tab is remade by itself, a little sharper.
 - [ ] **Hunter card.** Open Save hunter card on My sheet with a real hunter and a photo, and drop the picture in the group chat to see how it reads there.
 - [ ] **Start here and the Play lookup.** Read the wording as a first-time player would: the three steps on the Guide, and the "I want to..." list on Play.
 

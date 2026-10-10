@@ -1455,7 +1455,7 @@ function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.h
 function defaults() {
   return { v: 1, tab: 'guide', hv: 'build', wiz: 0, bkAt: 0, start: { hide: false, rolled: false }, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage', theme: 'dark', ink: '', tname: '', tnote: true }, hold: { n: 0, move: '', asked: [] }, session: { started: 0, events: [] }, bench: [], hoseen: 0, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0 },
-    sheet: { name: '', pronouns: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, adv: {}, moves: '', gear: '' } };   // adv: the moves marked advanced, by id
+    sheet: { name: '', pronouns: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', tv: 0, bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, adv: {}, moves: '', gear: '' } };   // adv: the moves marked advanced, by id
 }
 var S = defaults();
 function merge(base, saved) {
@@ -3065,11 +3065,11 @@ $('#photo').addEventListener('change', function (e) {
   if (!/^image\//.test(f.type)) { photoMsg('That file is not an image. Try a JPG or PNG.'); return; }
   var url = URL.createObjectURL(f), img = new Image();
   img.onload = function () {
-    var max = 420, sc = Math.min(1, max / Math.max(img.width, img.height));
+    var max = 900, sc = Math.min(1, max / Math.max(img.width, img.height));   // enough for a sharp screen and for the portrait box on the card picture
     var c = document.createElement('canvas'); c.width = Math.max(1, Math.round(img.width * sc)); c.height = Math.max(1, Math.round(img.height * sc));
-    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    var cx = c.getContext('2d'); cx.imageSmoothingQuality = 'high'; cx.drawImage(img, 0, 0, c.width, c.height);
     URL.revokeObjectURL(url);
-    S.sheet.photo = c.toDataURL('image/jpeg', 0.82); S.sheet.thumb = '';
+    S.sheet.photo = c.toDataURL('image/jpeg', 0.85); S.sheet.thumb = '';
     photoMsg('Photo added.'); renderPortrait(); renderRollas(); scheduleSave();
   };
   img.onerror = function () { URL.revokeObjectURL(url); photoMsg('Could not read that photo. Try a JPG or PNG.'); };
@@ -3385,13 +3385,21 @@ $('#beasts').addEventListener('click', function (e) {
 
 /* ---------- party ---------- */
 var party = { started: false, docs: [], last: '', writing: false, again: false, blocked: false, msg: '', err: '', names: {} };
+/* the small copy of the portrait that goes to the table. It is shown about 120px wide, so 360px keeps it sharp on a phone's dense screen.
+   The table refuses a photo over 48,000 characters (worker/clean.mjs), so this steps the size and quality down until it is under THUMBMAX. */
+var THUMBV = 2, THUMBMAX = 40000;
 function makeThumb(url, cb) {
   var im = new Image();
   im.onload = function () {
-    var sc = Math.min(1, 160 / Math.max(im.width, im.height)), c = document.createElement('canvas');
-    c.width = Math.max(1, Math.round(im.width * sc)); c.height = Math.max(1, Math.round(im.height * sc));
-    c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
-    cb(c.toDataURL('image/jpeg', 0.75));
+    var tries = [[360, .8], [360, .68], [320, .68], [280, .65], [240, .6], [200, .55], [160, .5]], out = '', i, sc, c, cx;
+    for (i = 0; i < tries.length; i++) {
+      sc = Math.min(1, tries[i][0] / Math.max(im.width, im.height)); c = document.createElement('canvas');
+      c.width = Math.max(1, Math.round(im.width * sc)); c.height = Math.max(1, Math.round(im.height * sc));
+      cx = c.getContext('2d'); cx.imageSmoothingQuality = 'high'; cx.drawImage(im, 0, 0, c.width, c.height);
+      out = c.toDataURL('image/jpeg', tries[i][1]);
+      if (out.length <= THUMBMAX) break;
+    }
+    cb(out.length <= THUMBMAX ? out : '');
   };
   im.onerror = function () { cb(''); };
   im.src = url;
@@ -3402,7 +3410,7 @@ function partyBody() {
 }
 function pushParty(force) {
   if (!S.share || !tableOn() || party.blocked) return;
-  if (S.sheet.photo && !S.sheet.thumb) { if (!party.thumbing) { party.thumbing = true; makeThumb(S.sheet.photo, function (t) { party.thumbing = false; S.sheet.thumb = t || ' '; scheduleSave(); }); } return; }
+  if (S.sheet.photo && (!S.sheet.thumb || S.sheet.tv !== THUMBV)) { if (!party.thumbing) { party.thumbing = true; makeThumb(S.sheet.photo, function (t) { party.thumbing = false; S.sheet.thumb = t || ' '; S.sheet.tv = THUMBV; scheduleSave(); }); } return; }   // tv: a small copy made at the old 160px is made again
   if (tbl.on) { tblPush(force); return; }
   var body = partyBody(); if (body.photo === ' ') body.photo = '';
   var key = JSON.stringify(body);
@@ -3510,7 +3518,7 @@ function tblCard(c) {
   if (!c || typeof c !== 'object') return null;
   var st = c.stats && typeof c.stats === 'object' ? c.stats : {};
   var o = { name: tblStr(c.name, 60), pronouns: tblStr(c.pronouns, 40), playbook: tblStr(c.playbook, 40), catchline: tblStr(c.catchline, 200), look: tblStr(c.look, 280),
-    photo: typeof c.photo === 'string' && c.photo.length <= 24000 && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]*$/.test(c.photo) ? c.photo : '', stats: {},
+    photo: typeof c.photo === 'string' && c.photo.length <= 48000 && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]*$/.test(c.photo) ? c.photo : '', stats: {},
     luck: tblInt(c.luck, 0, 7, 7), harm: tblInt(c.harm, 0, 8, 0), unstable: c.unstable === true, xp: tblInt(c.xp, 0, 9, 0), level: tblInt(c.level, 0, 20, 0), armor: tblInt(c.armor, 0, 9, 0),
     weapons: tblList(c.weapons, 6, 60), moves: tblList(c.moves, 12, 60) };
   STATS.forEach(function (s) { o.stats[s] = tblInt(st[s], -3, 5, 0); });
@@ -5181,6 +5189,7 @@ function hcDraw(cv, img) {
   c.fillStyle = HCC.well; c.fillRect(px, py, pw, ph);
   if (img) {
     var k = Math.max(pw / img.naturalWidth, ph / img.naturalHeight), sw = pw / k, sh = ph / k;
+    c.imageSmoothingQuality = 'high';
     c.drawImage(img, (img.naturalWidth - sw) / 2, (img.naturalHeight - sh) * .3, sw, sh, px, py, pw, ph);
   } else {
     var who = String(d.playbook || '').replace(/^The\s+/, '') || String(d.name || '').trim();

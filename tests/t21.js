@@ -133,8 +133,8 @@ function upgrade(base, p, origin) {
   check('a roll with a die that is not a face is refused', !!(await wait(pb, "m.t === 'err' && m.why === 'bad roll'")));
   await clear(pb); await send(pb, 'this is not json');
   check('something that is not JSON is refused, politely', !!(await wait(pb, "m.t === 'err' && m.why === 'not JSON'")));
-  await clear(pb); await send(pb, JSON.stringify({ t: 'card', card: { name: 'x'.repeat(50000) } }));
-  check('a message over 40 KB is refused', !!(await wait(pb, "m.t === 'err' && m.why === 'too big'")));
+  await clear(pb); await send(pb, JSON.stringify({ t: 'card', card: { name: 'x'.repeat(90000) } }));
+  check('a message over 80 KB is refused', !!(await wait(pb, "m.t === 'err' && m.why === 'too big'")));
   await clear(pb); await send(pb, 'ping');
   check('a ping is answered with a pong, without waking the table', !!(await wait(pb, "m.t === 'raw' && m.data === 'pong'")));
   await clear(pb); await send(pb, { t: 'unknown-thing', x: 1 }); await send(pb, '{"t": 5}'); await send(pb, 'null');

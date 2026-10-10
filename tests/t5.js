@@ -177,7 +177,11 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await p.check('#share'); await p.waitForTimeout(900);
   const doc = await p.evaluate(()=>window.__store['party/me123']);
   check('sharing writes only public fields', !!doc && doc.name==='Dee Ray' && doc.moves.includes('Last Stand') && !('backstory' in doc) && !('inventory' in doc) && !('bonds' in doc), doc && Object.keys(doc).join(','));
-  check('shared card has a photo thumbnail', !!doc && doc.photo.startsWith('data:image/jpeg') && doc.photo.length<20000, doc && doc.photo.length);
+  check('shared card has a photo thumbnail', !!doc && doc.photo.startsWith('data:image/jpeg') && doc.photo.length<=40000, doc && doc.photo.length);
+  // sharp enough: the kept portrait is up to 900px on its long side, and the copy for the table 360px (it is shown about 120px wide, on screens three times as dense)
+  const dims = await p.evaluate(async (thumb) => { const size = (src) => new Promise(r => { const i = new Image(); i.onload = () => r([i.naturalWidth, i.naturalHeight]); i.onerror = () => r([0, 0]); i.src = src; }); const sh = JSON.parse(localStorage.getItem('hunters-journal-v1')).sheet; return { photo: await size(sh.photo), thumb: await size(thumb), tv: sh.tv, kb: Math.round(sh.photo.length / 1024) }; }, doc.photo);
+  check('the portrait is kept at 900px on its long side', Math.max(...dims.photo) === 900 && dims.kb < 400, JSON.stringify(dims));
+  check('the copy for the table is 360px on its long side, or as near as fits', Math.max(...dims.thumb) <= 360 && Math.max(...dims.thumb) >= 240 && dims.tv === 2, JSON.stringify(dims));
   await p.click('#t-hunter'); await p.click('#seg-sheet'); await p.click('#luck button[data-n="2"]'); await p.waitForTimeout(900);
   check('sheet change syncs to table doc', (await p.evaluate(()=>window.__store['party/me123'].luck))===2);
   check('bond name suggestions include table hunters', (await p.evaluate(()=>[...document.querySelectorAll('#partynames option')].map(o=>o.value))).includes('Alex Reyes'));
