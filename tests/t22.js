@@ -76,7 +76,11 @@ const ALG = { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: ne
   check('card: things that are not objects are refused', [null, undefined, 'a', 5, [], [1]].every((x) => C.cleanCard(x) === null));
   const hostile = JSON.parse('{"__proto__": {"polluted": 1}, "constructor": {"prototype": {"polluted": 2}}, "name": "x", "stats": {"__proto__": {"polluted": 3}}}');
   const clean = C.cleanCard(hostile);
-  check('card: prototype tricks do nothing', ({}).polluted === undefined && clean.polluted === undefined && Object.keys(clean).join() === 'name,pronouns,playbook,catchline,look,photo,stats,luck,harm,unstable,xp,level,armor,weapons,moves');
+  check('card: prototype tricks do nothing', ({}).polluted === undefined && clean.polluted === undefined && Object.keys(clean).join() === 'name,pronouns,playbook,catchline,look,photo,stats,luck,harm,unstable,xp,level,armor,weapons,moves,hid,pins');
+  // which hunter, and the badges they pin
+  const pinned = C.cleanCard({ name: 'x', hid: 'cmg1abc9zz', pins: ['snake', 'snake', 'nope', 7, '<b>', 'hog', 'bag', 'arm', 'peak', 'first', 'alive'] });
+  check('card: the hunter\'s id is kept when it looks like one, and dropped when it does not', pinned.hid === 'cmg1abc9zz' && ['', 'ab', 'UPPERCASE1', 'has space1', '<script>x', 'x'.repeat(21), 7, null].every((h) => C.cleanCard({ hid: h }).hid === ''));
+  check('card: pins are badges from the list, each once, five at most', JSON.stringify(pinned.pins) === '["snake","hog","bag","arm","peak"]' && C.cleanCard({ pins: 'snake' }).pins.length === 0 && C.cleanCard({ pins: ['constructor', '__proto__', 'toString'] }).pins.length === 0, JSON.stringify(pinned.pins));
   const dice = { a: { body: '#AABBCC', pip: '#102030', finish: 'bone"><script>', sigil: 'skull', glow: true }, b: { body: '#aabbcc', pip: '#102030', finish: 'resin', sigil: '', glow: 'yes' }, tray: 'wood' };
   const cd = C.cleanDice(dice);
   check('dice: colors lower-cased, names reduced to plain words, glow only for true', cd.a.body === '#aabbcc' && cd.a.finish === 'bonescript' && cd.b.glow === false && cd.tray === 'wood', JSON.stringify(cd.a));
@@ -84,6 +88,14 @@ const ALG = { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: ne
   const roll = C.cleanRoll({ move: 'Kick Some Ass', d1: 4, d2: 3, mod: 2, total: 9, tier: 'part', luck: false, dice });
   check('roll: a good one is kept, with its dice', roll.total === 9 && roll.tier === 'part' && roll.dice.a.body === '#aabbcc');
   check('roll: dice that are not real faces are refused', [{ d1: 0, d2: 3 }, { d1: 4, d2: 7 }, { d1: 4, d2: 2.5 }, { d1: '4', d2: 3 }, { d1: 4 }, {}, null, 'x', []].every((r) => C.cleanRoll(r) === null));
+  const counted = C.cleanRoll({ d1: 4, d2: 3, mod: 2, hid: 'cmg1abc9zz', mv: 'kick', hm: 5 }), loose = C.cleanRoll({ d1: 4, d2: 3, hid: '../etc', mv: 'drop table', hm: 99 }), bare = C.cleanRoll({ d1: 4, d2: 3 });
+  check('roll: the hunter, the basic move and the harm carried are kept for the session\'s count', counted.hid === 'cmg1abc9zz' && counted.mv === 'kick' && counted.hm === 5);
+  check('roll: a hunter id that is not one, a move that is not one of the eight, and harm past 8 are put right', loose.hid === '' && loose.mv === '' && loose.hm === 8 && bare.hid === '' && bare.mv === '' && bare.hm === 0, JSON.stringify(loose));
+  // a hunter's own numbers for the night
+  const night = C.cleanNight({ k: '3.2', hid: 'cmg1abc9zz', harm: '4', peak: 12, hit: -3, luck: 2.4, left: 99, lvl: 'x', unst: 1, died: true, extra: '<b>' });
+  check('night: numbers are clamped, flags are true only for true, and nothing extra gets through', JSON.stringify(night) === '{"k":"3.2","hid":"cmg1abc9zz","harm":4,"peak":8,"hit":0,"luck":2,"left":7,"lvl":0,"unst":false,"died":true}', JSON.stringify(night));
+  check('night: without a session and part, or without a hunter, there is nothing to keep', [{ hid: 'cmg1abc9zz' }, { k: '3', hid: 'cmg1abc9zz' }, { k: '3.2' }, { k: '3.2; DROP', hid: 'cmg1abc9zz' }, { k: 3.2, hid: 'cmg1abc9zz' }, null, 'x', []].every((n) => C.cleanNight(n) === null));
+  check('session: a name is one short line, and the note on where the table left off keeps its lines', C.cleanTitle('  The   Dry\n Well\u0000 ') === 'The Dry Well' && C.cleanTitle('x'.repeat(200)).length === 60 && C.cleanTitle(7) === '' && C.cleanNote('At the well.\r\n\r\nMoss is hurt.\u0007') === 'At the well.\n\nMoss is hurt.' && C.cleanNote('y'.repeat(900)).length === 600);
   const lie = C.cleanRoll({ d1: 1, d2: 2, mod: 0, total: 12, tier: 'full', luck: false });
   check('roll: the total and tier are worked out here, not believed', lie.total === 3 && lie.tier === 'miss' && C.cleanRoll({ d1: 4, d2: 3, mod: 2, total: 1, tier: 'miss' }).tier === 'part' && C.cleanRoll({ d1: 6, d2: 5, mod: 0 }).tier === 'full');
   check('roll: Luck makes it a 12 whatever the dice say', C.cleanRoll({ d1: 1, d2: 1, mod: 0, luck: true }).total === 12 && C.cleanRoll({ d1: 1, d2: 1, mod: 0, luck: true }).tier === 'full');

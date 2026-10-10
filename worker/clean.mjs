@@ -3,6 +3,7 @@
 // The page still checks and escapes whatever it receives (as it does for a dice code); this is the second lock, not the only one.
 //
 // No Cloudflare-only imports, so tests/t22.js runs it in plain Node.
+import { MOVES, BADGE_IDS } from './awards.mjs';
 
 const HEX = /^#[0-9a-f]{6}$/i;
 const WORD = /[^a-z0-9_-]/gi;
@@ -16,7 +17,9 @@ const text = (v, max) => { if (typeof v !== 'string') return ''; v = v.replace(/
 const list = (a, n, m) => (Array.isArray(a) ? a.slice(0, n).map((x) => strt(x, m)).filter(Boolean) : []);
 const isObj = (o) => !!o && typeof o === 'object' && !Array.isArray(o);
 
-export const LIMITS = { message: 80000, card: 64000, roll: 1500, image: 700 * 1024, rolls: 50, images: 300, handouts: 60 };
+export const LIMITS = { message: 80000, card: 64000, roll: 1500, image: 700 * 1024, rolls: 50, images: 300, handouts: 60, tallies: 20, pins: 5 };
+const HID = /^[a-z0-9]{6,20}$/;                 // a hunter's own id, made by the page once and kept for the hunter's life
+export const hunterId = (v) => (typeof v === 'string' && HID.test(v) ? v : '');
 export const KINDS = ['scene', 'clue', 'person', 'place', 'note'];
 
 export function cleanName(v, fallback) {
@@ -34,7 +37,9 @@ export function cleanCard(c) {
     name: strt(c.name, 60), pronouns: strt(c.pronouns, 40), playbook: strt(c.playbook, 40), catchline: strt(c.catchline, 200), look: strt(c.look, 280), photo,
     stats: { charm: ci(st.charm, -3, 5, 0), cool: ci(st.cool, -3, 5, 0), sharp: ci(st.sharp, -3, 5, 0), tough: ci(st.tough, -3, 5, 0), weird: ci(st.weird, -3, 5, 0) },
     luck: ci(c.luck, 0, 7, 7), harm: ci(c.harm, 0, 8, 0), unstable: c.unstable === true, xp: ci(c.xp, 0, 9, 0), level: ci(c.level, 0, 20, 0), armor: ci(c.armor, 0, 9, 0),
-    weapons: list(c.weapons, 6, 60), moves: list(c.moves, 12, 60)
+    weapons: list(c.weapons, 6, 60), moves: list(c.moves, 12, 60),
+    // which hunter this is, and the badges they have pinned: only ids from the list, each once, five at most
+    hid: hunterId(c.hid), pins: (Array.isArray(c.pins) ? c.pins : []).filter((b, i, a) => typeof b === 'string' && BADGE_IDS.includes(b) && a.indexOf(b) === i).slice(0, LIMITS.pins)
   };
 }
 
@@ -55,8 +60,21 @@ export function cleanRoll(r) {
   const face = (v) => Number.isInteger(v) && v >= 1 && v <= 6;
   if (!face(r.d1) || !face(r.d2)) return null;
   const mod = ci(r.mod, -15, 15, 0), luck = r.luck === true, total = luck ? 12 : r.d1 + r.d2 + mod;
-  return { move: strt(r.move, 80), d1: r.d1, d2: r.d2, mod, total, tier: total >= 10 ? 'full' : total >= 7 ? 'part' : 'miss', luck, dice: cleanDice(r.dice) };
+  // for the session's count: which hunter rolled, which basic move it was (or none), and the harm they were carrying
+  return { move: strt(r.move, 80), d1: r.d1, d2: r.d2, mod, total, tier: total >= 10 ? 'full' : total >= 7 ? 'part' : 'miss', luck, dice: cleanDice(r.dice),
+    hid: hunterId(r.hid), mv: MOVES.includes(r.mv) ? r.mv : '', hm: ci(r.hm, 0, 8, 0) };
 }
+
+/* a hunter's own numbers for the part of the session being played: what only their page knows. k says which session and part the page believes it is counting for;
+   the room keeps the numbers only when that is the part really in play. */
+export function cleanNight(n) {
+  if (!isObj(n) || typeof n.k !== 'string' || !/^\d{1,9}\.\d{1,4}$/.test(n.k)) return null;
+  const hid = hunterId(n.hid); if (!hid) return null;
+  return { k: n.k, hid, harm: ci(n.harm, 0, 99, 0), peak: ci(n.peak, 0, 8, 0), hit: ci(n.hit, 0, 8, 0), luck: ci(n.luck, 0, 7, 0), left: ci(n.left, 0, 7, 7), lvl: ci(n.lvl, 0, 9, 0), unst: n.unst === true, died: n.died === true };
+}
+/* what the Keeper calls a session, and the few lines on where the table left off */
+export const cleanTitle = (v) => str(v, 120).replace(/\s+/g, ' ').trim().slice(0, 60).trim();
+export const cleanNote = (v) => text(v, 600);
 
 /* a picture the Keeper posts: JPEG or WebP, by its first bytes, within the size cap. Returns the type or null. */
 export function imageType(bytes) {

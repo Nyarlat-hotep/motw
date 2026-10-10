@@ -23,14 +23,15 @@ Decided by Jacob on 2026-10-10:
 7. Badges should be **textured** to fit the journal.
 8. The card: **full customization, Steam-page level**. Frames can be chosen from ones drawn in code **or uploaded as your own artwork**.
 9. The group plays by **the standard rules**, so no move is renamed for a badge.
+10. **A session can take more than one night.** "Say a session doesn't get finished in one night and turns into a multi part session. The keeper will need to be able to end the current 'episode' and continue from where the party left off when the next session begins." Built the same day: see "What a session is".
 
 Assumed by me unless Jacob says otherwise. Each one is a real choice; strike any that are wrong.
 
 | # | Assumption | Why | The other way |
 |---|---|---|---|
 | A1 | Only a hunter who is **shared with the table** can earn badges. A player who has not turned on "Show my hunter and my rolls to the table" sees the summary but is not in it. | The table can only count what it is sent, and one path is simpler and harder to get wrong. | Also work out personal badges on each player's own page. Twice the code, and two sources that can disagree. |
-| A2 | A session **starts by itself**: at the first shared roll after the table has had no rolls for three hours. Nobody has to press Start. | A Start button will be forgotten, and then the night is not counted. | A Start button on the Keeper's desk. |
-| A3 | If the Keeper forgets to end the session, **it can still be awarded later**. The table keeps the last five sessions that were never ended. | Forgetting is likely. It also means counting can go live before the awards screen exists. | An un-ended session is lost when the next one starts. |
+| A2 | A session **starts by itself** at the first shared roll when none is in play. Nobody has to press Start. (Built. The three-quiet-hours rule now begins a new *part* of the same session, not a new session: see "What a session is".) | A Start button will be forgotten, and then the night is not counted. | A Start button on the Keeper's desk. |
+| A3 | If the Keeper forgets to end the session, **nothing is lost**: it simply carries on, in parts, until it is ended. (Built. This replaced the list of five un-ended sessions.) If two stories ran together that way, the Keeper says which parts were the first when ending it, and the rest become the next session. | Forgetting is likely. | An un-ended session is lost when the next one starts. |
 | A4 | Rolls are counted **as rolled**. A miss rescued with Luck still counts as a miss (and earns Lucky Devil as well). | It is funnier, and Luck already has its own badge. | A rescued roll counts as the 12 it became. |
 | A5 | **Five** badges at most are displayed on a card. The rest live in the collection. | The card has little room, and choosing is part of the fun. | Three, or as many as fit. |
 | A6 | "Dealt the most damage" becomes **Heavy Hitter: the most Kick Some Ass rolls of 7 or more**. | The journal has never recorded harm dealt, only harm taken. | The Keeper hands it out by hand. |
@@ -55,10 +56,15 @@ A night, as it would go:
 
 ## What a session is
 
-- It starts at the first shared roll after three quiet hours (A2), or after the last session was ended.
-- It ends when the Keeper presses End the session, or discards it.
-- A session nobody ended stays on the Keeper's desk, with its date and roll count, and can be ended or discarded later. The table keeps five of these; the oldest falls off (A3).
-- The table keeps the finished tallies of the **last 20 sessions**, so they can be reopened.
+Built on 2026-10-10 (`worker/table.mjs`, `tests/t30.js`, `tests/t31.js`).
+
+- **There is one session in play at a time.** It begins by itself at the first shared roll when there is none, or when the Keeper names one ahead of time.
+- **A session is made of parts**, one for each night it takes. Most sessions are one part.
+- **A part ends** when the Keeper presses **End the episode: to be continued**, or by itself when the table has been quiet for three hours. Either way the session stays open, and the next roll, whenever it comes, begins the next part of the same session. Nobody has to press anything to carry on.
+- **Ending the episode** lets the Keeper write a few lines on where the table is leaving it. Everyone gets a **To be continued** screen there and then (the note, and the scoreboard so far, no badges), and the note comes back as **Previously** at the top of Play until each player puts it away.
+- **The session ends** only when the Keeper presses **End the session and hand out awards**, or discards it. That is when the badges are handed out, for every part at once: a streak can run from one night into the next.
+- **If two stories ran together** because nobody ended the first, the Keeper chooses which parts were the first one when ending it ("Only part 1", "Parts 1 to 2", "All 3 parts"). The parts left out become the next session, with their rolls.
+- The table keeps the finished tallies of the **last 20 sessions**, so they can be reopened, and so a page that was away (or was restored from an old backup) can catch up on what its hunters earned.
 
 ## What is counted, and by whom
 
@@ -203,19 +209,19 @@ The icon is stamped into the middle. The wear is one of the grey texture tiles t
 
 Still to come for the look, in J4: the token **stamping down** at the reveal (a hit, a puff of dust from Kenney's smoke sprites, the scorched edge), and whether the top rank's shine is enough motion or wants real frames.
 
-## Ending the session (the Keeper)
+## Running the session (the Keeper)
 
-On the Keeper's desk, above the handouts:
+Built on 2026-10-10. A card headed **The session** at the top of the Keeper's desk:
 
-- **While a session is running:** "Tonight: 4 hunters, 61 rolls, since 7:02 pm" and the button **End the session**.
-- **Pressing it opens a preview**, seen only by the Keeper: the scoreboard, and every badge about to be awarded with who gets it.
-  - **Keeper's picks:** for each of the five, choose a hunter or leave it out.
-  - **Discard this session instead** (A9), with its own confirmation.
-  - **Award it:** one more "Are you sure? This cannot be taken back" and it fires.
-- **Sessions that were never ended** are listed below with the same two choices.
+- **With no session:** it says one begins at the first shared roll, and offers **Name the next session**.
+- **While one is being played:** its name (or "Session 3"), the part, "3 hunters, 10 rolls, since Sat, Oct 10 7:02 PM", and three buttons: **End the episode: to be continued**, **End the session and hand out awards**, and **Rename**.
+- **End the episode** asks where the table is leaving it (optional), then sends everyone the To be continued screen. The card then says "To be continued", shows the note with **Edit where it left off**, and says the next roll picks it up.
+- **End the session** first shows a preview that only the Keeper can see: which parts to count (when there is more than one), the scoreboard, **the Keeper's five picks** (each a hunter or nobody), and every badge about to be handed out with who gets it. Changing the parts or a pick redraws it. Then:
+  - **Hand out the awards**, with one more "This cannot be taken back", or
+  - **Discard this session instead** (A9), with its own confirmation, for practice nights and tests.
 - Only the Keeper's connection can do any of this. The table refuses it from anyone else, as it does for handouts.
 
-There is no "take it back" in the first version. The preview and the confirmation are the guard, and Discard covers practice nights.
+There is no "take it back". The preview and the confirmation are the guard, and Discard covers practice nights.
 
 ## The tally (everyone's screen)
 
@@ -223,7 +229,7 @@ A dialog over the page, the same on every screen, in three parts. A **Skip** but
 
 1. **The scoreboard.** One row a hunter, with portrait, name and playbook: rolls, 10+, 7 to 9, misses, harm taken, Luck spent, best and worst roll. The table's totals underneath. On a phone each hunter is a small card instead of a row.
 2. **The awards.** One at a time, a couple of seconds each: the token lands, the name, who earned it, the roast line. The scorched edge burns for each, and with sound on there is a hit for each. Superlatives first, feats next, secret badges and the Keeper's picks last. A newly discovered secret badge says so.
-3. **Your haul.** The badges your own hunter earned tonight, with **Pin to my card** on each, then **Copy for chat** (the whole tally as plain text for Discord) and **Finish my session**, which opens the end-of-session ritual that already exists.
+3. **Your haul.** The badges your own hunter earned tonight (milestones included), with **Pin to my card** on each, then **Copy for chat** (the whole tally as plain text for Discord) and **Finish my session**, which opens the end-of-session ritual that already exists.
 
 Details:
 
@@ -231,6 +237,7 @@ Details:
 - The dialog can be closed and reopened. The Party tab gets a **Last session** button, and a list of the last 20.
 - A player who was not connected when it fired gets a dot on the Party tab, as a new handout does, and the tally opens from there. Their badges are added when their page next connects.
 - The Keeper sees the same dialog, without a haul.
+- Built on 2026-10-10, with two differences from the plan above: the reveal is the token stamping down with a soft hit, without the scorched edge for each one (thirty of those in a row would be too much); and the scoreboard has no portraits yet.
 
 ## Badges on the hunter
 
@@ -262,12 +269,15 @@ For whoever builds it. Skip this part if you only want to know what it does.
 | Message | From | What |
 |---|---|---|
 | `roll` (changed) | player | also carries `hid`, `mv` (a basic move id or empty) and `hm` (harm carried at the time) |
-| `roll-luck` | player | "my roll number n was rescued with Luck" |
+| `roll-luck` | player | Luck was spent on the roll this player just made (it names the dice, so it cannot be claimed for another roll) |
 | `card` (changed) | player | also carries `hid`, `pins`, `night` |
-| `sess` | table | the current session's number and start, in the first snapshot and whenever it changes |
-| `sess-preview` | Keeper | "show me what ending session n would award"; answered only to the Keeper |
-| `sess-end` | Keeper | session n, the Keeper's picks, or discard |
-| `synopsis` | table | the finished tally, sent to everyone; also fetched by number, and the latest number is in the first snapshot |
+| `sess` | table | the session in play: its number, name, part, whether a part is being played, and for each part its times, roll count and the Keeper's note. In the first snapshot and whenever it changes |
+| `roll-fix` | table | a roll in the feed changed (Luck made it a 12) |
+| `sess-name`, `sess-pause`, `sess-note` | Keeper | name the session; end the episode with a note; reword a finished part's note |
+| `recap` | table | "to be continued": the note and the scoreboard so far, to everyone |
+| `sess-preview` | Keeper | "show me what ending it would award", for parts 1 to `upto` and with these picks; answered only to the Keeper |
+| `sess-end` | Keeper | end parts 1 to `upto` with these picks, or discard; answered with `sess-done` |
+| `tally` | table | the finished tally, sent to everyone; an older one is fetched with `tally-get`. The first snapshot lists the last 20 with what this member's hunters earned in each, and the newest whole |
 
 **In the table (the Durable Object).** New SQLite tables: the sessions (number, start, last roll, state), the session's rolls (one row a roll: who, which hunter, the dice, the modifier, the move, the harm carried, whether Luck rescued it, when), the hunters in a session (the page's numbers, and the name, playbook and small photo as they were), and the finished tallies (the last 20, each a few kilobytes of JSON). The rolls of a session are deleted when its tally is made, except for sessions never ended, which keep theirs so they can still be awarded. A roll now writes two rows where it wrote one. At a hundred rolls a night that is nowhere near the free plan's daily limits.
 
@@ -295,15 +305,15 @@ For whoever builds it. Skip this part if you only want to know what it does.
 | Chunk | What | Size | Done when |
 |---|---|---|---|
 | J0 | **The list and the token.** `BADGES`, `badgeSVG`, ranks, textures, the icons. | M | **Built 2026-10-10** (`tests/t27.js`). |
-| J1 | **Counting.** Hunter ids; `hid`, `mv`, `hm` and `roll-luck` on rolls; the page's `night` numbers; sessions and every roll of them in the table. No screen. | M | Two test players roll a scripted night against the local Worker and the stored tally matches by hand, including a rescued miss, an undone harm click, a hunter who dies and is replaced, and a three-hour gap starting a new session. Old pages and old saves still work. |
-| J2 | **The rules.** `worker/awards.mjs` with every session badge (the 57 that are not milestones), ties, minimums, secrets and the two table-wide ones. | M to L | A plain-Node test feeds it a dozen made-up nights (a tie, a lone hunter, nobody qualifying, every secret) and each gives exactly the expected awards. |
-| J3 | **Ending the session.** The desk's session line, the preview, the Keeper's picks, discard, and the un-ended list. | M | Only the Keeper can preview or end; a player's attempt is refused; a discarded session awards nothing; a session ended the next day awards correctly. |
-| J4 | **The tally.** The dialog, the token drawing, the reveal, the haul, Copy for chat, reopening, and the dot for someone who missed it. | M to L | Three browsers see the same tally within two seconds; Skip, reduced motion and Big moments off all give the plain list; it fits a phone; a player who connects afterwards gets the dot and the badges. |
-| J5 | **Badges on the hunter.** The Badges card, pinning, tokens on the Party card and the Keeper's overview, restore from the table. | M | Badges survive a reload, a backup and a hunter switch; five pins at most; a hostile `pins` list from another player draws nothing it should not. |
+| J1 | **Counting.** Hunter ids; `hid`, `mv`, `hm` and `roll-luck` on rolls; the page's `night` numbers; sessions and every roll of them in the table. No screen. | M | Two test players roll a scripted night against the local Worker and the stored tally matches by hand, including a rescued miss, an undone harm click, a hunter who dies and is replaced, and a three-hour gap starting a new session. Old pages and old saves still work. **Built 2026-10-10** (`tests/t29.js`, `tests/t30.js`, `tests/t31.js`). |
+| J2 | **The rules.** `worker/awards.mjs` with every session badge (the 57 that are not milestones), ties, minimums, secrets and the two table-wide ones. | M to L | A plain-Node test feeds it a dozen made-up nights (a tie, a lone hunter, nobody qualifying, every secret) and each gives exactly the expected awards. **Built 2026-10-10** (`tests/t29.js`, `tests/t30.js`, `tests/t31.js`). |
+| J3 | **Running the session.** The desk's session card, ending an episode "to be continued", the preview, the Keeper's picks, which parts to count, and discard. | M | Only the Keeper can preview or end; a player's attempt is refused; a discarded session awards nothing; a session ended the next day awards correctly. **Built 2026-10-10** (`tests/t29.js`, `tests/t30.js`, `tests/t31.js`). |
+| J4 | **The tally.** The dialog, the token drawing, the reveal, the haul, Copy for chat, reopening, and the dot for someone who missed it. | M to L | Three browsers see the same tally within two seconds; Skip, reduced motion and Big moments off all give the plain list; it fits a phone; a player who connects afterwards gets the dot and the badges. **Built 2026-10-10** (`tests/t29.js`, `tests/t30.js`, `tests/t31.js`). |
+| J5 | **Badges on the hunter.** The Badges card, pinning, tokens on the Party card and the Keeper's overview, restore from the table. | M | Badges survive a reload, a backup and a hunter switch; five pins at most; a hostile `pins` list from another player draws nothing it should not. **Built 2026-10-10** (`tests/t29.js`, `tests/t30.js`, `tests/t31.js`). |
 | J6 | **Badges on the card picture.** | S | The picture shows the pinned row and nothing spills, checked the way `tests/t14.js` checks the rest. |
 | J7 | **Words and icons pass.** Jacob's rewrite of the names and lines, and the final icon for each badge. | S | Jacob has read them all. |
 | J8 | *(later)* The Keeper answers the end-of-session questions for the table. | M | |
-| J9 | **Milestones.** `sheet.career`, added to when a tally is applied; the six milestone badges worked out on the page from it. | S to M | A hunter who reaches 100 rolls across several nights gets Century once, and again at 200; restoring an old backup does not hand any out twice. |
+| J9 | **Milestones.** `sheet.career`, added to when a tally is applied; the six milestone badges worked out on the page from it. | S to M | A hunter who reaches 100 rolls across several nights gets Century once, and again at 200; restoring an old backup does not hand any out twice. **Built 2026-10-10** (`tests/t29.js`, `tests/t30.js`, `tests/t31.js`). |
 
 **J1 is worth shipping on its own before Wednesday 2026-10-14.** It has no screen and changes nothing a player sees, but it means the first real session is counted. Because an un-ended session is kept (A3), that night can be awarded as soon as J2 to J4 exist, even if that is days later.
 
@@ -388,12 +398,12 @@ Where the choices live: a **Customize** screen opened from My sheet, with the pr
 
 # Proposed order
 
-1. **J1** (counting), built, tested and pushed before Wednesday 2026-10-14, so the first session is recorded. Nothing else is tied to a date.
-2. **J2, J3, J4, J5** (the rules, ending the session, the tally, badges on the hunter). The awards are not finished until all four are in.
+1. **J1 to J5 and J9** (counting, the rules, running the session, the tally, badges on the hunter, milestones) were built on 2026-10-10. They need to be pushed before Wednesday 2026-10-14 for the first session to be counted.
+2. **J6** (badges on the card picture) and **J7** (Jacob's pass over the names and lines).
 3. **L1, L2, L3** (the mark, the colors, the page and its first showcases). From here every hunter has a page worth opening.
 4. **L5, L6** (the art locker, then your own background): the first uploaded artwork.
 5. **L4, L7** (frames in code, then your own frame).
-6. **J6, J7, J9** (badges on the card picture, the words pass, milestones).
+6. **J8** (the Keeper asks the end-of-session questions once for the table).
 7. **L8, L9, L10**, then **L11 to L13 and J8** as taste decides.
 
 # For Jacob

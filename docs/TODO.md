@@ -4,18 +4,20 @@ Last tidied 2026-10-10. **The first session is Wednesday 2026-10-14.** Jacob is 
 
 ## Start here next time
 
-Written 2026-10-10 (second pass, after Jacob's answers that day).
+Written 2026-10-10 (third pass, that evening).
 
-1. **Committed and pushed to `main` on 2026-10-10, on Jacob's word, so it is live.** Four pieces of work, with every test passing:
-   - **Punchier big moments.** Jacob said the scorched edge felt slow. It now lands inside 50ms, snaps in past its resting place and is gone in 0.8s (a 12+), 0.6s (a miss) or 1.3s in two strikes (a level-up); the miss shake and the 12+ pop are quicker too (`tests/t26.js`). **Jacob:** judge it in motion.
-   - **Crop for the round portrait.** He said the circle on Play was awkward and that he should be able to crop it. There is now a "Crop round portrait" button under the photo on My sheet: drag, or three sliders. It also starts a little above the middle, where faces are (`tests/t28.js`). **Jacob:** try it with his own photo.
-   - **Badges: the list and the token.** 63 badges in five kinds, each with an icon chosen to show what it is for, four ranks, and wear from the dice textures (`tests/t27.js`; look sheets at `tests/out/badges-dark.png` and `badges-light.png`, remade by `node tests/t27.js`). Nothing in the page shows a badge yet and nothing awards one, so this is safe to ship with anything else.
-   - **99 more sigils**, in a new "Trophies" group at the end of the dice maker's picker (342 in all). They were fetched for the badges and are offered on dice like any other. Sbed joins the authors in the Credits, which the page fills in by itself.
-2. **Next: J1, counting.** It has to be built, tested and pushed before Wednesday 2026-10-14 so the first session is recorded; the awards screen can follow later because an un-ended session is kept. The spec changed on 2026-10-10 in ways that touch J1: the table keeps **every roll** of a session, a roll also carries the harm the hunter was on, and the page's `night` numbers gained the biggest single hit, the Luck left and Unstable. Read "What is counted" and "How it is built" in [SPEC-CARDS.md](SPEC-CARDS.md) first.
-3. **Then** J2 to J5 (the rules, ending the session, the tally, badges on the hunter), then the hunter's page (L1 to L3). The order is at the foot of the spec.
-4. **The live site works.** Jacob confirmed on 2026-10-10 that the Party tab says "Live", and that the Keeper's email is set as `KEEPER_EMAILS` on the Worker. Still untried: two people at the table at once (a card following a change, a roll landing in "At the table", a handout with a picture reaching a player). He plans to do that with a friend this weekend. Afterwards, look at the Durable Object usage in the Cloudflare dashboard against the free daily limits.
-5. **Things only Jacob or the Keeper can judge** once two people are on it: the wording on the desk and the scene board, whether the bell on a new handout is welcome, and whether one table for the whole site is right (it is, until a second group wants in).
-6. **Everything from 2026-10-09 is live and Jacob has not been through it** (the list is under "Waiting on Jacob's eye and ear"). Expect notes, and fix those before anything new.
+1. **Committed and pushed to `main` on the evening of 2026-10-10, on Jacob's word: the session awards and a new look for the 12+.** Every test passed first. It is live, so Wednesday 2026-10-14 will be counted. What it holds:
+   - **The session at the table.** It is counted from the first shared roll; the Keeper can end an episode "to be continued" and the count carries on next time (Jacob asked for exactly this); the Keeper ends the session with a preview, five picks of their own and a choice of which parts to count, or discards it; everyone gets the tally, the badges land on the hunters, and they can be pinned to the card. See "What a session is" and "Running the session" in [SPEC-CARDS.md](SPEC-CARDS.md).
+   - **A full test session was played** (Jacob asked for one): `node tests/t31.js`, the Keeper and three players over two nights. 88 checks pass; its screenshots are `tests/out/night-*.png`. It found one real bug, fixed: a hunter who died had their harm counted twice.
+   - **The 12+ and the level-up look different from a miss now.** Jacob liked the miss and not the high roll. Good news is a gold edge with real flame frames along the bottom of the screen and rising embers; the miss is as it was. **Jacob: judge it in motion.** If it is still off, ask what about it.
+2. **For Jacob and the Keeper to try on the live site** (none of this can be seen from here, the site is behind the sign-in; it was only ever run against the local Worker):
+   - The Keeper opens the Party tab, Keeper's desk: is "The session" card there, and does it start counting at the first shared roll?
+   - End an episode with a note, and check everyone gets "To be continued".
+   - End a session and hand out awards with two people at the table.
+   - Afterwards, look at the Durable Object usage in the Cloudflare dashboard against the free daily limits: every roll now writes three rows and sends one more small message to each page.
+3. **Next:** the hunter's page (L1 to L3), unless Jacob's notes on this batch come first. Smaller things left on the awards: badges on the card picture (J6), his pass over the names and lines (J7), the Keeper asking the end-of-session questions once for the table (J8), a puff of dust when a badge stamps down.
+4. **The live site works.** Jacob confirmed on 2026-10-10 that the Party tab says "Live", and that the Keeper's email is set as `KEEPER_EMAILS` on the Worker. Still untried: two people at the table at once. He plans to do that with a friend this weekend.
+5. **Everything from 2026-10-09 is live and Jacob has not been through it** (the list is under "Waiting on Jacob's eye and ear"). Expect notes, and fix those before anything new.
 
 ## For Jacob to answer: badges and the hunter's page
 
@@ -38,7 +40,7 @@ Jacob approved these that day. They are in `Hunters Journal/downloads/`, beside 
 |---|---|---|---|---|
 | `sigil-cache/`: 284 icons and two fonts | game-icons.net (its GitHub repository) and the Noto fonts | 1.4 MB | CC BY 3.0; SIL OFL 1.1 | yes: `sigils.js` is made from it. 99 of the icons are new; the rest are the ones already in the journal, fetched again because the first download folder was gone |
 | `kenney-smoke/`: 77 smoke, explosion and flash sprites | kenney.nl, Smoke Particles | 6.0 MB zip | CC0 | no. Meant for the puff of dust when a badge is stamped down (J4) |
-| `unity-Flame02/`, `unity-Flame03/`, `unity-SmallFlame01/`: three flame flipbooks, 64 frames each (16 by 4), as TGA and EXR | Unity Labs' free VFX flipbooks | 17.9 MB of zips | CC0 | no. Meant for flames on the big moments' edge and for flame frames on the hunter's page (L10) |
+| `unity-Flame02/`, `unity-Flame03/`, `unity-SmallFlame01/`: three flame flipbooks, 64 frames each (16 by 4), as TGA and EXR | Unity Labs' free VFX flipbooks | 17.9 MB of zips | CC0 | Flame02 is: `img/fx-flame.webp` is cut from it. The other two are not used yet |
 
 To use a flipbook, write a tool beside `tools/make_candles.py` that cuts the frames wanted out of the TGA, shrinks them and saves a strip into `img/`; the page then steps through it the way the candle flame does.
 
@@ -61,7 +63,8 @@ Chunk IDs are defined in [WORKPLAN.md](WORKPLAN.md).
 | G5, G7, G8 | Discord from the server, retiring the claude.ai path, a cloud copy of each journal | not started |
 | A3, C2, D, E, F, I | See WORKPLAN.md | not started |
 | J0 | The badge list and the token: 63 badges, five kinds, ranks, textures, icons | built, tested and pushed to `main` 2026-10-10 (`tests/t27.js`). Nothing shows a badge yet |
-| J1 to J9 | Session awards: counting, the rules, ending the session, the tally, badges on the hunter, milestones | **J1 is next, and is needed before Wednesday 2026-10-14.** The rest follow |
+| J1 to J5, J9 | Session awards: counting, the rules, running the session (with episodes), the tally, badges on the hunter, milestones | built, tested and pushed to `main` 2026-10-10 (`tests/t29.js`, `t30.js`, `t31.js`). Not yet seen working on the real account |
+| J6, J7, J8 | Badges on the card picture; Jacob's pass over the names and lines; the Keeper asks the end-of-session questions for the table | not started |
 | L0 | Crop for the round portrait | built, tested and pushed to `main` 2026-10-10 (`tests/t28.js`). **Jacob:** try it with his own photo |
 | L1 to L13 | The hunter's page: a mark, colors, the page and its showcases, frames in code, uploads, your own background and frame, portrait treatments, motion, a guestbook | respecified 2026-10-10 to Jacob's "Steam page" brief. Not started; L1 to L3 follow the awards |
 
@@ -69,7 +72,7 @@ Chunk IDs are defined in [WORKPLAN.md](WORKPLAN.md).
 
 | Branch | What it holds | State |
 |---|---|---|
-| `main` | Everything pushed: the dice work, the Luck candles, the first-night pieces, the hunter card, the 2026-10-09 morning batch, and the shared table with the Keeper's area (the Worker in `worker/` now deploys with the site) | Pushed 2026-10-09, twice, and again on 2026-10-10 (punchier big moments, the round portrait's crop, 99 more sigils, the badge list and token) |
+| `main` | Everything pushed: the dice work, the Luck candles, the first-night pieces, the hunter card, the 2026-10-09 morning batch, and the shared table with the Keeper's area (the Worker in `worker/` now deploys with the site) | Pushed 2026-10-09, twice, and twice on 2026-10-10: first the punchier big moments, the round portrait's crop, 99 more sigils and the badge list and token; then the session awards (counting, episodes, the Keeper's controls, the tally, badges on the hunter) and the gold 12+ |
 
 Every other branch was merged or replaced, and all were deleted on 2026-10-09. The first drawing of the Luck candles (commit d3358c3) went with them; the candles in `main` replaced it.
 
@@ -81,7 +84,7 @@ Pushing `main` deploys. Pushing any other branch does not.
 - [ ] Have one friend run a short practice: build a hunter, roll five moves, take harm, spend Luck.
 - [ ] **Jacob:** tell the Keeper about "Running the game (for the Keeper)" in the Guide and the Keeper's desk on the Party tab, and read the guide against pages 5 and 6 of the reference PDF.
 - [ ] **Jacob:** ask the Keeper whether threat cards (H3) are wanted.
-- [ ] **J1 (counting)** built, tested and pushed, so the first session is recorded.
+- [ ] **Jacob:** tell the Keeper about "The session" on the Keeper's desk: nothing to press to start, "End the episode" if the story is not finished, "End the session" when it is.
 - [ ] **Jacob (optional, for A3):** make a test channel and webhook in Discord so a real post can be tried.
 
 ## Waiting on Jacob's eye and ear
@@ -90,7 +93,8 @@ All of this is live and none of it has had his review yet (nor has anything from
 
 - [ ] **3D dice.** Judge them in motion: the fuel swish, the three lighting moods, the finishes. Try them on a phone.
 - [ ] **Dice sounds (F1).** Nothing has been tuned by ear. A bounce is a die half and a tray half chosen separately, so there are 21 listens in all (14 finishes, 7 trays), not 98 pairs. Turn sound on and use "Hear these dice" in the dice maker, and note which are wrong. From the first, made-up pass: gem was the only die sound he liked, and leather and felt should land as more of a thud.
-- [ ] **Big moments (the scorched edge).** He saw the live one on 2026-10-10 and said it should be punchier: "seems a little slow". It was retimed and pushed the same day. Judge the new timing on a 12+, a miss and a level-up, and on a real phone. It passes in WebKit (Safari's engine) in the tests.
+- [ ] **Big moments.** He saw the retimed ones on 2026-10-10: "I really like the feel of the failures but I just don't like the high roll big moment feel." The miss is untouched. The 12+ and the level-up were redone and pushed the same day as gold light with flames and embers. Judge them in motion, on a phone too.
+- [ ] **The tally's reveal.** A token stamps down for each award, about two seconds each (a second and a half past twelve awards), with Next and Skip. Is that the right pace for a night with thirty awards?
 - [ ] **A friend's roll.** With a second person at the table and sound on: is the quiet clatter of their dice welcome, and is it the right loudness? It can be switched off under Settings.
 - [ ] **Luck candles.** He saw them before they went live and asked for a flame with more frames, which they now have. Check the flame in motion, and what happens at 2 Luck or fewer.
 - [ ] **Portrait photos.** They were kept at 420px and sent to the table at 160px, which looked soft; from 2026-10-09 they are kept at 900px and sent at 360px. A photo added before that stays soft on My sheet and in the card picture until it is added again (the original was never kept). The copy on the Party tab is remade by itself, a little sharper.
@@ -101,7 +105,7 @@ All of this is live and none of it has had his review yet (nor has anything from
 
 Jacob asked (2026-10-10) about open source frame animations for hunter cards, badges and the big moments. He notices motion, and one shape nudged by a transform reads as unfinished to him, so real frames are worth having. He approved two downloads the same day, which are now on disk (see "Downloaded on 2026-10-10" above): Kenney's Smoke Particles and three Unity flame flipbooks.
 
-- [ ] **Flames on the big moments' edge.** The edge is still one roughened shape with quick timing. Try a row of Flame02 frames along the bottom and sides for a 12+ and a level-up, and show Jacob both.
+- [x] **Flames on the big moments.** Done 2026-10-10 for the 12+ and the level-up: a row of Flame02 frames along the bottom (`img/fx-flame.webp`, 79 KB, made by `tools/make_fx.py`).
 - [ ] **A badge stamping down** at the reveal (J4): a hit, a puff from Kenney's white puff or explosion sprites.
 - [ ] **Flame, ember and smoke frames for the hunter's page** (L10).
 - Other leads, not downloaded: [Fire FX by Mikodrak](https://opengameart.org/content/fire-fx-burning-fire-animation) (CC0, a 40-frame looping flame, 1.2 MB); Kenney's Particle Pack (CC0, the pack the candle flame came from: sparks, flares, scorch marks); the other 25 Unity flipbooks (fireballs, explosions, wispy smoke). Pixel-art packs are plentiful but would clash with the journal's look. Lottie needs a player script and its free files are not CC0.
@@ -169,6 +173,8 @@ Detail is in [WORKPLAN.md](WORKPLAN.md); the specs they refine are in [SPEC.md](
 
 - The official playbook sheets and reference sheets are the source for rules. On 2026-10-08 all twelve playbooks, the basic and weird moves, and the harm, healing, Luck and level-up rules were compared with them line by line. What differed was fixed: the builder now asks for a playbook's own choices before moves and gear, as the sheets do; a pronouns field was added; and a few wordings were corrected (Protect Someone on a 10+, the telekinesis explosion's fire tag, two history prompts, the Divine's Boss from Beyond).
 - The Harm row has eight pips where the printed sheet has seven boxes. The eighth is "8 harm kills", which the reference sheet states.
+- **Good news and bad news look different (Jacob, 2026-10-10).** A miss keeps the red burnt edge and the shake, which he likes. A 12+ and a level-up are gold, with fire along the bottom.
+- **A session can take more than one night (Jacob, 2026-10-10).** The Keeper ends an episode "to be continued" and the next roll carries the same session on; badges come only when the Keeper ends the whole session. A quiet gap of three hours also begins a new part by itself, so nothing is lost if nobody presses anything. This replaced the earlier plan of a new session after three quiet hours and a list of un-ended sessions.
 - **The group plays by the standard rules (Jacob, 2026-10-10).** Use Magic keeps its name; nothing is renamed for The Long Dry.
 - Rules stay as built from the rulebook. A how-to-play video was checked on 2026-10-08 and nothing was changed to match it, including adding a "the Keeper never rolls" line to the Guide.
 - **Big moments burn the edge of the screen; nothing flashes from the middle (Jacob, 2026-10-09).** The white double flash on a 12+ and the brass burst on a level-up are gone.
