@@ -362,7 +362,7 @@ details.case .ttl, details.beast .ttl { font-size: 17px; }
 .texture { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity .6s; background: center / cover no-repeat; }
 .texture.on { opacity: .13; }
 .wrap { position: relative; z-index: 1; }
-.mast.has-banner { background: linear-gradient(90deg, rgba(12, 8, 10, .92) 0%, rgba(12, 8, 10, .66) 42%, rgba(12, 8, 10, .1) 82%), var(--banner) right 22% / cover no-repeat; border: 1px solid var(--line); border-radius: 10px; padding: 28px 20px 22px; min-height: 190px; align-items: flex-end; margin-bottom: 14px; color: #f0e7dc; }
+.mast.has-banner { background: linear-gradient(90deg, rgba(12, 8, 10, .92) 0%, rgba(12, 8, 10, .66) 42%, rgba(12, 8, 10, .1) 82%), var(--banner) var(--banner-pos, right 22%) / cover no-repeat; border: 1px solid var(--line); border-radius: 10px; padding: 28px 20px 22px; min-height: 190px; align-items: flex-end; margin-bottom: 14px; color: #f0e7dc; }
 .mast.has-banner .sub { color: #d6c9ba; }
 .mast.has-banner .kicker { color: #ee8277; }
 .mast.has-banner .stamp { color: #e3bd5f; border-color: #e3bd5f; }
@@ -372,6 +372,7 @@ details.case .ttl, details.beast .ttl { font-size: 17px; }
 .mast.has-banner > * { position: relative; z-index: 1; }
 .mast.has-banner::before, .mast.has-banner::after, #hero-tips::before, #hero-tips::after, #hero-hunter::before, #hero-hunter::after { content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; mix-blend-mode: screen; background: center / cover no-repeat; will-change: opacity; }
 .mast.has-banner::before, .mast.has-banner::after { background-position: right 22%; }
+.mast.hbanner::before, .mast.hbanner::after { display: none; }   /* the lamp glow is placed for banner.jpg's lantern */
 .mast.has-banner::before, #hero-tips::before, #hero-hunter::before { animation: lampbreathe 9s ease-in-out infinite; }
 .mast.has-banner::after, #hero-tips::after, #hero-hunter::after { animation: lampflicker 5.6s ease-in-out infinite; }
 #hero-tips::before { animation-duration: 10.5s; } #hero-tips::after { animation-duration: 6.4s; }
@@ -914,7 +915,7 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
   <header class="mast">
     <div>
       <p class="kicker">Monster of the Week</p>
-      <h1>Hunter's Journal</h1>
+      <h1 id="masttitle">Hunter's Journal</h1>
     </div>
   </header>
 
@@ -1132,7 +1133,6 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
 
   <!-- HUNTER -->
   <section class="panel" id="p-hunter" role="tabpanel" aria-labelledby="t-hunter" hidden>
-    <div class="hero" id="hero-hunter" hidden></div>
     <div id="hbar"></div>
     <div class="seg" role="group" aria-label="Hunter view">
       <button type="button" id="seg-play" aria-pressed="false">Play</button>
@@ -1689,6 +1689,7 @@ function showTab(name, fromHash) {
   if (name === 'guide') renderStart();
   if (name === 'hunter' && S.hv === 'build') renderBuild();
   if (typeof applyTex === 'function') applyTex();
+  applyMast();
   if (!fromHash) { try { history.replaceState(null, '', '#' + name); } catch (e) {} }
 }
 $$('.tabs button').forEach(function (b) { b.addEventListener('click', function () { showTab(b.dataset.tab); }); });
@@ -2744,7 +2745,7 @@ function renderPortrait() {
   $('#photolbl').textContent = sh.photo ? 'Change photo' : 'Upload photo';
   $('#rmphoto').hidden = !sh.photo;
 }
-function renderRollas() { renderPlay(); }
+function renderRollas() { renderPlay(); applyMast(); }
 function photoMsg(t) { $('#photomsg').textContent = t || ''; }
 
 /* ---------- play screen ---------- */
@@ -3006,7 +3007,7 @@ function takeHunter(h, build) {
 }
 function hunterChanged() {
   hn.retiring = false; hn.del = '';
-  renderBuild(); renderSheet(); renderPortrait(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderPlay(); renderParty(); renderStart(); renderHunters(); setHV(S.hv);
+  renderBuild(); renderSheet(); renderPortrait(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderPlay(); renderParty(); renderStart(); renderHunters(); setHV(S.hv); applyMast();
   scheduleSave(); window.scrollTo(0, 0);
 }
 function newHunter() { if (rolling) return; S.bench.unshift(benchOf(null)); takeHunter({ sheet: defaults().sheet, hold: defaults().hold }, true); hunterChanged(); }
@@ -4043,8 +4044,18 @@ function applyTex() {
 function pbSlug(name) { return String(name || '').replace(/^The\s+/i, '').toLowerCase().replace(/[^a-z]/g, ''); }
 function artFor(playbook) { var s = pbSlug(playbook); return s && ART.pb[s] ? 'img/pb-' + s + '.jpg' : ''; }
 function probe(url, ok) { var im = new Image(); im.onload = function () { ok(im); }; im.src = url; }
+/* The masthead: on Hunter it shows the hunter's own picture and name ("Your hunter" until there is one) */
+function applyMast() {
+  var m = $('.mast'), on = S.tab === 'hunter', img = on && ART.hbanner ? 'img/hero-hunter.jpg' : ART.banner ? 'img/banner.jpg' : '';
+  m.classList.toggle('has-banner', !!img);
+  if (img) m.style.setProperty('--banner', 'url(' + img + ')');
+  m.classList.toggle('hbanner', on && !!ART.hbanner);
+  if (on && ART.hbanner) m.style.setProperty('--banner-pos', 'center 62%'); else m.style.removeProperty('--banner-pos');
+  $('#masttitle').textContent = on ? (String(S.sheet.name || '').trim() || 'Your hunter') : "Hunter's Journal";
+}
 function initArt() {
-  probe('img/banner.jpg', function () { var m = $('.mast'); m.style.setProperty('--banner', 'url(img/banner.jpg)'); m.classList.add('has-banner'); });
+  probe('img/banner.jpg', function () { ART.banner = true; applyMast(); });
+  probe('img/hero-hunter.jpg', function () { ART.hbanner = true; applyMast(); });
   probe('img/texture.jpg', function () { $('.texture:not(.t2)').style.backgroundImage = 'url(img/texture.jpg)'; ART.tex1 = true; applyTex(); });
   probe('img/texture2.jpg', function () { $('.texture.t2').style.backgroundImage = 'url(img/texture2.jpg)'; ART.tex2 = true; applyTex(); });
   probe('img/tray.jpg', function () { ART.tray = true; applyTray(); });
@@ -4063,7 +4074,7 @@ function initArt() {
     probe('img/' + n + '.jpg', function () { ART.misc[n] = true; renderStage(); renderSheet(); renderBeasts(); renderParty(); if (!$('#cases input:focus, #cases textarea:focus')) renderCases(); });
   });
   PLAYBOOKS.forEach(function (p) { var s = pbSlug(p[0]); probe('img/pb-' + s + '.jpg', function () { ART.pb[s] = true; renderBuild(); renderPortrait(); renderRollas(); }); });
-  [['party', 'party-table.jpg'], ['bestiary', 'bestiary-unknown.jpg'], ['notes', 'casefile-desk.jpg'], ['guide', 'hero-guide.jpg'], ['roll', 'hero-roller.jpg'], ['hunter', 'hero-hunter.jpg'], ['tips', 'hero-tips.jpg']].forEach(function (h) {
+  [['party', 'party-table.jpg'], ['bestiary', 'bestiary-unknown.jpg'], ['notes', 'casefile-desk.jpg'], ['guide', 'hero-guide.jpg'], ['tips', 'hero-tips.jpg']].forEach(function (h) {
     probe('img/' + h[1], function (im) { var el = $('#hero-' + h[0]); if (el) { el.style.backgroundImage = 'url(img/' + h[1] + ')'; el.style.aspectRatio = im.naturalWidth + ' / ' + im.naturalHeight; el.hidden = false; } });
   });
 }
