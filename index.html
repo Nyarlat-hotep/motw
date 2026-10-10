@@ -912,6 +912,18 @@ div.wcard { cursor: default; border-color: var(--good); }
 .pbc[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--surface2); }
 .pbc[aria-pressed="true"]::before { border-color: var(--accent); opacity: .5; }
 .pbc .pbimg { width: 100%; border-radius: 6px; }
+.rlc .mc-body { margin-top: 18px; }
+.mcards > li { display: flex; }
+.mcards > li > .mcard { flex: 1; }
+.rlc .mc-name { font-size: 21px; }
+.rlrows { display: grid; gap: 4px; }
+.rlrow { display: flex; justify-content: space-between; align-items: center; padding: 3px 4px; font-size: 16px; }
+.rlrow b { font-family: var(--num); font-size: 18px; font-weight: 600; min-width: 3em; text-align: center; border-radius: 999px; padding: 1px 8px; }
+.rlhi b { background: var(--accent); color: var(--accent-ink); }
+.rllo { color: var(--muted); }
+.rlc .pbc-facts b { color: var(--ink); }
+.pbc:disabled { cursor: default; }
+.pbc:disabled:not([aria-pressed="true"]) { opacity: .55; }
 .mcard.mc-add { background: none; border: 2px dashed var(--line); box-shadow: none; }
 .mcard.mc-add::before { content: none; }
 .mcard.mc-add:hover { transform: none; box-shadow: none; border-color: var(--accent); }
@@ -2450,9 +2462,18 @@ function wizRatings() {
   var lines = '';
   if (d) {
     var st = pbState();
-    lines = '<span class="lbl">Pick one line</span><div class="wopts" role="group" aria-label="Rating lines">' + d.ratings.map(function (r, i) {
-      return '<button type="button" class="wopt" data-wrate="' + i + '" aria-pressed="' + (st.rating === i) + '"' + (lock ? ' disabled' : '') + '>' + STATS.map(function (s) { return '<span class="rc' + (r[s] >= 2 ? ' hi' : '') + '"><small>' + STATNAME[s] + '</small><b>' + fmtI(r[s]) + '</b></span>'; }).join('') + '</button>';
-    }).join('') + '</div>' + (lock ? '<p class="note" style="margin-top:12px">Your ratings only change when you level up, so the lines are locked.</p>' : '');
+    /* each line as a card you tap: what it is strong in, the five ratings as rows, and the basic moves it is best for */
+    lines = '<span class="lbl">Pick one line</span><ul class="mcards rlcards" role="group" aria-label="Rating lines">' + d.ratings.map(function (r, i) {
+      var top = Math.max.apply(null, STATS.map(function (s) { return r[s]; })), best = STATS.filter(function (s) { return r[s] === top; });
+      var head = 'Strong in ' + best.map(function (s) { return STATNAME[s]; }).join(best.length > 2 ? ', ' : ' and ').replace(/, ([^,]*)$/, ' and $1');
+      var moves = MOVES.filter(function (m) { return m.g === 'basic' && best.indexOf(m.stat) >= 0; }).map(function (m) { return m.name; });
+      var on = st.rating === i;
+      return '<li><button type="button" class="mcard pbc rlc" data-wrate="' + i + '" aria-pressed="' + on + '"' + (lock ? ' disabled' : '') + '><span class="mc-body">' +
+        '<span class="mc-kick">' + (on ? 'Your line' : '&nbsp;') + '</span><span class="mc-name">' + head + '</span><span class="mc-rule" aria-hidden="true"></span>' +
+        '<span class="rlrows">' + STATS.map(function (s) { return '<span class="rlrow rl' + (r[s] >= 2 ? 'hi' : r[s] < 0 ? 'lo' : 'mid') + '"><span>' + STATNAME[s] + '</span><b>' + fmtI(r[s]) + '</b></span>'; }).join('') + '</span>' +
+        (moves.length ? '<span class="pbc-facts"><b>Best for:</b> ' + moves.map(esc).join(', ') + '</span>' : '') +
+        (on ? '<span class="pbc-on"><span class="i i-check" aria-hidden="true"></span> Picked</span>' : '') + '</span></button></li>';
+    }).join('') + '</ul>' + (lock ? '<p class="note" style="margin-top:12px">Your ratings only change when you level up, so the lines are locked.</p>' : '');
   }
   var rows = STATS.map(function (s) {
     var used = MOVES.filter(function (m) { return m.g === 'basic' && m.stat === s; }).map(function (m) { return m.name; });
