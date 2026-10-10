@@ -1,5 +1,6 @@
 require('fs').mkdirSync(require('path').join(__dirname,'out'),{recursive:true});
 const { chromium } = require('playwright');
+const followDevice = require('./look');
 const fs = require('fs');
 const STUB = fs.readFileSync(require('path').join(__dirname,'fixtures','stub.txt'),'utf8');
 const results = []; const errs = [];
@@ -76,7 +77,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   check('Spend Luck is offered after a miss', (await p.locator('#spendluck').count())===1);
   await p.click('#spendluck'); await p.waitForTimeout(150);
   check('Spend Luck makes it a 12 and costs 1', (await T('#sum')).startsWith('12') && (await T('#rollas')).includes('Luck 6'), await T('#rollas'));
-  check('lightning flash fired on 12', await p.evaluate(()=>document.getElementById('fx').className)==='fx-crit');
+  check('a 12 is marked at the dice, with no burnt edge', await p.evaluate(()=>!!document.getElementById('trayfx') && document.getElementById('fx').className===''));
   await p.click('#clearhist'); check('Clear empties history', /No rolls yet/.test(await T('#hist')));
 
   // ---- HUNTER: BUILD ----
@@ -176,7 +177,11 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await p.check('#share'); await p.waitForTimeout(900);
   const doc = await p.evaluate(()=>window.__store['party/me123']);
   check('sharing writes only public fields', !!doc && doc.name==='Dee Ray' && doc.moves.includes('Last Stand') && !('backstory' in doc) && !('inventory' in doc) && !('bonds' in doc), doc && Object.keys(doc).join(','));
-  check('shared card has a photo thumbnail', !!doc && doc.photo.startsWith('data:image/jpeg') && doc.photo.length<20000, doc && doc.photo.length);
+  check('shared card has a photo thumbnail', !!doc && doc.photo.startsWith('data:image/jpeg') && doc.photo.length<=40000, doc && doc.photo.length);
+  // sharp enough: the kept portrait is up to 900px on its long side, and the copy for the table 360px (it is shown about 120px wide, on screens three times as dense)
+  const dims = await p.evaluate(async (thumb) => { const size = (src) => new Promise(r => { const i = new Image(); i.onload = () => r([i.naturalWidth, i.naturalHeight]); i.onerror = () => r([0, 0]); i.src = src; }); const sh = JSON.parse(localStorage.getItem('hunters-journal-v1')).sheet; return { photo: await size(sh.photo), thumb: await size(thumb), tv: sh.tv, kb: Math.round(sh.photo.length / 1024) }; }, doc.photo);
+  check('the portrait is kept at 900px on its long side', Math.max(...dims.photo) === 900 && dims.kb < 400, JSON.stringify(dims));
+  check('the copy for the table is 360px on its long side, or as near as fits', Math.max(...dims.thumb) <= 360 && Math.max(...dims.thumb) >= 240 && dims.tv === 2, JSON.stringify(dims));
   await p.click('#t-hunter'); await p.click('#seg-sheet'); await p.click('#luck button[data-n="2"]'); await p.waitForTimeout(900);
   check('sheet change syncs to table doc', (await p.evaluate(()=>window.__store['party/me123'].luck))===2);
   check('bond name suggestions include table hunters', (await p.evaluate(()=>[...document.querySelectorAll('#partynames option')].map(o=>o.value))).includes('Alex Reyes'));
@@ -187,7 +192,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   await p.click('#t-settings');
   await p.uncheck('#set-fx'); await p.click('#t-roll'); await p.evaluate(()=>{document.getElementById('fx').className='';});
   for (let i=0;i<6;i++){ await p.click('#roll'); await p.waitForTimeout(1400); }
-  check('effects off: no flash class set', await p.evaluate(()=>document.getElementById('fx').className)==='');
+  check('effects off: no effect class set', await p.evaluate(()=>document.getElementById('fx').className)==='');
   await p.click('#t-settings'); await p.check('#set-fx');
   await p.click('#bk-save'); await p.waitForTimeout(200);
   const saved = await p.evaluate(()=>window.__saved[0]);
@@ -208,7 +213,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
 
   // ---- LAYOUT / THEMES ----
   for (const [scheme,w] of [['light',1100],['dark',390],['light',390]]) {
-    const c2 = await b.newContext({ viewport: { width: w, height: 800 }, colorScheme: scheme }); await c2.addInitScript(STUB); const q = await c2.newPage();
+    const c2 = await b.newContext({ viewport: { width: w, height: 800 }, colorScheme: scheme }); await c2.addInitScript(STUB); if (scheme==='light') await followDevice(c2); const q = await c2.newPage();
     q.on('pageerror', e => errs.push('PAGEERR2 ' + e.message));
     await q.goto('file://'+require('path').join(__dirname,'..','index.html')+''); await q.waitForTimeout(500);
     let worst = 0;

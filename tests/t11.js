@@ -2,6 +2,7 @@
 // Module scripts cannot load from file://, so this test serves the repo over http itself.
 require('fs').mkdirSync(require('path').join(__dirname,'out'),{recursive:true});
 const { chromium } = require('playwright');
+const followDevice = require('./look');
 const path = require('path'), fs = require('fs'), http = require('http');
 const ROOT = path.join(__dirname,'..');
 const TYPES = { '.html':'text/html', '.js':'text/javascript', '.jpg':'image/jpeg', '.png':'image/png', '.webmanifest':'application/manifest+json' };
@@ -20,6 +21,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   const open = async (opts, seed, url) => {
     const ctx = await b.newContext(Object.assign({ viewport: { width: 1100, height: 900 }, colorScheme: 'dark', serviceWorkers: 'block' }, opts));
     if (seed) await ctx.addInitScript((v) => { if (!localStorage.getItem('hunters-journal-v1')) localStorage.setItem('hunters-journal-v1', JSON.stringify(v)); }, seed);
+    if (opts && opts.colorScheme === 'light') await followDevice(ctx);
     const p = await ctx.newPage(); p.reqs = [];
     p.on('pageerror', e => errs.push('PAGEERR ' + e.message));
     p.on('console', m => { if (m.type()==='error' && !/Failed to load resource|blocked by CORS policy/.test(m.text())) errs.push('CONSOLE ' + m.text()); });

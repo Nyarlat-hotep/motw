@@ -322,6 +322,10 @@ Turn the free-text threats box into optional cards (kind, name, motivation, weak
 
 ---
 
+## Track J: Session awards, and Track L: Card looks
+
+Specified in [SPEC-CARDS.md](SPEC-CARDS.md) on 2026-10-09, with their own chunks (J1 to J8, L1 to L8), sizes and order. Waiting for Jacob's review; nothing built.
+
 ## Track I: Later
 
 | ID | Size | What | Notes |

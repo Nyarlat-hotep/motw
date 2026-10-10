@@ -1,6 +1,7 @@
 // Dice maker: defaults untouched, live options, sigil, mismatched pairs, starter sets, dice codes, reload, phone width.
 require('fs').mkdirSync(require('path').join(__dirname,'out'),{recursive:true});
 const { chromium } = require('playwright');
+const followDevice = require('./look');
 const path = require('path');
 const URL = 'file://'+path.join(__dirname,'..','index.html');
 const results = []; const errs = [];
@@ -147,6 +148,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   // ---- phone width, both themes ----
   for (const scheme of ['dark','light']) {
     const c3 = await b.newContext({ viewport: { width: 390, height: 800 }, colorScheme: scheme });
+    if (scheme === 'light') await followDevice(c3);
     const m = await c3.newPage(); m.on('pageerror', e => errs.push('PAGEERR3 ' + e.message));
     await m.goto(URL+'#roll'); await m.waitForTimeout(500); await m.click('#dp-open');
     await m.click('[data-dp-pair="0"]'); await m.click('[data-dp-use="pb:spellslinger"]'); await m.fill('#dp-name','A fairly long name for a set of dice ok'); await m.click('#dp-save');
@@ -167,7 +169,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   check('traced sigils: pentagram and pentacle are offered, and the skull is the traced art', await p.evaluate(()=>{ const q=(n)=>document.querySelector('[data-dp-set="sigil"][data-v="'+n+'"] svg path'); return !!q('pentagram') && !!q('pentacle') && q('skull').getAttribute('transform')==='scale(.1)' && q('skull').getAttribute('d').length>500; }));
   // ---- the sigil pack: groups, a grid per group, and a pack sigil on a die ----
   const grp = (name) => p.evaluate((name)=>{ [...document.querySelectorAll('[data-dp-sg]')].find(b=>b.textContent===name).click(); return document.querySelectorAll('.siggrid [data-dp-set="sigil"]').length - 1; }, name);
-  check('sigils come in groups', (await p.evaluate(()=>[...document.querySelectorAll('[data-dp-sg]')].map(b=>b.textContent).join(',')))==='Classic,Wasteland,Hunter,Monsters,Beasts,Spirits,Symbols,Tarot,Runes,Elements,Zodiac,Glyphs');
+  check('sigils come in groups', (await p.evaluate(()=>[...document.querySelectorAll('[data-dp-sg]')].map(b=>b.textContent).join(',')))==='Classic,Wasteland,Hunter,Monsters,Beasts,Spirits,Symbols,Tarot,Runes,Elements,Zodiac,Glyphs,Trophies');
   check('Tarot has all 22 cards, Runes all 24, and every sigil button has a name', (await grp('Tarot'))===22 && (await grp('Runes'))===24 && await p.evaluate(()=>[...document.querySelectorAll('.siggrid [data-v]')].every(b=>!b.getAttribute('data-v') || (b.getAttribute('aria-label')||'').length>2)));
   await grp('Tarot'); await p.click('.siggrid [data-v="tarot-moon"]');
   const moon = await slot(0);
@@ -192,7 +194,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
 
   // ---- without sigils.js the journal still works, with the classic sigils ----
   const ctxN = await b.newContext({ viewport: { width: 1100, height: 900 } });
-  await ctxN.route('**/sigils.js', r => r.abort());
+  await ctxN.route('**/sigils.js*', r => r.abort());
   const pn = await ctxN.newPage(); let nErr = 0; pn.on('pageerror', () => nErr++);
   await pn.goto(URL+'#roll'); await pn.waitForTimeout(600); await pn.click('#dp-open');
   check('no sigils.js: one group, the nine classics, no errors, and rolling works', nErr===0 && (await pn.locator('[data-dp-sg]').count())===1 && (await pn.locator('.siggrid [data-dp-set="sigil"]').count())===10 && await pn.evaluate(()=>{ document.getElementById('roll').click(); return true; }));

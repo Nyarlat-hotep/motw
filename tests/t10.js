@@ -1,6 +1,7 @@
 // Luck candles: seven candle buttons on My sheet and Play, snuff on spend, guttering when Luck runs low, the flame and smoke pictures and the drawn stand-ins, reduced motion, phone width.
 require('fs').mkdirSync(require('path').join(__dirname,'out'),{recursive:true});
 const { chromium } = require('playwright');
+const followDevice = require('./look');
 const path = require('path');
 const URL = 'file://'+path.join(__dirname,'..','index.html');
 const results = []; const errs = [];
@@ -9,6 +10,7 @@ function check(name, ok, extra){ results.push([ok?'PASS':'FAIL', name, extra===u
   const b = await chromium.launch({ executablePath: '/opt/pw-browsers/chromium' }).catch(()=>chromium.launch());
   const open = async (opts) => {
     const ctx = await b.newContext(Object.assign({ viewport: { width: 1100, height: 900 }, colorScheme: 'dark' }, opts));
+    if (opts && opts.colorScheme === 'light') await followDevice(ctx);
     const p = await ctx.newPage();
     p.on('pageerror', e => errs.push('PAGEERR ' + e.message));
     p.on('console', m => { if (m.type()==='error' && !/Failed to load resource/.test(m.text())) errs.push('CONSOLE ' + m.text()); });

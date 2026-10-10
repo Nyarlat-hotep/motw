@@ -72,11 +72,15 @@ const ALG = { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: ne
   check('card: unstable is true only for true', card.unstable === false && C.cleanCard({ unstable: true }).unstable === true);
   check('card: lists are cut and emptied of junk', card.weapons.length === 6 && card.moves.join() === 'A,B' && !('extra' in card));
   check('card: a small JPEG data URL is kept', card.photo === 'data:image/jpeg;base64,AAAA');
-  check('card: other photos are dropped (a link, an SVG, a script, too big)', ['https://evil.test/x.jpg', 'data:image/svg+xml;base64,AAAA', 'data:text/html;base64,AAAA', 'javascript:alert(1)', 'data:image/jpeg;base64,' + 'A'.repeat(24001)].every((p) => C.cleanCard({ photo: p }).photo === ''));
+  check('card: other photos are dropped (a link, an SVG, a script, too big)', ['https://evil.test/x.jpg', 'data:image/svg+xml;base64,AAAA', 'data:text/html;base64,AAAA', 'javascript:alert(1)', 'data:image/jpeg;base64,' + 'A'.repeat(48001)].every((p) => C.cleanCard({ photo: p }).photo === ''));
   check('card: things that are not objects are refused', [null, undefined, 'a', 5, [], [1]].every((x) => C.cleanCard(x) === null));
   const hostile = JSON.parse('{"__proto__": {"polluted": 1}, "constructor": {"prototype": {"polluted": 2}}, "name": "x", "stats": {"__proto__": {"polluted": 3}}}');
   const clean = C.cleanCard(hostile);
-  check('card: prototype tricks do nothing', ({}).polluted === undefined && clean.polluted === undefined && Object.keys(clean).join() === 'name,pronouns,playbook,catchline,look,photo,stats,luck,harm,unstable,xp,level,armor,weapons,moves');
+  check('card: prototype tricks do nothing', ({}).polluted === undefined && clean.polluted === undefined && Object.keys(clean).join() === 'name,pronouns,playbook,catchline,look,photo,stats,luck,harm,unstable,xp,level,armor,weapons,moves,hid,pins,pinn,career,page');
+  // which hunter, and the badges they pin
+  const pinned = C.cleanCard({ name: 'x', hid: 'cmg1abc9zz', pins: ['snake', 'snake', 'nope', 7, '<b>', 'hog', 'bag', 'arm', 'peak', 'first', 'alive'] });
+  check('card: the hunter\'s id is kept when it looks like one, and dropped when it does not', pinned.hid === 'cmg1abc9zz' && ['', 'ab', 'UPPERCASE1', 'has space1', '<script>x', 'x'.repeat(21), 7, null].every((h) => C.cleanCard({ hid: h }).hid === ''));
+  check('card: pins are badges from the list, each once, five at most', JSON.stringify(pinned.pins) === '["snake","hog","bag","arm","peak"]' && C.cleanCard({ pins: 'snake' }).pins.length === 0 && C.cleanCard({ pins: ['constructor', '__proto__', 'toString'] }).pins.length === 0, JSON.stringify(pinned.pins));
   const dice = { a: { body: '#AABBCC', pip: '#102030', finish: 'bone"><script>', sigil: 'skull', glow: true }, b: { body: '#aabbcc', pip: '#102030', finish: 'resin', sigil: '', glow: 'yes' }, tray: 'wood' };
   const cd = C.cleanDice(dice);
   check('dice: colors lower-cased, names reduced to plain words, glow only for true', cd.a.body === '#aabbcc' && cd.a.finish === 'bonescript' && cd.b.glow === false && cd.tray === 'wood', JSON.stringify(cd.a));
@@ -84,6 +88,14 @@ const ALG = { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: ne
   const roll = C.cleanRoll({ move: 'Kick Some Ass', d1: 4, d2: 3, mod: 2, total: 9, tier: 'part', luck: false, dice });
   check('roll: a good one is kept, with its dice', roll.total === 9 && roll.tier === 'part' && roll.dice.a.body === '#aabbcc');
   check('roll: dice that are not real faces are refused', [{ d1: 0, d2: 3 }, { d1: 4, d2: 7 }, { d1: 4, d2: 2.5 }, { d1: '4', d2: 3 }, { d1: 4 }, {}, null, 'x', []].every((r) => C.cleanRoll(r) === null));
+  const counted = C.cleanRoll({ d1: 4, d2: 3, mod: 2, hid: 'cmg1abc9zz', mv: 'kick', hm: 5 }), loose = C.cleanRoll({ d1: 4, d2: 3, hid: '../etc', mv: 'drop table', hm: 99 }), bare = C.cleanRoll({ d1: 4, d2: 3 });
+  check('roll: the hunter, the basic move and the harm carried are kept for the session\'s count', counted.hid === 'cmg1abc9zz' && counted.mv === 'kick' && counted.hm === 5);
+  check('roll: a hunter id that is not one, a move that is not one of the eight, and harm past 8 are put right', loose.hid === '' && loose.mv === '' && loose.hm === 8 && bare.hid === '' && bare.mv === '' && bare.hm === 0, JSON.stringify(loose));
+  // a hunter's own numbers for the night
+  const night = C.cleanNight({ k: '3.2', hid: 'cmg1abc9zz', harm: '4', peak: 12, hit: -3, luck: 2.4, left: 99, lvl: 'x', unst: 1, died: true, extra: '<b>' });
+  check('night: numbers are clamped, flags are true only for true, and nothing extra gets through', JSON.stringify(night) === '{"k":"3.2","hid":"cmg1abc9zz","harm":4,"peak":8,"hit":0,"luck":2,"left":7,"lvl":0,"unst":false,"died":true}', JSON.stringify(night));
+  check('night: without a session and part, or without a hunter, there is nothing to keep', [{ hid: 'cmg1abc9zz' }, { k: '3', hid: 'cmg1abc9zz' }, { k: '3.2' }, { k: '3.2; DROP', hid: 'cmg1abc9zz' }, { k: 3.2, hid: 'cmg1abc9zz' }, null, 'x', []].every((n) => C.cleanNight(n) === null));
+  check('session: a name is one short line, and the note on where the table left off keeps its lines', C.cleanTitle('  The   Dry\n Well\u0000 ') === 'The Dry Well' && C.cleanTitle('x'.repeat(200)).length === 60 && C.cleanTitle(7) === '' && C.cleanNote('At the well.\r\n\r\nMoss is hurt.\u0007') === 'At the well.\n\nMoss is hurt.' && C.cleanNote('y'.repeat(900)).length === 600);
   const lie = C.cleanRoll({ d1: 1, d2: 2, mod: 0, total: 12, tier: 'full', luck: false });
   check('roll: the total and tier are worked out here, not believed', lie.total === 3 && lie.tier === 'miss' && C.cleanRoll({ d1: 4, d2: 3, mod: 2, total: 1, tier: 'miss' }).tier === 'part' && C.cleanRoll({ d1: 6, d2: 5, mod: 0 }).tier === 'full');
   check('roll: Luck makes it a 12 whatever the dice say', C.cleanRoll({ d1: 1, d2: 1, mod: 0, luck: true }).total === 12 && C.cleanRoll({ d1: 1, d2: 1, mod: 0, luck: true }).tier === 'full');
@@ -96,6 +108,20 @@ const ALG = { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: ne
   check('pictures: PNG, SVG, text, empty and too-short are not', [png, svg, new Uint8Array(0), new Uint8Array(5), null].every((b) => C.imageType(b) === null));
   const big = new Uint8Array(C.LIMITS.image + 1); big.set([0xff, 0xd8, 0xff]);
   check('pictures: one byte over the cap is refused, at the cap is fine', C.imageType(big) === null && C.imageType(big.subarray(0, C.LIMITS.image)) === 'image/jpeg');
+
+  // ---- a hunter's page, and the art locker ----
+  const realPng = new Uint8Array(100); realPng.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+  check('art: a locker picture may be a PNG as well, by all eight of its first bytes; an SVG or a short file still may not', C.artType(realPng) === 'image/png' && C.artType(jpg) === 'image/jpeg' && C.artType(webp) === 'image/webp' && [png, svg, new Uint8Array(5), null].every((b) => C.artType(b) === null));
+  check('art: a picture id is eighteen hex characters and nothing else', C.artId('0123456789abcdef01') === '0123456789abcdef01' && ['', '0123456789ABCDEF01', '../0123456789abcdef', '0123456789abcdef012', 7, null, ['0123456789abcdef01']].every((v) => C.artId(v) === ''));
+  const pg = C.cleanPage({ mark: 'sk<ull"', epithet: '  <b>the Late</b>' + 'x'.repeat(80), frame: 'wan ted;', col: 'url(x)', bg: '../own', dim: 1e9, blur: -3, fw: 'wide', about: 'one\r\ntwo' + 'y'.repeat(900), cases: ['about', 'about', '<i>', 7, 'dice', 'a', 'b', 'c', 'd', 'e', 'f'],
+    sig: { weapon: 'Axe\n', move: 9, extra: 'x' }, art: { bg: '0123456789abcdef01', frame: 'https://evil.test/a.png', pframe: null, gal: ['0123456789abcdef02', '0123456789abcdef02', 'zz', '0123456789abcdef03', '0123456789abcdef04', '0123456789abcdef05'] }, style: 'color:red', html: '<script>' });
+  check('page: names are cut to plain words, so nothing can carry CSS or markup', pg.mark === 'skull' && pg.frame === 'wanted' && pg.col === 'urlx' && pg.bg === 'own' && pg.style === undefined && pg.html === undefined, JSON.stringify([pg.mark, pg.frame, pg.col, pg.bg]));
+  check('page: numbers are clamped, text is cut, and only About keeps its line breaks', pg.dim === 90 && pg.blur === 0 && pg.fw === 18 && pg.epithet.length <= 40 && pg.about.length === 400 && pg.about.slice(0, 7) === 'one\ntwo' && pg.sig.weapon === 'Axe' && pg.sig.move === '' && Object.keys(pg.sig).join() === 'weapon,move,bond', JSON.stringify([pg.dim, pg.blur, pg.fw, pg.about.slice(0, 9)]));
+  check('page: showcases are short words, each once, eight at most', pg.cases.join() === 'about,i,dice,a,b,c', pg.cases.join());
+  check('page: pictures are ids only, three in the gallery at most', pg.art.bg === '0123456789abcdef01' && pg.art.frame === '' && pg.art.pframe === '' && pg.art.gal.join() === '0123456789abcdef02,0123456789abcdef03,0123456789abcdef04' && C.pageArt(pg).length === 4, JSON.stringify(pg.art));
+  check('page: a card with no page, or one that is not an object, has none', [undefined, null, 'x', 7, []].every((v) => C.cleanCard({ name: 'x', page: v }).page === null) && C.pageArt(null).length === 0);
+  const withPage = C.cleanCard({ name: 'x', pins: ['snake', 'hog'], pinn: [3, 1e9, 4, 5, 6, 7, 8], career: { sessions: 4, rolls: -2, misses: 'x', harm: 1e12 }, page: {} });
+  check('card: pin counts and the career are numbers in range', withPage.pinn.join() === '3,999,4,5,6' && withPage.career.sessions === 4 && withPage.career.rolls === 0 && withPage.career.misses === 0 && withPage.career.harm === 1e7 && withPage.career.lvls === 0 && withPage.page.cases.length === 0, JSON.stringify([withPage.pinn, withPage.career]));
   check('names: tidied, cut to 30, and the fallback is used when nothing is left', C.cleanName('  Dee \n\t Ray  ') === 'Dee Ray' && C.cleanName('x'.repeat(100)).length === 30 && C.cleanName('\u0000\u0001', 'Player 1a2b') === 'Player 1a2b' && C.cleanName(42, 'F') === 'F');
 
   // what the Keeper posts
