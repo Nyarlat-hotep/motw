@@ -1450,12 +1450,28 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 .pcard.pcard { padding: 34px 30px; }
 .pcx { position: absolute; top: 14px; left: 16px; z-index: 3; display: grid; justify-items: center; gap: 2px; color: var(--pc, var(--accent)); pointer-events: none; }
 .pcx b { font-family: var(--display); font-size: 26px; line-height: 1; font-weight: 400; }
-.pcx svg { width: 18px; height: 18px; fill: currentColor; }
+.pcx svg { width: 34px; height: 34px; fill: currentColor; }
 .pcx-b { top: auto; left: auto; bottom: 14px; right: 16px; transform: rotate(180deg); }
 .hpage .lvplate { display: none; }
-.fr.fr-wanted .pcx:not(.pcx-b) { top: 22px; }
+.fr.fr-wanted::before, .fr.fr-wanted::after { display: none; }   /* no nail heads: the mark sits in the corner */
+.fr-dossier .frstamp { right: 52px !important; }   /* clear of the playing-card corner */
 .pcard.fr > .pcx, .hpage > .pcx { position: absolute; z-index: 3; }   /* a card's other children sit in its grid; the corners float over it */
 @media (max-width: 520px) { .hpage { padding: 34px 20px; } .pcard.pcard { padding: 30px 18px; } }
+/* the picture fills its side of the card: a tall panel down the left, cropped to fit */
+.hp-head.hp-case { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 0; padding: 0; overflow: hidden; align-items: stretch; }
+.hp-head .hp-por { display: flex; min-height: 300px; }
+.hp-head .hp-por img.ph0, .hp-head .hp-por .ph { width: 100%; height: 100%; aspect-ratio: auto; border-radius: 0; border: 0; object-fit: cover; object-position: 50% 30%; }
+.hp-head .hp-id { padding: 22px 24px; }
+.pcard.pcard { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 22px; }
+.pcard .pimg { align-self: stretch; display: flex; min-height: 240px; }
+.pcard .pimg > img:not(.pfr), .pcard .pimg > .ph { width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; object-position: 50% 30%; border-radius: 10px; }
+/* the sections as soft panels: no hard outline, a faint wash of the trim color, the title over a small diamond rule */
+.hp-case { border: 0 !important; border-radius: 12px !important; background: color-mix(in srgb, var(--pc, var(--accent)) 7%, var(--surface)) !important; box-shadow: 0 1px 0 color-mix(in srgb, var(--ink) 6%, transparent), 0 6px 16px rgba(0, 0, 0, .08); padding: 18px 22px; }
+.hp-case > h3 { font-family: var(--display); font-size: 21px; font-weight: 400; color: var(--pc, var(--accent)); margin: 0 0 14px; padding-bottom: 10px; position: relative; }
+.hp-case > h3::after { content: ""; position: absolute; left: 0; bottom: 0; width: 64px; height: 1px; background: color-mix(in srgb, var(--pc, var(--accent)) 45%, transparent); }
+.hp-case > h3::before { content: ""; position: absolute; left: 28px; bottom: -3px; width: 7px; height: 7px; background: var(--pc, var(--accent)); transform: rotate(45deg); z-index: 1; }
+.hp-hint { margin: 0; color: var(--muted); font-size: 15px; }
+@media (max-width: 640px) { .hp-head.hp-case, .pcard.pcard { grid-template-columns: minmax(0, 1fr); } .hp-head .hp-por { min-height: 220px; } .pcard .pimg { min-height: 200px; max-width: none; } }
 /* Customize: the page on one side, the choices on the other; on a phone the page sits on top */
 .czwrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 18px; align-items: start; }
 .czprev { position: sticky; top: 64px; display: grid; gap: 12px; min-width: 0; }
@@ -6951,11 +6967,11 @@ function frameStamp(look, d) {
   var hurt = d.unstable || (+d.harm || 0) >= 4;
   return '<div class="frstamp' + (hurt ? '' : ' ok') + '" aria-hidden="true">' + (d.unstable ? 'Unstable' : hurt ? 'Wounded' : 'Active') + '</div>';
 }
-/* a playing card's corner: the level over the mark, in the trim color, and the same turned round at the foot */
+/* a playing card's corner: the hunter's mark in the trim color, and the same turned round at the foot */
 function pcCorners(lv, mark) {
   var m = mark && pgHas(SIGILS, mark) ? '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + SIGILS[mark] + '</svg>' : '';
-  var c = '<b>' + (+lv || 0) + '</b>' + m;
-  return '<span class="pcx" aria-hidden="true">' + c + '</span><span class="pcx pcx-b" aria-hidden="true">' + c + '</span>';
+  if (!m) return '';
+  return '<span class="pcx" aria-hidden="true">' + m + '</span><span class="pcx pcx-b" aria-hidden="true">' + m + '</span>';
 }
 function markHTML(key) { return key && pgHas(SIGILS, key) ? '<svg class="mk" viewBox="0 0 24 24" role="img" aria-label="Their mark: ' + esc(SIGLABEL[key] || key) + '" focusable="false">' + SIGILS[key] + '</svg>' : ''; }
 /* a hunter's mark in their own trim color, for beside a name in the seat list and the roll feed */
