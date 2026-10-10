@@ -182,12 +182,9 @@ details.sect > .body { padding: 0 16px 16px; }
 .odds .f .bar span { background: var(--good); } .odds .p .bar span { background: var(--warn); } .odds .m .bar span { background: var(--bad); }
 .odds b { text-align: right; font-variant-numeric: tabular-nums; }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-.sesh > summary { cursor: pointer; margin: 0; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-.sesh > summary::-webkit-details-marker { display: none; }
-.sesh > summary::after { content: ""; width: 9px; height: 9px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg) translateY(-3px); transition: transform .15s ease; }
-.sesh[open] > summary::after { transform: rotate(-135deg) translateY(-3px); }
-@media (prefers-reduced-motion: reduce) { .sesh > summary::after { transition: none; } }
-.sesh[open] > summary { margin-bottom: 12px; }
+.sesh[open] > summary, #pl-weird[open] > summary { margin-bottom: 12px !important; }
+#hv-play details > summary.lbl { margin-bottom: 0; }
+#pl-weird .pmoves { margin-top: 0 !important; }
 .hist { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
 .hist li { display: grid; grid-template-columns: 4.6em 1fr auto; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--line); }
 .hist b { font-variant-numeric: tabular-nums; }
@@ -934,9 +931,14 @@ div.wcard { cursor: default; border-color: var(--good); }
 .i-x { --i: var(--i-x); }
 .i-check { --i: var(--i-check); }
 /* the accordion marker is a pseudo-element, so it masks the same icon directly */
-details.sect > summary::after { content: ""; display: block; width: 20px; height: 20px; flex: none; background: var(--accent);
-  --i: var(--i-plus); -webkit-mask: var(--i) center / contain no-repeat; mask: var(--i) center / contain no-repeat; }
-details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
+/* every accordion on the site: no browser triangle, one chevron on the right that turns as it opens (the opening itself is animated in script, accOpen) */
+details > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 4px 12px; }
+details > summary::-webkit-details-marker { display: none; }
+details > summary.lbl { display: flex; }
+details.case > summary::after, details.beast > summary::after { margin-left: 0; }
+details > summary::after { content: ""; flex: none; align-self: center; margin-left: auto; width: 9px; height: 9px; border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: translateY(-3px) rotate(45deg); transition: transform .2s ease; }
+details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
+@media (prefers-reduced-motion: reduce) { details > summary::after { transition: none; } }
 /* ---- buttons: one corner for every button ----
    Round controls (pips, swatches, step pills), the underline tabs, the joined
    segmented control and the candles keep their own shape. */
@@ -1748,6 +1750,26 @@ $$('.tabs button').forEach(function (b) { b.addEventListener('click', function (
   function frost() { nav.classList.toggle('frost', (window.pageYOffset || 0) > 0); }
   frost(); window.addEventListener('scroll', frost, { passive: true });
 })();
+/* Accordions: every <details> on the site opens and closes with a short height animation.
+   The summary click is taken over, the height is measured both ways, and [open] only drops once the close has played. */
+function accToggle(d, sm) {
+  if (d._acc) d._acc.cancel();
+  var closing = d.open, start = d.offsetHeight, end;
+  d.open = !closing; end = d.offsetHeight; d.open = true;
+  d.style.overflow = 'hidden';
+  var a = d._acc = d.animate({ height: [start + 'px', end + 'px'] }, { duration: 240, easing: 'cubic-bezier(.2, .7, .2, 1)' });
+  function done() { d._acc = null; d.style.overflow = ''; }
+  a.onfinish = function () { done(); if (closing) d.open = false; };
+  a.oncancel = done;
+}
+document.addEventListener('click', function (e) {
+  var sm = e.target.closest('summary'), d = sm && sm.parentElement;
+  if (!d || d.tagName !== 'DETAILS' || d.querySelector('summary') !== sm) return;
+  var ctl = e.target.closest('a, button, input, select, textarea, label');
+  if (ctl && ctl !== sm && sm.contains(ctl)) return;   // a control inside a summary does its own thing
+  if (!d.animate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  e.preventDefault(); accToggle(d, sm);
+});
 window.addEventListener('hashchange', function () { var h = location.hash.replace('#', ''); if (tabOK(h)) showTab(h, true); });
 
 /* ---------- guide: moves, lists ---------- */
@@ -2905,8 +2927,8 @@ function renderPlay() {
       (mine.length ? '<div class="pmoves">' + mine.map(pmoveBtn).join('') + '</div>' : '') +
       pass.map(function (m) { return '<details class="ppass"><summary><b>' + esc(m.name) + '</b> <span class="muted small">no roll</span></summary><p>' + esc(m.summary) + '</p></details>'; }).join('') +
       (!mine.length && !pass.length ? '<p class="small muted" style="margin:0">Moves you pick in Build a hunter show up here.</p>' : '') + '</div>' +
-    '<div class="card" style="margin-top:16px"><details' + (weirdOpen ? ' open' : '') + ' id="pl-weird"><summary class="lbl" style="cursor:pointer;margin:0">Weird moves and plain rolls</summary><div class="pmoves" style="margin-top:10px">' + weird.map(pmoveBtn).join('') +
-      '<button type="button" class="pmove" data-pmove="plain" aria-pressed="' + (R.move === 'plain') + '"><span>Plain roll</span><small>' + STATNAME[R.stat] + ' ' + fmtI(sh.stats[R.stat]) + '</small></button></div></details></div>';
+    '<details class="card" style="margin-top:16px"' + (weirdOpen ? ' open' : '') + ' id="pl-weird"><summary class="lbl" style="margin:0">Weird moves and plain rolls</summary><div class="pmoves">' + weird.map(pmoveBtn).join('') +
+      '<button type="button" class="pmove" data-pmove="plain" aria-pressed="' + (R.move === 'plain') + '"><span>Plain roll</span><small>' + STATNAME[R.stat] + ' ' + fmtI(sh.stats[R.stat]) + '</small></button></div></details>';
   if (rit.open) $('#play-moves').innerHTML = ritualHTML();
 
   var mv = BYID[R.move] || PLAIN, m = bonus(), f = 0, p = 0, x = 0;
