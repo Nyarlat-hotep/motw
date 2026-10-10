@@ -30,10 +30,10 @@ const HUNTER = { sheet: { name: 'Dee Ray', playbook: 'The Mundane', luck: 5, sta
   };
   const fx = (p) => p.evaluate(() => {
     const f = document.getElementById('fx'), cs = getComputedStyle(f), r = getComputedStyle(f.querySelector('rect'));
-    return { cls: f.className, anim: cs.animationName, dur: cs.animationDuration, vis: cs.visibility, op: +cs.opacity, bg: cs.backgroundImage + ' ' + cs.backgroundColor, shadow: cs.boxShadow, stroke: r.stroke, sw: r.strokeWidth, filter: r.filter, fill: r.fill };
+    return { cls: f.className, anim: cs.animationName, dur: cs.animationDuration, bite: getComputedStyle(f.querySelector('svg')).animationName, vis: cs.visibility, op: +cs.opacity, bg: cs.backgroundImage + ' ' + cs.backgroundColor, shadow: cs.boxShadow, stroke: r.stroke, sw: r.strokeWidth, filter: r.filter, fill: r.fill };
   });
-  // hold the effect still while it is bright, or (with no kind) put it away again
-  const hold = (p, kind) => p.evaluate((k) => { const f = document.getElementById('fx'); f.className = ''; f.style.animationPlayState = k ? 'paused' : ''; f.style.animationDelay = k ? '-0.45s' : ''; void f.offsetWidth; if (k) f.className = 'fx-' + k; }, kind);
+  // hold the effect still while it is bright (it peaks about 50ms in), or (with no kind) put it away again
+  const hold = (p, kind) => p.evaluate((k) => { const f = document.getElementById('fx'); f.className = ''; f.style.animationPlayState = k ? 'paused' : ''; f.style.animationDelay = k ? '-0.05s' : ''; void f.offsetWidth; if (k) f.className = 'fx-' + k; }, kind);
   const same = (x, y) => Buffer.compare(x, y) === 0;
 
   // ---- at rest ----
@@ -48,10 +48,10 @@ const HUNTER = { sheet: { name: 'Dee Ray', playbook: 'The Mundane', luck: 5, sta
   // ---- a 12 ----
   await roll(p, 6, 6);
   f = await fx(p);
-  check('a 12 burns the edge', f.cls === 'fx-crit' && f.anim === 'fxburn' && f.dur === '1.6s', JSON.stringify([f.cls, f.anim, f.dur]));
+  check('a 12 burns the edge, and it is over inside a second', f.cls === 'fx-crit' && f.anim === 'fxburn' && f.dur === '0.8s' && f.bite === 'fxbite', JSON.stringify([f.cls, f.anim, f.dur, f.bite]));
   check('while it burns the layer is drawn', f.vis === 'visible', f.vis);
   check('dark: the edge is ember orange, roughened by the filter', f.stroke === 'rgb(184, 116, 28)' && /fxrough"?\)/.test(f.filter), f.stroke + ' ' + f.filter);
-  await p.waitForTimeout(1900);
+  await p.waitForTimeout(1100);
   f = await fx(p);
   check('afterwards it is put away again', f.vis === 'hidden' && f.op === 0, f.vis + ' ' + f.op);
 
@@ -59,13 +59,25 @@ const HUNTER = { sheet: { name: 'Dee Ray', playbook: 'The Mundane', luck: 5, sta
   await roll(p, 1, 1);
   f = await fx(p);
   const shook = await p.evaluate(() => document.querySelector('.wrap').classList.contains('shake'));
-  check('a miss burns the edge red and shakes the page', f.cls === 'fx-miss' && f.anim === 'fxburn' && f.stroke === 'rgb(122, 22, 22)' && shook, JSON.stringify([f.cls, f.stroke, shook]));
-  await p.waitForTimeout(1700);
+  check('a miss burns the edge red and shakes the page', f.cls === 'fx-miss' && f.anim === 'fxburn' && f.dur === '0.6s' && f.stroke === 'rgb(122, 22, 22)' && shook, JSON.stringify([f.cls, f.dur, f.stroke, shook]));
+  await p.waitForTimeout(1000);
 
   // ---- a level-up ----
   await p.evaluate(() => window.__journal.fxPlay('level'));
   f = await fx(p);
-  check('a level-up burns the edge for longer', f.cls === 'fx-level' && f.anim === 'fxburn' && f.dur === '2.2s' && f.stroke === 'rgb(184, 116, 28)', JSON.stringify([f.cls, f.dur, f.stroke]));
+  check('a level-up burns the edge for longer, in two strikes', f.cls === 'fx-level' && f.anim === 'fxburn2' && f.dur === '1.3s' && f.bite === 'fxbite2' && f.stroke === 'rgb(184, 116, 28)', JSON.stringify([f.cls, f.anim, f.dur, f.bite, f.stroke]));
+
+  // ---- how it moves: full strength within three frames, mostly gone by half a second, and nothing left at the end ----
+  const at = (p, kind, ms) => p.evaluate(([k, t]) => { const f = document.getElementById('fx'), s = f.querySelector('svg'); f.className = ''; [f, s].forEach(e => { e.style.animationPlayState = 'paused'; e.style.animationDelay = (-t / 1000) + 's'; }); void f.offsetWidth; f.className = 'fx-' + k;
+    const m = new DOMMatrix(getComputedStyle(s).transform); const o = +getComputedStyle(f).opacity; f.className = ''; [f, s].forEach(e => { e.style.animationPlayState = ''; e.style.animationDelay = ''; }); return { op: o, scale: m.a }; }, [kind, ms]);
+  for (const [kind, total] of [['crit', 800], ['miss', 600], ['level', 1300]]) {
+    const hit = await at(p, kind, 50), late = await at(p, kind, total * .7), start = await at(p, kind, 0);
+    check(kind + (kind === 'level' ? ': the first, lighter strike has landed 50ms in' : ': at full strength 50ms in'), hit.op >= (kind === 'level' ? .8 : .95), hit.op);
+    check(kind + ': it starts outside the screen and snaps in past its resting place', start.scale > 1.03 && hit.scale < 1, start.scale + ' then ' + hit.scale);
+    check(kind + ': guttering out by seven tenths of the way', late.op < .55 && late.op > 0 && Math.abs(late.scale - 1) < .002, JSON.stringify(late));
+  }
+  const second = await at(p, 'level', 338), between = await at(p, 'level', 270);
+  check('level-up: the second strike is harder than the first and reaches further in', second.op > .97 && between.op < .4 && second.scale < .975, JSON.stringify([between, second]));
 
   // ---- where it draws: the edges change, the middle does not ----
   p = await open();
@@ -100,7 +112,7 @@ const HUNTER = { sheet: { name: 'Dee Ray', playbook: 'The Mundane', luck: 5, sta
   check('phone: a thinner, finer edge', f.sw === '40px' && /fxrough-s"?\)/.test(f.filter), f.sw + ' ' + f.filter);
   const wide = await p.evaluate(() => document.documentElement.scrollWidth);
   check('phone: no sideways scroll while it burns', wide <= 390, wide);
-  await p.waitForTimeout(1900);
+  await p.waitForTimeout(1100);
   await p.locator('#roll').scrollIntoViewIfNeeded();
   const box = await p.evaluate(() => { const r = document.querySelector('#roll').getBoundingClientRect(); return { x: Math.round(r.left + r.width / 2 - 40), y: Math.round(r.top + 6), width: 80, height: Math.round(r.height - 12) }; });
   const plain = await p.screenshot({ clip: box });

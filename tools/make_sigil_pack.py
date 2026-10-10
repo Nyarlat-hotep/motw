@@ -103,6 +103,27 @@ PICKS = [
         (0x2660, 'spade', 'Spade'), (0x2665, 'heart', 'Heart'), (0x2666, 'diamond', 'Diamond'), (0x2663, 'club', 'Club'), (0x2605, 'star', 'Star'), (0x2620, 'crossbones', 'Skull glyph'),
         (0x262F, 'yinyang', 'Yin yang glyph'), (0x2694, 'swords', 'Swords glyph'), (0x2696, 'scales', 'Scales'), (0x2697, 'alembic', 'Alembic'), (0x269B, 'atom', 'Atom'),
         (0x269C, 'fleur', 'Fleur-de-lis'), (0x26A1, 'bolt', 'Lightning'), (0x2604, 'comet', 'Comet'), (0x2693, 'anchor', 'Anchor glyph'), (0x2692, 'hammers', 'Hammer and pick')]]),
+    # picked for the badges (the page's BADGES list names these keys), and offered on dice like any other sigil
+    ('Trophies', dela('dice-six-faces-one die1 One pip', 'dice-six-faces-six die6 Six pips', 'rolling-dices dicepair Rolling dice', 'rolling-dice-cup dicecup Dice cup',
+                      'park-bench bench Park bench', 'biceps biceps Biceps', 'punching-bag punchbag Punching bag', 'boomerang boomerang Boomerang', 'piggy-bank piggybank Piggy bank',
+                      'horse-head horse Horse', 'horseshoe horseshoe Horseshoe', 'arm-sling armsling Arm in a sling', 'theater-curtains curtains Curtains', 'microphone microphone Microphone',
+                      'graduate-cap gradcap Graduate cap', 'exit-door exitdoor Way out', 'door door Door', 'broom broom Broom', 'soap soap Soap', 'tongue tongue Tongue',
+                      'swiss-army-knife pocketknife Pocket knife', 'contract contract Contract', 'nose-side nose Nose', 'chat-bubble chatbubble Speech bubble', 'heart-beats heartbeat Heartbeat',
+                      'matchbox matchbox Matchbox', 'lungs lungs Lungs', 'trophy-cup trophycup Trophy cup', 'weight weight Weight', 'hole hole Hole', 'summits summits Summits',
+                      'dunce-cap duncecap Dunce cap', 'jester-hat jester Jester hat', 'tumbleweed tumbleweed Tumbleweed', 'water-flask canteen Canteen', 'podium-winner podium Podium',
+                      'party-popper popper Party popper', 'shaking-hands handshake Handshake', 'weight-lifting-up lifter Weightlifter', 'pitchfork pitchfork Pitchfork',
+                      'money-stack moneystack Stack of money', 'first-aid-kit firstaid First aid kit', 'sitting-dog sittingdog Sitting dog', 'megaphone megaphone Megaphone',
+                      'binoculars binoculars Binoculars', 'toolbox toolbox Toolbox', 'brass-knuckles knuckles Brass knuckles', 'sergeant sergeant Sergeant', 'steak steak Steak')
+                 + lorc('snowflake-1 snowflake Snowflake', 'fire-punch firepunch Burning fist', 'dodging dodging Dodging', 'tombstone tombstone Tombstone', 'scales scales Scales',
+                        'cracked-glass crackedglass Cracked glass', 'jawbone jawbone Jawbone', 'dove dove Dove', 'bandage-roll bandage Bandage', 'clover clover Clover',
+                        'tornado tornado Tornado', 'top-hat tophat Top hat', 'mailed-fist mailedfist Mailed fist', 'pig-face pig Pig', 'magnifying-glass magnifier Magnifying glass',
+                        'feathered-wing wing Wing', 'angel-wings wings Wings', 'rock rock Rock', 'peaks peaks Peaks', 'light-bulb lightbulb Light bulb', 'thorny-vine thorns Thorns',
+                        'shiny-apple apple Apple', 'laurel-crown laurels Laurels', 'trophy trophy Trophy', 'medal medal Medal', 'conversation conversation Conversation',
+                        'quill-ink quill Quill and ink', 'match-tip match Lit match', 'drop drop Drop', 'desert-skull desertskull Desert skull', 'dust-cloud dustcloud Dust cloud',
+                        'empty-hourglass emptyglass Empty hourglass', 'cycle cycle Cycle', 'two-shadows twoshadows Two shadows', 'imp-laugh imp Laughing imp', 'horned-skull hornedskull Horned skull',
+                        'stitched-wound stitches Stitches', 'cash cash Cash', 'locked-chest lockedchest Locked chest', 'campfire campfire Campfire', 'sprout sprout Sprout',
+                        'shouting shouting Shouting', 'anvil anvil Anvil', 'meteor-impact meteor Meteor', 'doorway doorway Doorway', 'back-forth backforth Back and forth')
+                 + L('sbed', 'shield shield Shield', 'falling falling Falling') + L('skoll', 'fist fist Fist', 'rank-3 rank3 Three chevrons')),
 ]
 
 def fetch(url, name):

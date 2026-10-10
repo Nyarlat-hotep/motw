@@ -220,6 +220,15 @@ details.sect > .body { padding: 0 16px 16px; }
 .pips.candles button, .play .pips.candles button, .pips.candles button[aria-pressed="true"] { flex: 1 1 0; min-width: 0; max-width: 46px; width: auto; height: auto; aspect-ratio: 40 / 84; padding: 0; border: 0; border-radius: 6px; background: none; }
 .candles button > svg { display: block; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .cdefs { position: absolute; width: 0; height: 0; }
+/* badges: a token is one inline SVG from badgeSVG(). The metals are colors of their own; one not earned yet is an outline in the muted ink */
+.bdg { display: inline-block; width: 56px; height: 56px; vertical-align: middle; overflow: visible; filter: drop-shadow(0 1.5px 1.5px rgba(0, 0, 0, .45)); }
+.bdg.off { color: var(--muted); filter: none; }
+.bdg.b-sm { width: 30px; height: 30px; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .4)); }
+.bdg.b-lg { width: 112px; height: 112px; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, .45)); }
+/* the wear is a grey tile laid over the metal the way the dice do it; the shadow on .bdg keeps the blend inside the token. The shine is the top rank's, and crosses now and then */
+.bdg .b-tx { mix-blend-mode: overlay; pointer-events: none; }
+.bdg .b-sh { animation: bdgshine 3.6s ease-in-out infinite; }
+@keyframes bdgshine { 0%, 58% { transform: translateX(0); } 100% { transform: translateX(150px); } }
 .candles .wx { fill: url(#cn-wax); } .candles .dr { fill: url(#cn-drip); } .candles .pd { fill: var(--cw-pd); } .candles .tp { fill: var(--cw-rim); } .candles .pl { fill: var(--cw-pool); }
 .candles button[aria-pressed="true"] .pl { fill: url(#cn-pool); }
 .candles .gw { fill: url(#cn-glow); } .candles .dk { fill: url(#cn-dark); opacity: var(--cw-dk); } .candles .sh { fill: #000; opacity: var(--cw-sh); } .candles .hl { fill: url(#cn-halo); }
@@ -306,7 +315,13 @@ details.case .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 .filebtn { display: inline-flex; align-items: center; cursor: pointer; }
 .filebtn:focus-within { outline: 3px solid var(--accent); outline-offset: 2px; }
 .rollas { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 10px 14px; flex-wrap: wrap; }
-.rollas img, .rollas .av { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); background: var(--bg); flex: none; }
+.rollas .avc, .rollas .av { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--line); background: var(--bg); flex: none; }
+/* the round portrait: .avc is the frame, and the picture inside is placed and scaled by cropCSS() from the hunter's crop */
+.avc { display: block; overflow: hidden; isolation: isolate; } .avc img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cropbox { margin-top: 10px; padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.cropview { width: 148px; height: 148px; margin: 0 auto 4px; border-radius: 50%; border: 2px solid var(--accent); overflow: hidden; isolation: isolate; background: var(--surface2); cursor: grab; touch-action: none; }
+.cropview.drag { cursor: grabbing; } .cropview img { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; -webkit-user-select: none; user-select: none; }
+.cropbox .volrow { margin-top: 6px; } .cropbox .volrow span { flex: 0 0 5.2em; font-size: 15px; }
 .rollas .who { font-family: var(--display); font-size: 20px; letter-spacing: .04em; text-transform: uppercase; }
 .rollas .stats { display: flex; gap: 6px; flex-wrap: wrap; margin-left: auto; }
 .invhead { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; margin-bottom: 12px; }
@@ -501,21 +516,29 @@ details.sect.slim > summary { font-size: 16px; }
 .tiny { font-size: 12px; color: var(--muted); }
 
 /* big moments: a ragged, burnt edge around the screen, never a flash across the middle. #fx holds one SVG rectangle; its thick stroke is blurred and then pushed about by noise
-   (the #fxrough filter, or the finer #fxrough-s on a phone), which is what makes the edge uneven. Only the layer's opacity moves, and the layer is not drawn at all between moments. */
+   (the #fxrough filter, or the finer #fxrough-s on a phone), which is what makes the edge uneven. The layer is not drawn at all between moments.
+   It lands hard and is gone inside a second: full strength within three frames while the drawing snaps in past its resting place and settles (fxbite), then it gutters out in
+   uneven steps (fxburn). A level-up strikes twice, the second harder. Only opacity and a transform move, so the roughened edge is painted once and never again mid-burn. */
 #fx { position: fixed; inset: 0; z-index: 50; pointer-events: none; opacity: 0; visibility: hidden; overflow: hidden; }
 #fx svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 #fx rect { fill: none; stroke: var(--scorch); stroke-width: clamp(64px, 11vmin, 120px); filter: url(#fxrough); }
 #fx.fx-miss rect { stroke: var(--scorch-miss); }
 @media (max-width: 640px) { #fx rect { stroke-width: 40px; filter: url(#fxrough-s); } }
-#fx.fx-crit { animation: fxburn 1.6s ease-in-out; }
-#fx.fx-miss { animation: fxburn 1.4s ease-in-out; }
-#fx.fx-level { animation: fxburn 2.2s ease-in-out; }
-@keyframes fxburn { 0%, 100% { opacity: 0; visibility: visible; } 30% { opacity: .9; visibility: visible; } }
-.wrap.shake { animation: shake .5s cubic-bezier(.36, .07, .19, .97); }
-@keyframes shake { 10%, 90% { transform: translateX(-2px); } 20%, 80% { transform: translateX(4px); } 30%, 50%, 70% { transform: translateX(-7px); } 40%, 60% { transform: translateX(7px); } }
-.tier.boom { animation: boom .6s ease-out; }
-@keyframes boom { 0% { transform: scale(.96); } 40% { transform: scale(1.025); } 100% { transform: scale(1); } }
-@media (prefers-reduced-motion: reduce) { #fx, .wrap.shake, .tier.boom, .tfeed li.new .tdice { animation: none !important; } .texture { transition: none; } }
+#fx.fx-crit { animation: fxburn .8s linear; }
+#fx.fx-miss { animation: fxburn .6s linear; }
+#fx.fx-level { animation: fxburn2 1.3s linear; }
+#fx.fx-crit svg { animation: fxbite .8s ease-out; }
+#fx.fx-miss svg { animation: fxbite .6s ease-out; }
+#fx.fx-level svg { animation: fxbite2 1.3s ease-out; }
+@keyframes fxburn { 0%, 100% { opacity: 0; visibility: visible; } 6% { opacity: 1; } 18% { opacity: .92; } 28% { opacity: .56; } 36% { opacity: .8; } 52% { opacity: .34; } 60% { opacity: .46; } }
+@keyframes fxburn2 { 0%, 100% { opacity: 0; visibility: visible; } 4% { opacity: .85; } 13% { opacity: .42; } 21% { opacity: .3; } 26% { opacity: 1; } 37% { opacity: .9; } 48% { opacity: .58; } 56% { opacity: .78; } 70% { opacity: .38; } 78% { opacity: .5; } }
+@keyframes fxbite { 0% { transform: scale(1.06); } 7% { transform: scale(.972); } 22% { transform: scale(1.006); } 40%, 100% { transform: scale(1); } }
+@keyframes fxbite2 { 0% { transform: scale(1.05); } 5% { transform: scale(.985); } 14% { transform: scale(1.004); } 21% { transform: scale(1.03); } 27% { transform: scale(.965); } 40% { transform: scale(1.006); } 55%, 100% { transform: scale(1); } }
+.wrap.shake { animation: shake .36s ease-out; }
+@keyframes shake { 0%, 100% { transform: translateX(0); } 12% { transform: translateX(-11px); } 30% { transform: translateX(9px); } 48% { transform: translateX(-6px); } 66% { transform: translateX(4px); } 84% { transform: translateX(-2px); } }
+.tier.boom { animation: boom .34s ease-out; }
+@keyframes boom { 0% { transform: scale(.88); } 42% { transform: scale(1.045); } 72% { transform: scale(.992); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { #fx, #fx svg, .wrap.shake, .tier.boom, .tfeed li.new .tdice, .bdg .b-sh { animation: none !important; } .texture { transition: none; } }
 
 /* ---- the old book: type, paper, rules ---- */
 body { font: 19px/1.6 var(--body); font-variant-ligatures: common-ligatures discretionary-ligatures; text-rendering: optimizeLegibility;
@@ -798,7 +821,7 @@ div.wcard { cursor: default; border-color: var(--good); }
 @media (max-width: 700px) { .play { grid-template-columns: minmax(0, 1fr); } }
 .play .small, .play .hint { font-size: 15px; }
 .pwho { display: flex; align-items: center; gap: 10px; }
-.pwho img, .pwho .av { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--line); background: var(--bg); flex: none; }
+.pwho .avc, .pwho .av { width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--line); background: var(--bg); flex: none; }
 .pwho b { display: block; font-family: var(--display); font-size: 21px; font-weight: 400; line-height: 1.15; }
 .pblock { margin-top: 14px; min-width: 0; }
 .pblock > .lbl { margin-bottom: 4px; }
@@ -1173,6 +1196,15 @@ div.wcard { cursor: default; border-color: var(--good); }
             <button class="btn ghost sm" id="rmphoto" type="button" hidden>Remove</button>
           </div>
           <p class="small muted" id="photomsg" role="status" style="text-align:center;margin:8px 0 0"></p>
+          <div class="actions" style="justify-content:center"><button class="btn ghost sm" id="cropbtn" type="button" aria-expanded="false" aria-controls="cropbox" hidden>Crop round portrait</button></div>
+          <div class="cropbox" id="cropbox" hidden>
+            <p class="small muted" style="margin:0 0 10px">The round picture on Play and the Roller. Drag it, or use the sliders, until the face sits right.</p>
+            <div class="cropview" id="cropview"><img id="cropimg" alt="" draggable="false"></div>
+            <label class="volrow"><span>Zoom</span><input type="range" id="cropzoom" min="100" max="400" step="5"></label>
+            <label class="volrow"><span>Across</span><input type="range" id="cropx" min="0" max="100" step="1"></label>
+            <label class="volrow"><span>Up, down</span><input type="range" id="cropy" min="0" max="100" step="1"></label>
+            <div class="actions" style="justify-content:center"><button class="btn ghost sm" type="button" id="cropreset">Reset</button><button class="btn sm" type="button" id="cropdone">Done</button></div>
+          </div>
           <div class="actions" style="justify-content:center"><button class="btn sm" type="button" data-hcard>Save hunter card</button></div>
         </div>
         <div class="hfields">
@@ -1344,7 +1376,7 @@ div.wcard { cursor: default; border-color: var(--good); }
   <p class="foot">Rules and playbooks are summarized here in plain English. Your printed playbook sheet and your Keeper have the final word.</p>
 </div>
 
-<script src="sigils.js"></script>
+<script src="sigils.js?v=2"></script>
 <script>
 (function () {
 'use strict';
@@ -1455,7 +1487,7 @@ function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.h
 function defaults() {
   return { v: 1, tab: 'guide', hv: 'build', wiz: 0, bkAt: 0, start: { hide: false, rolled: false }, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage', theme: 'dark', ink: '', tname: '', tnote: true }, hold: { n: 0, move: '', asked: [] }, session: { started: 0, events: [] }, bench: [], hoseen: 0, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0 },
-    sheet: { name: '', pronouns: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', tv: 0, bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, adv: {}, moves: '', gear: '' } };   // adv: the moves marked advanced, by id
+    sheet: { name: '', pronouns: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', tv: 0, crop: { x: 50, y: 30, z: 1 }, bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, adv: {}, moves: '', gear: '' } };   // adv: the moves marked advanced, by id
 }
 var S = defaults();
 function merge(base, saved) {
@@ -2746,11 +2778,71 @@ function renderPortrait() {
   }
   $('#photolbl').textContent = sh.photo ? 'Change photo' : 'Upload photo';
   $('#rmphoto').hidden = !sh.photo;
+  cropShow();
 }
+/* The round portrait shows part of the picture. crop.x and crop.y say which part, 0 to 100 the way CSS object-position counts (50 is the middle; y starts at 30, where faces usually are),
+   and crop.z how far in, 1 to 4. The same pair places the picture and is the point it is scaled about, which is what keeps the frame filled at every setting. */
+var CROP0 = { x: 50, y: 30, z: 1 };
+function cropOf(sh) {
+  var c = (sh && sh.crop) || {}, n = function (v, lo, hi, d) { v = +v; return isFinite(v) ? Math.round(Math.max(lo, Math.min(hi, v)) * 100) / 100 : d; };
+  return { x: n(c.x, 0, 100, CROP0.x), y: n(c.y, 0, 100, CROP0.y), z: n(c.z, 1, 4, CROP0.z) };
+}
+function cropCSS(c) { var at = c.x + '% ' + c.y + '%'; return 'object-position:' + at + ';transform-origin:' + at + ';transform:scale(' + c.z + ')'; }
+function avatarHTML(sh) {
+  var src = sh.photo || artFor(sh.playbook);
+  return src ? '<span class="avc"><img src="' + esc(src) + '" alt="" style="' + cropCSS(cropOf(sh)) + '"></span>' : '<span class="av"></span>';
+}
+/* the editor under the photo on My sheet. cropShow() draws it from the save; cropLive() moves the pictures already on the page, so a drag does not redraw Play on every step */
+var crop = { drag: null };
+function cropRoom() {   // how far the picture overhangs the round frame each way, as a share of the frame: 0 means it cannot move that way
+  var im = $('#cropimg'), w = im.naturalWidth || 1, h = im.naturalHeight || 1, z = cropOf(S.sheet).z;
+  return { x: Math.max(1, w / h) * z - 1, y: Math.max(1, h / w) * z - 1 };
+}
+function cropLive() {
+  var c = cropOf(S.sheet), css = cropCSS(c), room = cropRoom();
+  $('#cropimg').style.cssText = css;
+  $$('.avc img').forEach(function (im) { im.style.cssText = css; });
+  $('#cropzoom').value = Math.round(c.z * 100); $('#cropx').value = c.x; $('#cropy').value = c.y;
+  $('#cropx').disabled = room.x < .005; $('#cropy').disabled = room.y < .005;
+}
+function cropShow() {
+  var sh = S.sheet, src = sh.photo || artFor(sh.playbook), btn = $('#cropbtn'), im = $('#cropimg');
+  if (!btn) return;
+  btn.hidden = !src;
+  if (!src) { $('#cropbox').hidden = true; btn.setAttribute('aria-expanded', 'false'); im.removeAttribute('src'); return; }
+  if (im.getAttribute('src') !== src) im.src = src;
+  cropLive();
+}
+function cropSet(c, done) { S.sheet.crop = cropOf({ crop: c }); cropLive(); if (done !== false) scheduleSave(); }
+$('#cropimg').addEventListener('load', cropLive);
+$('#cropbtn').addEventListener('click', function () { var box = $('#cropbox'); box.hidden = !box.hidden; this.setAttribute('aria-expanded', String(!box.hidden)); if (!box.hidden) cropShow(); });
+$('#cropdone').addEventListener('click', function () { $('#cropbox').hidden = true; $('#cropbtn').setAttribute('aria-expanded', 'false'); $('#cropbtn').focus(); });
+$('#cropreset').addEventListener('click', function () { cropSet(CROP0); });
+['cropzoom', 'cropx', 'cropy'].forEach(function (id) {
+  $('#' + id).addEventListener('input', function () { var c = cropOf(S.sheet); if (id === 'cropzoom') c.z = this.value / 100; else c[id === 'cropx' ? 'x' : 'y'] = +this.value; cropSet(c); });
+});
+(function () {
+  var v = $('#cropview');
+  v.addEventListener('pointerdown', function (e) {
+    if (e.button) return;
+    crop.drag = { id: e.pointerId, x: e.clientX, y: e.clientY, c: cropOf(S.sheet) };
+    try { v.setPointerCapture(e.pointerId); } catch (er) {}
+    v.classList.add('drag'); e.preventDefault();
+  });
+  v.addEventListener('pointermove', function (e) {
+    var d = crop.drag; if (!d || d.id !== e.pointerId) return;
+    var size = v.clientWidth || 1, room = cropRoom(), c = { x: d.c.x, y: d.c.y, z: d.c.z };
+    if (room.x >= .005) c.x = d.c.x - 100 * (e.clientX - d.x) / (size * room.x);   // the picture follows the pointer: pulling it right shows more of its left
+    if (room.y >= .005) c.y = d.c.y - 100 * (e.clientY - d.y) / (size * room.y);
+    cropSet(c, false);
+  });
+  var end = function (e) { var d = crop.drag; if (!d || d.id !== e.pointerId) return; crop.drag = null; v.classList.remove('drag'); scheduleSave(); };
+  v.addEventListener('pointerup', end); v.addEventListener('pointercancel', end);
+})();
 function renderRollas() {
   var sh = S.sheet, host = $('#rollas');
   if (!host) return;
-  var av0 = sh.photo || artFor(sh.playbook), av = av0 ? '<img src="' + esc(av0) + '" alt="">' : '<span class="av"></span>';
+  var av = avatarHTML(sh);
   var a = armorVal();
   renderPlay();
   host.innerHTML = av + '<span class="who">' + esc(sh.name || 'Your hunter') + '</span>' + (sh.playbook ? '<span class="muted small">' + esc(sh.playbook) + '</span>' : '') + '<span class="stats"><span class="chip">Luck ' + sh.luck + '</span><span class="chip">Harm ' + sh.harm + '</span>' + (a ? '<span class="chip">Armor ' + a + '</span>' : '') + '</span>';
@@ -2791,7 +2883,7 @@ function pmoveBtn(m) {
 function renderPlay() {
   var host = $('#play-status'); if (!host) return;
   var sh = S.sheet, R = S.roller, d = curPB(), a = armorVal(), w = weaponsOut();
-  var av0 = sh.photo || artFor(sh.playbook), av = av0 ? '<img src="' + esc(av0) + '" alt="">' : '<span class="av"></span>';
+  var av = avatarHTML(sh);
   var fresh = !sh.playbook && !(sh.name && sh.name.trim());
   var gear = w.map(function (i) { return '<li class="chip">' + esc(i.name || 'Weapon') + ' ' + (+i.val || 0) + '-harm' + (i.note ? ' <span class="muted">' + esc(String(i.note).replace(/\s*\[.*\]$/, '')) + '</span>' : '') + '</li>'; }).join('') + (a ? '<li class="chip">Armor ' + a + '</li>' : '');
   host.innerHTML =
@@ -3069,13 +3161,13 @@ $('#photo').addEventListener('change', function (e) {
     var c = document.createElement('canvas'); c.width = Math.max(1, Math.round(img.width * sc)); c.height = Math.max(1, Math.round(img.height * sc));
     var cx = c.getContext('2d'); cx.imageSmoothingQuality = 'high'; cx.drawImage(img, 0, 0, c.width, c.height);
     URL.revokeObjectURL(url);
-    S.sheet.photo = c.toDataURL('image/jpeg', 0.85); S.sheet.thumb = '';
+    S.sheet.photo = c.toDataURL('image/jpeg', 0.85); S.sheet.thumb = ''; S.sheet.crop = cropOf({});
     photoMsg('Photo added.'); renderPortrait(); renderRollas(); scheduleSave();
   };
   img.onerror = function () { URL.revokeObjectURL(url); photoMsg('Could not read that photo. Try a JPG or PNG.'); };
   img.src = url;
 });
-$('#rmphoto').addEventListener('click', function () { S.sheet.photo = ''; S.sheet.thumb = ''; photoMsg('Photo removed.'); renderPortrait(); renderRollas(); scheduleSave(); });
+$('#rmphoto').addEventListener('click', function () { S.sheet.photo = ''; S.sheet.thumb = ''; S.sheet.crop = cropOf({}); photoMsg('Photo removed.'); renderPortrait(); renderRollas(); scheduleSave(); });
 
 var removed = null;
 function itemHTML(i) {
@@ -4138,7 +4230,9 @@ var SIGILART = {
 };
 /*END SIGILART*/
 (function () { for (var k in SIGILART) SIGILS[k] = SIGILART[k]; })();
-/* sigils.js (made by tools/make_sigil_pack.py) is loaded before this script. Without it the journal still works, with the classic sigils only. */
+/* sigils.js (made by tools/make_sigil_pack.py) is loaded before this script. Without it the journal still works, with the classic sigils only.
+   The offline copy hands back the saved file first and fetches the new one for next time, so when the library grows and the page starts to rely on the new keys
+   (the badges do), raise the ?v= on its script tag: a new address is fetched fresh. */
 var SIGILPACK = window.HJ_SIGILS || [], SIGILCREDIT = window.HJ_SIGIL_CREDIT || '';
 /* SIGGROUPS is how the dice maker lays the sigils out: [group name, [keys]]. SIGLABEL is what each is called. SIGNAMES is every key a die may carry. */
 var SIGLABEL = { antler: 'Antlers', lantern: 'Lantern', crescent: 'Crescent', eye: 'Eye', skull: 'Skull', cross: 'Cross', pentagram: 'Pentagram', pentacle: 'Pentacle', pupil: 'Pupil' };
@@ -4150,6 +4244,163 @@ SIGILPACK.forEach(function (g) {
 });
 SIGNAMES = [''].concat(Object.keys(SIGILS));
 (function () { var el = document.getElementById('sigcredit'); if (el && SIGILCREDIT) el.textContent = SIGILCREDIT; })();
+
+/* ---------- badges ----------
+   What a hunter collects when the Keeper ends a session (docs/SPEC-CARDS.md, track J). This block is the list and the drawing; nothing hands one out yet.
+   A row is [id, kind, name, icon, how it is earned, the line]. The id is saved with the hunter, so never rename one. The icon is a sigil key, and it should show what the badge is for.
+   Kinds: f a feat (everyone who does it gets one), s a superlative (one winner a session), k a Keeper's pick, x a secret, m a milestone (counted over the hunter's whole life). */
+var BADGES = [
+  ['snake', 'f', 'Snake Eyes', 'die1', 'Roll a 1 and a 1.', 'Two ones. The dice looked at you and felt nothing.'],
+  ['boxcars', 'f', 'Boxcars', 'die6', 'Roll a 6 and a 6.', 'Two sixes. Do not get used to it.'],
+  ['cold', 'f', 'Cold Streak', 'snowflake', 'Miss three rolls in a row.', 'Three misses running. Have you tried rolling better?'],
+  ['hot', 'f', 'Hot Hand', 'firepunch', 'Roll 10 or more three times in a row.', 'Three in a row. Somebody check those dice.'],
+  ['clean', 'f', 'Clean Sheet', 'soap', 'Six or more rolls and not one miss.', 'Not a single miss. Suspicious.'],
+  ['over', 'f', 'Overachiever', 'gradcap', 'A total of 12 or more without spending Luck.', 'Twelve. Nobody likes a showoff.'],
+  ['devil', 'f', 'Lucky Devil', 'imp', 'Spend Luck to change a roll.', 'Bought your way out. The bill comes later.'],
+  ['fumes', 'f', 'Running on Fumes', 'jerrycan', 'End the session with no Luck left.', 'Luck: none. From here on it is all you.'],
+  ['door', 'f', "Death's Door", 'doorway', 'Reach 7 harm and live to the end of the session.', 'One more scratch and we would be reading your will.'],
+  ['scratch', 'f', 'Not a Scratch', 'dodging', 'Six or more rolls and no harm taken.', 'Everyone else bled. You watched.'],
+  ['wiser', 'f', 'Older and Wiser', 'owl', 'Level up.', 'Levelled up. Mostly by failing.'],
+  ['bench', 'f', 'Benchwarmer', 'bench', 'One or two rolls on a night when the table rolled 20 or more.', 'Were you even here?'],
+  ['buried', 'f', 'Buried in the Dry', 'tombstone', 'Die.', 'Died as they lived: rolling badly.'],
+  ['fence', 'f', 'Fence Sitter', 'scales', 'Five results of 7 to 9 in one session.', 'Five mixed successes. Pick a side.'],
+  ['comeback', 'f', 'Comeback', 'boomerang', 'Roll 10 or more straight after two misses in a row.', 'Down two, then that. Where was it earlier?'],
+  ['jaw', 'f', 'Glass Jaw', 'jawbone', 'Take 3 or more harm in one hit.', 'One hit did all that. Drink some milk.'],
+  ['hoard', 'f', 'Rainy Day Fund', 'piggybank', 'Miss three times and spend no Luck, with 4 or more left.', 'Three misses and no Luck spent. Saving it for what?'],
+  ['trigger', 'f', 'Trigger Happy', 'revolver', 'Five or more Kick Some Ass rolls in one session.', 'Five fights in one night. Have you tried talking?'],
+  ['pacifist', 'f', 'Pacifist', 'dove', 'Eight or more rolls and not one Kick Some Ass.', 'Not one punch thrown. The monsters send their thanks.'],
+  ['pony', 'f', 'One-Trick Pony', 'horse', 'Six or more rolls, and two in three of them the same basic move.', 'Same move all night. It is a good move, to be fair.'],
+  ['wounded', 'f', 'Walking Wounded', 'armsling', 'End the session Unstable.', 'Went home leaking. See a doctor. Or a mechanic.'],
+  ['seven', 'f', 'Lucky Seven', 'clover', 'A total of exactly 7, three times in one session.', 'Seven, three times. Just enough, every time.'],
+  ['clutch', 'f', 'Clutch', 'heartbeat', 'Roll 10 or more while on 6 harm or more.', 'Bleeding out and still nailed it. Showoff.'],
+  ['disaster', 'f', 'Natural Disaster', 'tornado', 'The dice alone come to 4 or less, three times in one session.', 'The dice gave you nothing, three times. Nothing personal.'],
+  ['roller', 'f', 'High Roller', 'tophat', 'The dice alone come to 10 or more, three times in one session.', 'Three tens off the dice alone. Somebody frisk them.'],
+  ['underdog', 'f', 'Underdog', 'hound', 'Roll 10 or more with a total modifier of -1 or worse.', 'A 10 on a minus. Every dog has its day.'],
+  ['weight', 's', 'Dead Weight', 'weight', 'The most misses at the table, and at least 3.', 'Most misses at the table. At least the XP is good.'],
+  ['arm', 's', 'Golden Arm', 'biceps', 'The most rolls of 10 or more, and at least 3.', 'Most full successes. Enjoy it. It will not last.'],
+  ['bag', 's', 'Punching Bag', 'punchbag', 'The most harm taken, and at least 3.', 'Took the most harm. Have you considered ducking?'],
+  ['hitter', 's', 'Heavy Hitter', 'mailedfist', 'The most Kick Some Ass rolls of 7 or more, and at least 2.', 'Landed the most hits. Violence was the answer.'],
+  ['hog', 's', 'Spotlight Hog', 'pig', 'The most rolls, and at least 8.', 'Rolled more than anyone. Let someone else talk.'],
+  ['nosy', 's', 'Nosy', 'nose', 'The most Investigate a Mystery and Read a Bad Situation rolls, and at least 3.', 'Asked the most questions. Trusted none of the answers.'],
+  ['shield', 's', 'Human Shield', 'shield', 'The most Protect Someone rolls, and at least 2.', "Stood in front of everyone else's bad decisions."],
+  ['tongue', 's', 'Silver Tongue', 'tongue', 'The most Manipulate Someone rolls of 7 or more, and at least 2.', 'Talked their way through it. Again.'],
+  ['fire', 's', 'Playing with Fire', 'match', 'The most Use Magic rolls, and at least 2.', 'Used the most magic. Nothing bad ever comes of that.'],
+  ['wing', 's', 'Wingman', 'wing', 'The most Help Out rolls, and at least 2.', 'Helped the most. Somebody had to.'],
+  ['bottom', 's', 'Rock Bottom', 'rock', 'The lowest single total of the night.', 'Lowest roll of the night. The floor thanks you for visiting.'],
+  ['peak', 's', 'Peak', 'peaks', 'The highest single total of the night.', 'Highest roll of the night. We get it.'],
+  ['first', 's', 'Opening Act', 'curtains', 'The first roll of the night.', 'Rolled first. Somebody had to find out.'],
+  ['last', 's', 'Last Word', 'microphone', 'The last roll of the night.', 'Had the last roll of the night. Of course you did.'],
+  ['mixed', 's', 'Mixed Blessing', 'yinyang', 'The most results of 7 to 9, and at least 3.', 'Most mixed successes. It worked. It also cost you.'],
+  ['spender', 's', 'Big Spender', 'cash', 'The most Luck spent, and at least 2.', 'Spent the most Luck. It does not grow back.'],
+  ['carried', 'k', 'Carried the Night', 'lifter', 'The Keeper picks one hunter.', 'The Keeper says you were the reason anyone lived.'],
+  ['idea', 'k', 'Worst Idea of the Night', 'duncecap', 'The Keeper picks one hunter.', 'The Keeper would like a word about your plan.'],
+  ['quote', 'k', 'Line of the Night', 'chatbubble', 'The Keeper picks one hunter.', 'Said the thing everyone will be quoting.'],
+  ['thorn', 'k', 'Thorn in My Side', 'thorns', 'The Keeper picks one hunter.', 'The Keeper had plans. You had other ideas.'],
+  ['pet', 'k', "Keeper's Pet", 'apple', 'The Keeper picks one hunter.', 'The Keeper is not supposed to have favorites.'],
+  ['dry', 'x', 'The Long Dry', 'desertskull', 'Six or more rolls and not one of 10 or more.', 'A whole session without a 10. The campaign is named after you now.'],
+  ['dust', 'x', 'Dust to Dust', 'candleskull', 'Die with three or more Luck unspent.', 'Died with Luck in the bank. You cannot take it with you.'],
+  ['again', 'x', 'Same Again', 'cycle', 'Roll the same two dice three times in a row.', 'The dice are stuck. So are you.'],
+  ['twins', 'x', 'Twins', 'twoshadows', 'Four natural doubles in one session.', 'Seeing double. Four times.'],
+  ['jack', 'x', 'Jack of All Trades', 'pocketknife', 'Roll all eight basic moves in one session.', 'Tried everything. Mastered nothing.'],
+  ['deal', 'x', 'Deal with the Devil', 'handshake', 'Spend Luck on a roll of a 1 and a 1.', 'Snake eyes into a 12. Somebody will want that back.'],
+  ['bath', 'x', 'Bloodbath', 'drop', 'Every hunter at the table takes harm, with three or more hunters.', 'Nobody walked away clean. A proper night out.'],
+  ['beast', 'x', 'Number of the Beast', 'hornedskull', 'A 6 and a 6, then a 6 on your very next roll.', 'Three sixes. We are not saying anything. Just noting it.'],
+  ['thirteen', 'x', 'Thirteen', 'cat', 'A total of exactly 13.', 'Rolled a 13. Unlucky for somebody. Not you, this time.'],
+  ['perfect', 'x', 'Perfect Night', 'popper', 'The table rolls 12 or more times with no misses at all.', 'A whole table, not one miss. Do not expect it again.'],
+  ['meat', 'm', 'Fresh Meat', 'steak', 'Finish your first session.', 'First session done. All the original parts, for now.'],
+  ['alive', 'm', 'Still Breathing', 'lungs', 'Finish a session alive.', 'Survived another one. Low bar. Cleared it.'],
+  ['century', 'm', 'Century', 'dicepair', 'Every 100 rolls.', 'A hundred rolls. The dice know you by name.'],
+  ['flyer', 'm', 'Frequent Flyer', 'falling', 'Every 25 misses.', 'Twenty-five misses. That is a lot of experience.'],
+  ['scars', 'm', 'Scar Tissue', 'stitches', 'Every 25 harm taken.', 'Twenty-five harm and counting. Most of you is original.'],
+  ['stripes', 'm', 'Earned Your Stripes', 'rank3', 'Every five level-ups.', 'Five improvements. Dangerous, in a good way. Mostly.']
+];
+var BADGE = {};
+BADGES.forEach(function (b) { BADGE[b[0]] = { id: b[0], kind: b[1], name: b[2], icon: b[3], how: b[4], line: b[5] }; });
+/* each kind is its own piece of metal: a crimped tin cap, a brass cog, a wax seal, a blackened nut, a riveted copper plate.
+   a, b, c: the body from lit to shaded. e: its edge. d, g: the pressed middle. ink: the stamp. hi: the lip of the stamp that catches the light.
+   tile: the grey die texture laid over it (the same img/die-*.jpg tiles the dice use), and wear: how strongly.
+   These are the colors of objects, so they do not change with the theme. */
+var BDGK = {
+  f: { name: 'Feat', a: '#eceef0', b: '#a3a9af', c: '#5b6167', e: '#34383c', d: '#c3c8cd', g: '#7f868c', ink: '#1d2023', hi: '#ffffff', tile: 'rust', wear: .95 },
+  s: { name: 'Superlative', a: '#f8e29a', b: '#cba23c', c: '#7a5912', e: '#3f2d06', d: '#e0bb58', g: '#a17d24', ink: '#2e2007', hi: '#fff3c4', tile: 'bone', wear: 1 },
+  k: { name: "Keeper's pick", a: '#e2675a', b: '#ab292d', c: '#5c0f15', e: '#35070b', d: '#c23a38', g: '#8a1a20', ink: '#2c0508', hi: '#ffab9c', tile: 'marble', wear: .3 },
+  x: { name: 'Secret', a: '#7b838b', b: '#3d4349', c: '#1b1f23', e: '#0b0d0f', d: '#30363b', g: '#15191c', ink: '#8fe3c4', hi: '#000000', tile: 'stone', wear: .8 },
+  m: { name: 'Milestone', a: '#f2b48e', b: '#b5673a', c: '#5e2f16', e: '#2e1509', d: '#cf8a5c', g: '#8a4c26', ink: '#2a1206', hi: '#ffd9bd', tile: 'rust', wear: 1 }
+};
+/* A badge earned again and again moves up a rank: the 3rd, the 6th and the 10th time. Each rank is cleaner metal with more on it: a bright ring, then studs on the ring, then a moving shine. */
+function bdgRank(n) { n = +n || 0; return n >= 10 ? 4 : n >= 6 ? 3 : n >= 3 ? 2 : 1; }
+/* the outlines, on a 64 by 64 face. bdgPts walks round the middle asking for a radius at each step; bdgSmooth rounds the corners off */
+function bdgPts(n, r) { var out = [], i, a, q; for (i = 0; i < n; i++) { a = i / n * 6.283185 - 1.570796; q = r(i, a); out.push([32 + q * Math.cos(a), 32 + q * Math.sin(a)]); } return out; }
+function bdgNum(v) { return Math.round(v * 100) / 100; }
+function bdgSmooth(p) {
+  var n = p.length, d = 'M' + bdgNum((p[n - 1][0] + p[0][0]) / 2) + ' ' + bdgNum((p[n - 1][1] + p[0][1]) / 2), i, q;
+  for (i = 0; i < n; i++) { q = p[(i + 1) % n]; d += 'Q' + bdgNum(p[i][0]) + ' ' + bdgNum(p[i][1]) + ' ' + bdgNum((p[i][0] + q[0]) / 2) + ' ' + bdgNum((p[i][1] + q[1]) / 2); }
+  return d + 'Z';
+}
+function bdgPoly(p) { return 'M' + p.map(function (q) { return bdgNum(q[0]) + ' ' + bdgNum(q[1]); }).join('L') + 'Z'; }
+var BDGSHAPE = {
+  f: bdgSmooth(bdgPts(42, function (i) { return i % 2 ? 27.2 : 31; })),                                                                              // a bottle cap: 21 crimps
+  s: bdgPoly(bdgPts(48, function (i) { return i % 4 < 2 ? 30.6 : 26.4; })),                                                                         // a cog: 12 teeth
+  k: bdgSmooth(bdgPts(40, function (i, a) { return 28.2 + 1.5 * Math.sin(3 * a + 1) + 1.1 * Math.sin(5 * a + 2.3) + .6 * Math.sin(9 * a + .7); })),  // wax, pressed out unevenly
+  x: bdgPoly(bdgPts(6, function () { return 30; })),                                                                                                // a hex nut
+  m: 'M9 2.5H55L61.5 9V55L55 61.5H9L2.5 55V9Z'                                                                                                      // a plate with its corners cut
+};
+function bdgGrads(kind) {
+  var c = BDGK[kind];
+  return '<linearGradient id="bdg-b' + kind + '" x1="0" y1="0" x2="1" y2="1"><stop offset=".08" stop-color="' + c.a + '"/><stop offset=".5" stop-color="' + c.b + '"/><stop offset="1" stop-color="' + c.c + '"/></linearGradient>' +
+    '<radialGradient id="bdg-d' + kind + '" cx=".36" cy=".32" r=".8"><stop offset="0" stop-color="' + c.d + '"/><stop offset="1" stop-color="' + c.g + '"/></radialGradient>' +
+    '<clipPath id="bdg-c' + kind + '"><path d="' + BDGSHAPE[kind] + '"/></clipPath>';
+}
+/* Tokens in the page share one set of gradients, textures and outlines, and one copy of each sigil they use, kept in a block that is always in the page (a gradient inside a hidden tab would not draw).
+   A texture is asked for once; if its file is there it becomes four patterns, each the tile turned a different way, so no two neighbours wear the same scratches. Until then, and without the file, a token is plain metal. */
+var bdgHave = {};
+function bdgDefs() {
+  var el = document.getElementById('bdefs');
+  if (!el) {
+    document.body.insertAdjacentHTML('beforeend', '<svg class="cdefs" id="bdefs" aria-hidden="true" focusable="false"><defs>' + Object.keys(BDGK).map(bdgGrads).join('') +
+      '<linearGradient id="bdg-sh"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".6"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs></svg>');
+    el = document.getElementById('bdefs');
+    Object.keys(BDGK).forEach(function (kind) {
+      var src = 'img/die-' + BDGK[kind].tile + '.jpg';
+      probe(src, function () {
+        var h = '', v;
+        for (v = 0; v < 4; v++) h += '<pattern id="bdg-t' + kind + v + '" patternUnits="userSpaceOnUse" x="-16" y="-16" width="96" height="96" patternTransform="rotate(' + (v * 97 + 13) + ' 32 32)"><image href="' + src + '" width="96" height="96" preserveAspectRatio="none"/></pattern>';
+        el.firstChild.insertAdjacentHTML('beforeend', h);
+      });
+    });
+  }
+  return el.firstChild;
+}
+function bdgSym(key) { return '<symbol id="bdg-s-' + key + '" viewBox="0 0 24 24">' + SIGILS[key] + '</symbol>'; }
+/* A badge as one SVG. o.n: times earned (a count shows from 2, and the rank follows it). o.off: not earned yet, so an outline. o.hid: a secret nobody at the table has found, so a blank nut.
+   o.cls: more classes (b-sm, b-lg). o.label: false when its name is written beside it. o.solo: a pixel size; the SVG then carries its own gradients and sigil, for drawing on a canvas (no texture, no shine). */
+function badgeSVG(id, o) {
+  var b = Object.prototype.hasOwnProperty.call(BADGE, id) ? BADGE[id] : null; if (!b) return '';   // ids will arrive from other players' cards: only a row of the list draws
+  o = o || {};
+  var k = b.kind, c = BDGK[k], hid = !!o.hid && k === 'x', off = !!o.off || hid, key = SIGILS[b.icon] ? b.icon : 'skull', n = Math.max(0, Math.min(999, o.n | 0)), px = o.solo | 0, rank = bdgRank(n), i, a;
+  var label = hid ? 'A secret badge nobody has found yet' : b.name + (off ? ', not earned yet' : n > 1 ? ', earned ' + n + ' times' : '');
+  var use = function (x, y, color, more) { return '<use href="#bdg-s-' + key + '" x="' + x + '" y="' + y + '" width="33" height="33" color="' + color + '"' + (more || '') + '/>'; };
+  var h = '<svg class="bdg' + (off ? ' off' : ' b-r' + rank) + (o.cls ? ' ' + o.cls : '') + '" viewBox="0 0 64 64"' + (px ? ' xmlns="http://www.w3.org/2000/svg" width="' + px + '" height="' + px + '"' : '') +
+    (o.label === false ? ' aria-hidden="true"' : ' role="img" aria-label="' + esc(label) + '"') + ' focusable="false">';
+  if (px) h += '<defs>' + bdgGrads(k) + bdgSym(key) + '</defs>';
+  else if (!bdgHave[key]) { bdgDefs().insertAdjacentHTML('beforeend', bdgSym(key)); bdgHave[key] = true; }
+  if (hid) return h + '<path d="' + BDGSHAPE.x + '" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray="3 2.6" opacity=".7"/><text x="32" y="41.5" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="currentColor" opacity=".7">?</text></svg>';
+  if (off) return h + '<path d="' + BDGSHAPE[k] + '" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" stroke-dasharray="3 2.6" opacity=".7"/>' + use(15.5, 15.5, 'currentColor', ' opacity=".5"') + '</svg>';
+  h += '<path d="' + BDGSHAPE[k] + '" fill="url(#bdg-b' + k + ')" stroke="' + c.e + '" stroke-width="1.1" stroke-linejoin="round"/>';
+  if (k === 'm') h += [[9.6, 9.6], [54.4, 9.6], [9.6, 54.4], [54.4, 54.4]].map(function (q) { return '<circle cx="' + q[0] + '" cy="' + q[1] + '" r="2.1" fill="' + c.b + '" stroke="' + c.e + '" stroke-width=".8"/><circle cx="' + (q[0] - .5) + '" cy="' + (q[1] - .6) + '" r=".7" fill="' + c.a + '"/>'; }).join('');   // rivets
+  h += '<circle cx="32" cy="32" r="21.4" fill="url(#bdg-d' + k + ')" stroke="' + c.e + '" stroke-opacity=".75" stroke-width="1.1"/>' +
+    '<circle cx="32" cy="32" r="19.9" fill="none" stroke="#000" stroke-opacity=".16" stroke-width="2.4"/>';                                                      // shade in the pressed middle, under its lip
+  if (!px) h += '<path class="b-tx" d="' + BDGSHAPE[k] + '" fill="url(#bdg-t' + k + (id.charCodeAt(0) + id.length) % 4 + ')" opacity="' + bdgNum(c.wear * (1.05 - rank * .17)) + '"/>';   // wear: less of it at each rank
+  h += '<path d="M53.07 35.72A21.4 21.4 0 0 1 22.96 51.39" fill="none" stroke="' + c.a + '" stroke-opacity=".6" stroke-width="1" stroke-linecap="round"/>' +   // the far lip of the pressed middle, lit
+    '<path d="M7.97 27.76A24.4 24.4 0 0 1 27.76 7.97" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="1.3" stroke-linecap="round"/>';                // a shine on the rim
+  if (rank > 1) h += '<circle cx="32" cy="32" r="24.3" fill="none" stroke="' + c.e + '" stroke-opacity=".55" stroke-width="2"/><circle cx="32" cy="32" r="24.3" fill="none" stroke="' + c.a + '" stroke-width=".9"/>';
+  if (rank > 2) for (i = 0; i < 12; i++) { a = i / 12 * 6.283185; h += '<circle cx="' + bdgNum(32 + 24.3 * Math.cos(a)) + '" cy="' + bdgNum(32 + 24.3 * Math.sin(a)) + '" r="1.25" fill="' + c.a + '" stroke="' + c.e + '" stroke-width=".5"/>'; }
+  h += use(16.15, 16.3, c.hi, ' opacity=".6"') + use(15.5, 15.5, c.ink);
+  if (rank > 3 && !px) h += '<g clip-path="url(#bdg-c' + k + ')"><g transform="skewX(-18)"><rect class="b-sh" x="-34" y="-4" width="22" height="72" fill="url(#bdg-sh)"/></g></g>';
+  if (n > 1) h += '<rect x="33" y="42.5" width="31" height="19" rx="9.5" fill="#17110f" stroke="' + c.b + '" stroke-width="1"/><text x="48.5" y="56.6" text-anchor="middle" font-family="EB Garamond, Georgia, serif" font-weight="700" font-size="14" fill="#f0e7dc">' + (n > 99 ? '99+' : 'x' + n) + '</text>';
+  return h + '</svg>';
+}
+window.__journal.badges = BADGES; window.__journal.badgeSVG = badgeSVG; window.__journal.badgeRank = bdgRank;
 var BODYSW = [['#e9dcba', 'Bone'], ['#f5f5f2', 'White'], ['#c3c7cc', 'Silver'], ['#a8842c', 'Old gold'], ['#c0282c', 'Blood red'], ['#1f6b50', 'Jade'], ['#24365e', 'Midnight'], ['#2b2a2e', 'Charcoal']];
 var PIPSW = [['#6a1420', 'Oxblood'], ['#111111', 'Black'], ['#ffffff', 'White'], ['#efe4c8', 'Bone'], ['#e3bd5f', 'Gold'], ['#ff8a2a', 'Ember'], ['#c9f5d5', 'Pale green'], ['#1d2f5c', 'Ink blue']];
 function mkDie(body, finish, pip, glow, sigil) { return { body: body, finish: finish, pip: pip, glow: !!glow, sigil: sigil || '' }; }
