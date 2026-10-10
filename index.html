@@ -334,10 +334,10 @@ details.sect > .body { padding: 0 16px 16px; }
 .bknudge { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 12px 0; font-style: normal; }
 .bknudge span { flex: 1 1 240px; }
 .want { position: relative; }
-#hv-sheet select, #wiz select { -webkit-appearance: none; appearance: none; cursor: pointer; background-color: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 40px 9px 12px;
+#hv-sheet select, #wiz select, #czopts select { -webkit-appearance: none; appearance: none; cursor: pointer; background-color: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 40px 9px 12px;
   background-image: linear-gradient(45deg, transparent calc(50% - 1px), var(--ink) calc(50% - 1px), var(--ink) calc(50% + 1px), transparent calc(50% + 1px)), linear-gradient(-45deg, transparent calc(50% - 1px), var(--ink) calc(50% - 1px), var(--ink) calc(50% + 1px), transparent calc(50% + 1px));
   background-position: calc(100% - 23px) 50%, calc(100% - 16px) 50%; background-size: 7px 7px; background-repeat: no-repeat; }
-#hv-sheet select:hover, #hv-sheet select[aria-expanded="true"], #wiz select:hover, #wiz select[aria-expanded="true"] { border-color: var(--accent); }
+#hv-sheet select:hover, #hv-sheet select[aria-expanded="true"], #wiz select:hover, #wiz select[aria-expanded="true"], #czopts select:hover, #czopts select[aria-expanded="true"] { border-color: var(--accent); }
 .ddpop { position: fixed; z-index: 30; margin: 0; padding: 6px; list-style: none; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 12px 32px rgba(0, 0, 0, .28); outline: none; }
 .ddpop:focus-visible .wantopt.on { outline: 2px solid var(--accent); outline-offset: -2px; }
 .ddpop .wanthd:first-child { border-top: 0; margin-top: 0; }
@@ -1427,6 +1427,35 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 .hp-hint { color: var(--muted); font-style: italic; }
 @media (max-width: 520px) { .hpage { padding: 12px; } .hp-head { grid-template-columns: 96px minmax(0, 1fr); gap: 12px; } .hp-id h2 { font-size: 24px; } .lvplate { width: 48px; height: 48px; font-size: 20px; } .hpage.fr.fr-own { border-width: 22px; border-image-width: 22px; } }
 
+/* Showcase view: headings, background tiles, section rows */
+.czh { font-family: var(--display); font-size: 24px; font-weight: 400; line-height: 1.25; margin: 0 0 18px; }
+.czbgs { display: flex; flex-wrap: wrap; gap: 10px; }
+.czbg { position: relative; width: 64px; height: 64px; padding: 0; border-radius: 10px; border: 1px solid var(--line); background: var(--bg) center / cover no-repeat; cursor: pointer; font: inherit; font-size: 26px; color: var(--muted); box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .15); }
+.czbg.none { background-image: linear-gradient(135deg, transparent calc(50% - 1px), var(--line) calc(50% - 1px), var(--line) calc(50% + 1px), transparent calc(50% + 1px)); }
+.czbg.own { border-style: dashed; }
+.czbg:hover { border-color: var(--accent); }
+.czbg[aria-pressed="true"] { border: 2px solid var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.czbg[data-tip]::after { content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 8px); z-index: 7; white-space: nowrap; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 14px; padding: 4px 10px; border-radius: 6px; transform: translateX(-50%); display: none; }
+.czbg:hover::after, .czbg:focus-visible::after { display: block; animation: tipin .15s ease-out .2s both; }
+.czcases li { grid-template-columns: minmax(0, 1fr) auto auto !important; gap: 12px !important; padding: 10px 12px !important; }
+.cztxt { display: grid; gap: 2px; min-width: 0; }
+.czcases .mv .btn.ib { width: 36px; min-width: 36px; min-height: 36px; }
+.czcases .switch { margin: 0; }
+.czcases .switch input { width: 44px; height: 26px; margin: 0; }
+/* the showcase and the Party card as playing cards, whatever the frame: rounded, an inner rule, a lift, and the level and mark in the corners */
+.hpage, .pcard { position: relative; }
+.hpage.hpage, .pcard.pcard { border-radius: 16px; }
+.hpage, .pcard.fr, .czprev .pcard { box-shadow: inset 0 0 0 7px var(--surface), inset 0 0 0 8px color-mix(in srgb, var(--pc, var(--accent)) 45%, transparent), 0 14px 34px rgba(0, 0, 0, .3); }
+.hpage { padding: 40px 34px; }
+.pcard.pcard { padding: 34px 30px; }
+.pcx { position: absolute; top: 14px; left: 16px; z-index: 3; display: grid; justify-items: center; gap: 2px; color: var(--pc, var(--accent)); pointer-events: none; }
+.pcx b { font-family: var(--display); font-size: 26px; line-height: 1; font-weight: 400; }
+.pcx svg { width: 18px; height: 18px; fill: currentColor; }
+.pcx-b { top: auto; left: auto; bottom: 14px; right: 16px; transform: rotate(180deg); }
+.hpage .lvplate { display: none; }
+.fr.fr-wanted .pcx:not(.pcx-b) { top: 22px; }
+.pcard.fr > .pcx, .hpage > .pcx { position: absolute; z-index: 3; }   /* a card's other children sit in its grid; the corners float over it */
+@media (max-width: 520px) { .hpage { padding: 34px 20px; } .pcard.pcard { padding: 30px 18px; } }
 /* Customize: the page on one side, the choices on the other; on a phone the page sits on top */
 .czwrap { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 18px; align-items: start; }
 .czprev { position: sticky; top: 64px; display: grid; gap: 12px; min-width: 0; }
@@ -1775,6 +1804,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
     </div>
 
     <div id="hv-page" hidden>
+      <h3 class="czh">Your showcase, as the others see it when they open your card</h3>
       <div class="czwrap"><div class="czprev" id="czprev"></div><div class="czopts" id="czopts"></div></div>
     </div>
 
@@ -3578,7 +3608,7 @@ document.addEventListener('keydown', function (e) {
 });
 /* Selects on the Sheet keep their native element (values, data-bind and change handlers stay as they are),
    but open a hand-drawn list styled like the Play dropdown instead of the browser's own. */
-var DDSCOPE = '#hv-sheet select, #wiz select', dd = { sel: null, el: null, ix: -1 };
+var DDSCOPE = '#hv-sheet select, #wiz select, #czopts select', dd = { sel: null, el: null, ix: -1 };
 function ddClose(back) {
   if (!dd.el) return;
   dd.el.remove(); dd.sel.setAttribute('aria-expanded', 'false');
@@ -4367,7 +4397,7 @@ function partyCard(d) {
   var mv = (d.moves || []).length ? '<ul class="chips">' + d.moves.map(function (m) { return '<li class="chip">' + esc(m) + '</li>'; }).join('') + '</ul>' : '';
   var pins = (Array.isArray(d.pins) ? d.pins : []).filter(badgeHas).slice(0, 5);   // the badges this hunter shows off; my own carry their count
   var pinned = pins.length ? '<ul class="pins" aria-label="Pinned badges">' + pins.map(function (id, i) { return '<li title="' + esc(BADGE[id].name + ': ' + BADGE[id].line) + '">' + badgeSVG(id, { cls: 'b-sm', n: pinCount(d, id, i, you) }) + '</li>'; }).join('') + '</ul>' : '';
-  return '<article class="pcard ' + look.cls + (you ? ' you' : '') + '"' + frStyle(look) + '>' + frBg(look, true) + frameTop(look, d) + '<div class="pimg">' + img + '</div><div class="pinfo"><h3>' + esc(d.name || 'Unnamed hunter') + markHTML(p.mark) + (you ? '<span class="chip">You</span>' : '') + (d.online === false ? '<span class="chip tag">Away</span>' : '') + '</h3>' + (p.epithet.trim() ? '<p class="epi">' + esc(p.epithet.trim()) + '</p>' : '') +
+  return '<article class="pcard ' + look.cls + (you ? ' you' : '') + '"' + frStyle(look) + '>' + frBg(look, true) + pcCorners(d.level, p.mark) + frameTop(look, d) + '<div class="pimg">' + img + '</div><div class="pinfo"><h3>' + esc(d.name || 'Unnamed hunter') + markHTML(p.mark) + (you ? '<span class="chip">You</span>' : '') + (d.online === false ? '<span class="chip tag">Away</span>' : '') + '</h3>' + (p.epithet.trim() ? '<p class="epi">' + esc(p.epithet.trim()) + '</p>' : '') +
     '<p class="small muted">' + esc(d.playbook || 'No playbook yet') + (d.pronouns ? ' · ' + esc(String(d.pronouns).slice(0, 40)) : '') + (by && !you ? ' · played by ' + esc(by) : '') + '</p>' + (d.catchline ? '<p class="catch">“' + esc(d.catchline) + '”</p>' : '') + pinned +
     '<ul class="chips" style="margin:2px 0">' + stats + '</ul>' +
     '<div class="meters"><div><span>Luck</span>' + meter(+d.luck || 0, 7, 'luck', 'Luck') + '</div><div><span>Harm</span>' + meter(+d.harm || 0, 8, 'harm', 'Harm') + '</div><div><span>XP</span>' + meter(Math.min(+d.xp || 0, 5), 5, 'xp', 'XP') + '</div></div>' +
@@ -6921,6 +6951,12 @@ function frameStamp(look, d) {
   var hurt = d.unstable || (+d.harm || 0) >= 4;
   return '<div class="frstamp' + (hurt ? '' : ' ok') + '" aria-hidden="true">' + (d.unstable ? 'Unstable' : hurt ? 'Wounded' : 'Active') + '</div>';
 }
+/* a playing card's corner: the level over the mark, in the trim color, and the same turned round at the foot */
+function pcCorners(lv, mark) {
+  var m = mark && pgHas(SIGILS, mark) ? '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + SIGILS[mark] + '</svg>' : '';
+  var c = '<b>' + (+lv || 0) + '</b>' + m;
+  return '<span class="pcx" aria-hidden="true">' + c + '</span><span class="pcx pcx-b" aria-hidden="true">' + c + '</span>';
+}
 function markHTML(key) { return key && pgHas(SIGILS, key) ? '<svg class="mk" viewBox="0 0 24 24" role="img" aria-label="Their mark: ' + esc(SIGLABEL[key] || key) + '" focusable="false">' + SIGILS[key] + '</svg>' : ''; }
 /* a hunter's mark in their own trim color, for beside a name in the seat list and the roll feed */
 function markOf(card, dice) {
@@ -6972,7 +7008,7 @@ function pageHTML(d, you) {
   var pins = (Array.isArray(d.pins) ? d.pins : []).filter(badgeHas).slice(0, 5);
   var stats = STATS.map(function (s) { return '<li class="chip">' + STATNAME[s] + ' ' + fmt(+st[s] || 0) + '</li>'; }).join('');
   var flags = (d.unstable ? '<li class="chip" style="color:var(--bad);border-color:var(--bad)">Unstable</li>' : '') + (d.armor ? '<li class="chip">Armor ' + (+d.armor) + '</li>' : '');
-  return '<div class="hpage ' + look.cls + '"' + frStyle(look) + '>' + frBg(look, false) + '<div class="hp-in">' + frameTop(look, d) +
+  return '<div class="hpage ' + look.cls + '"' + frStyle(look) + '>' + frBg(look, false) + pcCorners(lv, p.mark) + '<div class="hp-in">' + frameTop(look, d) +
     '<header class="hp-head hp-case"><div class="hp-por">' + img + pfrHTML(p) + '</div><div class="hp-id"><div class="hp-top"><div><h2>' + esc(d.name || 'Unnamed hunter') + ' ' + markHTML(p.mark) + '</h2>' + (p.epithet.trim() ? '<p class="epi">' + esc(p.epithet.trim()) + '</p>' : '') + '</div>' +
     '<span class="lvplate" role="img" aria-label="Level ' + lv + '"><small>Level</small>' + lv + '</span></div>' +
     '<p class="small muted">' + esc(d.playbook || 'No playbook yet') + (d.pronouns ? ' &middot; ' + esc(String(d.pronouns).slice(0, 40)) : '') + (by && !you ? ' &middot; played by ' + esc(by) : '') + '</p>' +
@@ -7017,8 +7053,7 @@ function hpClose() {
 function czPrev() {
   var host = $('#czprev'), d; if (!host) return;
   d = myDoc();
-  host.innerHTML = '<p class="small muted" style="margin:0">Your showcase, as the others see it when they open your card.</p>' + pageHTML(d, true) +
-    '<p class="small muted" style="margin:0">And your card on the Party tab.</p>' + partyCard(d);
+  host.innerHTML = pageHTML(d, true) + '<h3 class="czh" style="margin-top:20px">And your card on the Party tab</h3>' + partyCard(d);
   $$('#czprev [data-hpage]').forEach(function (b) { b.parentNode.removeChild(b); });
 }
 function czMarks() {
@@ -7070,21 +7105,22 @@ function renderPageEd() {
     '<span class="lbl" style="margin-top:14px">Mark' + (p.mark ? ': <span class="signame">' + esc(SIGLABEL[p.mark] || p.mark) + '</span>' : '') + '</span><p class="small muted" style="margin:0 0 8px">Your emblem. It sits beside your name on your card, in the list of who is at the table, and next to every roll you make.</p>' +
     '<div class="addrow" style="grid-template-columns:minmax(0,1fr) auto"><input type="search" id="cz-q" placeholder="Search the marks: skull, wrench, moon" aria-label="Search the marks" value="' + esc(cz.q) + '"><button class="btn ghost" type="button" data-cz="mark" data-v=""' + (p.mark ? '' : ' disabled') + '>No mark</button></div><div id="czmarkbox">' + czMarks() + '</div></div>';
   /* background */
-  h += '<div class="card"><span class="lbl">Background</span><div class="chips" role="group" aria-label="Background">' + PBGS.map(function (b) { return chip('bg', b.id, p.bg === b.id, esc(b.name)); }).join('') + chip('bg', 'own', p.bg === 'own', 'My own picture') + '</div>' +
+  var bgt = function (v, on, name, src) { return '<button type="button" class="czbg' + (src ? '' : v === 'own' ? ' own' : ' none') + '" data-cz="bg" data-v="' + v + '" aria-pressed="' + on + '" aria-label="' + esc(name) + '" data-tip="' + esc(name) + '"' + (src ? ' style="background-image:url(' + esc(src) + ')"' : '') + '>' + (src ? '' : v === 'own' ? '+' : '') + '</button>'; };
+  h += '<div class="card"><span class="lbl">Background</span><div class="czbgs" role="group" aria-label="Background">' + PBGS.map(function (b) { return bgt(b.id, p.bg === b.id, b.name, b.src); }).join('') + bgt('own', p.bg === 'own', 'My own picture', '') + '</div>' +
     (p.bg === 'own' && !(p.art.bg && tbl.on) ? '<p class="small" style="margin:10px 0 0">Upload a picture under Your pictures and press Background on it.</p>' : '') +
     (p.bg ? '<label class="volrow" style="margin-top:10px"><span>Dim</span><input type="range" id="cz-dim" min="0" max="90" step="5" value="' + p.dim + '"></label><label class="volrow"><span>Blur</span><input type="range" id="cz-blur" min="0" max="12" step="1" value="' + p.blur + '"></label><p class="small muted" style="margin:4px 0 0">Dim lays your card\'s own color over the picture so the words stay easy to read.</p>' : '') + '</div>';
   /* showcases */
   var order = p.cases.concat(CASES.map(function (c) { return c.id; }).filter(function (c) { return p.cases.indexOf(c) < 0; }));
-  h += '<div class="card"><span class="lbl">Sections</span><p class="small muted" style="margin:0 0 8px">Tick the sections your showcase has, and put them in your order.</p><ul class="czcases">' + order.map(function (id) {
+  h += '<div class="card"><span class="lbl">Sections</span><p class="small muted" style="margin:0 0 8px">Switch on the sections your showcase has, and put them in your order.</p><ul class="czcases">' + order.map(function (id) {
     var on = p.cases.indexOf(id), c = CASEN[id];
-    return '<li><label><input type="checkbox" data-cz-case="' + id + '"' + (on >= 0 ? ' checked' : '') + '><span><b>' + c.name + '</b><br><span class="small muted">' + c.what + '</span></span></label>' +
-      '<span class="mv"><button class="btn ghost sm" type="button" data-cz="case-up" data-v="' + id + '" aria-label="Move ' + c.name + ' up"' + (on > 0 ? '' : ' disabled') + '>Up</button><button class="btn ghost sm" type="button" data-cz="case-down" data-v="' + id + '" aria-label="Move ' + c.name + ' down"' + (on >= 0 && on < p.cases.length - 1 ? '' : ' disabled') + '>Down</button></span></li>';
+    return '<li><span class="cztxt"><b>' + c.name + '</b><span class="small muted">' + c.what + '</span></span>' +
+      '<span class="mv"><button class="btn ghost sm ib" type="button" data-cz="case-up" data-v="' + id + '" aria-label="Move ' + c.name + ' up" data-tip="Move up"' + (on > 0 ? '' : ' disabled') + '><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 15l6-6 6 6"/></svg></button><button class="btn ghost sm ib" type="button" data-cz="case-down" data-v="' + id + '" aria-label="Move ' + c.name + ' down" data-tip="Move down"' + (on >= 0 && on < p.cases.length - 1 ? '' : ' disabled') + '><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9l6 6 6-6"/></svg></button></span><label class="switch"><input type="checkbox" role="switch" data-cz-case="' + id + '"' + (on >= 0 ? ' checked' : '') + '><span class="vh">Show ' + c.name + '</span></label></li>';
   }).join('') + '</ul></div>';
   /* signature and about */
   var opts = function (list, cur) { var seen = {}, all = (cur && list.indexOf(cur) < 0 ? [cur] : []).concat(list).filter(function (x) { x = String(x || '').trim(); if (!x || seen[x]) return false; seen[x] = 1; return true; }); return '<option value="">None</option>' + all.map(function (x) { x = String(x).trim().slice(0, 60); return '<option' + (x === cur ? ' selected' : '') + '>' + esc(x) + '</option>'; }).join(''); };
-  h += '<div class="card"><span class="lbl">Signature</span><div class="cols"><div><label class="small" for="cz-sw">Weapon of choice</label><select id="cz-sw" data-cz-sig="weapon">' + opts(sh.inventory.filter(function (i) { return i.type === 'Weapon'; }).map(function (i) { return i.name; }), p.sig.weapon) + '</select></div>' +
-    '<div><label class="small" for="cz-sm">Signature move</label><select id="cz-sm" data-cz-sig="move">' + opts(allMoveNames().concat(['Kick Some Ass', 'Act Under Pressure', 'Help Out', 'Investigate a Mystery', 'Manipulate Someone', 'Protect Someone', 'Read a Bad Situation', 'Use Magic']), p.sig.move) + '</select></div></div>' +
-    '<div style="margin-top:10px"><label class="small" for="cz-sb">Closest bond</label><select id="cz-sb" data-cz-sig="bond">' + opts(sh.bonds.map(function (b) { return b.who; }), p.sig.bond) + '</select></div>' +
+  h += '<div class="card"><span class="lbl">Signature</span><div class="cols"><div><label class="lbl" for="cz-sw">Weapon of choice</label><select id="cz-sw" data-cz-sig="weapon">' + opts(sh.inventory.filter(function (i) { return i.type === 'Weapon'; }).map(function (i) { return i.name; }), p.sig.weapon) + '</select></div>' +
+    '<div><label class="lbl" for="cz-sm">Signature move</label><select id="cz-sm" data-cz-sig="move">' + opts(allMoveNames().concat(['Kick Some Ass', 'Act Under Pressure', 'Help Out', 'Investigate a Mystery', 'Manipulate Someone', 'Protect Someone', 'Read a Bad Situation', 'Use Magic']), p.sig.move) + '</select></div></div>' +
+    '<div style="margin-top:10px"><label class="lbl" for="cz-sb">Closest bond</label><select id="cz-sb" data-cz-sig="bond">' + opts(sh.bonds.map(function (b) { return b.who; }), p.sig.bond) + '</select></div>' +
     '<p class="small muted" style="margin:8px 0 0">Weapons come from your inventory, moves from your sheet, and bonds from History and bonds.</p>' +
     '<label class="lbl" for="cz-about" style="margin-top:14px">About</label><textarea id="cz-about" maxlength="400" rows="4" placeholder="What should the table know about this hunter?">' + esc(p.about) + '</textarea></div>';
   /* the art locker */
