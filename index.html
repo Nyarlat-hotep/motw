@@ -197,11 +197,13 @@ details.sect > .body { padding: 0 16px 16px; }
 .hist .evk { font-family: var(--type); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .hist .evend { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 6px; }
 .hist .evmore { border-bottom: 0; }
-.hvrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 16px; }
-.hvrow .seg { margin-bottom: 0; border: 0; border-radius: 0; overflow: visible; gap: 4px; background: none; }
-.hvrow .seg button { background: none; border: 1.5px solid transparent; border-radius: 999px; padding: 6px 18px; min-height: 40px; color: var(--muted); }
+.hvrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 32px; }
+/* Play / Sheet / Build: one rounded tray, the view you are on sits in a soft pill inside it */
+.hvrow .seg { margin-bottom: 0; gap: 4px; padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; overflow: visible; box-shadow: 0 2px 10px rgba(0, 0, 0, .08); }
+.hvrow .seg button { background: none; border: 0; border-radius: 999px; padding: 8px 24px; min-height: 40px; color: var(--muted); transition: background-color .2s ease, color .2s ease; }
 .hvrow .seg button:hover { color: var(--ink); }
-.hvrow .seg button[aria-pressed="true"] { background: none; color: var(--accent); border-color: var(--accent); }
+.hvrow .seg button[aria-pressed="true"] { background: var(--surface2); color: var(--ink); }
+@media (prefers-reduced-motion: reduce) { .hvrow .seg button { transition: none; } }
 .hicons { display: flex; align-items: center; gap: 4px; }
 .hdiv { width: 1px; align-self: stretch; margin: 6px 8px; background: var(--line); }
 .hdiv[hidden], .hend[hidden] { display: none; }
@@ -766,22 +768,32 @@ details.sect > .body > p:first-child { text-align: left; }
 .tier::after { content: ""; display: block; clear: both; }
 .emptyimg { display: block; max-width: 240px; width: 100%; margin: 0 auto 12px; border-radius: 3px; }
 .lvlimg { width: 56px; height: 56px; object-fit: cover; border-radius: 3px; }
-.wtop { margin-bottom: 4px; }
-/* builder steps: a numbered dot with its name under it, joined by a line; done steps turn green with a check */
-.wpills { list-style: none; display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 0; padding: 0; margin: 0 0 14px; }
-.wpills li { position: relative; display: flex; justify-content: center; min-width: 0; }
-.wpills li + li::before { content: ""; position: absolute; top: 20px; right: calc(50% + 24px); left: calc(-50% + 24px); height: 2px; background: var(--line); }
-.wpills li:has(button.done) + li::before { background: var(--good); }
-.wpills button { display: flex; flex-direction: column; align-items: center; gap: 6px; background: none; border: 0; padding: 0; cursor: pointer; color: var(--muted); min-width: 0; max-width: 100%; }
+.wtop { margin: 8px 0 12px; }
+/* builder steps: eight dots spread edge to edge with their names under them, on one track that fills green as steps are done */
+.wpills { --fill: 0; position: relative; list-style: none; display: flex; justify-content: space-between; padding: 0 0 30px; margin: 0 0 44px; }
+.wpills::before, .wpills::after { content: ""; position: absolute; top: 19px; left: 20px; height: 2px; }
+.wpills::before { right: 20px; background: var(--line); }
+.wpills::after { width: calc((100% - 40px) * var(--fill)); background: var(--good); transition: width .3s ease; }
+.wpills li { position: relative; z-index: 1; width: 40px; flex: none; }
+.wpills button { display: block; background: none; border: 0; padding: 0; cursor: pointer; color: var(--muted); }
 .wdot { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--line); background: var(--bg); font-family: var(--display); font-size: 17px; transition: background-color .2s ease, border-color .2s ease; }
-.wlab { font-size: 14px; line-height: 1.2; text-align: center; overflow-wrap: anywhere; }
+.wlab { position: absolute; top: 48px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 15px; line-height: 1.2; }
+.wpills li:first-child .wlab { left: 0; transform: none; }
+.wpills li:last-child .wlab { left: auto; right: 0; transform: none; }
 .wpills button:hover .wdot { border-color: var(--accent); }
 .wpills button.done .wdot { border-color: var(--good); background: var(--good); color: var(--bg); }
 .wpills button.done .wlab { color: var(--good); }
-.wpills button[aria-current="step"] .wdot { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+.wpills button[aria-current="step"] .wdot { border-color: var(--ink); background: var(--bg); color: var(--ink); }
 .wpills button[aria-current="step"] .wlab { color: var(--ink); font-weight: 700; }
-@media (max-width: 620px) { .wpills { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 14px; } .wpills li:nth-child(5)::before { content: none; } }
-.wstep { margin: 6px 0 18px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { .wpills::after { transition: none; } }
+@media (max-width: 760px) {
+  .wpills { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: 16px; padding: 0; margin: 16px 0 24px; }
+  .wpills::before, .wpills::after { content: none; }
+  .wpills li { width: auto; display: flex; justify-content: center; }
+  .wpills button { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .wlab, .wpills li:first-child .wlab, .wpills li:last-child .wlab { position: static; transform: none; white-space: normal; text-align: center; font-size: 14px; }
+}
+.wstep { margin: 0 0 28px; color: var(--muted); }
 .wstep b { color: var(--ink); }
 #wiz { scroll-margin-top: 76px; }
 .wbody > h2:first-child { margin-top: 0; }
@@ -790,7 +802,8 @@ details.sect > .body > p:first-child { text-align: left; }
 .wnav { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 24px; padding-top: 16px; border-top: 1px solid var(--line); }
 .wfield { margin: 16px 0; }
 .wfield textarea { min-height: 84px; }
-.wrow2 { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.wrow2 { display: flex; flex-wrap: wrap; gap: 8px; align-items: stretch; }   /* buttons take the height of the field beside them */
+.wrow2 .btn.ib { width: 49px; min-width: 49px; min-height: 0; }   /* square at the field's 49px height */
 .wrow2 input[type="text"] { flex: 1 1 180px; min-width: 0; }
 .wrow2 select { flex: 0 1 140px; }
 .wtag { display: inline-block; align-self: flex-start; font-family: var(--type); font-size: 14px; letter-spacing: .03em; border: 1px solid var(--line); border-radius: 2px; padding: 0 8px; color: var(--muted); }
@@ -2357,7 +2370,8 @@ function wizPillsHTML() {
     return '<li><button type="button" class="' + cls + '" data-wgo="' + i + '"' + (i === cur ? ' aria-current="step"' : '') + ' aria-label="Step ' + (i + 1) + ': ' + n + (d[i] ? ', done' : '') + '"><span class="wdot">' + (d[i] && i !== cur ? '<span class="i i-check" aria-hidden="true"></span>' : (i + 1)) + '</span><span class="wlab" aria-hidden="true">' + n + '</span></button></li>';
   }).join('');
 }
-function wizPills() { var p = $('#wpills'); if (p) p.innerHTML = wizPillsHTML(); }
+function wizFill() { var d = wizDone(), n = 0; while (n < WSTEPS.length && d[n]) n++; return Math.max(0, n - 1) / (WSTEPS.length - 1); }   // up to the last step in an unbroken run of finished ones
+function wizPills() { var p = $('#wpills'); if (p) { p.innerHTML = wizPillsHTML(); p.style.setProperty('--fill', wizFill()); } }
 function needPB() { return '<p class="empty">Pick a playbook first (step 1). This step uses what your playbook gives you.</p><p><button type="button" class="btn" data-wgo="0">Go to Playbook</button></p>'; }
 function cnt(n, max, extra) { return '<p class="wcount" role="status"><b>' + n + '</b> of ' + max + ' picked' + (extra || '') + '</p>'; }
 
@@ -2573,7 +2587,7 @@ function wizReview() {
     '<span class="lbl" style="margin-top:12px">Gear</span><ul class="chips" style="margin-top:0">' + gear + '</ul>' + (ex ? '<span class="lbl" style="margin-top:12px">Playbook details</span>' + ex : '') +
     '<span class="lbl" style="margin-top:12px">Bonds</span><p style="margin:0">' + (sh.bonds.length ? sh.bonds.map(function (b) { return esc(b.who || 'Someone') + ' (' + esc(b.tie) + ')'; }).join(', ') : '<span class="muted">None yet</span>') + '</p></div></div>' +
     todoH + (dn.slice(0, 6).every(Boolean) ? bkNudge('Your hunter is saved in this browser, on this device only.') : '') +
-    '<div class="actions"><button class="btn" type="button" id="wtoplay">Go to Play</button><button class="btn ghost" type="button" id="wtosheet">Open my sheet</button><button class="btn ghost" type="button" data-hcard>Save hunter card</button></div>' +
+    '<div class="actions"><button class="btn" type="button" id="wtoplay">Go to Play</button><button class="btn ghost" type="button" id="wtosheet">Open my sheet</button><button class="btn ghost" type="button" data-hcard>Share hunter card</button></div>' +
     '<h2 class="sectitle">Before session one, ask your Keeper</h2><ul><li>Are the playbooks and moves here the ones we are using?</li><li>Do the 12+ Advanced results apply from the start?</li><li>What tone are we playing: spooky, campy or all-out action?</li><li>How do you want to handle harm and armor numbers?</li></ul>';
 }
 
@@ -2583,7 +2597,7 @@ function renderWiz(focusHead) {
   var n = clamp(S.wiz | 0, 0, WSTEPS.length - 1);
   var sig = null, a = document.activeElement;
   if (!focusHead && a && el.contains(a)) { for (var i = 0; i < a.attributes.length; i++) { if (/^data-w/.test(a.attributes[i].name) && a.attributes[i].name !== 'data-wi') { sig = '[' + a.attributes[i].name + '="' + String(a.attributes[i].value).replace(/"/g, '\\"') + '"]'; break; } } }
-  el.innerHTML = '<div class="wtop"><ol class="wpills" id="wpills" aria-label="Hunter builder steps">' + wizPillsHTML() + '</ol><p class="wstep">Step ' + (n + 1) + ' of ' + WSTEPS.length + ': <b>' + WSTEPS[n] + '</b></p></div>' +
+  el.innerHTML = '<div class="wtop"><ol class="wpills" id="wpills" aria-label="Hunter builder steps" style="--fill:' + wizFill() + '">' + wizPillsHTML() + '</ol><p class="wstep">Step ' + (n + 1) + ' of ' + WSTEPS.length + ': <b>' + WSTEPS[n] + '</b></p></div>' +
     '<div class="wbody" id="wbody">' + wizStepHTML(n) + '</div>' +
     '<div class="wnav">' + (n > 0 ? '<button class="btn ghost" type="button" data-wgo="' + (n - 1) + '">Back</button>' : '<span></span>') + (n < WSTEPS.length - 1 ? '<button class="btn" type="button" data-wgo="' + (n + 1) + '">Next: ' + WSTEPS[n + 1] + '</button>' : '') + '</div>';
   $$('#wbody [data-bind]').forEach(function (b) { var v = getPath(S, b.dataset.bind); b.value = v == null ? '' : v; });
