@@ -873,7 +873,17 @@ div.wcard { cursor: default; border-color: var(--good); }
 .prow .ctl { display: inline-flex; align-items: center; gap: 4px; }
 .prow .ctl button { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; line-height: 1; }
 .prow .ctl button:hover { border-color: var(--accent); }
-.prow .ctl output { min-width: 2.6ch; text-align: center; font-family: var(--num); font-weight: 500; font-variant-numeric: lining-nums tabular-nums; }
+.odo-v { display: block; }
+.odo-out { position: absolute; inset: 0; }
+.odo-in.up { animation: odoInUp .26s cubic-bezier(.2, .8, .2, 1); } .odo-out.up { animation: odoOutUp .26s cubic-bezier(.2, .8, .2, 1) forwards; }
+.odo-in.dn { animation: odoInDn .26s cubic-bezier(.2, .8, .2, 1); } .odo-out.dn { animation: odoOutDn .26s cubic-bezier(.2, .8, .2, 1) forwards; }
+@keyframes odoInUp { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes odoOutUp { from { transform: none; } to { transform: translateY(-100%); } }
+@keyframes odoInDn { from { transform: translateY(-100%); } to { transform: none; } }
+@keyframes odoOutDn { from { transform: none; } to { transform: translateY(100%); } }
+.prollline { font-size: 22px; line-height: 1.3; }
+.prollline .muted { font-size: 18px; }
+.prow .ctl output { position: relative; display: inline-block; overflow: hidden; line-height: 1; min-width: 2.6ch; text-align: center; font-family: var(--num); font-weight: 500; font-variant-numeric: lining-nums tabular-nums; }
 .prow label { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; }
 .prow input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); }
 .pmsg { margin: 6px 0 0; min-height: 1.2em; font-size: 15px; color: var(--warn); }
@@ -2891,6 +2901,18 @@ function pipStr(id, cls, n, val, label) {
   for (var i = 1; i <= n; i++) h += '<button type="button" data-n="' + i + '" aria-pressed="' + (i <= val) + '" aria-label="' + label + ' ' + i + '">' + i + '</button>';
   return '<div class="pips ' + cls + '" id="' + id + '" role="group" aria-label="' + label + '">' + h + '</div>';
 }
+/* The steppers' numbers roll like an odometer: renderPlay draws the new value, odoRun slides the old one out and the new one in */
+var odoPrev = {};
+function odoRun() {
+  var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $$('#hv-play .prow .ctl output').forEach(function (o) {
+    var b = o.previousElementSibling, k = b && (b.dataset.padj || (b.dataset.ph ? 'hit' : '')); if (!k) return;
+    var now = o.textContent, was = odoPrev[k], wasH = odoPrev[k + '#']; odoPrev[k] = now; odoPrev[k + '#'] = o.innerHTML;
+    if (was == null || was === now || calm) return;
+    var up = parseInt(now.replace(String.fromCharCode(8722), '-'), 10) > parseInt(was.replace(String.fromCharCode(8722), '-'), 10);
+    o.innerHTML = '<span class="odo-v odo-in ' + (up ? 'up' : 'dn') + '">' + o.innerHTML + '</span><span class="odo-v odo-out ' + (up ? 'up' : 'dn') + '" aria-hidden="true">' + wasH + '</span>';
+  });
+}
 function stepStr(label, key, val, hint) {
   return '<div class="prow"><span>' + label + (hint ? ' <span class="muted small">' + hint + '</span>' : '') + '</span><span class="ctl"><button type="button" data-padj="' + key + '" data-d="-1" aria-label="Lower ' + label + '"><span class="i i-minus" aria-hidden="true"></span></button><output>' + val + '</output><button type="button" data-padj="' + key + '" data-d="1" aria-label="Raise ' + label + '"><span class="i i-plus" aria-hidden="true"></span></button></span></div>';
 }
@@ -2931,17 +2953,15 @@ function renderPlay() {
       '<button type="button" class="pmove" data-pmove="plain" aria-pressed="' + (R.move === 'plain') + '"><span>Plain roll</span><small>' + STATNAME[R.stat] + ' ' + fmtI(sh.stats[R.stat]) + '</small></button></div></details>';
   if (rit.open) $('#play-moves').innerHTML = ritualHTML();
 
-  var mv = BYID[R.move] || PLAIN, m = bonus(), f = 0, p = 0, x = 0;
-  for (var i = 1; i <= 6; i++) for (var j = 1; j <= 6; j++) { var t = i + j + m; if (t >= 10) f++; else if (t >= 7) p++; else x++; }
-  function pct(n) { return Math.round(n / 36 * 100); }
+  var mv = BYID[R.move] || PLAIN, m = bonus();
   var parts = [STATNAME[R.stat] + ' ' + fmt(sh.stats[R.stat])];
   if (R.forward) parts.push('forward ' + fmt(R.forward)); if (R.ongoing) parts.push('ongoing ' + fmt(R.ongoing)); if (R.other) parts.push('other ' + fmt(R.other));
   $('#play-sel').className = 'card psel';
   $('#play-sel').innerHTML = '<h3>' + esc(mv.id === 'plain' ? 'Plain roll' : mv.name) + '</h3>' + (mv.trig ? '<p class="muted"><i>' + esc(mv.trig) + '</i></p>' : '') +
-    '<p>Roll 2d6 <b>' + fmt(m) + '</b> <span class="muted small">(' + esc(parts.join(', ')) + ')</span></p>' +
-    '<p class="small"><span class="tag full">10+ ' + pct(f) + '%</span> &middot; <span class="tag part">7-9 ' + pct(p) + '%</span> &middot; <span class="tag miss">Miss ' + pct(x) + '%</span></p>' +
+    '<p class="prollline">Roll 2d6 <b>' + fmt(m) + '</b> <span class="muted">(' + esc(parts.join(', ')) + ')</span></p>' +
     (mv.adv ? '<label class="small" style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="adv"' + (S.sheet.adv[R.move] ? ' checked' : '') + ' style="width:20px;height:20px;accent-color:var(--accent)"> My hunter has the Advanced version</label>' : '') +
     '<div class="pblock"><span class="lbl">This roll</span>' + stepStr('+1 forward', 'forward', fmtI(R.forward), '(clears)') + stepStr('+1 ongoing', 'ongoing', fmtI(R.ongoing)) + stepStr('Other', 'other', fmtI(R.other), '(clears)') + stepStr('Hold', 'hold', S.hold.n) + '</div>';
+  odoRun();
 }
 (function playEvents() {
   var host = $('#hv-play');
