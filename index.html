@@ -202,7 +202,7 @@ details.sect > .body { padding: 0 16px 16px; }
 .hvrow .seg { margin-bottom: 0; gap: 4px; padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; overflow: visible; box-shadow: 0 2px 10px rgba(0, 0, 0, .08); }
 .hvrow .seg button { background: none; border: 0; border-radius: 999px; padding: 8px 24px; min-height: 40px; color: var(--muted); transition: background-color .2s ease, color .2s ease; }
 .hvrow .seg button:hover { color: var(--ink); }
-.hvrow .seg button[aria-pressed="true"] { background: var(--surface2); color: var(--ink); }
+.hvrow .seg button[aria-pressed="true"] { background: var(--surface2); color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
 @media (prefers-reduced-motion: reduce) { .hvrow .seg button { transition: none; } }
 .hicons { display: flex; align-items: center; gap: 4px; }
 .hdiv { width: 1px; align-self: stretch; margin: 6px 8px; background: var(--line); }
@@ -568,7 +568,14 @@ details.beast .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 .kho .actions { margin-top: 6px; }
 #t-party.hasdot::after { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-left: 6px; vertical-align: middle; }
 .switch { display: flex; gap: 12px; align-items: center; cursor: pointer; }
-.switch input { width: 22px; height: 22px; accent-color: var(--accent); }
+.switch { align-items: flex-start; }
+/* every on/off setting is a sliding switch */
+.switch input { -webkit-appearance: none; appearance: none; flex: none; position: relative; width: 44px; height: 26px; margin: 0; border-radius: 999px; background: var(--line); cursor: pointer; transition: background-color .2s ease; }
+.switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--bg); box-shadow: 0 1px 3px rgba(0, 0, 0, .35); transition: transform .2s ease; }
+.switch input:checked { background: var(--accent); }
+.switch input:checked::after { transform: translateX(18px); }
+.switch input:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .switch input, .switch input::after { transition: none; } }
 
 /* settings + recap */
 .recap textarea { min-height: 130px; font-family: var(--type); line-height: 1.6; }
@@ -732,6 +739,14 @@ details.sect > .body > p:first-child { text-align: left; }
 .volrow { display: flex; align-items: center; gap: 12px; margin-top: 10px; max-width: 360px; }
 .volrow input { flex: 1; min-width: 0; accent-color: var(--accent); }
 .tray.mini { height: 132px; margin-bottom: 12px; }
+/* the dice maker: a big tray that stays in view on the left, the options in one tidy column on the right */
+.dpwrap { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 32px; align-items: start; }
+.dpstage { position: sticky; top: calc(var(--navh, 56px) + 16px); }
+.dpstage .tray.mini { height: 340px; margin-bottom: 12px; }
+.dpstage .tray.mini .dice { padding-top: 0; }
+.dpsec { font-family: var(--display); font-size: 20px; font-weight: 400; margin: 28px 0 4px; padding-top: 20px; border-top: 1px solid var(--line); }
+.dpsec[style*="margin-top:0"] { border-top: 0; padding-top: 0; }
+@media (max-width: 900px) { .dpwrap { grid-template-columns: minmax(0, 1fr); gap: 16px; } .dpstage { top: var(--navh, 56px); z-index: 4; background: var(--surface); margin: -8px -17px 0; padding: 10px 17px 10px; box-shadow: 0 8px 12px -10px rgba(0, 0, 0, .4); } .dpstage .tray.mini { height: 200px; } .dpstage h3, .dpstage > p { display: none; } }
 .tray.mini .dice { padding-top: 6px; }
 .dicebar { display: flex; justify-content: flex-end; margin-top: 12px; }
 .dicepanel .dp-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 12px; }
@@ -847,9 +862,23 @@ details.sect > .body > p:first-child { text-align: left; }
 .wex { margin: 16px 0; }
 .wex summary { cursor: pointer; font-weight: 700; }
 .wex li { margin: 6px 0; }
-.wsum { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
-.wsum > div { flex: 1 1 260px; min-width: 0; }
-.wsumimg { width: 120px; height: 150px; object-fit: cover; object-position: center top; border-radius: 3px; border: 1px solid var(--line); }
+.wsum { padding: 24px; }
+.wsumtop { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 24px; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+.wsumimg { width: 120px; height: 120px; object-fit: cover; object-position: center top; border-radius: 10px; border: 1px solid var(--line); }
+.wsumwho h3 { margin: 0; font-family: var(--display); font-size: 28px; }
+.wsumwho p { margin: 2px 0 0; }
+.wsumcatch { font-style: italic; }
+.wsumstats { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, auto); gap: 6px; }
+.wsumstats li { display: grid; justify-items: center; gap: 2px; min-width: 64px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.wsumstats span { font-size: 14px; color: var(--muted); }
+.wsumstats b { font-family: var(--num); font-size: 20px; font-weight: 600; }
+.wsumstats b.hi { color: var(--accent); } .wsumstats b.lo { color: var(--muted); }
+.wsumgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px 28px; padding-top: 20px; }
+.wsec .lbl { margin-bottom: 8px; }
+.wsec p { margin: 0 0 4px; }
+.wsumlist { list-style: none; padding: 0; margin: 0; display: grid; gap: 4px; }
+@media (max-width: 900px) { .wsumtop { grid-template-columns: auto minmax(0, 1fr); } .wsumstats { grid-column: 1 / -1; grid-template-columns: repeat(5, minmax(0, 1fr)); } .wsumstats li { min-width: 0; } }
+@media (max-width: 520px) { .wsumimg { width: 80px; height: 80px; } .wsumwho h3 { font-size: 22px; } }
 .wtodo { margin: 6px 0 0; padding-left: 20px; }
 .linkbtn { background: none; border: 0; padding: 0; font: inherit; color: var(--accent); text-decoration: underline; cursor: pointer; text-align: left; }
 @media (max-width: 560px) { .wbondform { grid-template-columns: 1fr; } #w-btheirs { grid-column: auto; } .wbondform .btn { justify-self: start; } .wstat { grid-template-columns: 1fr; } .wctl { justify-self: start; } }
@@ -1626,28 +1655,34 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
       <div class="card">
         <h3 style="margin-top:0">Big moments</h3>
         <label class="switch"><input type="checkbox" id="set-fx"><span>Lightning on a 12+, a shake on a miss, a glow on level-up</span></label>
-        <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-snd"><span>Sound: dice that sound like what they are made of, a bell on a 10+, thunder on a 12+ and a low thud on a miss</span></label>
-        <label class="volrow"><span>Volume</span><input type="range" id="set-vol" min="0" max="100" step="5"></label>
-        <p class="small muted" style="margin:6px 0 0">Sound is off unless you turn it on, because on a call your microphone may pick it up. Hold the Roll button to shake the dice, let go to throw.</p>
-        <label class="switch" style="margin-top:10px"><input type="checkbox" id="set-3d"><span>3D dice (new): the dice tumble in real 3D, and Fuel dice show their liquid. Best on a recent phone or computer.</span></label>
-        <p class="small muted" id="d3msg" role="status" style="margin:6px 0 0"></p>
       </div>
     </div>
     <div style="margin-top:16px">
       <div class="card dicepanel" id="dicepanel">
-        <h3 style="margin-top:0">Dice</h3>
-        <p class="small muted" style="margin:0 0 12px">Pick the look and sound of your dice, save sets, and trade codes with friends.</p>
-        <div class="tray mini" id="dp-tray" aria-hidden="true"><div class="dice" id="dp-dice"></div></div>
-        <div id="dp-warn" aria-live="polite"></div>
+        <div class="dpwrap">
+        <div class="dpstage">
+          <h3 style="margin-top:0">Dice</h3>
+          <p class="small muted" style="margin:0 0 14px">Pick the look and sound of your dice, save sets, and trade codes with friends.</p>
+          <div class="tray mini" id="dp-tray" aria-hidden="true"><div class="dice" id="dp-dice"></div></div>
+          <div id="dp-warn" aria-live="polite"></div>
+        </div>
+        <div class="dpctl">
         <div id="dp-opts"></div>
-        <span class="lbl">Sets</span>
+        <h4 class="dpsec">3D and sound</h4>
+        <label class="switch"><input type="checkbox" role="switch" id="set-3d"><span><b>3D dice</b><br><span class="small muted">The dice tumble in real 3D, and Fuel dice show their liquid. Best on a recent phone or computer.</span></span></label>
+        <p class="small muted" id="d3msg" role="status" style="margin:6px 0 0"></p>
+        <label class="switch" style="margin-top:14px"><input type="checkbox" role="switch" id="set-snd"><span><b>Sound</b><br><span class="small muted">Dice that sound like what they are made of, a bell on a 10+, thunder on a 12+ and a low thud on a miss. Off unless you turn it on, because on a call your microphone may pick it up.</span></span></label>
+        <label class="volrow"><span>Volume</span><input type="range" id="set-vol" min="0" max="100" step="5"></label>
+        <h4 class="dpsec">Sets</h4>
         <div id="dp-sets"></div>
         <div class="dp-row"><input type="text" id="dp-name" maxlength="40" placeholder="Name these dice" aria-label="Name for this set"><button class="btn sm" id="dp-save" type="button">Save as my set</button></div>
-        <span class="lbl">Dice code</span>
+        <h4 class="dpsec">Dice code</h4>
         <p class="small muted" style="margin:4px 0 0">Trade dice with a friend. Copy your code and send it, or paste theirs here.</p>
         <div class="dp-row"><input type="text" id="dp-code" placeholder="Paste a code" aria-label="Dice code" autocomplete="off" spellcheck="false"><button class="btn sm" id="dp-load" type="button">Use this code</button><button class="btn ghost sm" id="dp-copy" type="button">Copy code</button></div>
         <p class="small" id="dp-msg" aria-live="polite" style="margin:10px 0 0; min-height:1.2em"></p>
         <div class="actions"><button class="btn ghost sm" id="dp-reset" type="button">Reset to Bone and Oxblood</button></div>
+        </div>
+        </div>
       </div>
     </div>
     <div class="grid" style="margin-top:16px">
@@ -2798,16 +2833,25 @@ function wizReview() {
   if (!dn[1]) todo.push([1, 'Give your hunter a name']);
   if (!dn[2]) todo.push([2, 'Pick a ratings line']);
   if (d && !dn[3]) todo.push([3, 'Finish your playbook details']);
-  if (d && !dn[4]) todo.push([4, 'Pick ' + (d.moves.pick - countOn(st.moves)) + ' more special move' + (d.moves.pick - countOn(st.moves) === 1 ? '' : 's')]);
+  var mleft = d ? Math.max(0, pbMoveCap(d, st) - countOn(st.moves)) : 0;
+  if (d && !dn[4] && mleft) todo.push([4, 'Pick ' + mleft + ' more special move' + (mleft === 1 ? '' : 's')]);
   if (d && !dn[5]) todo.push([5, 'Finish your gear picks']);
   if (!dn[6]) todo.push([6, 'Add a bond or two']);
-  var todoH = todo.length ? '<div class="note" style="margin:12px 0"><b>Still open:</b><ul class="wtodo">' + todo.map(function (t) { return '<li><button type="button" class="linkbtn" data-wgo="' + t[0] + '">' + esc(t[1]) + '</button></li>'; }).join('') + '</ul></div>' : '<div class="note" style="margin:12px 0">Everything is filled in. Nice work.</div>';
-  return '<h2 class="sectitle" tabindex="-1">Your hunter</h2>' +
-    '<div class="card wsum">' + (img ? '<img class="wsumimg" src="' + esc(img) + '" alt="">' : '') + '<div><h3 style="margin:0;font-family:var(--display);font-size:26px">' + esc(sh.name || 'Unnamed hunter') + '</h3><p class="muted" style="margin:2px 0">' + esc(sh.playbook || 'No playbook yet') + (sh.pronouns ? ' &middot; ' + esc(sh.pronouns) : '') + (sh.catch ? ' &middot; &ldquo;' + esc(sh.catch) + '&rdquo;' : '') + '</p>' +
-    (lookFull() ? '<p class="small" style="margin:4px 0">' + esc(lookFull()) + '</p>' : '') + '<ul class="chips">' + stats + '</ul><span class="lbl" style="margin-top:12px">Special moves</span><p style="margin:0">' + (moves || '<span class="muted">None yet</span>') + '</p>' +
-    '<span class="lbl" style="margin-top:12px">Gear</span><ul class="chips" style="margin-top:0">' + gear + '</ul>' + (ex ? '<span class="lbl" style="margin-top:12px">Playbook details</span>' + ex : '') +
-    '<span class="lbl" style="margin-top:12px">Bonds</span><p style="margin:0">' + (sh.bonds.length ? sh.bonds.map(function (b) { return esc(b.who || 'Someone') + ' (' + esc(b.tie) + ')'; }).join(', ') : '<span class="muted">None yet</span>') + '</p></div></div>' +
-    todoH + (dn.slice(0, 6).every(Boolean) ? bkNudge('Your hunter is saved in this browser, on this device only.') : '') +
+  var todoH = todo.length ? '<div class="note" style="margin:0 0 20px"><b>Still open:</b><ul class="wtodo">' + todo.map(function (t) { return '<li><button type="button" class="linkbtn" data-wgo="' + t[0] + '">' + esc(t[1]) + '</button></li>'; }).join('') + '</ul></div>' : '<div class="note" style="margin:0 0 20px">Everything is filled in. Nice work.</div>';
+  var sec = function (title, body) { return '<section class="wsec"><span class="lbl">' + title + '</span>' + body + '</section>'; };
+  /* the summary: who they are across the top, then the four parts of the sheet side by side */
+  return '<h2 class="sectitle" tabindex="-1">Your hunter</h2>' + todoH +
+    '<div class="card wsum"><div class="wsumtop">' + (img ? '<img class="wsumimg" src="' + esc(img) + '" alt="">' : '') +
+    '<div class="wsumwho"><h3>' + esc(sh.name || 'Unnamed hunter') + '</h3><p class="muted">' + esc(sh.playbook || 'No playbook yet') + (sh.pronouns ? ' &middot; ' + esc(sh.pronouns) : '') + '</p>' +
+    (sh.catch ? '<p class="wsumcatch">&ldquo;' + esc(sh.catch) + '&rdquo;</p>' : '') + (lookFull() ? '<p class="small muted" style="margin:0">' + esc(lookFull()) + '</p>' : '') + '</div>' +
+    '<ul class="wsumstats">' + STATS.map(function (s) { return '<li><span>' + STATNAME[s] + '</span><b class="' + (sh.stats[s] >= 2 ? 'hi' : sh.stats[s] < 0 ? 'lo' : '') + '">' + fmtI(sh.stats[s]) + '</b></li>'; }).join('') + '</ul></div>' +
+    '<div class="wsumgrid">' +
+      sec('Special moves', moves ? '<ul class="wsumlist">' + moves.split(', ').map(function (m) { return '<li>' + m + '</li>'; }).join('') + '</ul>' : '<p class="muted">None yet</p>') +
+      sec('Gear', sh.inventory.length ? '<ul class="wsumlist">' + sh.inventory.map(function (i) { return '<li>' + esc(i.name || 'Item') + (i.type === 'Weapon' ? ' <span class="muted">' + (+i.val || 0) + '-harm</span>' : i.type === 'Armor' ? ' <span class="muted">armor ' + (+i.val || 0) + '</span>' : '') + '</li>'; }).join('') + '</ul>' : '<p class="muted">None yet</p>') +
+      sec('Playbook details', ex || '<p class="muted">None yet</p>') +
+      sec('Bonds', sh.bonds.length ? '<ul class="wsumlist">' + sh.bonds.map(function (b) { return '<li><b>' + esc(b.who || 'Someone') + '</b> <span class="muted">' + esc(b.tie) + '</span></li>'; }).join('') + '</ul>' : '<p class="muted">None yet</p>') +
+    '</div></div>' +
+    (dn.slice(0, 6).every(Boolean) ? bkNudge('Your hunter is saved in this browser, on this device only.') : '') +
     '<div class="actions"><button class="btn" type="button" id="wtoplay">Go to Play</button><button class="btn ghost" type="button" id="wtosheet">Open my sheet</button><button class="btn ghost" type="button" data-hcard>Share hunter card</button></div>' +
     '<h2 class="sectitle">Before session one, ask your Keeper</h2><ul><li>Are the playbooks and moves here the ones we are using?</li><li>Do the 12+ Advanced results apply from the start?</li><li>What tone are we playing: spooky, campy or all-out action?</li><li>How do you want to handle harm and armor numbers?</li></ul>';
 }
@@ -4859,20 +4903,20 @@ function renderDice() {
   function cap(n) { return n.charAt(0).toUpperCase() + n.slice(1); }
   if (D.linked) dpTab = 0;
   d = curDie(dpTab);
-  h += '<span class="lbl">Pair</span><div class="chips">' + dpBtn('data-dp-pair="1"', D.linked, 'Matched') + dpBtn('data-dp-pair="0"', !D.linked, 'Mismatched') + '</div>';
+  h += '<h4 class="dpsec" style="margin-top:0">Look</h4><span class="lbl">Pair</span><div class="chips">' + dpBtn('data-dp-pair="1"', D.linked, 'Matched') + dpBtn('data-dp-pair="0"', !D.linked, 'Mismatched') + '</div>';
   if (!D.linked) h += '<div class="chips" role="group" aria-label="Which die to change">' + dpBtn('data-dp-tab="0"', !dpTab, 'Die 1') + dpBtn('data-dp-tab="1"', dpTab === 1, 'Die 2') + '</div>';
   h += '<span class="lbl">Body</span>' + dpSwatches('body', BODYSW, d.body);
   h += '<span class="lbl">Finish</span><div class="chips">' + FINISHES.map(function (f) { return dpBtn('data-dp-set="finish" data-v="' + f + '"', d.finish === f, FINLABEL[f] || cap(f)); }).join('') + '</div>';
   if (d.finish === 'fuel' && !d3Want()) h += '<p class="small muted" style="margin:6px 0 0">Fuel dice show their liquid with 3D dice on. <button type="button" class="linkbtn" data-dp-3d="1">Turn on 3D dice</button></p>';
   h += '<span class="lbl">Pips</span>' + dpSwatches('pip', PIPSW, d.pip);
-  h += '<label class="switch" style="margin-top:12px"><input type="checkbox" id="dp-glow"' + (d.glow ? ' checked' : '') + '><span>Glowing pips</span></label>';
+  h += '<label class="switch" style="margin-top:12px"><input type="checkbox" role="switch" id="dp-glow"' + (d.glow ? ' checked' : '') + '><span>Glowing pips</span></label>';
   if (dpSigFor !== d.sigil) { dpSigFor = d.sigil; SIGGROUPS.forEach(function (g, gi) { if (d.sigil && g[1].indexOf(d.sigil) >= 0) dpSig = gi; }); }
-  h += '<span class="lbl">Sigil on the 6' + (d.sigil ? ': <span class="signame">' + esc(SIGLABEL[d.sigil] || d.sigil) + '</span>' : '') + '</span>';
+  h += '<h4 class="dpsec">Sigil</h4><span class="lbl">On the 6' + (d.sigil ? ': <span class="signame">' + esc(SIGLABEL[d.sigil] || d.sigil) + '</span>' : '') + '</span>';
   h += '<div class="chips" role="group" aria-label="Kind of sigil">' + SIGGROUPS.map(function (g, gi) { return dpBtn('data-dp-sg="' + gi + '"', dpSig === gi, g[0]); }).join('') + '</div>';
   h += '<div class="siggrid">' + dpBtn('data-dp-set="sigil" data-v=""', !d.sigil, 'None') + SIGGROUPS[dpSig][1].map(function (n) {
     return dpBtn('data-dp-set="sigil" data-v="' + n + '" title="' + esc(SIGLABEL[n] || n) + '" aria-label="' + esc(SIGLABEL[n] || n) + '"', d.sigil === n, '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + SIGILS[n] + '</svg>');
   }).join('') + '</div>';
-  h += '<span class="lbl">Tray</span><div class="chips">' + TRAYS.map(function (t) { return dpBtn('data-dp-tray="' + t + '"', curTray() === t, cap(t)); }).join('') + '</div>';
+  h += '<h4 class="dpsec">Table</h4><span class="lbl">Tray</span><div class="chips">' + TRAYS.map(function (t) { return dpBtn('data-dp-tray="' + t + '"', curTray() === t, cap(t)); }).join('') + '</div>';
   if (d3Want()) h += '<span class="lbl">Lighting</span><div class="chips">' + Object.keys(D3MOODS).map(function (k) { return dpBtn('data-dp-light="' + k + '"', d3MoodName() === k, D3MOODS[k].name); }).join('') + '</div>';
   if (S.settings.sound) h += '<div class="actions" style="margin-top:12px"><button type="button" class="btn ghost sm" data-dp-hear="1">Hear these dice</button></div>';
   $('#dp-opts').innerHTML = h;
