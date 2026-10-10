@@ -169,11 +169,11 @@ details.sect > .body { padding: 0 16px 16px; }
 .sum { font-family: var(--display); font-size: 64px; line-height: 1; font-variant-numeric: tabular-nums; min-width: 2ch; }
 .sum small { display: block; font-family: var(--type); font-size: 13px; letter-spacing: .08em; color: var(--muted); }
 .rollbtn { font-family: var(--display); font-size: 26px; letter-spacing: .08em; text-transform: uppercase; width: 100%; min-height: 60px; margin-top: 14px; }
-.tier { border-radius: 8px; padding: 12px 14px; margin-top: 14px; border-left: 8px solid; }
+.tier { border-radius: 8px; padding: 14px 16px; margin-top: 14px; }
 .tier h3 { font-family: var(--display); font-size: 26px; letter-spacing: .05em; text-transform: uppercase; }
-.tier.full { background: var(--good-bg); border-color: var(--good); } .tier.full h3 { color: var(--good); }
-.tier.part { background: var(--warn-bg); border-color: var(--warn); border-left-style: double; } .tier.part h3 { color: var(--warn); }
-.tier.miss { background: var(--bad-bg); border-color: var(--bad); border-left-style: dashed; } .tier.miss h3 { color: var(--bad); }
+.tier.full { background: var(--good-bg); } .tier.full h3 { color: var(--good); }
+.tier.part { background: var(--warn-bg); } .tier.part h3 { color: var(--warn); }
+.tier.miss { background: var(--bad-bg); } .tier.miss h3 { color: var(--bad); }
 .tier p { margin: 6px 0 0; }
 .odds { display: grid; gap: 6px; margin-top: 10px; font-size: 14px; }
 .odds div { display: grid; grid-template-columns: 5.2em 1fr 3.2em; gap: 8px; align-items: center; }
@@ -614,7 +614,8 @@ details.sect > .body > p:first-child { text-align: left; }
 .seg button { font-size: 18px; font-weight: 400; }
 
 /* ---- dice tray: bone cubes thrown onto oxblood leather ---- */
-.stage { display: block; }
+.stage { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.stage .hicon[hidden] { display: none; }
 .tray { position: relative; height: 210px; overflow: hidden; border-radius: 10px; border: 7px solid #3a2a22; cursor: default;
   background: radial-gradient(ellipse at 50% 38%, #5a2a30 0%, #34161b 62%, #1d0c10 100%);
   box-shadow: inset 0 0 46px rgba(0, 0, 0, .75), 0 1px 0 var(--line); touch-action: manipulation; }
@@ -717,12 +718,9 @@ details.sect > .body > p:first-child { text-align: left; }
 .fc-3 { transform: rotateX(90deg) translateZ(32px); }
 .fc-4 { transform: rotateX(-90deg) translateZ(32px); }
 .shadow { position: absolute; left: 6%; right: 6%; bottom: -11px; height: 15px; border-radius: 50%; background: radial-gradient(ellipse, rgba(0, 0, 0, .75), transparent 70%); filter: blur(2px); opacity: .55; }
-.sum.pop { animation: sumpop .5s ease-out; }
-@keyframes sumpop { 0% { transform: scale(.7); opacity: .3; } 55% { transform: scale(1.18); opacity: 1; } 100% { transform: scale(1); } }
 .tray .hintskip { position: absolute; right: 16px; bottom: 12px; z-index: 2; font-size: 14px; font-style: italic; color: rgba(240, 231, 220, .55); pointer-events: none; opacity: 0; transition: opacity .2s; }
 .tray.rolling .hintskip { opacity: 1; }
 @media (max-width: 420px) { .tray { height: 190px; } .dice { gap: 44px; } }
-@media (prefers-reduced-motion: reduce) { .sum.pop { animation: none; } }
 .tierimg { float: right; width: 84px; height: 84px; object-fit: cover; border-radius: 3px; margin: 0 0 6px 12px; border: 1px solid var(--line); }
 .tier::after { content: ""; display: block; clear: both; }
 .emptyimg { display: block; max-width: 240px; width: 100%; margin: 0 auto 12px; border-radius: 3px; }
@@ -1251,6 +1249,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
           <div class="tray" id="tray" aria-hidden="true"><div class="dice" id="dice"></div><span class="hintskip">Tap to skip</span></div>
           <div class="stage">
             <div class="sum" id="sum" aria-live="polite">&ndash;<small id="calc">Ready to roll</small></div>
+            <button type="button" class="hicon" id="copyroll" aria-label="Copy for chat" data-tip="Copy for chat" hidden><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg></button>
           </div>
           <button class="btn rollbtn" id="roll" type="button">Roll 2d6</button>
           <div id="result" aria-live="polite"></div>
@@ -1826,7 +1825,7 @@ function renderStage() {
   if (!last) {
     $('#dice').className = 'dice blank'; $('#dice').innerHTML = cubeHTML(5, 0) + cubeHTML(2, 1);
     $('#sum').innerHTML = '&ndash;<small id="calc">Pick a move, then roll</small>';
-    $('#result').innerHTML = '';
+    $('#result').innerHTML = ''; $('#copyroll').hidden = true;
     return;
   }
   $('#dice').className = 'dice'; $('#dice').innerHTML = cubeHTML(last.d1, 0) + cubeHTML(last.d2, 1);
@@ -1856,9 +1855,10 @@ function renderStage() {
   html += '</div><div class="actions">';
   if (t === 'miss' && !last.luck) html += '<button class="btn sm" type="button" id="markxp"' + (last.xpMarked ? ' disabled' : '') + '>' + (last.xpMarked ? 'XP marked' : 'Mark XP') + '</button>';
   if (last.total < 12 && !last.luck) html += '<button class="btn ghost sm" type="button" id="spendluck"' + (S.sheet.luck < 1 ? ' disabled' : '') + '>Spend Luck: make it a 12 (' + S.sheet.luck + ' left)</button>';
-  html += '<button class="btn ghost sm" type="button" id="copyroll">Copy for chat</button><span class="small muted" id="copymsg" role="status" style="flex:1 1 100%"></span>';
+  html += '<span class="small muted" id="copymsg" role="status" style="flex:1 1 100%"></span>';
   html += '</div>';
   $('#result').innerHTML = html;
+  $('#copyroll').hidden = false;
 }
 /* The last roll as one plain line for a chat: "Mara: Kick Some Ass, 9 (4 + 3, +2), partial success".
    Plain hyphen for a minus, because chat apps mangle the real minus sign. If Luck made it a 12, the line shows the dice as rolled and says so. */
@@ -1902,7 +1902,7 @@ function rollClicks(e) {
     S.roller[k] = clamp(S.roller[k] + d, -5, 5);
     renderRoller(); scheduleSave(); return;
   }
-  if (e.target.id === 'copyroll' && last) { copyRoll(); return; }
+  if (e.target.closest('#copyroll') && last) { copyRoll(); return; }
   if (e.target.id === 'markxp' && last && !last.xpMarked) { evSay('Marked XP on a miss', true); last.xpMarked = true; S.sheet.xp = Math.min(S.sheet.xp + 1, 9); renderSheet(); renderStage(); scheduleSave(); }
   if (e.target.id === 'spendluck' && last && !last.luck && S.sheet.luck > 0) { evSay('Spent Luck: made the roll a 12', true); last.luck = true; last.total = 12; setLuck(S.sheet.luck - 1); evRollUpdate(); if (S.rolls[0]) { S.rolls[0].total = 12; S.rolls[0].tier = 'full'; S.rolls[0].name += ' (Luck)'; } if (HOLDS[last.move]) { var was = last.hold && S.hold.move === last.move ? S.hold.asked : []; S.hold = { n: Math.max(0, HOLDS[last.move].full - was.length), move: last.move, asked: was }; last.hold = true; evSkip('hold'); } renderSheet(); renderRoller(); fxPlay('crit'); stinger(12); scheduleSave(); }
 }
@@ -4522,7 +4522,7 @@ function throwDice(d1, d2) {
   slots.forEach(function (slot, i) {
     var dx = slot.querySelector('.dx'), dy = slot.querySelector('.dy'), cube = slot.querySelector('.cube3'), sh = slot.querySelector('.shadow');
     var r = REST[i], delay = i * 70, dur = THROW_MS - i * 40;
-    var sx = -(i ? 230 : 300) - rnd(0, 40), sy = i ? -150 : -180;
+    var sx = -(i ? 230 : 300) - rnd(0, 40), sy = i ? -110 : -130;
     var spinX = (Math.random() < .5 ? -1 : 1) * (720 + Math.round(rnd(0, 2)) * 360), spinY = (Math.random() < .5 ? -1 : 1) * (720 + Math.round(rnd(0, 2)) * 360), spinZ = (Math.random() < .5 ? -1 : 1) * 360 * Math.round(rnd(1, 2));
     anims.push(cube.animate([
       { transform: 'rotateX(' + (r[0] + spinX) + 'deg) rotateY(' + (r[1] + spinY) + 'deg) rotateZ(' + (r[2] + spinZ) + 'deg)' },
@@ -4534,19 +4534,19 @@ function throwDice(d1, d2) {
     anims.push(dy.animate([
       { offset: 0, transform: 'translateY(' + sy + 'px)', easing: ease['in'] },
       { offset: .34, transform: 'translateY(0px)', easing: ease.out },
-      { offset: .5, transform: 'translateY(-46px)', easing: ease['in'] },
+      { offset: .5, transform: 'translateY(-24px)', easing: ease['in'] },
       { offset: .64, transform: 'translateY(0px)', easing: ease.out },
-      { offset: .74, transform: 'translateY(-16px)', easing: ease['in'] },
+      { offset: .74, transform: 'translateY(-8px)', easing: ease['in'] },
       { offset: .82, transform: 'translateY(0px)', easing: ease.out },
-      { offset: .88, transform: 'translateY(-5px)', easing: ease['in'] },
+      { offset: .88, transform: 'translateY(-2px)', easing: ease['in'] },
       { offset: .93, transform: 'translateY(0px)' },
       { offset: 1, transform: 'translateY(0px)' }
     ], { duration: dur, delay: delay, fill: 'backwards' }));
     function s(o, sc, op) { return { offset: o, transform: 'scale(' + sc + ')', opacity: op }; }
-    anims.push(sh.animate([s(0, .4, .1), s(.34, 1, .6), s(.5, .7, .3), s(.64, 1, .58), s(.74, .88, .45), s(.82, 1, .56), s(.88, .95, .5), s(.93, 1, .55), s(1, 1, .55)], { duration: dur, delay: delay, fill: 'backwards' }));
+    anims.push(sh.animate([s(0, .4, .1), s(.34, 1, .6), s(.5, .84, .42), s(.64, 1, .58), s(.74, .94, .5), s(.82, 1, .56), s(.88, .98, .54), s(.93, 1, .55), s(1, 1, .55)], { duration: dur, delay: delay, fill: 'backwards' }));
     if (S.settings.sound) [[.34, .5], [.64, .35], [.82, .2], [.93, .1]].forEach(function (h) { hitTimers.push(setTimeout(function () { hit(curDie(i), h[1]); }, delay + dur * h[0])); });
   });
-  var thump = tray.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(2px)' }, { transform: 'translateY(0)' }], { duration: 140, delay: THROW_MS * .34, easing: 'ease-out' });
+  var thump = tray.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(1px)' }, { transform: 'translateY(0)' }], { duration: 140, delay: THROW_MS * .34, easing: 'ease-out' });
   anims.push(thump);
   d3Throw(d1, d2, THROW_MS);
   return anims;
@@ -4740,7 +4740,7 @@ var D3TRAY = {
   leather: { rough: .5, tint: '#8f8386', n: .7 }, felt: { rough: 1, tint: '#d9d9d9', n: .6 }, wood: { rough: .45, tint: '#dedede', n: .8 }, slate: { rough: .7, tint: '#e2e2e2', n: 1 },
   rust: { rough: 1, tint: '#e6e6e6', n: 1.1, r: true }, dust: { rough: 1, tint: '#e6e6e6', n: 1.3, r: true }, concrete: { rough: 1, tint: '#e6e6e6', n: .9, r: true }
 };
-var D3BOUNCE = [[0, .34, 3.2], [.34, .64, .9], [.64, .82, .32], [.82, .93, .1]]; /* from, to, height: same beats as the flat dice so sounds line up */
+var D3BOUNCE = [[0, .34, 2.4], [.34, .64, .48], [.64, .82, .16], [.82, .93, .05]]; /* from, to, height: same beats as the flat dice so sounds line up */
 /* Lighting moods. Each is a real photographed surrounding (img/env-*.hdr, from Poly Haven, CC0) plus a lamp of our own placed where its
    brightest light is, so shadows and reflections agree. az is where that bright spot sits in the photo, in degrees (tools/make_env.py
    prints it); the photo is turned to bring it round to the lamp. sun is where our lamp stands, lamp is a second, close light for the lantern,
@@ -5206,7 +5206,7 @@ function d3Frame(now) {
   if (busy || now < D3.until) D3.raf = requestAnimationFrame(d3Frame); else D3.last = 0;
 }
 var skipAnims = null;
-function popSum() { var s = $('#sum'); if (!s) return; s.classList.remove('pop'); void s.offsetWidth; s.classList.add('pop'); }
+function popSum() {}   // the total just shows; it used to pop
 function doRoll() {
   if (rolling) return;
   rolling = true;
