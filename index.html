@@ -324,10 +324,10 @@ details.sect > .body { padding: 0 16px 16px; }
 .bknudge { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 12px 0; font-style: normal; }
 .bknudge span { flex: 1 1 240px; }
 .want { position: relative; }
-#hv-sheet select { -webkit-appearance: none; appearance: none; cursor: pointer; background-color: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 40px 9px 12px;
+#hv-sheet select, #wiz select { -webkit-appearance: none; appearance: none; cursor: pointer; background-color: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 40px 9px 12px;
   background-image: linear-gradient(45deg, transparent calc(50% - 1px), var(--ink) calc(50% - 1px), var(--ink) calc(50% + 1px), transparent calc(50% + 1px)), linear-gradient(-45deg, transparent calc(50% - 1px), var(--ink) calc(50% - 1px), var(--ink) calc(50% + 1px), transparent calc(50% + 1px));
   background-position: calc(100% - 23px) 50%, calc(100% - 16px) 50%; background-size: 7px 7px; background-repeat: no-repeat; }
-#hv-sheet select:hover, #hv-sheet select[aria-expanded="true"] { border-color: var(--accent); }
+#hv-sheet select:hover, #hv-sheet select[aria-expanded="true"], #wiz select:hover, #wiz select[aria-expanded="true"] { border-color: var(--accent); }
 .ddpop { position: fixed; z-index: 30; margin: 0; padding: 6px; list-style: none; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 12px 32px rgba(0, 0, 0, .28); outline: none; }
 .ddpop:focus-visible .wantopt.on { outline: 2px solid var(--accent); outline-offset: -2px; }
 .ddpop .wanthd:first-child { border-top: 0; margin-top: 0; }
@@ -821,14 +821,28 @@ details.sect > .body > p:first-child { text-align: left; }
 .wlist { list-style: none; padding: 0; margin: 8px 0 12px; display: grid; gap: 8px; }
 .wlist > li:not(.witem):not(.empty) { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; border: 1px solid var(--line); background: var(--bg); border-radius: 3px; padding: 10px 12px; }
 .wlist > li > span { min-width: 0; overflow-wrap: anywhere; }
-.witem { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; border: 1px solid var(--line); background: var(--bg); border-radius: 3px; padding: 10px; }
-.witem > input[type="text"] { flex: 1 1 160px; min-width: 0; }
-.witem > select { flex: 0 1 120px; }
-.wval { display: grid; gap: 2px; }
-.wval span { font-family: var(--type); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.wval input { width: 72px; }
-.weq { display: flex; align-items: center; gap: 6px; font-size: 14px; white-space: nowrap; }
+/* a pack row: name, type, harm or armor, equipped, then remove or the playbook mark, all one height and in fixed columns so rows line up */
+.witem { display: grid; grid-template-columns: minmax(0, 1fr) 140px 112px 112px 42px; gap: 10px; align-items: center; border: 1px solid var(--line); background: var(--bg); border-radius: 10px; padding: 10px 12px; }
+.witem > input[type="text"], .witem > select, .wval { height: 42px; min-height: 0; }
+.wval { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 0 6px 0 12px; }
+.wval:focus-within { border-color: var(--accent); }
+.wval span { font-size: 15px; color: var(--muted); }
+.wval input { flex: 1; width: 100%; min-width: 0; height: 100%; min-height: 0; border: 0; background: none; padding: 0; text-align: right; font-family: var(--num); font-weight: 600; font-size: 18px; }
+.wval input:focus { outline: none; }
+.weq { display: flex; align-items: center; gap: 8px; font-size: 15px; white-space: nowrap; cursor: pointer; }
 .weq input { width: 20px; height: 20px; accent-color: var(--accent); }
+.wgap { grid-column: span 2; }
+.wpbk { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 42px; height: 42px; color: var(--good); }
+.wpbk svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.wpbk::after { content: attr(data-tip); position: absolute; top: calc(100% + 4px); right: 0; z-index: 6; white-space: nowrap; pointer-events: none; background: var(--ink); color: var(--bg); font-size: 14px; padding: 4px 10px; border-radius: 6px; display: none; }
+.wpbk:hover::after, .wpbk:focus-visible::after { display: block; animation: tipin .15s ease-out .2s both; }
+@media (max-width: 640px) { .witem { grid-template-columns: minmax(0, 1fr) 1fr 42px; } .witem > input[type="text"] { grid-column: 1 / -1; } .wgap { grid-column: span 1; } .wval { grid-column: 1; } .weq { grid-column: 2; } }
+.wsub { display: flex; align-items: center; gap: 10px; margin: 32px 0 6px; font-family: var(--display); font-size: 21px; font-weight: 400; }
+.wsub span { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--ink); font-size: 15px; }
+.hcardx.used:not([aria-pressed="true"]) { opacity: .55; }
+.whint { margin: 0 0 12px; }
+.whint i { color: var(--ink); }
+.wnames { margin: 0 0 12px; }
 .wbondform { display: grid; grid-template-columns: minmax(0, 1fr) 130px minmax(0, 2fr) auto; gap: 8px; align-items: center; }
 .wex { margin: 16px 0; }
 .wex summary { cursor: pointer; font-weight: 700; }
@@ -952,6 +966,13 @@ span.mc-out { display: grid; }
 .pbc[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--surface2); }
 .pbc[aria-pressed="true"]::before { border-color: var(--accent); opacity: .5; }
 .pbc .pbimg { width: 100%; border-radius: 6px; }
+.hcards { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+.hcardx { aspect-ratio: 4 / 5; }
+.hcardx .mc-body { justify-content: center; margin-top: 34px; }
+.hcardx .mc-text { font-family: var(--body); font-size: 18px; line-height: 1.4; font-style: normal; }
+.hglass { width: 18px; height: 18px; fill: none; stroke: var(--brass); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.hcardx .pbc-facts .i { width: 14px; height: 14px; vertical-align: -2px; }
+.hcardx[aria-pressed="true"] .pbc-facts { color: var(--accent); }
 /* gear cards: harm as pips, armor as shields, tags that explain themselves */
 .gcards { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
 .gcard { aspect-ratio: 4 / 5; }
@@ -988,9 +1009,6 @@ span.mc-out { display: grid; }
 .pta { font-size: 14px; color: var(--muted); }
 .pta .ladd { font-family: var(--num); font-weight: 600; color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { .ptile { transition: none; } .ptile:hover { transform: none; } }
-.taglegend { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; margin: 12px 0 4px; }
-.taglegend dt { font-weight: 700; }
-.taglegend dd { margin: 0; color: var(--muted); }
 /* the forge: parts on the left, the weapon card on the right, glinting as it changes */
 .wforge { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 32px; align-items: stretch; }
 .wforge-card { display: flex; }
@@ -2686,7 +2704,6 @@ function wizGear() {
   var pack = S.sheet.inventory.length ? S.sheet.inventory.map(function (i) { return wizGearItem(i); }).join('') : '<li class="empty">Your pack is empty.</li>';
   return '<h2 class="sectitle" tabindex="-1">Pack your gear</h2>' +
     '<p>These are the weapons, armor and items your playbook offers. Weapons list their harm, and armor takes that much off the harm you suffer. Whatever you pick goes into your pack, ready to use in the Roller.</p><p class="wmsg" id="wmsg" role="status"></p>' + groups +
-    (Object.keys(tagsSeen).length ? '<details class="wex"><summary>What the tags mean</summary><dl class="taglegend">' + Object.keys(TAGDESC).filter(function (t) { return tagsSeen[t]; }).map(function (t) { return '<dt>' + t + '</dt><dd>' + esc(TAGDESC[t]) + '</dd>'; }).join('') + '</dl></details>' : '') +
     '<h3 style="margin-top:20px">Anything else in your pack?</h3><span class="lbl">Ideas</span><ul class="chips" style="margin-top:0">' + QUICK.map(function (g, n) { return '<li><button type="button" class="chip" data-wq="' + n + '">+ ' + esc(g[0]) + '</button></li>'; }).join('') + '</ul>' +
     '<form id="wgearform" class="wrow2" autocomplete="off" style="margin-top:12px"><input type="text" id="w-newname" placeholder="Or type your own" aria-label="New item name"><select id="w-newtype" aria-label="Item type">' + ITYPES.map(function (t) { return '<option>' + t + '</option>'; }).join('') + '</select>' + ib('plus', 'Add to your pack', '', 'x', 'submit') + '</form>' +
     '<ul class="wlist" id="wgearlist" style="margin-top:12px">' + pack + '</ul>' +
@@ -2696,15 +2713,15 @@ function wizGearItem(i) {
   var gt = i.type === 'Weapon' || i.type === 'Armor';
   var opts = ITYPES.map(function (t) { return '<option' + (t === i.type ? ' selected' : '') + '>' + t + '</option>'; }).join('');
   return '<li class="witem" data-iid="' + i.id + '"><input type="text" data-wi="name" value="' + esc(i.name) + '" aria-label="Item name"><select data-wi="type" aria-label="Type">' + opts + '</select>' +
-    (gt ? '<label class="wval"><span>' + (i.type === 'Weapon' ? 'Harm' : 'Armor') + '</span><input type="number" data-wi="val" min="0" max="9" value="' + esc(i.val) + '" inputmode="numeric"></label><label class="weq"><input type="checkbox" data-wi="eq"' + (i.eq ? ' checked' : '') + '><span>Equipped</span></label>' : '') +
-    (i.pbk ? '<span class="chip ok">From playbook</span>' : '' + ib('trash', 'Remove ' + esc(i.name || 'item'), 'data-wirm') + '') + '</li>';
+    (gt ? '<label class="wval"><span>' + (i.type === 'Weapon' ? 'Harm' : 'Armor') + '</span><input type="number" data-wi="val" min="0" max="9" value="' + esc(i.val) + '" inputmode="numeric"></label><label class="weq"><input type="checkbox" data-wi="eq"' + (i.eq ? ' checked' : '') + '><span>Equipped</span></label>' : '<span class="wgap"></span>') +
+    (i.pbk ? '<span class="wpbk" tabindex="0" role="img" aria-label="From your playbook" data-tip="From your playbook"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h7"/></svg></span>' : ib('trash', 'Remove ' + esc(i.name || 'item'), 'data-wirm')) + '</li>';
 }
 function wizGearList() { var el = $('#wgearlist'); if (el) el.innerHTML = S.sheet.inventory.length ? S.sheet.inventory.map(wizGearItem).join('') : '<li class="empty">Your pack is empty.</li>'; }
 
 /* ----- step 4: details (playbook-specific choices) ----- */
 /* sets that pull one way or the other get a tone: brass for the good side, ember red for the bad */
 var XTONE = { heroic: 'gold', 'good-traditions': 'gold', 'agency-resources': 'gold', mission: 'gold', doom: 'doom', 'bad-traditions': 'doom', 'agency-red-tape': 'doom', curse: 'doom', 'dark-side': 'doom', heat: 'doom' };
-var wizLand = '', wizForged = false;   // the pick that just went into a slot, so only it plays the landing
+var wizLand = '', wizForged = false, wizHist = -1;   // wizHist: the history card picked on the History step   // the pick that just went into a slot, so only it plays the landing
 function wizDetails() {
   var d = curPB(); if (!d) return '<h2 class="sectitle" tabindex="-1">Details</h2>' + needPB();
   var st = pbState();
@@ -2742,11 +2759,24 @@ function wizBondList() {
 }
 function wizBonds() {
   var d = curPB(), ties = TIES.map(function (t) { return '<option>' + t + '</option>'; }).join('');
-  var hist = d ? '<span class="lbl" style="margin-top:16px">History picks for ' + esc(d.name) + '</span><p class="small muted">Pick one of these for each other hunter. Tap one to start an entry with it.</p><ul class="wlist">' + d.history.map(function (h, i) { return '<li><span>' + esc(h) + '</span><button type="button" class="btn ghost sm" data-whist="' + i + '">Use this</button></li>'; }).join('') + '</ul>' : '';
+  var hist = d ? '<h3 class="wsub"><span>1</span> Pick a history</h3><p class="small muted">' + esc(d.name) + '\'s list. Pick one for each other hunter.</p><ul class="mcards hcards">' + d.history.map(function (h, i) {
+    /* a history as a card: an hourglass in the corners, the history in the middle; tapping it starts an entry */
+    var used = S.sheet.bonds.some(function (b) { return b.note === h; }), on = wizHist === i;
+    return '<li><button type="button" class="mcard pbc hcardx' + (used ? ' used' : '') + '" data-whist="' + i + '" aria-pressed="' + on + '"><span class="mc-idx"><svg class="hglass" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 3h10M7 21h10M8 3c0 5 8 6 8 9s-8 4-8 9M16 3c0 5-8 6-8 9s8 4 8 9"/></svg></span><span class="mc-idx mc-b" aria-hidden="true"><svg class="hglass" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 3h10M7 21h10M8 3c0 5 8 6 8 9s-8 4-8 9M16 3c0 5-8 6-8 9s8 4 8 9"/></svg></span>' +
+      '<span class="mc-body"><span class="mc-kick">' + (used ? 'In your history' : 'History') + '</span><span class="mc-rule" aria-hidden="true"></span><span class="mc-text">' + esc(h) + '</span>' +
+      '<span class="pbc-facts">' + (on ? '<span class="i i-check" aria-hidden="true"></span> Picked' : used ? 'Used already' : 'Tap to pick') + '</span></span></button></li>';
+  }).join('') + '</ul>' : '';
   return '<h2 class="sectitle" tabindex="-1">History with the other hunters</h2>' +
     '<p>The hunters already know each other. In the first session, wait until everyone has got this far. Go round the table once so each player can introduce their hunter by name and look and say what the others would know about them. Then go round again: you pick one history from your list below for each other hunter, and each of them picks one from their own list for you. Leave this step until then if you have not met the team yet. It is also on My sheet.</p>' +
-    '<form id="wbondform" class="wbondform" autocomplete="off"><input type="text" id="w-bwho" list="partynames" placeholder="Who?" aria-label="Who"><select id="w-btie" aria-label="Kind of bond">' + ties + '</select><input type="text" id="w-bnote" placeholder="The history you picked for them" aria-label="The history you picked for them"><input type="text" id="w-btheirs" placeholder="What they picked for you (fill in at the table)" aria-label="What they picked for you">' + ib('plus', 'Add this history', '', 'x', 'submit') + '</form>' +
-    '<ul class="wlist" id="wbondlist" style="margin-top:12px">' + wizBondList() + '</ul>' + hist;
+    hist +
+    '<h3 class="wsub"><span>2</span> Which hunter is it with?</h3>' +
+    (d && wizHist >= 0 ? '<p class="whint">Which hunter does this describe? <i>&ldquo;' + esc(d.history[wizHist]) + '&rdquo;</i></p>' : '<p class="whint muted">Each history is about one of the other hunters at your table. Pick one above, then name the hunter it is with.</p>') +
+    (function () {   // the other hunters at the shared table, one tap to fill the name
+      var me = myId(), names = party.docs.filter(function (x) { return x.id !== me && x.name; }).map(function (x) { return String(x.name); });
+      return names.length ? '<ul class="chips wnames" aria-label="Hunters at your table">' + names.map(function (n) { return '<li><button type="button" class="chip" data-wwho="' + esc(n) + '">' + esc(n) + '</button></li>'; }).join('') + '</ul>' : '';
+    })() +
+    '<form id="wbondform" class="wbondform" autocomplete="off"><input type="text" id="w-bwho" list="partynames" placeholder="Their hunter\'s name" aria-label="Their hunter\'s name"><select id="w-btie" aria-label="Kind of bond">' + ties + '</select><input type="text" id="w-bnote" placeholder="Pick a history above, or write your own" aria-label="The history you picked for them" value="' + (d && wizHist >= 0 ? esc(d.history[wizHist]) : '') + '"><input type="text" id="w-btheirs" placeholder="What they picked for you (fill in at the table)" aria-label="What they picked for you">' + ib('plus', 'Add this history', '', 'x', 'submit') + '</form>' +
+    '<h3 class="wsub"><span>3</span> Your history so far</h3><ul class="wlist" id="wbondlist">' + wizBondList() + '</ul>';
 }
 
 /* ----- step 8: review ----- */
@@ -2913,8 +2943,13 @@ function wizToggle(map, key, limit, what) {
     if ((g = t.closest('[data-wrmb]'))) {
       var bid = g.dataset.wrmb; S.sheet.bonds = S.sheet.bonds.filter(function (x) { return x.id !== bid; }); renderBonds(); $('#wbondlist').innerHTML = wizBondList(); wizPills(); scheduleSave(); return;
     }
+    if ((g = t.closest('[data-wwho]'))) { var bw = $('#w-bwho'); bw.value = g.dataset.wwho; $$('[data-wwho]').forEach(function (c) { c.setAttribute('aria-pressed', String(c === g)); }); (wizHist >= 0 ? $('#w-btheirs') : bw).focus(); return; }
     if ((g = t.closest('[data-whist]'))) {
-      var hp = curPB().history[+g.dataset.whist]; $('#w-bnote').value = hp.slice(0, 200); $('#w-bwho').focus(); return;
+      var hi = +g.dataset.whist, hp = curPB().history[hi], keep = { who: $('#w-bwho').value, tie: $('#w-btie').value, theirs: $('#w-btheirs').value };
+      wizHist = wizHist === hi ? -1 : hi; renderWiz(false);
+      $('#w-bwho').value = keep.who; $('#w-btie').value = keep.tie; $('#w-btheirs').value = keep.theirs;
+      if (wizHist >= 0) { $('#w-bnote').value = hp.slice(0, 200); var f = $('#wbondform'); f.scrollIntoView({ block: 'center', behavior: 'smooth' }); $('#w-bwho').focus({ preventScroll: true }); }
+      return;
     }
     if (t.id === 'wtosheet') { setHV('sheet'); scheduleSave(); window.scrollTo(0, 0); return; }
     if (t.id === 'wtoplay') { setHV('play'); scheduleSave(); window.scrollTo(0, 0); return; }
@@ -2929,7 +2964,8 @@ function wizToggle(map, key, limit, what) {
       var w = $('#w-bwho'), who = w.value.trim();
       if (!who) { w.focus(); return; }
       S.sheet.bonds.push({ id: uid(), who: who.slice(0, 80), tie: $('#w-btie').value, note: $('#w-bnote').value.slice(0, 200), theirs: $('#w-btheirs').value.slice(0, 200) });
-      renderBonds(); $('#wbondlist').innerHTML = wizBondList(); w.value = ''; $('#w-bnote').value = ''; $('#w-btheirs').value = ''; wizPills(); scheduleSave(); w.focus();
+      wizHist = -1; renderBonds(); wizPills(); scheduleSave(); renderWiz(false);
+      var li = $('#wbondlist'); if (li) li.scrollIntoView({ block: 'center', behavior: 'smooth' });
     }
   });
   host.addEventListener('input', function (e) {
@@ -3237,7 +3273,7 @@ document.addEventListener('keydown', function (e) {
 });
 /* Selects on the Sheet keep their native element (values, data-bind and change handlers stay as they are),
    but open a hand-drawn list styled like the Play dropdown instead of the browser's own. */
-var DDSCOPE = '#hv-sheet select', dd = { sel: null, el: null, ix: -1 };
+var DDSCOPE = '#hv-sheet select, #wiz select', dd = { sel: null, el: null, ix: -1 };
 function ddClose(back) {
   if (!dd.el) return;
   dd.el.remove(); dd.sel.setAttribute('aria-expanded', 'false');
