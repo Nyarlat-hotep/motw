@@ -806,7 +806,15 @@ div.wcard { cursor: default; border-color: var(--good); }
 
 /* ---- play screen: status | moves | dice, built for a laptop window beside a call ---- */
 .play { display: grid; grid-template-columns: 296px minmax(0, 1fr) minmax(330px, 400px); gap: 16px; align-items: start; }
-@media (max-width: 1060px) { .play { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } #play-status { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 4px 20px; } }
+.ptop { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 32px; margin-bottom: 16px; }
+.ptop .pblock { margin-top: 0; }
+.ptop .pblock:has(.statrow) { flex: 0 1 380px; }
+.ptop .pend { margin-left: auto; }
+.ptop .pfresh { flex-basis: 100%; order: 9; }
+.pvit { display: grid; gap: 16px; min-width: 0; }
+.pvit #lvlup:empty { display: none; }
+.pvit .levelup { margin-top: 0; }
+@media (max-width: 1060px) { .play { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .pvit { grid-column: 1 / -1; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); align-items: start; } }
 @media (max-width: 700px) { .play { grid-template-columns: minmax(0, 1fr); } }
 .play .small, .play .hint { font-size: 15px; }
 .pwho { display: flex; align-items: center; gap: 10px; }
@@ -1167,9 +1175,18 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
     <!-- PLAY: everything you touch mid-session on one screen -->
     <div id="hv-play" hidden>
       <div id="play-pin"></div>
+      <div class="card ptop" id="play-status"></div>
       <div class="play">
-        <div><div class="card" id="play-status"></div><div id="lvlup"></div></div>
-        <div id="play-moves"></div>
+        <div class="pvit"><div class="card" id="pv-harm"></div><div class="card" id="pv-luck"></div><div class="card" id="pv-xp"></div><div id="lvlup"></div></div>
+        <div class="pmid"><div id="play-moves"></div>
+        <div class="card" style="margin-top:16px">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px">
+            <span class="lbl" id="histttl" style="margin:0">Recent rolls</span>
+            <button class="btn ghost sm" id="clearhist" type="button">Clear</button>
+          </div>
+          <ul class="hist" id="hist"></ul>
+        </div>
+        </div>
         <div><div class="card" id="play-sel" style="margin-bottom:16px"></div><div id="play-stage"><div id="rollkit">
         <div class="card">
           <div class="tray" id="tray" aria-hidden="true"><div class="dice" id="dice"></div><span class="hintskip">Tap to skip</span></div>
@@ -1178,13 +1195,6 @@ details.sect[open] > summary::after { content: ""; --i: var(--i-minus); }
           </div>
           <button class="btn rollbtn" id="roll" type="button">Roll 2d6</button>
           <div id="result" aria-live="polite"></div>
-        </div>
-        <div class="card" style="margin-top:16px">
-          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:8px">
-            <span class="lbl" id="histttl" style="margin:0">Recent rolls</span>
-            <button class="btn ghost sm" id="clearhist" type="button">Clear</button>
-          </div>
-          <ul class="hist" id="hist"></ul>
         </div>
         </div></div><div id="play-feed"></div></div>
       </div>
@@ -2810,20 +2820,19 @@ function renderPlay() {
   var fresh = !sh.playbook && !(sh.name && sh.name.trim());
   var gear = w.map(function (i) { return '<li class="chip">' + esc(i.name || 'Weapon') + ' ' + (+i.val || 0) + '-harm' + (i.note ? ' <span class="muted">' + esc(String(i.note).replace(/\s*\[.*\]$/, '')) + '</span>' : '') + '</li>'; }).join('') + (a ? '<li class="chip">Armor ' + a + '</li>' : '');
   host.innerHTML =
-    '<div><div class="pwho">' + av + '<span><b>' + esc(sh.name || 'Your hunter') + '</b><span class="muted small">' + esc(sh.playbook || 'No playbook yet') + ' &middot; Level ' + sh.level + '</span></span></div>' +
-    (fresh ? '<p class="note" style="margin:10px 0 0">No hunter yet. You can still roll the basic moves. <button type="button" class="linkbtn" data-pgo="build">Build a hunter</button></p>' : '') +
-    '<div class="pblock"><span class="lbl">Ratings</span><div class="statrow" role="group" aria-label="Stat to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmtI(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div></div>' +
-    '<div class="pblock"><span class="lbl">Harm</span>' + pipStr('pl-harm', 'harm', 8, sh.harm, 'Harm') + '<p class="small' + (sh.harm >= 4 ? '' : ' muted') + '" style="margin:6px 0 0">' + (sh.unstable ? '<b style="color:var(--bad)">Unstable.</b> ' : '') + esc(harmText(sh.harm)) + '</p>' +
+    '<div class="pwho">' + av + '<span><b>' + esc(sh.name || 'Your hunter') + '</b><span class="muted small">' + esc(sh.playbook || 'No playbook yet') + ' &middot; Level ' + sh.level + '</span></span></div>' +
+    (fresh ? '<p class="note pfresh" style="margin:0">No hunter yet. You can still roll the basic moves. <button type="button" class="linkbtn" data-pgo="build">Build a hunter</button></p>' : '') +
+    '<div class="pblock"><span class="lbl">Ratings</span><div class="statrow" role="group" aria-label="Stat to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmtI(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div>' +
+    (gear ? '<div class="pblock"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '') +
+    '<div class="pblock pend"><button type="button" class="btn ghost sm" data-rit="open">End the session</button></div>';
+  $('#pv-harm').innerHTML = '<span class="lbl">Harm</span>' + pipStr('pl-harm', 'harm', 8, sh.harm, 'Harm') + '<p class="small' + (sh.harm >= 4 ? '' : ' muted') + '" style="margin:6px 0 0">' + (sh.unstable ? '<b style="color:var(--bad)">Unstable.</b> ' : '') + esc(harmText(sh.harm)) + '</p>' +
       '<div class="prow"><span>Take harm</span><span class="ctl"><button type="button" data-ph="-1" aria-label="Less harm"><span class="i i-minus" aria-hidden="true"></span></button><output>' + play.harm + '</output><button type="button" data-ph="1" aria-label="More harm"><span class="i i-plus" aria-hidden="true"></span></button></span><button type="button" class="btn sm" id="pl-take">Apply</button></div>' +
       '<div class="prow"><label><input type="checkbox" id="pl-ign"' + (play.ignore ? ' checked' : '') + '> Ignores armor</label><span><button type="button" class="btn ghost sm" id="pl-heal1"' + (sh.harm < 1 ? ' disabled' : '') + '>Heal 1</button> <button type="button" class="btn ghost sm" id="pl-healall"' + (sh.harm < 1 ? ' disabled' : '') + '>Heal all</button></span></div>' +
       '<div class="prow"><label><input type="checkbox" id="pl-unst"' + (sh.unstable ? ' checked' : '') + '> Unstable</label></div>' +
       '<p class="pmsg" role="status">' + esc(play.msg) + '</p>' +
-      (play.wound > 0 && sh.luck > 0 ? '<button type="button" class="btn ghost sm" id="pl-undo">Spend Luck: cancel that wound</button>' : '') + '</div>' +
-    '<div class="pblock"><span class="lbl">Luck</span>' + '<div class="pips candles' + (sh.luck < 3 ? ' low' : '') + '" id="pl-luck" role="group" aria-label="Luck">' + luckPips(sh.luck) + '</div><p class="lucknote' + (sh.luck < 3 ? ' low' : '') + '">' + luckNote(sh.luck) + '</p>' + (d ? '<p class="small muted" style="margin:6px 0 0"><b>When you spend Luck:</b> ' + esc(d.luckSpecial) + '</p>' : '') + '</div>' +
-    '<div class="pblock"><span class="lbl">Experience</span>' + pipStr('pl-xp', '', 5, Math.min(sh.xp, 5), 'XP') + '</div>' +
-    '<div class="pblock"><span class="lbl">This roll</span>' + stepStr('+1 forward', 'forward', fmtI(R.forward), '(clears)') + stepStr('+1 ongoing', 'ongoing', fmtI(R.ongoing)) + stepStr('Other', 'other', fmtI(R.other), '(clears)') + stepStr('Hold', 'hold', S.hold.n) + '</div>' +
-    (gear ? '<div class="pblock"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '') +
-    '<div class="pblock"><button type="button" class="btn ghost sm" data-rit="open">End the session</button></div>';
+      (play.wound > 0 && sh.luck > 0 ? '<button type="button" class="btn ghost sm" id="pl-undo">Spend Luck: cancel that wound</button>' : '');
+  $('#pv-luck').innerHTML = '<span class="lbl">Luck</span>' + '<div class="pips candles' + (sh.luck < 3 ? ' low' : '') + '" id="pl-luck" role="group" aria-label="Luck">' + luckPips(sh.luck) + '</div><p class="lucknote' + (sh.luck < 3 ? ' low' : '') + '">' + luckNote(sh.luck) + '</p>' + (d ? '<p class="small muted" style="margin:6px 0 0"><b>When you spend Luck:</b> ' + esc(d.luckSpecial) + '</p>' : '');
+  $('#pv-xp').innerHTML = '<span class="lbl">Experience</span>' + pipStr('pl-xp', '', 5, Math.min(sh.xp, 5), 'XP') + '<p class="small muted" style="margin:8px 0 0">Level ' + sh.level + '. Mark one on any roll of 6 or less. At 5 you level up.</p>';
 
   var basic = MOVES.filter(function (m) { return m.g === 'basic'; }), weird = MOVES.filter(function (m) { return m.g === 'weird'; });
   var mine = S.sheet.custom.map(function (c) { return BYID['x' + c.id]; }).filter(Boolean);
@@ -2849,7 +2858,8 @@ function renderPlay() {
   $('#play-sel').innerHTML = '<h3>' + esc(mv.id === 'plain' ? 'Plain roll' : mv.name) + '</h3>' + (mv.trig ? '<p class="muted"><i>' + esc(mv.trig) + '</i></p>' : '') +
     '<p>Roll 2d6 <b>' + fmt(m) + '</b> <span class="muted small">(' + esc(parts.join(', ')) + ')</span></p>' +
     '<p class="small"><span class="tag full">10+ ' + pct(f) + '%</span> &middot; <span class="tag part">7-9 ' + pct(p) + '%</span> &middot; <span class="tag miss">Miss ' + pct(x) + '%</span></p>' +
-    (mv.adv ? '<label class="small" style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="adv"' + (S.sheet.adv[R.move] ? ' checked' : '') + ' style="width:20px;height:20px;accent-color:var(--accent)"> My hunter has the Advanced version</label>' : '');
+    (mv.adv ? '<label class="small" style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="adv"' + (S.sheet.adv[R.move] ? ' checked' : '') + ' style="width:20px;height:20px;accent-color:var(--accent)"> My hunter has the Advanced version</label>' : '') +
+    '<span class="lbl">This roll</span>' + stepStr('+1 forward', 'forward', fmtI(R.forward), '(clears)') + stepStr('+1 ongoing', 'ongoing', fmtI(R.ongoing)) + stepStr('Other', 'other', fmtI(R.other), '(clears)') + stepStr('Hold', 'hold', S.hold.n) + '</div>';
 }
 (function playEvents() {
   var host = $('#hv-play');
@@ -2863,7 +2873,7 @@ function renderPlay() {
       renderRoller(); scheduleSave(); return;
     }
     if ((g = t.closest('[data-ph]'))) { play.harm = clamp(play.harm + +g.dataset.ph, 1, 12); renderPlay(); return; }
-    if ((g = t.closest('.pips button')) && $('#play-status').contains(g)) {
+    if ((g = t.closest('.pips button')) && /^pl-/.test(g.parentElement.id)) {
       var n = +g.dataset.n, id = g.parentElement.id;
       if (id === 'pl-luck') setLuck(sh.luck === n ? n - 1 : n);
       if (id === 'pl-harm') { sh.harm = sh.harm === n ? n - 1 : n; if (sh.harm >= 4) sh.unstable = true; if (sh.harm === 0) sh.unstable = false; play.wound = 0; play.msg = ''; }
