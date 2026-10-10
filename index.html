@@ -3569,15 +3569,18 @@ function renderCustom() {
   var old = $('#mvpaste'), keep = old ? old.value : '', msg = $('#mvmsg') ? $('#mvmsg').textContent : '';
   /* the last card: a dashed blank to paste a move onto, or to start one from scratch */
   var add = '<li class="mcard mc-add mc-paste"><div class="mc-body"><span class="mc-kick">Your own</span><h4 class="mc-name">Add a move</h4><span class="mc-rule" aria-hidden="true"></span>' +
-    '<label class="mc-text mc-prev" for="mvpaste">Paste a move from your playbook sheet, and it is split into its parts for you.</label>' +
+    '<label class="mc-text mc-prev" for="mvpaste">Paste a move from your playbook sheet and press +. It is split into its parts for you. Leave it empty for a blank move.</label>' +
     '<textarea id="mvpaste" placeholder="Tough as nails: When you take harm, roll +Tough. On a 10+, ... On a 7-9, ..."></textarea>' +
-    '<div class="mc-addrow"><button class="btn sm" id="mvparse" type="button">Fill in</button><button class="btn ghost sm ib" type="button" aria-label="Add a blank move" data-tip="Add a blank move" id="mvadd"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></button></div>' +
+    '<div class="mc-addrow"><button class="btn sm ib" type="button" aria-label="Add a blank move" data-tip="Add a blank move" id="mvadd"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></button></div>' +
     '<p class="small muted" id="mvmsg" role="status" style="margin:0;text-align:center"></p></div></li>';
   $('#custom').innerHTML = '<ul class="mcards">' + c.map(customCard).join('') + add + '</ul>';
-  $('#mvpaste').value = keep; $('#mvmsg').textContent = msg;
+  $('#mvpaste').value = keep; $('#mvmsg').textContent = msg; mvTip();
 }
 function mvMsg(t) { $('#mvmsg').textContent = t || ''; }
-$('#custom').addEventListener('click', function (e) { if (e.target.closest('#mvparse')) mvParse(); else if (e.target.closest('#mvadd')) mvBlank(); });
+/* one + on the card: it fills in a move from the pasted text, or starts a blank one when the box is empty */
+$('#custom').addEventListener('click', function (e) { if (e.target.closest('#mvadd')) { if ($('#mvpaste').value.trim()) mvParse(); else mvBlank(); } });
+function mvTip() { var b = $('#mvadd'), t = $('#mvpaste'); if (!b || !t) return; var l = t.value.trim() ? 'Add a move from this text' : 'Add a blank move'; b.dataset.tip = l; b.setAttribute('aria-label', l); }
+$('#custom').addEventListener('input', function (e) { if (e.target.id === 'mvpaste') mvTip(); });
 function mvParse() {
   var t = $('#mvpaste').value;
   if (!t.trim()) { mvMsg('Paste a move first.'); return; }
