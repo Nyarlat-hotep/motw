@@ -344,10 +344,10 @@ details.sect > .body { padding: 0 16px 16px; }
 .bknudge { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 12px 0; font-style: normal; }
 .bknudge span { flex: 1 1 240px; }
 .want { position: relative; }
-#hv-sheet select, #wiz select, #czopts select, #invdlg select, #retdlg select { -webkit-appearance: none; appearance: none; cursor: pointer; background-color: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 40px 9px 12px;
+#hv-sheet select, #wiz select, #czopts select, #invdlg select, #retdlg select, #p-bestiary select, #p-notes select { -webkit-appearance: none; appearance: none; cursor: pointer; background-color: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 40px 9px 12px;
   background-image: linear-gradient(45deg, transparent calc(50% - 1px), var(--ink) calc(50% - 1px), var(--ink) calc(50% + 1px), transparent calc(50% + 1px)), linear-gradient(-45deg, transparent calc(50% - 1px), var(--ink) calc(50% - 1px), var(--ink) calc(50% + 1px), transparent calc(50% + 1px));
   background-position: calc(100% - 23px) 50%, calc(100% - 16px) 50%; background-size: 7px 7px; background-repeat: no-repeat; }
-#hv-sheet select:hover, #hv-sheet select[aria-expanded="true"], #wiz select:hover, #wiz select[aria-expanded="true"], #czopts select:hover, #czopts select[aria-expanded="true"], #invdlg select:hover, #invdlg select[aria-expanded="true"], #retdlg select:hover, #retdlg select[aria-expanded="true"] { border-color: var(--accent); }
+#hv-sheet select:hover, #hv-sheet select[aria-expanded="true"], #wiz select:hover, #wiz select[aria-expanded="true"], #czopts select:hover, #czopts select[aria-expanded="true"], #invdlg select:hover, #invdlg select[aria-expanded="true"], #retdlg select:hover, #retdlg select[aria-expanded="true"], #p-bestiary select:hover, #p-bestiary select[aria-expanded="true"], #p-notes select:hover, #p-notes select[aria-expanded="true"] { border-color: var(--accent); }
 .ddpop { position: fixed; z-index: 30; margin: 0; padding: 6px; list-style: none; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 12px 32px rgba(0, 0, 0, .28); outline: none; }
 .ddpop:focus-visible .wantopt.on { outline: 2px solid var(--accent); outline-offset: -2px; }
 .ddpop .wanthd:first-child { border-top: 0; margin-top: 0; }
@@ -381,6 +381,8 @@ details.sect > .body { padding: 0 16px 16px; }
 /* case files */
 .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 16px; }
 .bar input[type=search] { flex: 1 1 200px; width: auto; }
+.bar input, .bar select { height: 44px; min-height: 0; }
+#p-bestiary .bar select { min-width: 160px; }
 details.case { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; margin-bottom: 12px; }
 details.case > summary { list-style: none; cursor: pointer; padding: 12px 16px; display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; min-height: 52px; }
 details.case > summary::-webkit-details-marker { display: none; }
@@ -395,6 +397,8 @@ details.case .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 .eos { display: grid; gap: 6px; }
 .eos label { display: flex; gap: 10px; align-items: flex-start; }
 .eos input { flex: none; width: 20px; height: 20px; margin-top: 3px; accent-color: var(--accent); }
+.eos .eosrow { justify-content: space-between; align-items: center; gap: 16px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.eos .eosrow input { width: 44px; height: 26px; margin: 0; }
 .example { font-family: var(--type); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; background: var(--warn-bg); color: var(--warn); border-radius: 4px; padding: 1px 8px; }
 .empty { text-align: center; padding: 28px 16px; color: var(--muted); border: 2px dashed var(--line); border-radius: 8px; }
 .foot { margin-top: 36px; color: var(--muted); font-size: 14px; }
@@ -532,6 +536,13 @@ details.beast .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 .st.s-Escaped { color: var(--bad); border-color: var(--bad); }
 .st.s-Weakness { color: var(--brass); border-color: var(--brass); }
 .combat { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; align-items: end; }
+.combat input { height: 44px; min-height: 0; }
+/* the harm-taken stepper as one 44px box, like the inventory's quantity */
+.combat .step { display: flex; align-items: center; justify-content: space-between; height: 44px; padding: 0 4px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); margin: 0; }
+.combat .step .ctl { display: flex; align-items: center; justify-content: space-between; width: 100%; gap: 4px; }
+.combat .step .ctl button { width: 34px; height: 34px; border: 0; background: none; border-radius: 6px; color: var(--ink); }
+.combat .step .ctl button:hover { background: var(--surface2); }
+.combat .lbl { margin-bottom: 6px; }
 .hbar { height: 12px; background: var(--surface2); border-radius: 6px; overflow: hidden; border: 1px solid var(--line); }
 .hbar span { display: block; height: 100%; background: var(--bad); transition: width .2s; }
 .hint { font-size: 14px; color: var(--muted); margin: 0; }
@@ -1624,8 +1635,8 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
   <button role="tab" id="t-guide" aria-controls="p-guide" aria-selected="false" data-tab="guide">Guide</button>
   <button role="tab" id="t-party" aria-controls="p-party" aria-selected="false" data-tab="party">Party<span class="vh" id="t-party-new"></span></button>
   <button role="tab" id="t-bestiary" aria-controls="p-bestiary" aria-selected="false" data-tab="bestiary">Bestiary</button>
-  <button role="tab" id="t-tips" aria-controls="p-tips" aria-selected="false" data-tab="tips">Tips</button>
   <button role="tab" id="t-notes" aria-controls="p-notes" aria-selected="false" data-tab="notes">Case files</button>
+  <button role="tab" id="t-tips" aria-controls="p-tips" aria-selected="false" data-tab="tips">Tips</button>
 </div>
 <div class="tabend">
   <button role="tab" id="t-settings" aria-controls="p-settings" aria-selected="false" data-tab="settings" aria-label="Settings" title="Settings"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
@@ -2370,7 +2381,7 @@ function renderSession(el) {
 }
 
 /* ---------- tabs ---------- */
-var TABS = ['hunter', 'guide', 'party', 'bestiary', 'tips', 'notes', 'settings'];
+var TABS = ['hunter', 'guide', 'party', 'bestiary', 'notes', 'tips', 'settings'];
 /* Play and the Roller were tabs of their own; old links and saves land on Hunter's Play view */
 function tabOK(h) { return TABS.indexOf(h) >= 0 || h === 'play' || h === 'roll'; }
 function showTab(name, fromHash) {
@@ -3730,7 +3741,7 @@ document.addEventListener('keydown', function (e) {
 });
 /* Selects on the Sheet keep their native element (values, data-bind and change handlers stay as they are),
    but open a hand-drawn list styled like the Play dropdown instead of the browser's own. */
-var DDSCOPE = '#hv-sheet select, #wiz select, #czopts select, #invdlg select, #retdlg select', dd = { sel: null, el: null, ix: -1 };
+var DDSCOPE = '#hv-sheet select, #wiz select, #czopts select, #invdlg select, #retdlg select, #p-bestiary select, #p-notes select', dd = { sel: null, el: null, ix: -1 };
 function ddClose(back) {
   if (!dd.el) return;
   dd.el.remove(); dd.sel.setAttribute('aria-expanded', 'false');
@@ -4221,7 +4232,7 @@ function eosXp(c) { var n = c.eos.filter(Boolean).length; return n >= 3 ? 2 : n 
 function caseHTML(c, idx, total) {
   var no = 'Case ' + (total - idx);
   var clock = CLOCK.map(function (n, i) { return '<button type="button" data-clock="' + (i + 1) + '" aria-pressed="' + (c.clock >= i + 1) + '">' + n + '</button>'; }).join('');
-  var eos = EOS.map(function (q, i) { return '<label><input type="checkbox" data-eos="' + i + '"' + (c.eos[i] ? ' checked' : '') + '><span>' + esc(q) + '</span></label>'; }).join('');
+  var eos = EOS.map(function (q, i) { return '<label class="switch eosrow"><span>' + esc(q) + '</span><input type="checkbox" role="switch" data-eos="' + i + '"' + (c.eos[i] ? ' checked' : '') + '></label>'; }).join('');
   var xp = eosXp(c);
   function ta(f, label, ph) { return '<div><label class="lbl" for="' + c.id + f + '">' + label + '</label><textarea id="' + c.id + f + '" data-f="' + f + '" placeholder="' + esc(ph) + '">' + esc(c[f]) + '</textarea></div>'; }
   return '<details class="case" data-id="' + c.id + '"' + (c.open ? ' open' : '') + '><summary><span class="no">' + no + '</span><span class="ttl">' + esc(c.title || 'Untitled mystery') + '</span>' + (c.example ? '<span class="example">Example</span>' : '') + '<span class="meta">' + (c.date ? esc(c.date) + ' · ' : '') + esc(c.clock ? CLOCK[c.clock - 1] : 'Day not started') + '</span></summary><div class="cbody">' +
