@@ -174,6 +174,9 @@ details.sect > .body { padding: 0 16px 16px; }
 .stage { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
 .sum { font-family: var(--display); font-size: 64px; line-height: 1; font-variant-numeric: tabular-nums; min-width: 2ch; }
 .sum small { display: block; font-family: var(--type); font-size: 13px; letter-spacing: .08em; color: var(--muted); }
+.rollrow { display: flex; gap: 10px; align-items: stretch; margin-top: 14px; }
+.rollrow .rollbtn { margin-top: 0; flex: 1; }
+.rollrow .rolledit { min-width: 60px; border: 1px solid var(--line); border-radius: var(--radius-btn); }
 .rollbtn { font-family: var(--display); font-size: 26px; letter-spacing: .08em; text-transform: uppercase; width: 100%; min-height: 60px; margin-top: 14px; }
 .tier { border-radius: 8px; padding: 14px 16px; margin-top: 14px; }
 .tier h3 { font-family: var(--display); font-size: 26px; letter-spacing: .05em; text-transform: uppercase; }
@@ -203,7 +206,13 @@ details.sect > .body { padding: 0 16px 16px; }
 .hvrow .seg { margin-bottom: 0; gap: 4px; padding: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; overflow: visible; box-shadow: 0 2px 10px rgba(0, 0, 0, .08); }
 .hvrow .seg button { background: none; border: 0; border-radius: 999px; padding: 8px 24px; min-height: 40px; color: var(--muted); transition: background-color .2s ease, color .2s ease; }
 .hvrow .seg button:hover { color: var(--ink); }
-.hvrow .seg button[aria-pressed="true"] { background: var(--surface2); color: var(--accent); box-shadow: inset 0 0 0 1.5px var(--accent); }
+.hvrow .seg { position: relative; }
+.hvrow .seg button { position: relative; z-index: 1; }
+.hvrow .seg button[aria-pressed="true"] { color: var(--accent); background: none; box-shadow: none; }
+/* one pill slides under whichever view is on */
+.segpill { position: absolute; top: 6px; left: 0; height: calc(100% - 12px); width: 0; border-radius: 999px; background: var(--surface2); box-shadow: inset 0 0 0 1.5px var(--accent); transition: transform .32s cubic-bezier(.3, .8, .25, 1), width .32s cubic-bezier(.3, .8, .25, 1); pointer-events: none; }
+.segpill.still { transition: none; }
+@media (prefers-reduced-motion: reduce) { .segpill { transition: none; } }
 @media (prefers-reduced-motion: reduce) { .hvrow .seg button { transition: none; } }
 .hicons { display: flex; align-items: center; gap: 4px; }
 .hdiv { width: 1px; align-self: stretch; margin: 6px 8px; background: var(--line); }
@@ -639,6 +648,13 @@ details.beast .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 #t-party.hasdot::after { content: ''; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-left: 6px; vertical-align: middle; }
 .switch { display: flex; gap: 12px; align-items: center; cursor: pointer; }
 .switch { align-items: flex-start; }
+/* a setting as a card: what it does on the left, its switch on the right */
+.swcard { display: flex; align-items: center; justify-content: space-between; gap: 20px; cursor: pointer; margin: 0; }
+.swcard > span:first-child { display: grid; gap: 4px; min-width: 0; }
+.swcard b { font-size: 18px; }
+.swcard .switch { flex: none; }
+.dpctl > .swcard { margin-bottom: 8px; }
+#d3msg:empty { display: none; }
 /* every on/off setting is a sliding switch */
 .switch input { -webkit-appearance: none; appearance: none; flex: none; position: relative; width: 44px; height: 26px; margin: 0; border-radius: 999px; background: var(--line); cursor: pointer; transition: background-color .2s ease; }
 .switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--bg); box-shadow: 0 1px 3px rgba(0, 0, 0, .35); transition: transform .2s ease; }
@@ -854,6 +870,9 @@ details.sect > .body > p:first-child { text-align: left; }
 .dpstage { position: sticky; top: calc(var(--navh, 56px) + 16px); }
 .dpstage .tray.mini { height: 460px; margin-bottom: 12px; }
 .dpstage .tray.mini .dice { padding-top: 0; }
+.dptest { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+.dptest .sum { font-size: 40px; min-width: 0; }
+#dp-tray.crit .slot { animation: chop .42s cubic-bezier(.2, .9, .3, 1); }
 .dpsec { font-family: var(--display); font-size: 20px; font-weight: 400; margin: 28px 0 4px; padding-top: 20px; border-top: 1px solid var(--line); }
 .dpsec[style*="margin-top:0"] { border-top: 0; padding-top: 0; }
 @media (max-width: 900px) { .dpwrap { grid-template-columns: minmax(0, 1fr); gap: 16px; } .dpstage { top: var(--navh, 56px); z-index: 4; background: var(--surface); margin: -8px -17px 0; padding: 10px 17px 10px; box-shadow: 0 8px 12px -10px rgba(0, 0, 0, .4); } .dpstage .tray.mini { height: 240px; } .dpstage h3, .dpstage > p { display: none; } }
@@ -1181,6 +1200,7 @@ span.mc-out { display: grid; }
 .mc-prev { color: var(--muted); font-size: 15px; }
 .mc-addrow { display: flex; justify-content: center; gap: 8px; margin-top: auto; }
 .mc-paste textarea { min-height: 120px; font-size: 16px; }
+.mc-or { margin: 0; text-align: center; font-style: italic; color: var(--muted); font-size: 17px; }
 .mcard.mc-edit { aspect-ratio: auto; grid-column: 1 / -1; padding: 0; border: 0; box-shadow: none; background: none; }
 .mcard.mc-edit::before { content: none; }
 .mcard.mc-edit:hover { transform: none; box-shadow: none; }
@@ -1811,6 +1831,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
     <div id="hhead">
       <div class="hvrow">
         <div class="seg" role="group" aria-label="Hunter view">
+          <span class="segpill" id="segpill" aria-hidden="true"></span>
           <button type="button" id="seg-play" aria-pressed="false">Play</button>
           <button type="button" id="seg-sheet" aria-pressed="false">Sheet</button>
           <button type="button" id="seg-page" aria-pressed="false">Showcase</button>
@@ -1848,7 +1869,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
             <button type="button" class="hicon" id="copyroll" aria-label="Copy for chat" data-tip="Copy for chat" hidden><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg></button>
           </div>
           <p class="small muted" id="copymsg" role="status"></p>
-          <button class="btn rollbtn" id="roll" type="button">Roll 2d6</button>
+          <div class="rollrow"><button class="btn rollbtn" id="roll" type="button">Roll 2d6</button><button type="button" class="hicon rolledit" id="dp-goedit" aria-label="Edit my dice" data-tip="Edit my dice"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button></div>
         </div>
         </div></div><div id="play-feed"></div></div>
       </div>
@@ -1976,14 +1997,14 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
   <!-- SETTINGS -->
   <section class="panel" id="p-settings" role="tabpanel" aria-labelledby="t-settings" hidden>
     <h2 class="sectitle" style="margin-top:0">Settings</h2>
-    <div class="grid">
+    <div class="grid" style="gap:16px">
       <div class="card">
         <h3 style="margin-top:0">Look</h3>
         <div class="seg" role="group" aria-label="Light or dark" style="margin-bottom:0"><button type="button" data-look="dark">Dark</button><button type="button" data-look="light">Light</button><button type="button" data-look="device">My device</button></div>
         <div class="inks" id="inks" role="group" aria-label="Ink color"></div>
         <p class="small muted" style="margin:8px 0 0">The ink colors the buttons, tabs and links. It does not change any of the art.</p>
-        <label class="switch" style="margin-top:18px"><input type="checkbox" role="switch" id="set-fx"><span><b>Big moments</b><br><span class="small muted">Gold sparks at the dice on a 12+ and at your level when you level up, and a red burnt edge and a shake on a miss.</span></span></label>
       </div>
+      <label class="card swcard"><span><b>Big moments</b><span class="small muted">Gold sparks at the dice on a 12+ and at your level when you level up, and a red burnt edge and a shake on a miss.</span></span><span class="switch"><input type="checkbox" role="switch" id="set-fx"></span></label>
     </div>
     <div style="margin-top:16px">
       <div class="card dicepanel" id="dicepanel">
@@ -1992,11 +2013,11 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
           <h3 style="margin-top:0">Dice</h3>
           <p class="small muted" style="margin:0 0 14px">Pick the look and sound of your dice, save sets, and trade codes with friends.</p>
           <div class="tray mini" id="dp-tray" aria-hidden="true"><div class="dice" id="dp-dice"></div></div>
+          <div class="dptest"><button class="btn" type="button" id="dp-test">Test roll</button><span class="sum" id="dp-sum" aria-live="polite"></span></div>
           <div id="dp-warn" aria-live="polite"></div>
         </div>
         <div class="dpctl">
-        <label class="switch"><input type="checkbox" role="switch" id="set-3d"><span><b>3D dice</b><br><span class="small muted">The dice tumble in real 3D, and Fuel dice show their liquid. Best on a recent phone or computer.</span></span></label>
-        <p class="small muted" id="d3msg" role="status" style="margin:6px 0 0"></p>
+        <label class="card swcard"><span><b>3D dice</b><span class="small muted">The dice tumble in real 3D, and Fuel dice show their liquid. Best on a recent phone or computer.</span><span class="small muted" id="d3msg" role="status"></span></span><span class="switch"><input type="checkbox" role="switch" id="set-3d"></span></label>
         <div id="dp-opts"></div>
         <h4 class="dpsec">Sound</h4>
         <label class="switch"><input type="checkbox" role="switch" id="set-snd"><span><b>Sound</b><br><span class="small muted">Dice that sound like what they are made of, a bell on a 10+, thunder on a 12+ and a low thud on a miss. Off unless you turn it on, because on a call your microphone may pick it up.</span></span></label>
@@ -2346,7 +2367,8 @@ function showTab(name, fromHash) {
     $('#p-' + t).hidden = !on;
   });
   if (name === 'hunter' && S.hv === 'play') renderHist();
-  if (name === 'hunter' && typeof d3Size === 'function') setTimeout(d3Size, 0);   // the Settings preview may have resized the 3D view
+  if (name === 'hunter' && typeof d3Size === 'function') setTimeout(d3Size, 0);
+  if (name === 'hunter') setTimeout(function () { segSlide(true); }, 0);   // the tab was hidden, so the pill could not be measured   // the Settings preview may have resized the 3D view
   if (name === 'settings') dpOpen(true);
   if (name === 'party') { if (tblUnseen()) tbl.view = 'board'; renderParty(); }
   if (name === 'guide') renderStart();
@@ -2531,10 +2553,20 @@ $('#hist').addEventListener('click', function (e) {
 });
 
 /* ---------- hunter ---------- */
+/* the sliding pill under the Hunter views: measured from the button that is on */
+function segSlide(still) {
+  var pill = $('#segpill'), b = $('#seg-' + S.hv); if (!pill || !b || !b.offsetWidth) return;
+  if (still || !pill.style.width) pill.classList.add('still');
+  pill.style.width = b.offsetWidth + 'px'; pill.style.transform = 'translateX(' + b.offsetLeft + 'px)';
+  if (pill.classList.contains('still')) { void pill.offsetWidth; pill.classList.remove('still'); }
+}
+window.addEventListener('resize', function () { segSlide(true); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { segSlide(true); });
 function setHV(v) {
   if (['play', 'sheet', 'page', 'build'].indexOf(v) < 0) v = 'play';
   S.hv = v;
   ['play', 'sheet', 'page', 'build'].forEach(function (k) { $('#hv-' + k).hidden = v !== k; $('#seg-' + k).setAttribute('aria-pressed', v === k); });
+  segSlide(false);
   $('#hn-end').hidden = $('#hn-div').hidden = v !== 'play';
   if (v === 'play') renderHist();
   if (v === 'page') renderPageEd();   // My page: the hunter's page and the choices that lay it out
@@ -4230,18 +4262,19 @@ function renderCustom() {
   var old = $('#mvpaste'), keep = old ? old.value : '', msg = $('#mvmsg') ? $('#mvmsg').textContent : '';
   /* the last card: a dashed blank to paste a move onto, or to start one from scratch */
   var add = '<li class="mcard mc-add mc-paste"><div class="mc-body"><span class="mc-kick">Your own</span><h4 class="mc-name">Add a move</h4><span class="mc-rule" aria-hidden="true"></span>' +
-    '<label class="mc-text mc-prev" for="mvpaste">Paste a move from your playbook sheet and press +. It is split into its parts for you. Leave it empty for a blank move.</label>' +
+    '<label class="mc-text mc-prev" for="mvpaste">Paste a move from your playbook sheet and it is split into its parts for you.</label>' +
     '<textarea id="mvpaste" placeholder="Tough as nails: When you take harm, roll +Tough. On a 10+, ... On a 7-9, ..."></textarea>' +
-    '<div class="mc-addrow"><button class="btn sm ib" type="button" aria-label="Add a blank move" data-tip="Add a blank move" id="mvadd"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></button></div>' +
+    '<p class="mc-or">Or</p><div class="mc-addrow"><button class="btn sm" type="button" id="mvadd">Create manually</button></div>' +
     '<p class="small muted" id="mvmsg" role="status" style="margin:0;text-align:center"></p></div></li>';
   $('#custom').innerHTML = '<ul class="mcards">' + c.map(customCard).join('') + add + '</ul>';
-  $('#mvpaste').value = keep; $('#mvmsg').textContent = msg; mvTip();
+  $('#mvpaste').value = keep; $('#mvmsg').textContent = msg;
 }
 function mvMsg(t) { $('#mvmsg').textContent = t || ''; }
 /* one + on the card: it fills in a move from the pasted text, or starts a blank one when the box is empty */
-$('#custom').addEventListener('click', function (e) { if (e.target.closest('#mvadd')) { if ($('#mvpaste').value.trim()) mvParse(); else mvBlank(); } });
-function mvTip() { var b = $('#mvadd'), t = $('#mvpaste'); if (!b || !t) return; var l = t.value.trim() ? 'Add a move from this text' : 'Add a blank move'; b.dataset.tip = l; b.setAttribute('aria-label', l); }
-$('#custom').addEventListener('input', function (e) { if (e.target.id === 'mvpaste') mvTip(); });
+$('#custom').addEventListener('click', function (e) { if (e.target.closest('#mvadd')) mvBlank(); });
+/* pasting a move fills it in at once; Ctrl or Cmd and Enter does the same for typed text */
+$('#custom').addEventListener('paste', function (e) { if (e.target.id === 'mvpaste') setTimeout(function () { if ($('#mvpaste') && $('#mvpaste').value.trim()) mvParse(); }, 0); });
+$('#custom').addEventListener('keydown', function (e) { if (e.target.id === 'mvpaste' && e.key === 'Enter' && (e.ctrlKey || e.metaKey) && e.target.value.trim()) { e.preventDefault(); mvParse(); } });
 function mvParse() {
   var t = $('#mvpaste').value;
   if (!t.trim()) { mvMsg('Paste a move first.'); return; }
@@ -5346,6 +5379,29 @@ function fxPlay(kind) {
   }
   if (kind === 'level') sound(kind);
 }
+/* Settings: a throw in the preview tray to see and hear the dice. Nothing is recorded, saved or shared. */
+var dpTesting = false, dpLast = null;
+function dpTest() {
+  if (dpTesting) return;
+  var d1 = rnd6(), d2 = rnd6(), t = d1 + d2, tray = $('#dp-tray'), sum = $('#dp-sum'), btn = $('#dp-test');
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, live3d = D3.state === 'on' && D3.pv && !D3.pv.hidden;
+  dpTesting = true; btn.disabled = true; fxCritOff(); sum.textContent = '';
+  function done() {
+    dpTesting = false; btn.disabled = false; dpLast = [d1, d2]; tray.classList.remove('rolling');
+    sum.textContent = t; hitTimers.forEach(clearTimeout); hitTimers = [];
+    stinger(t);
+    if (S.settings.fx && !reduce) {
+      if (t >= 12) { critDice(tray, '#dp-dice', sum); fxCritT = setTimeout(fxCritOff, 1200); }
+      else if (t < 7) fxPlay('miss');
+    }
+  }
+  if (live3d) { D3.pvLive = true; d3Cover(D3.cam); d3Throw(d1, d2, THROW_MS); setTimeout(done, THROW_MS + 250); return; }
+  if (reduce || !Element.prototype.animate) { $('#dp-dice').innerHTML = cubeHTML(d1, 0) + cubeHTML(d2, 1); done(); return; }
+  var anims = throwDice(d1, d2, tray, $('#dp-dice'));
+  Promise.all(anims.map(function (a) { return a.finished.catch(function () {}); })).then(done);
+}
+$('#dp-test').addEventListener('click', dpTest);
+$('#dp-goedit').addEventListener('click', function () { showTab('settings'); var d = $('#dicepanel'); if (d) d.scrollIntoView({ block: 'start', behavior: 'smooth' }); });
 function fxRand(a, b) { return a + Math.random() * (b - a); }
 
 /* A 12+: a ring and a spray of sparks from each die, a hop, and the total in gold (the CSS headed "A 12+ happens at the dice"). Jacob chose it on 2026-10-10 from three;
@@ -5355,12 +5411,13 @@ function fxCritOff() {
   var t = $('#trayfx'), s = $('#sum');
   clearTimeout(fxCritT);
   if (t) t.parentNode.removeChild(t);
-  $('#tray').classList.remove('crit');
-  if (s) s.classList.remove('gold');
+  $('#tray').classList.remove('crit'); $('#dp-tray').classList.remove('crit');
+  if (s) s.classList.remove('gold'); var ds = $('#dp-sum'); if (ds) ds.classList.remove('gold');
 }
-function critDice() {
-  var tray = $('#tray'), tb = tray.getBoundingClientRect(), h = '', sum = $('#sum'), box = document.createElement('div');
-  $$('#dice .slot').forEach(function (sl) {
+function critDice(tray, diceSel, sum) {
+  tray = tray || $('#tray'); sum = sum === undefined ? $('#sum') : sum;
+  var tb = tray.getBoundingClientRect(), h = '', box = document.createElement('div');
+  $$((diceSel || '#dice') + ' .slot').forEach(function (sl) {
     var b = sl.getBoundingClientRect(), at = '--x:' + Math.round(b.left + b.width / 2 - tb.left - tray.clientLeft) + 'px;--y:' + Math.round(b.top + b.height / 2 - tb.top - tray.clientTop) + 'px', i, n = 14;
     h += '<i class="rng" style="' + at + '"></i><i class="rng r2" style="' + at + '"></i>';
     for (i = 0; i < n; i++) h += '<i class="spk" style="' + at + ';--a:' + Math.round(i * 360 / n + fxRand(-11, 11)) + 'deg;--l:' + Math.round(fxRand(9, 22)) + 'px;--r:' + Math.round(fxRand(30, 92)) + 'px;--d:' + fxRand(.26, .48).toFixed(2) + 's;--t:' + fxRand(0, .05).toFixed(2) + 's"></i>';
@@ -5887,7 +5944,7 @@ function diceWarn() {
 }
 /* redraw everything that shows the dice, without touching the panel's controls (a color picker may be mid-drag) */
 function diceLive() {
-  $('#dp-dice').innerHTML = cubeHTML(6, 0) + cubeHTML(6, 1);
+  if (!dpTesting) $('#dp-dice').innerHTML = dpLast ? cubeHTML(dpLast[0], 0) + cubeHTML(dpLast[1], 1) : cubeHTML(6, 0) + cubeHTML(6, 1);
   if (!rolling) $('#dice').innerHTML = last ? cubeHTML(last.d1, 0) + cubeHTML(last.d2, 1) : cubeHTML(5, 0) + cubeHTML(2, 1);
   applyTray(); diceWarn();
   if (ac && S.settings.sound) sndWarm();
@@ -5928,6 +5985,7 @@ function renderDice() {
   diceLive();
 }
 function dpEdit(key, val) {
+  D3.pvLive = false; dpLast = null;
   var D = S.dice, d;
   D.a = cleanDie(D.a); D.b = cleanDie(D.b);
   d = D.linked || !dpTab ? D.a : D.b; d[key] = val;
@@ -5935,6 +5993,7 @@ function dpEdit(key, val) {
   scheduleSave();
 }
 function useSet(st) {
+  D3.pvLive = false; dpLast = null;
   var D = S.dice;
   D.a = cleanDie(st.a); D.b = cleanDie(st.b || st.a); D.linked = sameDie(D.a, D.b);
   D.tray = TRAYS.indexOf(st.tray) >= 0 ? st.tray : 'leather'; dpTab = 0;
@@ -6018,8 +6077,8 @@ function cubeHTML(v, idx) {
   return '<div class="slot fin-' + die.finish + (FINLIKE[die.finish] ? ' fin-' + FINLIKE[die.finish] : '') + (die.glow ? ' glow' : '') + '"' + (vars ? ' style="' + vars + '"' : '') + ' role="img" aria-label="Die showing ' + v + '"><div class="dx"><div class="shadow"></div><div class="dy"><div class="cube3"><div class="orient" style="transform:' + ORIENT[v] + '">' + f + '</div></div></div></div></div>';
 }
 var THROW_MS = 1200;
-function throwDice(d1, d2) {
-  var tray = $('#tray'), dice = $('#dice');
+function throwDice(d1, d2, tray, dice) {
+  tray = tray || $('#tray'); dice = dice || $('#dice');
   dice.className = 'dice';
   dice.innerHTML = cubeHTML(d1, 0) + cubeHTML(d2, 1);
   tray.classList.add('rolling');
@@ -6710,8 +6769,9 @@ function d3Frame(now) {
     d3Blobs(d);
   });
   if (a && !flying) D3.anim = null;
-  if (D3.pvDirty && !flying) d3Preview(); /* only when something has changed, and not while dice are in the air: the roll comes first */
+  if (!D3.pvLive && D3.pvDirty && !flying) d3Preview(); /* only when something has changed, and not while dice are in the air: the roll comes first */
   D3.renderer.render(D3.scene, D3.cam);
+  if (D3.pvLive && D3.pv && S.tab === 'settings') { D3.pvx.clearRect(0, 0, D3.pv.width, D3.pv.height); D3.pvx.drawImage(D3.canvas, 0, 0, D3.pv.width, D3.pv.height); }   // a test throw on Settings: show the tumble itself
   if (busy || now < D3.until) D3.raf = requestAnimationFrame(d3Frame); else D3.last = 0;
 }
 var skipAnims = null;
