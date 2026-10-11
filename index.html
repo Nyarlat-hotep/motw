@@ -1484,21 +1484,9 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 .hpage, .pcard.fr, .czprev .pcard { box-shadow: inset 0 0 0 7px var(--surface), inset 0 0 0 8px color-mix(in srgb, var(--pc, var(--accent)) 45%, transparent), 0 14px 34px rgba(0, 0, 0, .3); }
 .hpage { padding: 40px 34px; }
 .pcard.pcard { padding: 34px 30px; }
-.pcx { position: absolute; top: 12px; left: 12px; z-index: 3; display: grid; justify-items: center; gap: 2px; color: var(--pc, var(--accent)); pointer-events: none; }
-.pcx b { font-family: var(--display); font-size: 26px; line-height: 1; font-weight: 400; }
-.pcx svg { width: 48px; height: 48px; fill: currentColor; }
 .hp-head .hp-id { position: relative; }
-.hp-head .hp-id h2 .mk { position: absolute; top: 18px; right: 20px; width: 40px; height: 40px; }   /* the mark sits in the header's top right corner */
-.hp-head .hp-id h2 { padding-right: 52px; }
-.pcx-b { top: auto; left: auto; bottom: 12px; right: 12px; transform: rotate(180deg); }
 .hpage .lvplate { display: none; }
-.fr.fr-wanted::before, .fr.fr-wanted::after { display: none; }   /* no nail heads: the mark sits in the corner */
-.fr-dossier .frstamp { right: 72px !important; }   /* clear of the playing-card corner */
-/* with a mark in the corners, each frame's own header and footer sit between the two marks, like the title strip on a playing card */
-:is(.hpage, .pcard):has(> .pcx) .frtop:not(:empty), :is(.hpage, .pcard):has(> .pcx) .frbot:not(:empty) { margin-left: 52px !important; margin-right: 52px !important; }
-:is(.hpage, .pcard):has(> .pcx).fr-scrap .frtop { margin-left: 52px !important; margin-right: 52px !important; }
-:is(.hpage, .pcard):has(> .pcx).fr-journal { padding-top: 70px; padding-bottom: 70px; }
-@media (max-width: 520px) { .pcx svg { width: 34px; height: 34px; } .pcx { top: 10px; left: 10px; } .pcx-b { top: auto; left: auto; bottom: 10px; right: 10px; } :is(.hpage, .pcard):has(> .pcx) .frtop:not(:empty), :is(.hpage, .pcard):has(> .pcx) .frbot:not(:empty), :is(.hpage, .pcard):has(> .pcx).fr-scrap .frtop { margin-left: 44px !important; margin-right: 44px !important; } :is(.hpage, .pcard):has(> .pcx) .frbot { white-space: nowrap; letter-spacing: .1em !important; text-indent: .1em; font-size: 13px; } :is(.hpage, .pcard):has(> .pcx).fr-journal { padding-top: 54px; padding-bottom: 54px; } }
+.fr.fr-wanted::before, .fr.fr-wanted::after { display: none; }   /* no nail heads */
    /* a card's other children sit in its grid; the corners float over it */
 @media (max-width: 520px) { .hpage { padding: 34px 20px; } .pcard.pcard { padding: 30px 18px; } }
 /* the picture fills its side of the card: a tall panel down the left, cropped to fit */
@@ -7009,12 +6997,6 @@ function frameStamp(look, d) {
   if (look.frame !== 'dossier') return '';
   var hurt = d.unstable || (+d.harm || 0) >= 4;
   return '<div class="frstamp' + (hurt ? '' : ' ok') + '" aria-hidden="true">' + (d.unstable ? 'Unstable' : hurt ? 'Wounded' : 'Active') + '</div>';
-}
-/* a playing card's corner: the hunter's mark in the trim color, and the same turned round at the foot */
-function pcCorners(lv, mark) {
-  var m = mark && pgHas(SIGILS, mark) ? '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + SIGILS[mark] + '</svg>' : '';
-  if (!m) return '';
-  return '<span class="pcx" aria-hidden="true">' + m + '</span><span class="pcx pcx-b" aria-hidden="true">' + m + '</span>';
 }
 function markHTML(key) { return key && pgHas(SIGILS, key) ? '<svg class="mk" viewBox="0 0 24 24" role="img" aria-label="Their mark: ' + esc(SIGLABEL[key] || key) + '" focusable="false">' + SIGILS[key] + '</svg>' : ''; }
 /* a hunter's mark in their own trim color, for beside a name in the seat list and the roll feed */
