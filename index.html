@@ -145,6 +145,15 @@ details.sect { background: var(--surface); border: 1px solid var(--line); border
 details.sect > summary { list-style: none; cursor: pointer; padding: 14px 16px; font-family: var(--display); font-size: 24px; letter-spacing: .03em; text-transform: uppercase; display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 52px; }
 details.sect > summary::-webkit-details-marker { display: none; }
 details.sect > .body { padding: 0 16px 16px; }
+/* the Guide: a row of tags that jump to its sections, each always open */
+.guidetags { position: sticky; top: var(--navh, 56px); z-index: 5; display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 0; margin: 0 0 16px; background: color-mix(in srgb, var(--bg) 55%, transparent); -webkit-backdrop-filter: blur(12px) saturate(1.2); backdrop-filter: blur(12px) saturate(1.2); }
+.guidetags a { padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); text-decoration: none; font-size: 16px; white-space: nowrap; transition: background-color .2s ease, border-color .2s ease, color .2s ease; }
+.guidetags a:hover { border-color: var(--accent); }
+.guidetags a[aria-current="true"] { border-color: var(--accent); color: var(--accent); background: var(--surface2); }
+@media (max-width: 700px) { .guidetags { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-left: -16px; margin-right: -16px; padding-left: 16px; padding-right: 16px; } .guidetags::-webkit-scrollbar { display: none; } }
+.gsect { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); margin-bottom: 16px; scroll-margin-top: calc(var(--navh, 56px) + 76px); }
+.gsh { padding: 18px 20px 6px; margin: 0; font-family: var(--display); font-size: 24px; font-weight: 400; letter-spacing: .03em; }
+.gsect > .body { padding: 6px 20px 20px; }
 .body h3 { font-family: var(--display); font-size: 19px; letter-spacing: .04em; text-transform: uppercase; margin: 18px 0 6px; color: var(--accent); }
 .body ul { margin: 0 0 .9em; padding-left: 1.2em; }
 .body li { margin-bottom: .3em; }
@@ -779,8 +788,8 @@ th { font-size: 15px; letter-spacing: .08em; text-transform: none; }
 /* pages: a dropped red initial */
 .card, details.sect, details.case, details.beast, .pcard, .move, .pb, .tip, .cm, .item, .strip li, .sstat, .statbtn, .tier, .empty, .confirm, .levelup { border-radius: 3px; }
 .pcard.you { box-shadow: 0 0 0 1px var(--accent); }
-details.sect > .body > p:first-child::first-letter, .dropcap::first-letter { font-family: var(--black); font-weight: 700; float: left; font-size: 3.5em; line-height: .78; padding: .07em .1em 0 0; color: var(--accent); }
-details.sect > .body > p:first-child { text-align: left; }
+details.sect > .body > p:first-child::first-letter, .gsect > .body > p:first-child::first-letter, .dropcap::first-letter { font-family: var(--black); font-weight: 700; float: left; font-size: 3.5em; line-height: .78; padding: .07em .1em 0 0; color: var(--accent); }
+details.sect > .body > p:first-child, .gsect > .body > p:first-child { text-align: left; }
 .note { font-style: italic; border-left-width: 3px; }
 .foot { font-style: italic; text-align: center; border-top: 1px solid var(--line); padding-top: 16px; }
 .foot p { max-width: 72ch; margin: 0 auto 10px; }
@@ -1648,8 +1657,10 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
   <!-- GUIDE -->
   <section class="panel" id="p-guide" role="tabpanel" aria-labelledby="t-guide" hidden>
     <div class="hero" id="hero-guide" hidden></div>
-    <details class="sect" open>
-      <summary>What is Monster of the Week?</summary>
+    
+    <nav class="guidetags" aria-label="Guide sections"><a href="#g-what-is-monster-of-the-week" data-gto="g-what-is-monster-of-the-week">The game</a><a href="#g-the-roll-2d6-plus-a-stat" data-gto="g-the-roll-2d6-plus-a-stat">The roll</a><a href="#g-stats-and-the-hunter-agenda" data-gto="g-stats-and-the-hunter-agenda">Stats</a><a href="#sect-moves" data-gto="sect-moves">Basic moves</a><a href="#g-magic" data-gto="g-magic">Magic</a><a href="#g-harm-healing-and-luck" data-gto="g-harm-healing-and-luck">Harm and Luck</a><a href="#g-experience-and-leveling-up" data-gto="g-experience-and-leveling-up">Leveling up</a><a href="#g-weird-moves-for-hunters-without-" data-gto="g-weird-moves-for-hunters-without-">Weird moves</a><a href="#g-behind-the-keeper-s-screen" data-gto="g-behind-the-keeper-s-screen">Keeper's screen</a><a href="#sect-keeper" data-gto="sect-keeper">For the Keeper</a><a href="#g-glossary" data-gto="g-glossary">Glossary</a></nav>
+    <section class="sect gsect" id="g-what-is-monster-of-the-week">
+      <h2 class="gsh">What is Monster of the Week?</h2>
       <div class="body">
         <p>You play a monster hunter. Each mystery is its own episode: a creepy lead, an investigation, a monster to understand and stop. One person, the <b>Keeper</b>, runs the world and the monsters. Everyone else plays a <b>hunter</b>.</p>
         <div class="tw"><table>
@@ -1664,10 +1675,10 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
         </table></div>
         <p>The goal is not a fair fight. It is to investigate, learn the monster's weakness, and use it before the monster, or the clock, gets to people.</p>
       </div>
-    </details>
+    </section>
 
-    <details class="sect">
-      <summary>The roll: 2d6 plus a stat</summary>
+    <section class="sect gsect" id="g-the-roll-2d6-plus-a-stat">
+      <h2 class="gsh">The roll: 2d6 plus a stat</h2>
       <div class="body">
         <div class="tw"><table>
           <thead><tr><th>Total</th><th>Result</th><th>Meaning</th></tr></thead>
@@ -1686,10 +1697,10 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
         </ul>
         <p><b>When do I roll?</b> Only when what your hunter does matches a move's trigger, like "when you get into a fight and kick some ass." Otherwise the Keeper just tells you what happens.</p>
       </div>
-    </details>
+    </section>
 
-    <details class="sect">
-      <summary>Stats and the Hunter Agenda</summary>
+    <section class="sect gsect" id="g-stats-and-the-hunter-agenda">
+      <h2 class="gsh">Stats and the Hunter Agenda</h2>
       <div class="body">
         <div class="tw"><table>
           <thead><tr><th>Stat</th><th>Think of it as</th><th>Moves</th></tr></thead>
@@ -1709,18 +1720,18 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
           <li>Play your hunter like a real person.</li>
         </ul>
       </div>
-    </details>
+    </section>
 
-    <details class="sect" id="sect-moves">
-      <summary>The basic moves</summary>
+    <section class="sect gsect" id="sect-moves">
+      <h2 class="gsh">The basic moves</h2>
       <div class="body">
         <p class="muted">Every hunter can use these. Press Roll it to jump to the roller with the move picked.</p>
         <div class="grid g2" id="basic-moves"></div>
       </div>
-    </details>
+    </section>
 
-    <details class="sect">
-      <summary>Magic</summary>
+    <section class="sect gsect" id="g-magic">
+      <h2 class="gsh">Magic</h2>
       <div class="body">
         <p>When you use magic, say what you are trying to achieve and how you do the spell, then roll +Weird. On a 10+ it works without issues and you choose an effect. On a 7-9 you choose an effect and a glitch, and the Keeper decides what the glitch does.</p>
         <h3>Effects</h3>
@@ -1733,10 +1744,10 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
         <p>For more than Use Magic can do. Tell the Keeper what you want and they list the requirements: days or weeks of research, experiments with failures, rare ingredients, hours or days of casting, a crowd of helpers (2, 3, 7, 13 or more), a particular place or time, magic as part of the ritual, or a specific danger. Meet them and it works. The preparation is the adventure.</p>
         <p class="muted">No Use Magic on your playbook? Treat spells as Big Magic, and use your playbook's Weird move.</p>
       </div>
-    </details>
+    </section>
 
-    <details class="sect">
-      <summary>Harm, healing and Luck</summary>
+    <section class="sect gsect" id="g-harm-healing-and-luck">
+      <h2 class="gsh">Harm, healing and Luck</h2>
       <div class="body">
         <div class="tw"><table>
           <thead><tr><th>Harm</th><th>How serious</th><th>Healing</th></tr></thead>
@@ -1751,10 +1762,10 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
         <h3>Luck</h3>
         <p>You spend Luck, you never roll it. One point lets you reduce a wound you just suffered to 0 harm, or change a roll's result to a 12. With no Luck left, bad things will happen to you.</p>
       </div>
-    </details>
+    </section>
 
-    <details class="sect">
-      <summary>Experience and leveling up</summary>
+    <section class="sect gsect" id="g-experience-and-leveling-up">
+      <h2 class="gsh">Experience and leveling up</h2>
       <div class="body">
         <p>Mark XP when a roll totals 6 or less, or when a move tells you to. When you mark the fifth box, level up: erase the marks and choose an improvement. After five level-ups you can pick advanced improvements too.</p>
         <h3>End of session</h3>
@@ -1766,18 +1777,18 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
         </ul>
         <p>One or two yes answers: everyone marks 1 XP. Three or four: everyone marks 2.</p>
       </div>
-    </details>
+    </section>
 
-    <details class="sect">
-      <summary>Weird moves for hunters without Use Magic</summary>
+    <section class="sect gsect" id="g-weird-moves-for-hunters-without-">
+      <h2 class="gsh">Weird moves for hunters without Use Magic</h2>
       <div class="body">
         <p class="muted">All roll +Weird. Your playbook gives you one or two of these.</p>
         <div class="grid g2" id="weird-moves"></div>
       </div>
-    </details>
+    </section>
 
-    <details class="sect">
-      <summary>Behind the Keeper's screen</summary>
+    <section class="sect gsect" id="g-behind-the-keeper-s-screen">
+      <h2 class="gsh">Behind the Keeper's screen</h2>
       <div class="body">
         <p>Knowing what your Keeper is doing makes the game less mysterious. Their agenda: make the world seem real, play to see what happens, and make the hunters' lives dangerous and scary.</p>
         <ul>
@@ -1801,10 +1812,10 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
         <h3>Phenomena</h3>
         <p>Sometimes the threat is a phenomenon, not a creature: Alien, Artifact, Biohazard, Bubble, Conspiracy, Corruption, Experiment, Mutagen, Panic, Portal, Teratogen or Zone. When you investigate one you can ask: How is this phenomenon doing this? What could fix, cure or slow it down? How far does the effect reach? What will be affected next?</p>
       </div>
-    </details>
+    </section>
 
-    <details class="sect" id="sect-keeper">
-      <summary>Running the game (for the Keeper)</summary>
+    <section class="sect gsect" id="sect-keeper">
+      <h2 class="gsh">Running the game (for the Keeper)</h2>
       <div class="body">
         <p>For whoever runs the game. It is a plain-English summary of the Keeper's reference sheets; the printed sheets have the final word. When it is time to wrap up, the End the session button on Play walks everyone through XP and healing.</p>
         <h3>Your job</h3>
@@ -1847,12 +1858,12 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
         <h3>At the end of a session</h3>
         <p>Ask the four questions: did they conclude the mystery, did they save someone from certain death (or worse), did you learn something new and important about the world, and did you learn something new and important about one of the hunters. One or two yes answers is 1 XP for each hunter, three or four is 2. When a mystery ends, a hunter who had no chance to rest heals 1 harm, and one who had plenty of time heals all of it.</p>
       </div>
-    </details>
+    </section>
 
-    <details class="sect">
-      <summary>Glossary</summary>
+    <section class="sect gsect" id="g-glossary">
+      <h2 class="gsh">Glossary</h2>
       <div class="body"><div class="tw"><table><tbody id="gloss"></tbody></table></div></div>
-    </details>
+    </section>
   </section>
 
   <!-- HUNTER -->
@@ -2440,6 +2451,26 @@ function moveCard(m) {
   var chips = m.chips ? '<ul class="chips">' + m.chips.map(function (c) { return '<li class="chip">' + esc(c) + '</li>'; }).join('') + '</ul>' : '';
   return '<article class="move"><div class="stat">' + ROLLP + STATNAME[m.stat] + '</div><h4>' + esc(m.name) + '</h4><p class="trig">' + esc(m.trig) + '</p><dl>' + li + '</dl>' + (m.note ? '<p class="small muted">' + esc(m.note) + '</p>' : '') + chips + '<button class="btn sm" type="button" data-roll="' + m.id + '">Roll it</button></article>';
 }
+/* Guide tags: a smooth scroll to a section, and the tag for the section in view lit up */
+document.addEventListener('click', function (e) {
+  var a = e.target.closest && e.target.closest('[data-gto]'); if (!a) return;
+  e.preventDefault();
+  var t = document.getElementById(a.dataset.gto); if (!t) return;
+  var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var bar = $('.guidetags'), y = t.getBoundingClientRect().top + window.pageYOffset - (bar ? bar.getBoundingClientRect().height + (parseFloat(getComputedStyle(bar).top) || 56) : 120) - 12;
+  window.scrollTo({ top: Math.max(0, y), behavior: calm ? 'auto' : 'smooth' });
+  gtagLock = a.dataset.gto; clearTimeout(gtagT); gtagT = setTimeout(function () { gtagLock = ''; }, 900);
+  gtagOn(a.dataset.gto);
+});
+var gtagLock = '', gtagT = 0;   // while a jump is scrolling, its tag stays lit
+function gtagOn(id) { $$('.guidetags a').forEach(function (a) { var on = a.dataset.gto === id; a.setAttribute('aria-current', on ? 'true' : 'false'); if (on && a.scrollIntoView && a.parentNode.scrollWidth > a.parentNode.clientWidth) a.parentNode.scrollLeft = a.offsetLeft - 16; }); }
+window.addEventListener('scroll', function () {
+  if (S.tab !== 'guide' || gtagLock) return;
+  var line = ($('.guidetags') ? $('.guidetags').getBoundingClientRect().bottom : 120) + 40, cur = '';
+  $$('#p-guide .gsect').forEach(function (sec) { if (sec.getBoundingClientRect().top <= line) cur = sec.id; });
+  if (!cur) { var f = $('#p-guide .gsect'); cur = f ? f.id : ''; }
+  gtagOn(cur);
+}, { passive: true });
 function renderGuide() {
   $('#basic-moves').innerHTML = MOVES.filter(function (m) { return m.g === 'basic'; }).map(moveCard).join('');
   $('#weird-moves').innerHTML = MOVES.filter(function (m) { return m.g === 'weird'; }).map(moveCard).join('');
