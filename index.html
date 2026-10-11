@@ -1456,7 +1456,12 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 .pcx-b { top: auto; left: auto; bottom: 12px; right: 12px; transform: rotate(180deg); }
 .hpage .lvplate { display: none; }
 .fr.fr-wanted::before, .fr.fr-wanted::after { display: none; }   /* no nail heads: the mark sits in the corner */
-.fr-dossier .frstamp { right: 52px !important; }   /* clear of the playing-card corner */
+.fr-dossier .frstamp { right: 72px !important; }   /* clear of the playing-card corner */
+/* with a mark in the corners, each frame's own header and footer sit between the two marks, like the title strip on a playing card */
+:is(.hpage, .pcard):has(> .pcx) .frtop:not(:empty), :is(.hpage, .pcard):has(> .pcx) .frbot:not(:empty) { margin-left: 52px !important; margin-right: 52px !important; }
+:is(.hpage, .pcard):has(> .pcx).fr-scrap .frtop { margin-left: 52px !important; margin-right: 52px !important; }
+:is(.hpage, .pcard):has(> .pcx).fr-journal { padding-top: 70px; padding-bottom: 70px; }
+@media (max-width: 520px) { .pcx svg { width: 34px; height: 34px; } .pcx { top: 10px; left: 10px; } .pcx-b { top: auto; left: auto; bottom: 10px; right: 10px; } :is(.hpage, .pcard):has(> .pcx) .frtop:not(:empty), :is(.hpage, .pcard):has(> .pcx) .frbot:not(:empty), :is(.hpage, .pcard):has(> .pcx).fr-scrap .frtop { margin-left: 44px !important; margin-right: 44px !important; } :is(.hpage, .pcard):has(> .pcx) .frbot { white-space: nowrap; letter-spacing: .1em !important; text-indent: .1em; font-size: 13px; } :is(.hpage, .pcard):has(> .pcx).fr-journal { padding-top: 54px; padding-bottom: 54px; } }
 .pcard.fr > .pcx, .hpage > .pcx { position: absolute; z-index: 3; }   /* a card's other children sit in its grid; the corners float over it */
 @media (max-width: 520px) { .hpage { padding: 34px 20px; } .pcard.pcard { padding: 30px 18px; } }
 /* the picture fills its side of the card: a tall panel down the left, cropped to fit */
