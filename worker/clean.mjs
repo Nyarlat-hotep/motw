@@ -37,6 +37,8 @@ export function cleanCard(c) {
   const photo = typeof c.photo === 'string' && c.photo.length <= 48000 && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]*$/.test(c.photo) ? c.photo : '';
   return {
     name: strt(c.name, 60), pronouns: strt(c.pronouns, 40), playbook: strt(c.playbook, 40), catchline: strt(c.catchline, 200), look: strt(c.look, 280), photo,
+    // where the photo sits in its box: two numbers from 0 to 100, the way CSS object-position counts
+    pos: [ci(Array.isArray(c.pos) ? c.pos[0] : 50, 0, 100, 50), ci(Array.isArray(c.pos) ? c.pos[1] : 30, 0, 100, 30)],
     stats: { charm: ci(st.charm, -3, 5, 0), cool: ci(st.cool, -3, 5, 0), sharp: ci(st.sharp, -3, 5, 0), tough: ci(st.tough, -3, 5, 0), weird: ci(st.weird, -3, 5, 0) },
     luck: ci(c.luck, 0, 7, 7), harm: ci(c.harm, 0, 8, 0), unstable: c.unstable === true, xp: ci(c.xp, 0, 9, 0), level: ci(c.level, 0, 20, 0), armor: ci(c.armor, 0, 9, 0),
     weapons: list(c.weapons, 6, 60), moves: list(c.moves, 12, 60),

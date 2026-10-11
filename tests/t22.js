@@ -76,7 +76,7 @@ const ALG = { name: 'RSASSA-PKCS1-v1_5', modulusLength: 2048, publicExponent: ne
   check('card: things that are not objects are refused', [null, undefined, 'a', 5, [], [1]].every((x) => C.cleanCard(x) === null));
   const hostile = JSON.parse('{"__proto__": {"polluted": 1}, "constructor": {"prototype": {"polluted": 2}}, "name": "x", "stats": {"__proto__": {"polluted": 3}}}');
   const clean = C.cleanCard(hostile);
-  check('card: prototype tricks do nothing', ({}).polluted === undefined && clean.polluted === undefined && Object.keys(clean).join() === 'name,pronouns,playbook,catchline,look,photo,stats,luck,harm,unstable,xp,level,armor,weapons,moves,hid,pins,pinn,career,page');
+  check('card: prototype tricks do nothing', ({}).polluted === undefined && clean.polluted === undefined && Object.keys(clean).join() === 'name,pronouns,playbook,catchline,look,photo,pos,stats,luck,harm,unstable,xp,level,armor,weapons,moves,hid,pins,pinn,career,page');
   // which hunter, and the badges they pin
   const pinned = C.cleanCard({ name: 'x', hid: 'cmg1abc9zz', pins: ['snake', 'snake', 'nope', 7, '<b>', 'hog', 'bag', 'arm', 'peak', 'first', 'alive'] });
   check('card: the hunter\'s id is kept when it looks like one, and dropped when it does not', pinned.hid === 'cmg1abc9zz' && ['', 'ab', 'UPPERCASE1', 'has space1', '<script>x', 'x'.repeat(21), 7, null].every((h) => C.cleanCard({ hid: h }).hid === ''));

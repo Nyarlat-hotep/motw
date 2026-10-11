@@ -412,6 +412,7 @@ details.case .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 @media (max-width: 640px) { .hcard { grid-template-columns: minmax(0, 1fr); } .pcol { max-width: 240px; margin: 0 auto; width: 100%; } }
 .hfields { display: grid; gap: 12px; min-width: 0; }
 .portrait { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 8px; border: 2px solid var(--line); background: var(--bg); margin-bottom: 10px; }
+.portrait.drag { cursor: grab; touch-action: none; -webkit-user-select: none; user-select: none; } .portrait.drag.on { cursor: grabbing; }   /* drag the photo to choose what shows */
 .portrait.ph { display: grid; place-items: center; text-align: center; padding: 12px; color: var(--muted); border-style: dashed; font-family: var(--type); font-size: 13px; letter-spacing: .06em; text-transform: uppercase; }
 .vh { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; opacity: 0; }
 .filebtn { display: inline-flex; align-items: center; cursor: pointer; }
@@ -2454,6 +2455,7 @@ function showTab(name, fromHash) {
   if (name === 'party') { if (tblUnseen()) tbl.view = 'board'; renderParty(); }
   if (name === 'hunter' && S.hv === 'build') renderBuild();
   if (name === 'hunter' && S.hv === 'page') renderPageEd();
+  fpAll();
   if (typeof applyTex === 'function') applyTex();
   applyMast();
   if (!fromHash) { try { history.replaceState(null, '', '#' + name); } catch (e) {} }
@@ -2669,6 +2671,7 @@ function setHV(v) {
   segSlide(false);
   $('#hn-end').hidden = $('#hn-div').hidden = v !== 'play';
   if (v === 'play') renderHist();
+  fpAll();   // pictures that were hidden have a size now
   if (v === 'page') renderPageEd();   // My page: the hunter's page and the choices that lay it out
 }
 $('#seg-play').addEventListener('click', function () { setHV('play'); scheduleSave(); });
@@ -3703,6 +3706,7 @@ function renderPortrait() {
   var src = sh.photo || artFor(sh.playbook);
   if (src) {
     var im = document.createElement('img'); im.className = 'portrait'; im.src = src;
+    if (sh.photo) { im.className = 'portrait drag'; im.draggable = false; im.dataset.fp = cropOf(sh).x + ' ' + cropOf(sh).y; im.title = 'Drag to move the picture'; posDrag(im); }
     im.alt = sh.photo ? 'Portrait of ' + (sh.name || 'your hunter') : 'Playbook portrait for ' + sh.playbook;
     host.appendChild(im);
   } else {
@@ -3724,7 +3728,47 @@ function avatarHTML(sh) {
   var src = sh.photo || artFor(sh.playbook);
   return src ? '<span class="avc"><img src="' + esc(src) + '" alt="" style="' + cropCSS(cropOf(sh)) + '"></span>' : '<span class="av"></span>';
 }
-function cropShow() {}   // the crop editor was left out of this branch; the round avatars still read sheet.crop
+function cropShow() {}
+/* The photo's focus: crop.x and crop.y (0 to 100) are the point of the picture that sits in the middle of a box that crops it, or as near the middle as the picture allows.
+   Boxes come in different shapes (tall on the Sheet, wide on Play, the card picture), so each works out its own object-position from the same point. An img that carries
+   data-fp="x y" is placed by fpFit() when it loads and again when it comes into view (fpAll). */
+function fpPos(fx, fy, W, H, w, h) {   // object-position, in percent, that centers the point (fx, fy) of a w x h picture in a W x H box under object-fit: cover
+  var k = Math.max(W / w, H / h), sw = w * k, sh = h * k;
+  function one(f, S, B) { return S - B < 1 ? 50 : Math.round(clamp((f / 100 * S - B / 2) / (S - B), 0, 1) * 1000) / 10; }
+  return [one(fx, sw, W), one(fy, sh, H)];
+}
+function fpFit(im) {
+  var a = String(im.dataset.fp || '').split(' '), W = im.clientWidth, H = im.clientHeight;
+  if (a.length !== 2 || !im.naturalWidth || !W || !H) return;
+  var o = fpPos(+a[0] || 0, +a[1] || 0, W, H, im.naturalWidth, im.naturalHeight); im.style.objectPosition = o[0] + '% ' + o[1] + '%';
+}
+function fpAll() { $$('img[data-fp]').forEach(fpFit); }
+document.addEventListener('load', function (e) { if (e.target && e.target.dataset && e.target.dataset.fp) fpFit(e.target); }, true);
+window.addEventListener('resize', function () { clearTimeout(fpAll.t); fpAll.t = setTimeout(fpAll, 120); });
+/* Drag the Sheet photo to move its focus. Moving the pointer one pixel moves the picture one pixel; the focus stays where the box can still center it, so there is no dead stretch at an edge.
+   Every other picture of this hunter follows on release. */
+function posDrag(im) {
+  var st = null;
+  im.addEventListener('pointerdown', function (e) {
+    if (e.button) return;
+    var W = im.clientWidth, H = im.clientHeight, nw = im.naturalWidth, nh = im.naturalHeight;
+    if (!nw || !nh) return;
+    var k = Math.max(W / nw, H / nh), c = cropOf(S.sheet), sw = nw * k, sh = nh * k, o = fpPos(c.x, c.y, W, H, nw, nh);
+    // start from the focus the box really shows, so a point it cannot center does not have to be dragged back first
+    st = { x: e.clientX, y: e.clientY, sw: sw, sh: sh, W: W, H: H,
+      fx: (o[0] / 100 * (sw - W) + W / 2) / sw * 100, fy: (o[1] / 100 * (sh - H) + H / 2) / sh * 100 };
+    im.setPointerCapture(e.pointerId); im.classList.add('on'); e.preventDefault();
+  });
+  im.addEventListener('pointermove', function (e) {
+    if (!st) return;
+    var c = S.sheet.crop = cropOf(S.sheet), lx = st.W / 2 / st.sw * 100, ly = st.H / 2 / st.sh * 100;
+    c.x = Math.round(clamp(st.fx - (e.clientX - st.x) / st.sw * 100, lx, 100 - lx) * 10) / 10;
+    c.y = Math.round(clamp(st.fy - (e.clientY - st.y) / st.sh * 100, ly, 100 - ly) * 10) / 10;
+    im.dataset.fp = c.x + ' ' + c.y; fpFit(im);
+  });
+  function end() { if (!st) return; st = null; im.classList.remove('on'); renderPlay(); scheduleSave(); }
+  im.addEventListener('pointerup', end); im.addEventListener('pointercancel', end);
+}   // the crop editor was left out of this branch; the round avatars still read sheet.crop
 function renderRollas() { renderPlay(); applyMast(); }
 function photoMsg(t) { $('#photomsg').textContent = t || ''; }
 
@@ -3904,7 +3948,7 @@ function pmoveBtn(m) {
 function renderPlay() {
   var host = $('#play-status'); if (!host) return;
   var sh = S.sheet, R = S.roller, d = curPB(), a = armorVal(), w = weaponsOut();
-  var av0 = sh.photo || artFor(sh.playbook), av = av0 ? '<img src="' + esc(av0) + '" alt="">' : '<button type="button" class="pport-ph" data-pgo="photo">No picture yet<br><span>Add one on the Sheet</span></button>';
+  var av0 = sh.photo || artFor(sh.playbook), av = av0 ? '<img src="' + esc(av0) + '" alt=""' + (sh.photo ? ' data-fp="' + cropOf(sh).x + ' ' + cropOf(sh).y + '"' : '') + '>' : '<button type="button" class="pport-ph" data-pgo="photo">No picture yet<br><span>Add one on the Sheet</span></button>';
   var fresh = !sh.playbook && !(sh.name && sh.name.trim());
   host.innerHTML =
     '<div class="pport">' + av + '<span class="pclass">' + esc(sh.playbook || 'No playbook yet') + ' &middot; Level ' + sh.level + '</span></div>' +
@@ -4187,7 +4231,7 @@ $('#photo').addEventListener('change', function (e) {
     var cx = c.getContext('2d'); cx.imageSmoothingQuality = 'high'; cx.drawImage(img, 0, 0, c.width, c.height);
     URL.revokeObjectURL(url);
     S.sheet.photo = c.toDataURL('image/jpeg', 0.85); S.sheet.thumb = ''; S.sheet.crop = cropOf({});
-    photoMsg('Photo added.'); renderPortrait(); renderRollas(); scheduleSave();
+    photoMsg('Photo added. Drag it to choose what shows.'); renderPortrait(); renderRollas(); scheduleSave();
   };
   img.onerror = function () { URL.revokeObjectURL(url); photoMsg('Could not read that photo. Try a JPG or PNG.'); };
   img.src = url;
@@ -4585,7 +4629,7 @@ function makeThumb(url, cb) {
 }
 function partyBody() {
   var sh = S.sheet;
-  return { name: sh.name, pronouns: String(sh.pronouns || '').slice(0, 40), playbook: sh.playbook, catchline: sh.catch, look: lookFull().slice(0, 280), photo: sh.thumb || '', stats: sh.stats, luck: sh.luck, harm: sh.harm, unstable: !!sh.unstable, xp: sh.xp, level: sh.level, armor: armorVal(), weapons: weaponsOut().map(function (i) { return i.name; }).slice(0, 6), moves: allMoveNames().slice(0, 12), hid: hidOf(sh), pins: sh.pins.slice(0, 5), pinn: sh.pins.slice(0, 5).map(function (b) { return sh.badges[b] ? sh.badges[b].n : 1; }), career: sh.career, page: pageOf(sh) };
+  return { name: sh.name, pronouns: String(sh.pronouns || '').slice(0, 40), playbook: sh.playbook, catchline: sh.catch, look: lookFull().slice(0, 280), photo: sh.thumb || '', pos: [cropOf(sh).x, cropOf(sh).y], stats: sh.stats, luck: sh.luck, harm: sh.harm, unstable: !!sh.unstable, xp: sh.xp, level: sh.level, armor: armorVal(), weapons: weaponsOut().map(function (i) { return i.name; }).slice(0, 6), moves: allMoveNames().slice(0, 12), hid: hidOf(sh), pins: sh.pins.slice(0, 5), pinn: sh.pins.slice(0, 5).map(function (b) { return sh.badges[b] ? sh.badges[b].n : 1; }), career: sh.career, page: pageOf(sh) };
 }
 function pushParty(force) {
   if (!S.share || !tableOn() || party.blocked) return;
@@ -4631,7 +4675,7 @@ function ago(ts) {
 function meter(n, max, cls, label) { var h = ''; for (var i = 1; i <= max; i++) h += '<i class="' + (i <= n ? 'on' : '') + '"></i>'; return '<span class="meter ' + cls + '" role="img" aria-label="' + label + ' ' + n + ' of ' + max + '">' + h + '</span>'; }
 function partyCard(d) {
   var you = d.id === myId(), st = d.stats || {}, look = pageLook(d, d.dice), p = look.p;   // the look the player chose: frame, trim color, mark, title, background
-  var img = (d.photo ? '<img src="' + esc(d.photo) + '" alt="Portrait of ' + esc(d.name || 'a hunter') + '">' : '<div class="ph">No photo</div>') + pfrHTML(p);
+  var img = (d.photo ? '<img src="' + esc(d.photo) + '"' + posAt(d) + ' alt=""Portrait of ' + esc(d.name || 'a hunter') + '">' : '<div class="ph">No photo</div>') + pfrHTML(p);
   var by = you ? 'You' : (party.names[d.id] || '');
   var stats = STATS.map(function (s) { return '<li class="chip">' + STATNAME[s] + ' ' + fmtI(+st[s] || 0) + '</li>'; }).join('');
   var flags = (d.unstable ? '<li class="chip" style="color:var(--bad);border-color:var(--bad)">Unstable</li>' : '') + (d.armor ? '<li class="chip">Armor ' + (+d.armor) + '</li>' : '') + (d.weapons || []).map(function (w) { return '<li class="chip">' + esc(w) + '</li>'; }).join('');
@@ -4701,7 +4745,7 @@ function tblCard(c) {
   if (!c || typeof c !== 'object') return null;
   var st = c.stats && typeof c.stats === 'object' ? c.stats : {};
   var o = { name: tblStr(c.name, 60), pronouns: tblStr(c.pronouns, 40), playbook: tblStr(c.playbook, 40), catchline: tblStr(c.catchline, 200), look: tblStr(c.look, 280),
-    photo: typeof c.photo === 'string' && c.photo.length <= 48000 && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]*$/.test(c.photo) ? c.photo : '', stats: {},
+    photo: typeof c.photo === 'string' && c.photo.length <= 48000 && /^data:image\/jpeg;base64,[A-Za-z0-9+\/=]*$/.test(c.photo) ? c.photo : '', pos: tblPos(c.pos), stats: {},
     luck: tblInt(c.luck, 0, 7, 7), harm: tblInt(c.harm, 0, 8, 0), unstable: c.unstable === true, xp: tblInt(c.xp, 0, 9, 0), level: tblInt(c.level, 0, 20, 0), armor: tblInt(c.armor, 0, 9, 0),
     weapons: tblList(c.weapons, 6, 60), moves: tblList(c.moves, 12, 60),
     hid: HIDRX.test(c.hid || '') ? c.hid : '', pins: (Array.isArray(c.pins) ? c.pins : []).filter(function (b, i, a) { return badgeHas(b) && a.indexOf(b) === i; }).slice(0, 5),
@@ -4711,6 +4755,8 @@ function tblCard(c) {
   STATS.forEach(function (s) { o.stats[s] = tblInt(st[s], -3, 5, 0); });
   return o;
 }
+function tblPos(a) { a = Array.isArray(a) ? a : []; return [tblInt(a[0], 0, 100, 50), tblInt(a[1], 0, 100, 30)]; }   // where the photo sits in its box, as object-position counts
+function posAt(d) { var a = d && Array.isArray(d.pos) ? d.pos : [50, 30]; return ' data-fp="' + clamp(+a[0] || 0, 0, 100) + ' ' + clamp(+a[1] || 0, 0, 100) + '"'; }   // fpFit() places it once it has loaded
 function tblDice(d) { if (!d || typeof d !== 'object') return null; var a = strictDie(d.a), b = strictDie(d.b); return a && b ? { a: a, b: b, tray: TRAYS.indexOf(d.tray) >= 0 ? d.tray : 'leather' } : null; }
 function tblMember(m) {
   if (!m || typeof m !== 'object' || !/^[0-9a-f]{12}$/.test(m.id)) return null;
@@ -7021,7 +7067,8 @@ function hcDraw(cv, img, ex) {
   if (img) {
     var k = Math.max(pw / img.naturalWidth, ph / img.naturalHeight), sw = pw / k, sh = ph / k;
     c.imageSmoothingQuality = 'high';
-    c.drawImage(img, (img.naturalWidth - sw) / 2, (img.naturalHeight - sh) * .3, sw, sh, px, py, pw, ph);
+    var at = d.pos || [50, 30], o = fpPos(clamp(+at[0] || 0, 0, 100), clamp(+at[1] || 0, 0, 100), pw, ph, img.naturalWidth, img.naturalHeight);
+    c.drawImage(img, (img.naturalWidth - sw) * o[0] / 100, (img.naturalHeight - sh) * o[1] / 100, sw, sh, px, py, pw, ph);
   } else {
     var who = String(d.playbook || '').replace(/^The\s+/, '') || String(d.name || '').trim();
     c.fillStyle = HCC.accent; hcFont(c, '700', 250, 'black'); hcT(c, (who.charAt(0) || '?').toUpperCase(), px + pw / 2, py + ph / 2 + 78, pw, 'center');
@@ -7272,7 +7319,7 @@ function tcHead(d, p, extra) {
   return '<div class="tc-bar tc-title"><h2 class="tc-name">' + esc(d.name || 'Unnamed hunter') + (extra || '') + '</h2>' + markHTML(p.mark) + '</div>';
 }
 function tcArt(d, p) {
-  var img = d.photo && d.photo !== ' ' ? '<img src="' + esc(d.photo) + '" alt="Portrait of ' + esc(d.name || 'a hunter') + '">' : '<div class="ph">No photo</div>';
+  var img = d.photo && d.photo !== ' ' ? '<img src="' + esc(d.photo) + '"' + posAt(d) + ' alt=""Portrait of ' + esc(d.name || 'a hunter') + '">' : '<div class="ph">No photo</div>';
   return '<div class="tc-art">' + img + pfrHTML(p) + '</div>';
 }
 function tcType(d, p) {
@@ -7289,7 +7336,7 @@ function tcFoot(d, small) {
 }
 function pageHTML(d, you) {
   var look = pageLook(d, d.dice), p = look.p, st = d.stats || {}, lv = +d.level || 0, by = d.who || '';
-  var img = d.photo && d.photo !== ' ' ? '<img class="ph0" src="' + esc(d.photo) + '" alt="Portrait of ' + esc(d.name || 'a hunter') + '">' : '<div class="ph">No photo</div>';
+  var img = d.photo && d.photo !== ' ' ? '<img class="ph0" src="' + esc(d.photo) + '"' + posAt(d) + ' alt=""Portrait of ' + esc(d.name || 'a hunter') + '">' : '<div class="ph">No photo</div>';
   var pins = (Array.isArray(d.pins) ? d.pins : []).filter(badgeHas).slice(0, 5);
   var stats = STATS.map(function (s) { return '<li class="chip">' + STATNAME[s] + ' ' + fmt(+st[s] || 0) + '</li>'; }).join('');
   var flags = (d.unstable ? '<li class="chip" style="color:var(--bad);border-color:var(--bad)">Unstable</li>' : '') + (d.armor ? '<li class="chip">Armor ' + (+d.armor) + '</li>' : '');
