@@ -343,10 +343,10 @@ details.sect > .body { padding: 0 16px 16px; }
 .bknudge { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 12px 0; font-style: normal; }
 .bknudge span { flex: 1 1 240px; }
 .want { position: relative; }
-#hv-sheet select, #wiz select, #czopts select, #invdlg select { -webkit-appearance: none; appearance: none; cursor: pointer; background-color: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 40px 9px 12px;
+#hv-sheet select, #wiz select, #czopts select, #invdlg select, #retdlg select { -webkit-appearance: none; appearance: none; cursor: pointer; background-color: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 40px 9px 12px;
   background-image: linear-gradient(45deg, transparent calc(50% - 1px), var(--ink) calc(50% - 1px), var(--ink) calc(50% + 1px), transparent calc(50% + 1px)), linear-gradient(-45deg, transparent calc(50% - 1px), var(--ink) calc(50% - 1px), var(--ink) calc(50% + 1px), transparent calc(50% + 1px));
   background-position: calc(100% - 23px) 50%, calc(100% - 16px) 50%; background-size: 7px 7px; background-repeat: no-repeat; }
-#hv-sheet select:hover, #hv-sheet select[aria-expanded="true"], #wiz select:hover, #wiz select[aria-expanded="true"], #czopts select:hover, #czopts select[aria-expanded="true"], #invdlg select:hover, #invdlg select[aria-expanded="true"] { border-color: var(--accent); }
+#hv-sheet select:hover, #hv-sheet select[aria-expanded="true"], #wiz select:hover, #wiz select[aria-expanded="true"], #czopts select:hover, #czopts select[aria-expanded="true"], #invdlg select:hover, #invdlg select[aria-expanded="true"], #retdlg select:hover, #retdlg select[aria-expanded="true"] { border-color: var(--accent); }
 .ddpop { position: fixed; z-index: 30; margin: 0; padding: 6px; list-style: none; overflow-y: auto; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 12px 32px rgba(0, 0, 0, .28); outline: none; }
 .ddpop:focus-visible .wantopt.on { outline: 2px solid var(--accent); outline-offset: -2px; }
 .ddpop .wanthd:first-child { border-top: 0; margin-top: 0; }
@@ -1594,6 +1594,13 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 <dialog class="hcdlg hodlg" id="hodlg" aria-label="Picture from the Keeper"><img id="hodlg-img" alt=""><p id="hodlg-cap"></p><div class="actions"><button class="btn sm" type="button" id="hodlg-close">Close</button></div></dialog>
 <dialog class="hcdlg hpdlg" id="hpdlg" aria-label="A hunter's showcase"><div id="hpdlg-body"></div><div class="actions"><button class="btn sm" type="button" id="hpdlg-close">Close</button><button class="btn ghost sm" type="button" id="hpdlg-edit" hidden>Customize my showcase</button></div></dialog>
 <dialog class="hcdlg sessdlg" id="sessdlg" aria-labelledby="sessdlg-h"><div id="sessdlg-body"></div></dialog>
+<dialog class="hcdlg invdlg" id="retdlg" aria-labelledby="retdlg-h">
+  <h2 id="retdlg-h" class="czh" style="margin:0 0 8px">Retire this hunter</h2>
+  <p class="small muted" style="margin:0 0 18px">They move to My hunters and your next hunter takes over, or a blank one if you have none. You can bring them back.</p>
+  <div class="ifld"><label class="ilbl" for="hn-how">What happened to them?</label><select id="hn-how"><option value="died">Died</option><option value="retired">Retired</option><option value="lost">Lost (missing or gone)</option></select></div>
+  <div class="ifld" style="margin-top:14px"><label class="ilbl" for="hn-note">A line to remember them by (optional)</label><input type="text" id="hn-note" maxlength="200" placeholder="Saved the town, and paid for it"></div>
+  <div class="actions" style="justify-content:flex-end;margin-top:20px"><button class="btn ghost" type="button" id="retdlg-no">Cancel</button><button class="btn" type="button" id="retdlg-go">Retire them</button></div>
+</dialog>
 <dialog class="hcdlg invdlg" id="invdlg" aria-labelledby="invdlg-h">
   <form id="addform" method="dialog" autocomplete="off">
     <h2 id="invdlg-h" class="czh" style="margin:0 0 18px">Add to inventory</h2>
@@ -1864,7 +1871,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
         <div class="hicons">
           <button type="button" class="hicon" id="hn-list" data-hn="list" aria-expanded="false" aria-controls="hbar" aria-label="My hunters" data-tip="My hunters"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></button>
           <button type="button" class="hicon" data-hn="new" aria-label="New hunter" data-tip="New hunter"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg></button>
-          <button type="button" class="hicon" id="hn-ret" data-hn="retire" aria-expanded="false" aria-controls="hbar" aria-label="Retire or mark lost" data-tip="Retire or mark lost"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/></svg></button>
+          <button type="button" class="hicon" id="hn-ret" data-hn="retire" aria-haspopup="dialog" aria-label="Retire or mark lost" data-tip="Retire or mark lost"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/></svg></button>
           <span class="hdiv" id="hn-div" aria-hidden="true"></span>
           <button type="button" class="hicon hend" id="hn-end" data-rit="open" aria-label="End the session" data-tip="End the session"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 22V4"/><path d="M4 4h12l-2 4 2 4H4"/></svg></button>
         </div>
@@ -3714,7 +3721,7 @@ document.addEventListener('keydown', function (e) {
 });
 /* Selects on the Sheet keep their native element (values, data-bind and change handlers stay as they are),
    but open a hand-drawn list styled like the Play dropdown instead of the browser's own. */
-var DDSCOPE = '#hv-sheet select, #wiz select, #czopts select, #invdlg select', dd = { sel: null, el: null, ix: -1 };
+var DDSCOPE = '#hv-sheet select, #wiz select, #czopts select, #invdlg select, #retdlg select', dd = { sel: null, el: null, ix: -1 };
 function ddClose(back) {
   if (!dd.el) return;
   dd.el.remove(); dd.sel.setAttribute('aria-expanded', 'false');
@@ -3998,7 +4005,7 @@ function ritFinish() {
 /* The hunter in play is always S.sheet and S.hold, so nothing else in the page has to know there can be more. Spare hunters sit on S.bench as
    { id, sheet, hold, parked, ended }, where ended is null or { how, note, date } for a hunter who died, retired or was lost.
    Per hunter: the sheet and the hold. Per player, and left alone when hunters change: dice, settings, cases, bestiary, the timeline, backups. */
-var hn = { retiring: false, list: false, del: '' };
+var hn = { list: false, del: '' };
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 /* a bench entry made from the hunter in play: a copy, so the swap can never lose anything */
 function benchOf(ended) { return { id: uid(), sheet: clone(S.sheet), hold: clone(S.hold), parked: Date.now(), ended: ended || null }; }
@@ -4023,7 +4030,7 @@ function takeHunter(h, build) {
   S.wiz = 0; S.hv = build ? 'build' : 'play';
 }
 function hunterChanged() {
-  hn.retiring = false; hn.list = false; hn.del = '';
+  hn.list = false; hn.del = '';
   renderBuild(); renderSheet(); renderPortrait(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderPlay(); renderParty(); renderStart(); renderHunters(); setHV(S.hv); applyMast();
   scheduleSave(); window.scrollTo(0, 0);
 }
@@ -4051,17 +4058,9 @@ function renderHunters() {
   function nm(h) { return esc(String(h.sheet.name || '').trim() || 'Unnamed hunter'); }
   function sub(h) { return esc(h.sheet.playbook || 'No playbook yet') + ' &middot; Level ' + (+h.sheet.level || 0); }
   function del(e) { return hn.del === e.id ? '<button type="button" class="btn ghost sm" data-hn="del" data-id="' + esc(e.id) + '">Press again to delete for good</button>' : ib('trash', 'Delete', 'data-hn="del" data-id="' + esc(e.id) + '"'); }
-  $('#hn-list').setAttribute('aria-expanded', String(hn.list)); $('#hn-ret').setAttribute('aria-expanded', String(hn.retiring));
-  if (!hn.list && !hn.retiring) { el.innerHTML = ''; return; }
+  $('#hn-list').setAttribute('aria-expanded', String(hn.list));
+  if (!hn.list) { el.innerHTML = ''; return; }
   var h = '<div class="card hunters">';
-  if (hn.retiring) {
-    h += '<b>Retire ' + esc(String(sh.name || '').trim() || 'this hunter') + '</b>';
-    h += '<div class="hret"><label class="lbl" for="hn-how">What happened to them?</label><select id="hn-how"><option value="died">Died</option><option value="retired">Retired</option><option value="lost">Lost (missing or gone)</option></select>' +
-      '<label class="lbl" for="hn-note">A line to remember them by (optional)</label><input type="text" id="hn-note" maxlength="200" placeholder="Saved the town, and paid for it">' +
-      '<div class="actions"><button type="button" class="btn sm" data-hn="retire-go">Confirm</button><button type="button" class="btn ghost sm" data-hn="retire-no">Cancel</button></div>' +
-      '<p class="small muted" style="margin:0">They move to My hunters and your next hunter takes over, or a blank one if you have none. You can bring them back.</p></div>';
-    el.innerHTML = h + '</div>'; return;
-  }
   h += '<b>My hunters</b>';
   if (!spare.length && !gone.length) h += '<p class="small muted" style="margin:6px 0 0">No other hunters yet. The new hunter button starts one, and this one waits here for you.</p>';
   if (spare.length) h += '<span class="lbl" style="margin-top:14px">Other hunters</span><ul class="hlist">' + spare.map(function (e) { return '<li><span class="htxt"><b>' + nm(e) + '</b><p class="small muted">' + sub(e) + '</p></span><span class="hbtns"><button type="button" class="btn sm" data-hn="switch" data-id="' + esc(e.id) + '">Play this hunter</button>' + del(e) + '</span></li>'; }).join('') + '</ul>';
@@ -4072,10 +4071,8 @@ $('#hhead').addEventListener('click', function (e) {
   var b = e.target.closest('[data-hn]'); if (!b) return;
   var k = b.dataset.hn, id = b.dataset.id;
   if (k === 'new') newHunter();
-  else if (k === 'list') { hn.list = !hn.list; hn.retiring = false; renderHunters(); }
-  else if (k === 'retire') { hn.retiring = !hn.retiring; hn.list = false; renderHunters(); var f = $('#hn-how'); if (f) f.focus(); }
-  else if (k === 'retire-no') { hn.retiring = false; renderHunters(); }
-  else if (k === 'retire-go') retireHunter($('#hn-how').value, $('#hn-note').value);
+  else if (k === 'list') { hn.list = !hn.list; renderHunters(); }
+  else if (k === 'retire') retOpen();
   else if (k === 'switch' || k === 'back') switchHunter(id);
   else if (k === 'del') {
     if (hn.del === id) { var i = benchFind(id); if (i >= 0) S.bench.splice(i, 1); hn.del = ''; renderHunters(); scheduleSave(); }
@@ -4136,6 +4133,20 @@ function addItem(name, type, more) {
   renderInv(); scheduleSave(); return true;
 }
 /* adding to the inventory happens in a dialog: type, name, harm or armor, quantity, equipped and notes */
+/* retiring, a death or a hunter lost: asked in a dialog, which is the confirmation */
+function retWord() { var v = $('#hn-how').value; return v === 'died' ? 'Mark them dead' : v === 'lost' ? 'Mark them lost' : 'Retire them'; }
+function retOpen() {
+  var d = $('#retdlg'), nm = String(S.sheet.name || '').trim() || 'this hunter';
+  hn.list = false; renderHunters();
+  $('#retdlg-h').textContent = 'Retire or lose ' + nm + '?'; $('#hn-how').value = 'retired'; $('#hn-note').value = ''; $('#retdlg-go').textContent = retWord();
+  if (d.showModal) d.showModal(); else d.setAttribute('open', '');
+  $('#hn-how').focus();
+}
+function retClose() { var d = $('#retdlg'); if (d.close) d.close(); else d.removeAttribute('open'); $('#hn-ret').focus(); }
+$('#retdlg-no').addEventListener('click', retClose);
+$('#hn-how').addEventListener('change', function () { $('#retdlg-go').textContent = retWord(); });
+$('#retdlg').addEventListener('click', function (e) { if (e.target === this) retClose(); });
+$('#retdlg-go').addEventListener('click', function () { var how = $('#hn-how').value, note = $('#hn-note').value; var d = $('#retdlg'); if (d.close) d.close(); else d.removeAttribute('open'); retireHunter(how, note); });
 function invDlgSync() {
   var t = $('#newtype').value, gt = t === 'Weapon' || t === 'Armor';
   $('#newvalf').hidden = !gt; $('#neweqf').hidden = !gt; $('#newvall').textContent = t === 'Armor' ? 'Armor' : 'Harm';
