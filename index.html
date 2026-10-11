@@ -425,6 +425,8 @@ details.case .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 .item .val { display: grid; gap: 2px; }
 .item .val span { font-family: var(--type); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 .ifld { display: grid; gap: 4px; min-width: 0; }
+/* a weapon or armor that is not equipped is greyed out like a disabled control; its switch stays bright so it can be turned back on */
+.item.off > .ifld:not(.ieq), .item.off > .note { opacity: .5; }
 .ilbl { font-size: 13px; color: var(--muted); line-height: 1.2; }
 .ifld input[type="text"], .ifld input[type="number"], .ifld select { height: 44px; min-height: 0; }
 .ifld input[type="number"] { text-align: center; padding: 0 6px; }
@@ -4053,7 +4055,7 @@ function itemHTML(i) {
   var gearType = i.type === 'Weapon' || i.type === 'Armor', n = 'it' + i.id;
   var opts = ITYPES.map(function (t) { return '<option' + (t === i.type ? ' selected' : '') + '>' + t + '</option>'; }).join('');
   var f = function (cls, lab, ctl, forId) { return '<div class="ifld ' + cls + '">' + (forId ? '<label class="ilbl" for="' + forId + '">' : '<span class="ilbl">') + lab + (forId ? '</label>' : '</span>') + ctl + '</div>'; };
-  return '<li class="item" data-iid="' + i.id + '">' +
+  return '<li class="item' + (gearType && !i.eq ? ' off' : '') + '" data-iid="' + i.id + '">' +
     f('iname', 'Item', '<input type="text" id="' + n + 'n" data-i="name" value="' + esc(i.name) + '" autocomplete="off">', n + 'n') +
     f('itype', 'Type', '<select id="' + n + 't" data-i="type">' + opts + '</select>', n + 't') +
     (gearType ? f('ival', i.type === 'Weapon' ? 'Harm' : 'Armor', '<input type="number" id="' + n + 'v" data-i="val" min="0" max="9" value="' + esc(i.val) + '" inputmode="numeric">', n + 'v') : '<div class="ifld ival"></div>') +
@@ -4095,7 +4097,7 @@ $('#inv').addEventListener('input', function (e) {
 });
 $('#inv').addEventListener('change', function (e) {
   var it = itemOf(e.target), f = e.target.dataset.i; if (!it) return;
-  if (f === 'eq') { it.eq = e.target.checked; renderInvSum(); scheduleSave(); }
+  if (f === 'eq') { it.eq = e.target.checked; e.target.closest('.item').classList.toggle('off', !it.eq); renderInvSum(); scheduleSave(); }
   if (f === 'type') { it.type = e.target.value; if (it.type !== 'Weapon' && it.type !== 'Armor') it.eq = false; else if (!it.val) it.val = it.type === 'Weapon' ? 2 : 1; renderInv(); scheduleSave(); }
 });
 $('#inv').addEventListener('click', function (e) {
