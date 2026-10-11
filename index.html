@@ -1594,8 +1594,8 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 </dialog>
 <nav class="tabs" aria-label="Journal sections">
 <div class="tabrow" role="tablist" aria-label="Journal sections" aria-owns="t-settings">
-  <button role="tab" id="t-guide" aria-controls="p-guide" aria-selected="true" data-tab="guide">Guide</button>
-  <button role="tab" id="t-hunter" aria-controls="p-hunter" aria-selected="false" data-tab="hunter">Hunter</button>
+  <button role="tab" id="t-hunter" aria-controls="p-hunter" aria-selected="true" data-tab="hunter">Hunter</button>
+  <button role="tab" id="t-guide" aria-controls="p-guide" aria-selected="false" data-tab="guide">Guide</button>
   <button role="tab" id="t-party" aria-controls="p-party" aria-selected="false" data-tab="party">Party<span class="vh" id="t-party-new"></span></button>
   <button role="tab" id="t-bestiary" aria-controls="p-bestiary" aria-selected="false" data-tab="bestiary">Bestiary</button>
   <button role="tab" id="t-tips" aria-controls="p-tips" aria-selected="false" data-tab="tips">Tips</button>
@@ -1616,7 +1616,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 
 
   <!-- GUIDE -->
-  <section class="panel" id="p-guide" role="tabpanel" aria-labelledby="t-guide">
+  <section class="panel" id="p-guide" role="tabpanel" aria-labelledby="t-guide" hidden>
     <div class="hero" id="hero-guide" hidden></div>
     <div id="start"></div>
     <details class="sect" open>
@@ -1827,7 +1827,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
   </section>
 
   <!-- HUNTER -->
-  <section class="panel" id="p-hunter" role="tabpanel" aria-labelledby="t-hunter" hidden>
+  <section class="panel" id="p-hunter" role="tabpanel" aria-labelledby="t-hunter">
     <div id="hhead">
       <div class="hvrow">
         <div class="seg" role="group" aria-label="Hunter view">
@@ -1891,7 +1891,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
           <div class="actions" style="justify-content:center">
             <label class="hicon filebtn" id="photobtn" for="photo" data-tip="Upload photo"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13.5" r="3.5"/></svg><span class="vh" id="photolbl">Upload photo</span><input class="vh" type="file" id="photo" accept="image/*"></label>
             <button type="button" class="hicon" data-hcard aria-label="Share hunter card" data-tip="Share hunter card"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
-            <button class="btn ghost sm ib" type="button" aria-label="Remove photo" data-tip="Remove photo" id="rmphoto" hidden><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
+            <button class="hicon" type="button" aria-label="Remove photo" data-tip="Remove photo" id="rmphoto" hidden><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg></button>
           </div>
           <p class="small muted" id="photomsg" role="status" style="text-align:center;margin:8px 0 0"></p>
         </div>
@@ -2170,7 +2170,7 @@ function exampleCase() {
 }
 function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.hook = c.threats = c.weakness = c.npcs = c.loose = c.log = ''; c.clock = 0; c.eos = [false, false, false, false]; c.date = new Date().toISOString().slice(0, 10); return c; }
 function defaults() {
-  return { v: 1, tab: 'guide', hv: 'build', wiz: 0, bkAt: 0, start: { hide: false, rolled: false }, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage', theme: 'dark', ink: '', tname: '', tnote: true }, hold: { n: 0, move: '', asked: [] }, session: { started: 0, events: [] }, bench: [], hoseen: 0, tseen: 0, prev: '', night: { k: '', since: 0, end: 0, by: {} }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
+  return { v: 1, tab: 'hunter', hv: 'build', wiz: 0, bkAt: 0, start: { hide: false, rolled: false }, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage', theme: 'dark', ink: '', tname: '', tnote: true }, hold: { n: 0, move: '', asked: [] }, session: { started: 0, events: [] }, bench: [], hoseen: 0, tseen: 0, prev: '', night: { k: '', since: 0, end: 0, by: {} }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0 },
     sheet: { name: '', pronouns: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', tv: 0, crop: { x: 50, y: 30, z: 1 }, hid: '', page: {}, badges: {}, pins: [], tal: [], career: { sessions: 0, rolls: 0, misses: 0, harm: 0, lvls: 0 }, bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, adv: {}, moves: '', gear: '' } };   // adv: the moves marked advanced, by id
 }
@@ -2354,12 +2354,12 @@ function renderSession(el) {
 }
 
 /* ---------- tabs ---------- */
-var TABS = ['guide', 'hunter', 'party', 'bestiary', 'tips', 'notes', 'settings'];
+var TABS = ['hunter', 'guide', 'party', 'bestiary', 'tips', 'notes', 'settings'];
 /* Play and the Roller were tabs of their own; old links and saves land on Hunter's Play view */
 function tabOK(h) { return TABS.indexOf(h) >= 0 || h === 'play' || h === 'roll'; }
 function showTab(name, fromHash) {
   if (name === 'play' || name === 'roll') { name = 'hunter'; setHV('play'); }
-  if (TABS.indexOf(name) < 0) name = 'guide';
+  if (TABS.indexOf(name) < 0) name = 'hunter';
   S.tab = name;
   TABS.forEach(function (t) {
     var on = t === name;
@@ -7470,14 +7470,14 @@ function renderAll() {
 }
 renderAll();
 var h0 = location.hash.replace('#', '');
-showTab(tabOK(h0) ? h0 : 'guide', true);
+showTab(tabOK(h0) ? h0 : 'hunter', true);
 initArt(); initCaps();
 /* offline copy: only when served over http(s), never from a file or inside claude.ai */
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !window.claude) { try { navigator.serviceWorker.register('sw.js').catch(function () {}); } catch (e) {} }
 initStore().then(function () {
   renderAll(); startParty(); tblStart();
   var h = location.hash.replace('#', '');
-  showTab(tabOK(h) ? h : S.tab, true);
+  showTab(tabOK(h) ? h : 'hunter', true);   // the journal opens on the Hunter tab unless the address names another
 });
 })();
 </script>
