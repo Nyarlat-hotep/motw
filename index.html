@@ -332,14 +332,6 @@ details.sect > .body { padding: 0 16px 16px; }
 .lucknote { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
 .lucknote.low { color: var(--bad); }
 /* first night: the start-here card, backup nudges, and the "I want to" lookup on Play */
-.start { border: 2px solid var(--accent); margin-bottom: 16px; }
-.start h2 { font-family: var(--display); font-size: 26px; margin: 0 0 4px; }
-.startlist { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 10px; }
-.startlist li { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
-.startlist .tick { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-family: var(--type); color: var(--muted); }
-.startlist li.done .tick { background: var(--good-bg); border-color: var(--good); color: var(--good); }
-.startlist p { margin: 0; }
-@media (max-width: 560px) { .startlist li { grid-template-columns: 32px minmax(0, 1fr); } .startlist li .btn { grid-column: 2; justify-self: start; } }
 .bknudge { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; margin: 12px 0; font-style: normal; }
 .bknudge span { flex: 1 1 240px; }
 .want { position: relative; }
@@ -1656,7 +1648,6 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
   <!-- GUIDE -->
   <section class="panel" id="p-guide" role="tabpanel" aria-labelledby="t-guide" hidden>
     <div class="hero" id="hero-guide" hidden></div>
-    <div id="start"></div>
     <details class="sect" open>
       <summary>What is Monster of the Week?</summary>
       <div class="body">
@@ -2202,7 +2193,7 @@ function exampleCase() {
 }
 function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.hook = c.threats = c.weakness = c.npcs = c.loose = c.log = ''; c.clock = 0; c.eos = [false, false, false, false]; c.date = new Date().toISOString().slice(0, 10); return c; }
 function defaults() {
-  return { v: 1, tab: 'hunter', hv: 'build', wiz: 0, bkAt: 0, start: { hide: false, rolled: false }, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage', theme: 'dark', ink: '', tname: '', tnote: true }, hold: { n: 0, move: '', asked: [] }, session: { started: 0, events: [] }, bench: [], hoseen: 0, tseen: 0, prev: '', night: { k: '', since: 0, end: 0, by: {} }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
+  return { v: 1, tab: 'hunter', hv: 'build', wiz: 0, bkAt: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage', theme: 'dark', ink: '', tname: '', tnote: true }, hold: { n: 0, move: '', asked: [] }, session: { started: 0, events: [] }, bench: [], hoseen: 0, tseen: 0, prev: '', night: { k: '', since: 0, end: 0, by: {} }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0 },
     sheet: { name: '', pronouns: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', tv: 0, crop: { x: 50, y: 30, z: 1 }, hid: '', page: {}, badges: {}, pins: [], tal: [], career: { sessions: 0, rolls: 0, misses: 0, harm: 0, lvls: 0 }, bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, adv: {}, moves: '', gear: '' } };   // adv: the moves marked advanced, by id
 }
@@ -2403,7 +2394,6 @@ function showTab(name, fromHash) {
   if (name === 'hunter') setTimeout(function () { segSlide(true); }, 0);   // the tab was hidden, so the pill could not be measured   // the Settings preview may have resized the 3D view
   if (name === 'settings') dpOpen(true);
   if (name === 'party') { if (tblUnseen()) tbl.view = 'board'; renderParty(); }
-  if (name === 'guide') renderStart();
   if (name === 'hunter' && S.hv === 'build') renderBuild();
   if (name === 'hunter' && S.hv === 'page') renderPageEd();
   if (typeof applyTex === 'function') applyTex();
@@ -4037,7 +4027,7 @@ function takeHunter(h, build) {
 }
 function hunterChanged() {
   hn.list = false; hn.del = '';
-  renderBuild(); renderSheet(); renderPortrait(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderPlay(); renderParty(); renderStart(); renderHunters(); setHV(S.hv); applyMast();
+  renderBuild(); renderSheet(); renderPortrait(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderPlay(); renderParty(); renderHunters(); setHV(S.hv); applyMast();
   scheduleSave(); window.scrollTo(0, 0);
 }
 function newHunter() { if (rolling) return; nightLeave(false); S.bench.unshift(benchOf(null)); takeHunter({ sheet: defaults().sheet, hold: defaults().hold }, true); hunterChanged(); }
@@ -5561,7 +5551,7 @@ $('#set-3d').addEventListener('change', function (e) { S.settings.dice3d = e.tar
 /* say(text) reports how it went, wherever the button was */
 function bkSave(say) {
   var d = new Date().toISOString().slice(0, 10), fail = 'Could not save a file here. Use Copy backup text in Settings instead.';
-  function ok(msg) { S.bkAt = Date.now(); scheduleSave(); renderStart(); $$('[data-bkago]').forEach(function (b) { b.textContent = bkAgo(); }); say(msg); }
+  function ok(msg) { S.bkAt = Date.now(); scheduleSave(); $$('[data-bkago]').forEach(function (b) { b.textContent = bkAgo(); }); say(msg); }
   if (!caps.dl) {
     try {
       var url = URL.createObjectURL(new Blob([backupText()], { type: 'application/json' })), a = document.createElement('a');
@@ -5576,7 +5566,7 @@ $('#bk-save').addEventListener('click', function () { bkSave(bkMsg); });
 $('#bk-copy').addEventListener('click', function () {
   var txt = backupText(), ta = $('#rs-text');
   function fallback() { ta.value = txt; ta.focus(); ta.select(); bkMsg('Copy blocked here. The backup text is in the box below, select it and copy it yourself.'); }
-  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { S.bkAt = Date.now(); scheduleSave(); renderStart(); bkMsg('Backup text copied. Paste it somewhere safe.'); }, fallback); else fallback();
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(function () { S.bkAt = Date.now(); scheduleSave(); bkMsg('Backup text copied. Paste it somewhere safe.'); }, fallback); else fallback();
 });
 function stageRestore(text) {
   var j;
@@ -6855,7 +6845,7 @@ function doRoll() {
     var sv = S.sheet.stats[R.stat];
     last = { move: R.move, stat: R.stat, statVal: sv, fwd: R.forward, ong: R.ongoing, oth: R.other, d1: d1, d2: d2, total: d1 + d2 + sv + R.forward + R.ongoing + R.other, luck: false, xpMarked: false };
     S.rolls.unshift({ name: mv.id === 'plain' ? STATNAME[R.stat] + ' roll' : mv.name, d1: d1, d2: d2, mod: last.total - d1 - d2, total: last.total, tier: tierOf(last.total) });
-    S.rolls = S.rolls.slice(0, 30); S.start.rolled = true;
+    S.rolls = S.rolls.slice(0, 30);
     last.evid = evRoll({ name: S.rolls[0].name, d1: d1, d2: d2, mod: S.rolls[0].mod, total: last.total, tier: S.rolls[0].tier });
     tblRollOut(S.rolls[0], R.move);
     if (HOLDS[R.move] && tierOf(last.total) !== 'miss') { S.hold = { n: HOLDS[R.move][tierOf(last.total)], move: R.move, asked: [] }; last.hold = true; evSkip('hold'); }   // the hold is part of the roll's line
@@ -7500,36 +7490,18 @@ function bkAgo() {
 function bkNudge(why) {
   return '<div class="note bknudge"><span>' + esc(why) + ' Last backup: <b data-bkago>' + bkAgo() + '</b>.</span><button class="btn sm" type="button" data-bk>Download backup</button><span class="small" data-bkmsg role="status"></span></div>';
 }
-function renderStart() {
-  var el = $('#start'); if (!el) return;
-  el.hidden = !!S.start.hide; if (S.start.hide) { el.innerHTML = ''; return; }
-  var built = wizDone().slice(0, 6).filter(Boolean).length;
-  var steps = [
-    [built === 6, 'Build your hunter', built === 6 ? 'Done. You can change anything later.' : built ? built + ' of 6 builder steps done so far.' : 'About ten minutes. Pick a playbook and the builder walks you through the rest.', '<button class="btn sm" type="button" data-sgo="build">' + (built === 6 ? 'Open the builder' : built ? 'Carry on building' : 'Build a hunter') + '</button>'],
-    [S.start.rolled, 'Try one roll', 'Open Play on the Hunter tab, pick a move and roll it once, so you know where everything is before the first session.', '<button class="btn ' + (built === 6 && !S.start.rolled ? '' : 'ghost ') + 'sm" type="button" data-sgo="play">Open Play</button>'],
-    [S.bkAt > 0, 'Download a backup', 'Your journal is saved in this browser, on this device only. A backup file means a cleared browser or a new laptop cannot lose it. Last backup: ' + bkAgo() + '.', '<button class="btn ghost sm" type="button" data-bk>Download backup</button>']
-  ];
-  var all = steps.every(function (s) { return s[0]; });
-  el.innerHTML = '<div class="card start"><h2>Start here</h2>' +
-    '<p style="margin:0">' + (all ? 'You are ready for the first session. On the night, keep <b>Play</b> open: your moves, harm, Luck and dice are all on that one screen.' : 'New to this? Three steps and you are ready for the first session.') + '</p>' +
-    '<ol class="startlist">' + steps.map(function (s, i) { return '<li' + (s[0] ? ' class="done"' : '') + '><span class="tick" aria-hidden="true">' + (s[0] ? '<span class="i i-check" aria-hidden="true"></span>' : i + 1) + '</span><p><b>' + s[1] + (s[0] ? ' <span class="small muted">(done)</span>' : '') + '</b><br><span class="small">' + esc(s[2]) + '</span></p>' + s[3] + '</li>'; }).join('') + '</ol>' +
-    '<p class="small" style="margin:12px 0 0" data-bkmsg role="status"></p>' +
-    '<div class="actions"><button class="btn ghost sm" type="button" data-shide>' + (all ? 'Hide this' : 'I know my way around, hide this') + '</button></div></div>';
-}
 document.addEventListener('click', function (e) {
   var t = e.target, g;
   if (!t.closest) return;
-  if ((g = t.closest('[data-sgo]'))) { if (g.dataset.sgo === 'build') { showTab('hunter'); setHV('build'); } else showTab('play'); scheduleSave(); window.scrollTo(0, 0); return; }
-  if (t.closest('[data-shide]')) { S.start.hide = true; renderStart(); scheduleSave(); return; }
-  if ((g = t.closest('[data-bk]'))) {
-    var box = g.closest('#start') ? null : g.closest('.note');   // the start card is redrawn by a save, so look it up afresh
-    bkSave(function (msg) { var m = (box || $('#start')).querySelector('[data-bkmsg]'); if (m) m.textContent = msg; });
+  if ((g = t.closest('[data-bk]'))) {   // a backup nudge's button
+    var box = g.closest('.note');
+    bkSave(function (msg) { var m = box && box.querySelector('[data-bkmsg]'); if (m) m.textContent = msg; });
   }
 });
 
 /* ---------- boot ---------- */
 function renderAll() {
-  renderGuide(); renderBuild(); renderSheet(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderDice(); renderCases(); renderBeasts(); renderSettings(); renderParty(); renderStart(); renderHunters(); setHV(S.hv); d3Apply();
+  renderGuide(); renderBuild(); renderSheet(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderDice(); renderCases(); renderBeasts(); renderSettings(); renderParty(); renderHunters(); setHV(S.hv); d3Apply();
 }
 renderAll();
 var h0 = location.hash.replace('#', '');
