@@ -1427,6 +1427,43 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 .hp-hint { color: var(--muted); font-style: italic; }
 @media (max-width: 520px) { .hpage { padding: 12px; } .hp-head { grid-template-columns: 96px minmax(0, 1fr); gap: 12px; } .hp-id h2 { font-size: 24px; } .lvplate { width: 48px; height: 48px; font-size: 20px; } .hpage.fr.fr-own { border-width: 22px; border-image-width: 22px; } }
 
+/* ---- the trading card ---- */
+.tcard.tcard { display: block; padding: 14px; border-radius: 18px; }
+.tcard .hp-in { display: grid; gap: 8px; }
+.tcard > .hp-in > :is(.frtop, .frbot) { margin-left: 0 !important; margin-right: 0 !important; }
+.tc-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 14px; border-radius: 12px; background: color-mix(in srgb, var(--pc, var(--accent)) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--pc, var(--accent)) 45%, var(--line)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 2px 4px rgba(0, 0, 0, .18); min-width: 0; }
+.tc-title { min-height: 48px; }
+.tc-name { margin: 0; font-family: var(--display); font-size: 24px; font-weight: 400; line-height: 1.15; overflow-wrap: anywhere; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+.tc-name .chip { font-family: var(--body); font-size: 13px; }
+.tc-title .mk { width: 32px; height: 32px; flex: none; }
+.tc-art { position: relative; margin: 0 6px; border: 3px solid color-mix(in srgb, var(--ink) 75%, transparent); border-radius: 4px; overflow: hidden; aspect-ratio: 4 / 3; background: var(--bg); box-shadow: 0 2px 6px rgba(0, 0, 0, .3); }
+.tc-art > img:not(.pfr), .tc-art > .ph { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; border: 0; border-radius: 0; }
+.tc-art > .ph { display: grid; place-items: center; color: var(--muted); }
+.tc-type { font-size: 17px; }
+.tc-type .epi { font-size: 15px; margin: 0; text-align: right; }
+.tc-text { margin: 0 6px; padding: 14px 16px 18px; border-radius: 6px; background: color-mix(in srgb, var(--surface) 82%, #fff 18%); color: var(--ink); border: 1px solid color-mix(in srgb, var(--pc, var(--accent)) 30%, var(--line)); display: grid; gap: 12px; }
+.pal-dark .tc-text, :root[data-theme="dark"] .fr:not(.pal-light) .tc-text { background: color-mix(in srgb, var(--surface) 86%, #000 14%); }
+.tc-text p { margin: 0; }
+.tc-text .catch { font-style: italic; }
+.tc-stats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.tc-stats li { display: grid; justify-items: center; gap: 0; padding: 6px 2px; border-radius: 8px; border: 1px solid var(--line); background: color-mix(in srgb, var(--bg) 60%, transparent); }
+.tc-stats span { font-size: 13px; color: var(--muted); }
+.tc-stats b { font-family: var(--num); font-weight: 600; font-size: 19px; }
+.tc-stats b.hi { color: var(--pc, var(--accent)); } .tc-stats b.lo { color: var(--muted); }
+.tc-flags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tc-flag { font-size: 14px; padding: 1px 10px; border-radius: 999px; border: 1px solid var(--line); }
+.tc-flag.bad { color: var(--bad); border-color: var(--bad); }
+.tc-flavor, .tc-moves { font-style: italic; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; }
+.tc-text .hp-case { margin: 0; padding: 12px 0 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; border-top: 1px solid var(--line) !important; }
+.tc-text .hp-case > h3 { font-size: 18px; margin: 0 0 6px; padding: 0; }
+.tc-text .hp-case > h3::before, .tc-text .hp-case > h3::after { display: none; }
+.tc-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin: -22px 0 0; padding: 0 6px; position: relative; z-index: 2; }
+.tc-print { font-size: 13px; color: var(--muted); padding-bottom: 4px; padding-left: 4px; }
+.tc-lv { display: inline-flex; align-items: baseline; gap: 4px; padding: 6px 16px; border-radius: 12px; font-family: var(--display); font-size: 24px; line-height: 1; background: color-mix(in srgb, var(--pc, var(--accent)) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--pc, var(--accent)) 45%, var(--line)); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 2px 4px rgba(0, 0, 0, .25); }
+.tc-lv small { font-family: var(--body); font-size: 12px; color: var(--muted); }
+.tcard .pacts { margin: 0; }
+.pcard.tcard .tc-art { aspect-ratio: 16 / 10; }
+@media (max-width: 520px) { .tc-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); } .tc-name { font-size: 20px; } }
 /* Showcase view: headings, background tiles, section rows */
 .czh { font-family: var(--display); font-size: 24px; font-weight: 400; line-height: 1.25; margin: 0 0 18px; }
 .czbgs { display: flex; flex-wrap: wrap; gap: 10px; }
@@ -1462,7 +1499,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 :is(.hpage, .pcard):has(> .pcx).fr-scrap .frtop { margin-left: 52px !important; margin-right: 52px !important; }
 :is(.hpage, .pcard):has(> .pcx).fr-journal { padding-top: 70px; padding-bottom: 70px; }
 @media (max-width: 520px) { .pcx svg { width: 34px; height: 34px; } .pcx { top: 10px; left: 10px; } .pcx-b { top: auto; left: auto; bottom: 10px; right: 10px; } :is(.hpage, .pcard):has(> .pcx) .frtop:not(:empty), :is(.hpage, .pcard):has(> .pcx) .frbot:not(:empty), :is(.hpage, .pcard):has(> .pcx).fr-scrap .frtop { margin-left: 44px !important; margin-right: 44px !important; } :is(.hpage, .pcard):has(> .pcx) .frbot { white-space: nowrap; letter-spacing: .1em !important; text-indent: .1em; font-size: 13px; } :is(.hpage, .pcard):has(> .pcx).fr-journal { padding-top: 54px; padding-bottom: 54px; } }
-.pcard.fr > .pcx, .hpage > .pcx { position: absolute; z-index: 3; }   /* a card's other children sit in its grid; the corners float over it */
+   /* a card's other children sit in its grid; the corners float over it */
 @media (max-width: 520px) { .hpage { padding: 34px 20px; } .pcard.pcard { padding: 30px 18px; } }
 /* the picture fills its side of the card: a tall panel down the left, cropped to fit */
 .hp-head.hp-case { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); gap: 0; padding: 0; overflow: hidden; align-items: stretch; }
@@ -4418,13 +4455,14 @@ function partyCard(d) {
   var mv = (d.moves || []).length ? '<ul class="chips">' + d.moves.map(function (m) { return '<li class="chip">' + esc(m) + '</li>'; }).join('') + '</ul>' : '';
   var pins = (Array.isArray(d.pins) ? d.pins : []).filter(badgeHas).slice(0, 5);   // the badges this hunter shows off; my own carry their count
   var pinned = pins.length ? '<ul class="pins" aria-label="Pinned badges">' + pins.map(function (id, i) { return '<li title="' + esc(BADGE[id].name + ': ' + BADGE[id].line) + '">' + badgeSVG(id, { cls: 'b-sm', n: pinCount(d, id, i, you) }) + '</li>'; }).join('') + '</ul>' : '';
-  return '<article class="pcard ' + look.cls + (you ? ' you' : '') + '"' + frStyle(look) + '>' + frBg(look, true) + pcCorners(d.level, p.mark) + frameTop(look, d) + '<div class="pimg">' + img + '</div><div class="pinfo"><h3>' + esc(d.name || 'Unnamed hunter') + markHTML(p.mark) + (you ? '<span class="chip">You</span>' : '') + (d.online === false ? '<span class="chip tag">Away</span>' : '') + '</h3>' + (p.epithet.trim() ? '<p class="epi">' + esc(p.epithet.trim()) + '</p>' : '') +
-    '<p class="small muted">' + esc(d.playbook || 'No playbook yet') + (d.pronouns ? ' · ' + esc(String(d.pronouns).slice(0, 40)) : '') + (by && !you ? ' · played by ' + esc(by) : '') + '</p>' + (d.catchline ? '<p class="catch">“' + esc(d.catchline) + '”</p>' : '') + pinned +
-    '<ul class="chips" style="margin:2px 0">' + stats + '</ul>' +
-    '<div class="meters"><div><span>Luck</span>' + meter(+d.luck || 0, 7, 'luck', 'Luck') + '</div><div><span>Harm</span>' + meter(+d.harm || 0, 8, 'harm', 'Harm') + '</div><div><span>XP</span>' + meter(Math.min(+d.xp || 0, 5), 5, 'xp', 'XP') + '</div></div>' +
-    '<ul class="chips" style="margin:2px 0"><li class="chip">Level ' + (+d.level || 0) + '</li>' + flags + '</ul>' + mv +
-    (d.look ? '<p class="small">' + esc(d.look) + '</p>' : '') + (d.updated ? '<p class="tiny">Updated ' + ago(d.updated) + '</p>' : '') +
-    '<div class="actions pacts"><button class="btn ghost sm" type="button" data-hpage="' + esc(d.id) + '">Open showcase</button></div></div>' + frameBot(look, d) + frameStamp(look, d) + '</article>';
+  var flagsT = (d.unstable ? '<span class="tc-flag bad">Unstable</span>' : '') + (d.armor ? '<span class="tc-flag">Armor ' + (+d.armor) + '</span>' : '') + (d.weapons || []).map(function (w) { return '<span class="tc-flag">' + esc(w) + '</span>'; }).join('');
+  var print = [d.pronouns ? esc(String(d.pronouns).slice(0, 40)) : '', by && !you ? 'played by ' + esc(by) : '', d.updated ? 'updated ' + ago(d.updated) : ''].filter(Boolean).join(' &middot; ');
+  return '<article class="pcard tcard ' + look.cls + (you ? ' you' : '') + '"' + frStyle(look) + '>' + frBg(look, true) + '<div class="hp-in">' + frameTop(look, d) +
+    tcHead(d, p, (you ? '<span class="chip">You</span>' : '') + (d.online === false ? '<span class="chip tag">Away</span>' : '')) + tcArt(d, p) + tcType(d, p) +
+    '<div class="tc-text">' + (d.catchline ? '<p class="catch">&ldquo;' + esc(d.catchline) + '&rdquo;</p>' : '') + tcStats(d) + (flagsT ? '<p class="tc-flags">' + flagsT + '</p>' : '') + pinned +
+    ((d.moves || []).length ? '<p class="tc-moves">' + d.moves.map(esc).join(' &middot; ') + '</p>' : '') +
+    '<div class="actions pacts"><button class="btn ghost sm" type="button" data-hpage="' + esc(d.id) + '">Open showcase</button></div></div>' +
+    tcFoot(d, print) + frameBot(look, d) + '</div>' + frameStamp(look, d) + '</article>';
 }
 function renderParty() {
   var host = $('#partybody'); if (!host) return;
@@ -7023,22 +7061,42 @@ function showcaseHTML(id, d, p, you) {
   return h ? '<section class="hp-case" data-case="' + id + '"><h3>' + CASEN[id].name + '</h3>' + h + '</section>' : '';
 }
 /* the whole page: the header (portrait, name, mark, title, level, pinned badges, ratings and meters) and then the showcases in the player's order */
+/* The hunter as a trading card: a title bar (name, mark), the art box, a type line (playbook, title), the text box, a level box at the foot and a line of small print.
+   The frame (poster, dossier, tarot...) still brings its own paper, colors and header and footer around it. */
+function tcHead(d, p, extra) {
+  return '<div class="tc-bar tc-title"><h2 class="tc-name">' + esc(d.name || 'Unnamed hunter') + (extra || '') + '</h2>' + markHTML(p.mark) + '</div>';
+}
+function tcArt(d, p) {
+  var img = d.photo && d.photo !== ' ' ? '<img src="' + esc(d.photo) + '" alt="Portrait of ' + esc(d.name || 'a hunter') + '">' : '<div class="ph">No photo</div>';
+  return '<div class="tc-art">' + img + pfrHTML(p) + '</div>';
+}
+function tcType(d, p) {
+  return '<div class="tc-bar tc-type"><span>' + esc(d.playbook || 'No playbook yet') + '</span>' + (p.epithet.trim() ? '<span class="epi">' + esc(p.epithet.trim()) + '</span>' : '') + '</div>';
+}
+function tcStats(d) {
+  var st = d.stats || {};
+  return '<ul class="tc-stats">' + STATS.map(function (s) { var v = +st[s] || 0; return '<li><span>' + STATNAME[s] + '</span><b class="' + (v >= 2 ? 'hi' : v < 0 ? 'lo' : '') + '">' + fmtI(v) + '</b></li>'; }).join('') + '</ul>' +
+    '<div class="meters"><div><span>Luck</span>' + meter(+d.luck || 0, 7, 'luck', 'Luck') + '</div><div><span>Harm</span>' + meter(+d.harm || 0, 8, 'harm', 'Harm') + '</div><div><span>XP</span>' + meter(Math.min(+d.xp || 0, 5), 5, 'xp', 'XP') + '</div></div>';
+}
+function tcFoot(d, small) {
+  var lv = +d.level || 0;
+  return '<div class="tc-foot"><span class="tc-print">' + small + '</span><span class="tc-lv" role="img" aria-label="Level ' + lv + '"><small>Lv</small>' + lv + '</span></div>';
+}
 function pageHTML(d, you) {
   var look = pageLook(d, d.dice), p = look.p, st = d.stats || {}, lv = +d.level || 0, by = d.who || '';
   var img = d.photo && d.photo !== ' ' ? '<img class="ph0" src="' + esc(d.photo) + '" alt="Portrait of ' + esc(d.name || 'a hunter') + '">' : '<div class="ph">No photo</div>';
   var pins = (Array.isArray(d.pins) ? d.pins : []).filter(badgeHas).slice(0, 5);
   var stats = STATS.map(function (s) { return '<li class="chip">' + STATNAME[s] + ' ' + fmt(+st[s] || 0) + '</li>'; }).join('');
   var flags = (d.unstable ? '<li class="chip" style="color:var(--bad);border-color:var(--bad)">Unstable</li>' : '') + (d.armor ? '<li class="chip">Armor ' + (+d.armor) + '</li>' : '');
-  return '<div class="hpage ' + look.cls + '"' + frStyle(look) + '>' + frBg(look, false) + pcCorners(lv, p.mark) + '<div class="hp-in">' + frameTop(look, d) +
-    '<header class="hp-head hp-case"><div class="hp-por">' + img + pfrHTML(p) + '</div><div class="hp-id"><div class="hp-top"><div><h2>' + esc(d.name || 'Unnamed hunter') + ' ' + markHTML(p.mark) + '</h2>' + (p.epithet.trim() ? '<p class="epi">' + esc(p.epithet.trim()) + '</p>' : '') + '</div>' +
-    '<span class="lvplate" role="img" aria-label="Level ' + lv + '"><small>Level</small>' + lv + '</span></div>' +
-    '<p class="small muted">' + esc(d.playbook || 'No playbook yet') + (d.pronouns ? ' &middot; ' + esc(String(d.pronouns).slice(0, 40)) : '') + (by && !you ? ' &middot; played by ' + esc(by) : '') + '</p>' +
-    (d.catchline ? '<p class="catch">&ldquo;' + esc(d.catchline) + '&rdquo;</p>' : '') +
+  var flagsT = (d.unstable ? '<span class="tc-flag bad">Unstable</span>' : '') + (d.armor ? '<span class="tc-flag">Armor ' + (+d.armor) + '</span>' : '');
+  var print = [d.pronouns ? esc(String(d.pronouns).slice(0, 40)) : '', by && !you ? 'played by ' + esc(by) : ''].filter(Boolean).join(' &middot; ');
+  return '<div class="hpage tcard ' + look.cls + '"' + frStyle(look) + '>' + frBg(look, false) + '<div class="hp-in">' + frameTop(look, d) +
+    tcHead(d, p) + tcArt(d, p) + tcType(d, p) +
+    '<div class="tc-text">' + (d.catchline ? '<p class="catch">&ldquo;' + esc(d.catchline) + '&rdquo;</p>' : '') + tcStats(d) + (flagsT ? '<p class="tc-flags">' + flagsT + '</p>' : '') +
     (pins.length && p.cases.indexOf('badges') < 0 ? '<ul class="pins" aria-label="Pinned badges">' + pins.map(function (b, i) { return '<li title="' + esc(BADGE[b].name + ': ' + BADGE[b].line) + '">' + badgeSVG(b, { cls: 'b-sm', n: pinCount(d, b, i, you) }) + '</li>'; }).join('') + '</ul>' : '') +
-    '<ul class="chips" style="margin:2px 0">' + stats + flags + '</ul>' +
-    '<div class="meters"><div><span>Luck</span>' + meter(+d.luck || 0, 7, 'luck', 'Luck') + '</div><div><span>Harm</span>' + meter(+d.harm || 0, 8, 'harm', 'Harm') + '</div><div><span>XP</span>' + meter(Math.min(+d.xp || 0, 5), 5, 'xp', 'XP') + '</div></div>' +
-    (d.look ? '<p class="small">' + esc(d.look) + '</p>' : '') + '</div></header>' +
-    CASES.map(function (c) { return c.id; }).filter(function (c) { return p.cases.indexOf(c) >= 0; }).map(function (c) { return showcaseHTML(c, d, p, you); }).join('') + frameBot(look, d) + '</div>' + frameStamp(look, d) + '</div>';
+    (d.look ? '<p class="tc-flavor">' + esc(d.look) + '</p>' : '') +
+    CASES.map(function (c) { return c.id; }).filter(function (c) { return p.cases.indexOf(c) >= 0; }).map(function (c) { return showcaseHTML(c, d, p, you); }).join('') + '</div>' +
+    tcFoot(d, print) + frameBot(look, d) + '</div>' + frameStamp(look, d) + '</div>';
 }
 /* my own hunter as a card, whether or not it is being shown to the table */
 function myDoc() {
