@@ -1596,6 +1596,10 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 <dialog class="hcdlg hodlg" id="hodlg" aria-label="Picture from the Keeper"><img id="hodlg-img" alt=""><p id="hodlg-cap"></p><div class="actions"><button class="btn sm" type="button" id="hodlg-close">Close</button></div></dialog>
 <dialog class="hcdlg hpdlg" id="hpdlg" aria-label="A hunter's showcase"><div id="hpdlg-body"></div><div class="actions"><button class="btn sm" type="button" id="hpdlg-close">Close</button><button class="btn ghost sm" type="button" id="hpdlg-edit" hidden>Customize my showcase</button></div></dialog>
 <dialog class="hcdlg sessdlg" id="sessdlg" aria-labelledby="sessdlg-h"><div id="sessdlg-body"></div></dialog>
+<dialog class="hcdlg invdlg" id="hndlg" aria-labelledby="hndlg-h">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px"><h2 id="hndlg-h" class="czh" style="margin:0">My hunters</h2><button type="button" class="hicon" id="hndlg-x" aria-label="Close" data-tip="Close"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div id="hbar"></div>
+</dialog>
 <dialog class="hcdlg invdlg" id="retdlg" aria-labelledby="retdlg-h">
   <h2 id="retdlg-h" class="czh" style="margin:0 0 8px">Retire this hunter</h2>
   <p class="small muted" style="margin:0 0 18px">They move to My hunters and your next hunter takes over, or a blank one if you have none. You can bring them back.</p>
@@ -1871,14 +1875,13 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
           <button type="button" id="seg-build" aria-pressed="true">Build</button>
         </div>
         <div class="hicons">
-          <button type="button" class="hicon" id="hn-list" data-hn="list" aria-expanded="false" aria-controls="hbar" aria-label="My hunters" data-tip="My hunters"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></button>
+          <button type="button" class="hicon" id="hn-list" data-hn="list" aria-haspopup="dialog" aria-label="My hunters" data-tip="My hunters"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></button>
           <button type="button" class="hicon" data-hn="new" aria-label="New hunter" data-tip="New hunter"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg></button>
           <button type="button" class="hicon" id="hn-ret" data-hn="retire" aria-haspopup="dialog" aria-label="Retire or mark lost" data-tip="Retire or mark lost"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/></svg></button>
           <span class="hdiv" id="hn-div" aria-hidden="true"></span>
           <button type="button" class="hicon hend" id="hn-end" data-rit="open" aria-label="End the session" data-tip="End the session"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 22V4"/><path d="M4 4h12l-2 4 2 4H4"/></svg></button>
         </div>
       </div>
-      <div id="hbar"></div>
     </div>
 
     <!-- PLAY: everything you touch mid-session on one screen -->
@@ -4060,16 +4063,20 @@ function renderHunters() {
   function nm(h) { return esc(String(h.sheet.name || '').trim() || 'Unnamed hunter'); }
   function sub(h) { return esc(h.sheet.playbook || 'No playbook yet') + ' &middot; Level ' + (+h.sheet.level || 0); }
   function del(e) { return hn.del === e.id ? '<button type="button" class="btn ghost sm" data-hn="del" data-id="' + esc(e.id) + '">Press again to delete for good</button>' : ib('trash', 'Delete', 'data-hn="del" data-id="' + esc(e.id) + '"'); }
-  $('#hn-list').setAttribute('aria-expanded', String(hn.list));
-  if (!hn.list) { el.innerHTML = ''; return; }
-  var h = '<div class="card hunters">';
-  h += '<b>My hunters</b>';
+  var dlg = $('#hndlg');
+  if (!hn.list) { if (dlg.open) { if (dlg.close) dlg.close(); else dlg.removeAttribute('open'); } el.innerHTML = ''; return; }
+  var h = '<div class="hunters">';
   if (!spare.length && !gone.length) h += '<p class="small muted" style="margin:6px 0 0">No other hunters yet. The new hunter button starts one, and this one waits here for you.</p>';
   if (spare.length) h += '<span class="lbl" style="margin-top:14px">Other hunters</span><ul class="hlist">' + spare.map(function (e) { return '<li><span class="htxt"><b>' + nm(e) + '</b><p class="small muted">' + sub(e) + '</p></span><span class="hbtns"><button type="button" class="btn sm" data-hn="switch" data-id="' + esc(e.id) + '">Play this hunter</button>' + del(e) + '</span></li>'; }).join('') + '</ul>';
   if (gone.length) h += '<span class="lbl" style="margin-top:14px">Gone but not forgotten</span><ul class="hlist">' + gone.map(function (e) { return '<li><span class="htxt"><b>' + nm(e) + '</b> <span class="muted small">' + esc(ENDHOW[e.ended.how] || 'Gone') + (e.ended.date ? ' &middot; ' + esc(e.ended.date) : '') + '</span><p class="small muted">' + sub(e) + (e.ended.note ? ' &middot; ' + esc(e.ended.note) : '') + '</p></span><span class="hbtns"><button type="button" class="btn ghost sm" data-hn="back" data-id="' + esc(e.id) + '">Bring back</button>' + del(e) + '</span></li>'; }).join('') + '</ul>';
   el.innerHTML = h + '</div>';
+  if (!dlg.open) { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute('open', ''); }
 }
-$('#hhead').addEventListener('click', function (e) {
+$('#hndlg-x').addEventListener('click', function () { hn.list = false; renderHunters(); $('#hn-list').focus(); });
+$('#hndlg').addEventListener('close', function () { if (hn.list) { hn.list = false; renderHunters(); } });
+$('#hndlg').addEventListener('click', function (e) { if (e.target === this) { hn.list = false; renderHunters(); return; } hnClick(e); });
+$('#hhead').addEventListener('click', hnClick);
+function hnClick(e) {
   var b = e.target.closest('[data-hn]'); if (!b) return;
   var k = b.dataset.hn, id = b.dataset.id;
   if (k === 'new') newHunter();
@@ -4080,7 +4087,7 @@ $('#hhead').addEventListener('click', function (e) {
     if (hn.del === id) { var i = benchFind(id); if (i >= 0) S.bench.splice(i, 1); hn.del = ''; renderHunters(); scheduleSave(); }
     else { hn.del = id; renderHunters(); setTimeout(function () { if (hn.del === id) { hn.del = ''; renderHunters(); } }, 4000); }
   }
-});
+}
 $('#photo').addEventListener('change', function (e) {
   var f = e.target.files && e.target.files[0]; e.target.value = '';
   if (!f) return;
