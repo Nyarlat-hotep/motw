@@ -352,7 +352,7 @@ details.sect > .body { padding: 0 16px 16px; }
 .ddpop:focus-visible .wantopt.on { outline: 2px solid var(--accent); outline-offset: -2px; }
 .ddpop .wanthd:first-child { border-top: 0; margin-top: 0; }
 .wantdd { position: relative; }
-.wantbtn { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px; min-height: 52px; cursor: pointer; font-family: var(--body); font-size: 18px; color: var(--ink); }
+.wantbtn { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: 12px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 16px; min-height: 52px; cursor: pointer; font-family: var(--body); font-size: 24px; color: var(--ink); }
 .wantbtn i { color: var(--muted); }
 .wantbtn:hover, .wantbtn[aria-expanded="true"] { border-color: var(--accent); }
 .wantbtn svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; transition: transform .15s ease; }
@@ -362,6 +362,9 @@ details.sect > .body { padding: 0 16px 16px; }
 .wantopt:hover { background: var(--surface2); }
 .wantopt.on { background: var(--surface2); box-shadow: inset 3px 0 0 var(--accent); }
 .wantlist:focus-visible .wantopt.on { outline: 2px solid var(--accent); outline-offset: -2px; }
+.wantlist .wantopt { font-size: 24px; padding: 10px 14px; }   /* the I want to list only; the other site dropdowns keep their size */
+.wantlist { border-radius: 16px; }
+.wantlist .wanthd { font-size: 17px; }
 .wanthd { padding: 12px 12px 4px; font-size: 14px; letter-spacing: .06em; color: var(--accent); border-top: 1px solid var(--line); margin-top: 6px; }
 .want p { margin: 12px 4px 0; }
 .want p { margin: 8px 0 0; }
@@ -429,6 +432,11 @@ details.case .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 .invdlg { width: min(640px, calc(100vw - 24px)); padding: 24px; border-radius: 14px; }
 .invgrid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px 12px; align-items: end; }
 .invgrid .ifld[hidden] { display: none; }
+#dolevel.btn { background: var(--good); border-color: var(--good); color: var(--bg); }
+#dolevel.btn:hover { background: color-mix(in srgb, var(--good) 85%, #fff); }
+.lvldlg .lvllist { list-style: none; padding: 0; margin: 10px 0; display: grid; gap: 8px; }
+.lvldlg .lvllist .btn { width: 100%; justify-content: flex-start; text-align: left; }
+.lvldlg .levelpick { border: 0; padding: 0; background: none; }
 #retdlg .ilbl { font-size: 17px; color: var(--ink); }
 #retdlg .ifld { gap: 8px; }
 .invgrid .qty { display: inline-flex; align-items: center; justify-content: space-between; height: 44px; padding: 0 4px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
@@ -1234,19 +1242,21 @@ span.mc-out { display: grid; }
 .pport-ph span { font-size: 14px; text-decoration: underline; }
 .pport-ph:hover { border-color: var(--accent); color: var(--ink); }
 .pclass { font-family: var(--display); font-size: 22px; line-height: 1.2; color: var(--ink); }
-.ptop .pstats .statrow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-.ptop .pstats .statbtn { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 48px; padding: 6px 14px; text-align: left; }
-.ptop .pstats .statbtn b { order: 2; font-size: 24px; }
-.ptop .pstats .statbtn span { font-size: 16px; color: var(--ink); }
-@media (max-width: 520px) { .ptop .pstats .statrow { gap: 8px; } .ptop .pstats .statbtn { padding: 6px 10px; } .ptop .pstats .statbtn b { font-size: 22px; } }
+.pstatlist { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; text-align: center; }
+.pstatlist li { display: flex; flex-direction: column-reverse; align-items: center; gap: 2px; }
+.pstatlist li > span { font-family: var(--display); font-size: 16px; color: var(--muted); }
+.pstatlist b { font-family: var(--num); font-weight: 600; font-size: 28px; line-height: 1.1; }
+.pstatlist b.hi { color: var(--accent); } .pstatlist b.lo { color: var(--muted); }
+.pstatlist b { --sgn-size: .43em; --sgn-rise: .12em; }   /* small + and - signs, about 12px beside the 28px number */
+.eqlist { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.eqlist li { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.eqlist li.off .eqtxt { opacity: .5; }
+.eqtxt { display: grid; gap: 2px; min-width: 0; }
+.eqlist .switch { margin: 0; align-items: center; }
 .pvit { display: grid; gap: 16px; min-width: 0; }
-.pvit #lvlup:empty { display: none; }
 .pvit .levelup { margin-top: 0; }
-.pbtns { display: inline-flex; gap: 6px; }
-.pbtns .btn { min-width: 52px; font-family: var(--num); font-size: 17px; letter-spacing: 0; }
 .prow.pchecks { justify-content: flex-start; gap: 12px 16px; }
 #pl-undo { margin-top: 16px; }
-.vdiv { width: 1px; align-self: stretch; min-height: 20px; background: var(--line); }
 /* Play: room to breathe */
 #hv-play .card { padding: 24px; }
 #hv-play .play, #hv-play .pvit, #hv-play .pmid { gap: 16px; }
@@ -1279,6 +1289,36 @@ span.mc-out { display: grid; }
 .play .statbtn b { font-size: 21px; } .play .statbtn span { font-size: 13px; }
 .play .pips { gap: 4px; }
 .play .pips button { width: 28px; height: 28px; font-size: 13px; }
+/* harm and XP: the circles share the card's width, as big as it allows */
+#pl-harm, #pl-xp { display: grid; gap: 8px; }
+#pl-harm { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+#pl-xp { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+#pl-harm button, #pl-xp button { width: 100%; height: auto; aspect-ratio: 1; max-width: 60px; justify-self: center; padding: 0; border: 0; border-radius: 6px; background: none; cursor: pointer; }
+#pl-harm svg, #pl-xp svg { display: block; width: 100%; height: 100%; overflow: visible; }
+/* tally: a parchment square, a scratched stroke in ink that turns to blood from 4 harm */
+.tally button { background: color-mix(in srgb, #e9dcbf 14%, var(--bg)) !important; box-shadow: inset 0 0 0 1px var(--line), inset 0 -6px 10px rgba(0, 0, 0, .12); }
+.tally .tl { fill: url(#ts-blood); filter: url(#ts-ink); }
+.tally .sp { fill: #8d1520; }
+.tally .sl { transform-origin: 20% 90%; }
+.tally.bleed .tl { filter: url(#ts-ink) drop-shadow(0 0 2px rgba(179, 32, 44, .6)); }
+.tally .drip { fill: #8d1520; opacity: .9; }
+.tally button.fresh .sl { animation: tslash .3s cubic-bezier(.6, 0, .2, 1) both; }
+.tally button.fresh .sp { animation: tspray .5s ease-out .2s both; }
+.tally button.fresh .drip { animation: tdrip .9s ease-in .35s both; }
+.tally text { font-family: var(--body); font-size: 9px; fill: var(--muted); text-anchor: end; opacity: .7; }
+.tally button:hover { box-shadow: inset 0 0 0 1px var(--accent), inset 0 -6px 10px rgba(0, 0, 0, .12); }
+@keyframes tslash { from { clip-path: inset(0 100% 0 0); transform: translate(-3px, 3px); } to { clip-path: inset(0 0 0 0); transform: none; } }
+@keyframes tspray { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+@keyframes tdrip { from { transform: translateY(-6px) scaleY(.2); opacity: 0; } to { transform: none; opacity: .9; } }
+/* seals: a poured wax disc with a pressed ring and the hunter's mark, stamped down */
+.seals .wax { fill: url(#ws-wax); filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .45)); }
+.seals .ring { fill: none; stroke: rgba(60, 0, 8, .45); stroke-width: 1.6; }
+.seals .em { fill: rgba(60, 0, 8, .55); }
+.seals .shine { fill: url(#ws-shine); }
+.seals .empty { fill: none; stroke: var(--line); stroke-width: 1.6; stroke-dasharray: 3 3; }
+.seals button:hover .empty { stroke: var(--accent); }
+.seals button.fresh svg { animation: sealstamp .5s cubic-bezier(.3, 1.4, .5, 1) both; transform-origin: 50% 50%; }
+@media (prefers-reduced-motion: reduce) { .tally button.fresh .sl, .tally button.fresh .sp, .tally button.fresh .drip, .seals button.fresh svg { animation: none; } }
 .prow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 6px 8px; margin-top: 6px; }
 .prow .ctl { display: inline-flex; align-items: center; gap: 4px; }
 .prow .ctl button { width: 30px; height: 30px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); cursor: pointer; line-height: 1; }
@@ -1291,7 +1331,12 @@ span.mc-out { display: grid; }
 @keyframes odoOutUp { from { transform: none; } to { transform: translateY(-100%); } }
 @keyframes odoInDn { from { transform: translateY(-100%); } to { transform: none; } }
 @keyframes odoOutDn { from { transform: none; } to { transform: translateY(100%); } }
-.prollline { font-size: 22px; line-height: 1.3; }
+.prollline { font-size: 32px; line-height: 1.3; }
+.rollwith { display: grid; gap: 6px; margin-top: 10px; }
+.rwbtns { display: flex; flex-wrap: wrap; gap: 6px; }
+.rwbtns button { font: inherit; font-size: 15px; padding: 4px 10px; border: 1px solid var(--line); border-radius: 8px; background: none; color: var(--muted); cursor: pointer; }
+.rwbtns button:hover { color: var(--ink); border-color: var(--accent); }
+.rwbtns button[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); background: var(--surface2); }
 .prollline .muted { font-size: 18px; }
 .prow .ctl output { position: relative; display: inline-block; overflow: hidden; line-height: 1; min-width: 2.6ch; text-align: center; font-family: var(--num); font-weight: 500; font-variant-numeric: lining-nums tabular-nums; }
 .prow label { display: inline-flex; align-items: center; gap: 6px; font-size: 15px; }
@@ -1316,7 +1361,7 @@ span.mc-out { display: grid; }
 .chip, .pmove small, .move .stat, .rc b, .wctl output { --sgn-size: .58em; --sgn-rise: -.07em; }
 /* the sign itself, kept in the markup at no size: it stays on the same line, so the
    value still reads and copies as "+0", while only the icon is seen. */
-.sgnt { display: inline-block; width: 0; overflow: hidden; vertical-align: baseline; }
+.sgnt { display: inline-block; width: 0; height: 0; overflow: hidden; vertical-align: top; }   /* the copyable sign; no size, so it never stretches the line */
 /* where an icon is the whole of a control, centre it on the box rather than on the
    baseline: a baseline nudge leaves it a pixel high and off to one side. */
 .step .ctl button, .prow .ctl button, .item .qty button, .wctl button,
@@ -1577,6 +1622,10 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 </style>
 
 <svg class="cdefs" aria-hidden="true" focusable="false"><defs>
+  <radialGradient id="ws-wax" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#e2585a"/><stop offset=".45" stop-color="#a81d2c"/><stop offset="1" stop-color="#5e0b16"/></radialGradient>
+  <radialGradient id="ws-shine" cx=".35" cy=".28" r=".35"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>
+  <linearGradient id="ts-blood" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#5e0b14"/><stop offset=".55" stop-color="#b3202c"/><stop offset="1" stop-color="#7a1019"/></linearGradient>
+  <filter id="ts-ink" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="1.6" numOctaves="2" seed="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="1.6"/></filter>
   <linearGradient id="cn-wax"><stop offset="0" style="stop-color:var(--cw-a)"/><stop offset=".2" style="stop-color:var(--cw-c)"/><stop offset=".46" style="stop-color:var(--cw-b)"/><stop offset=".7" style="stop-color:var(--cw-c)"/><stop offset="1" style="stop-color:var(--cw-a)"/></linearGradient>
   <linearGradient id="cn-drip"><stop offset="0" style="stop-color:var(--cw-c)"/><stop offset=".4" style="stop-color:var(--cw-b)"/><stop offset="1" style="stop-color:var(--cw-d)"/></linearGradient>
   <linearGradient id="cn-glow" x2="0" y2="1"><stop offset="0" stop-color="#ffb24c" stop-opacity=".9"/><stop offset=".28" stop-color="#ff9c3e" stop-opacity=".42"/><stop offset=".7" stop-color="#ff8a30" stop-opacity="0"/></linearGradient>
@@ -1596,6 +1645,11 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
 <dialog class="hcdlg hodlg" id="hodlg" aria-label="Picture from the Keeper"><img id="hodlg-img" alt=""><p id="hodlg-cap"></p><div class="actions"><button class="btn sm" type="button" id="hodlg-close">Close</button></div></dialog>
 <dialog class="hcdlg hpdlg" id="hpdlg" aria-label="A hunter's showcase"><div id="hpdlg-body"></div><div class="actions"><button class="btn sm" type="button" id="hpdlg-close">Close</button><button class="btn ghost sm" type="button" id="hpdlg-edit" hidden>Customize my showcase</button></div></dialog>
 <dialog class="hcdlg sessdlg" id="sessdlg" aria-labelledby="sessdlg-h"><div id="sessdlg-body"></div></dialog>
+<dialog class="hcdlg invdlg lvldlg" id="lvldlg" aria-labelledby="lvldlg-h">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px"><h2 id="lvldlg-h" class="czh" style="margin:0">Level up</h2><button type="button" class="hicon" id="lvldlg-x" aria-label="Not yet" data-tip="Not yet"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <p class="small muted" style="margin:0 0 14px">Five XP: your hunter gets better. Pick one improvement.</p>
+  <div id="lvlup"></div>
+</dialog>
 <dialog class="hcdlg invdlg" id="hndlg" aria-labelledby="hndlg-h">
   <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px"><h2 id="hndlg-h" class="czh" style="margin:0">My hunters</h2><button type="button" class="hicon" id="hndlg-x" aria-label="Close" data-tip="Close"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   <div id="hbar"></div>
@@ -1889,8 +1943,8 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
       <div id="play-pin"></div>
       <div id="play-prev"></div>
       <div class="play">
-        <div class="pvit"><div class="card ptop" id="play-status"></div><div class="card" id="pv-harm"></div><div class="card" id="pv-luck"></div><div class="card" id="pv-xp"></div><div id="lvlup"></div></div>
-        <div class="pmid"><div id="play-moves"></div>
+        <div class="pvit"><div class="card ptop" id="play-status"></div><div class="card" id="pv-harm"></div><div class="card" id="pv-luck"></div><div class="card" id="pv-xp"></div></div>
+        <div class="pmid"><div id="play-moves"></div><div class="card" id="play-gear"></div>
         <details class="card sesh" id="sesh">
           <summary class="lbl" id="histttl">This session</summary>
           <ul class="hist" id="hist"></ul>
@@ -3499,6 +3553,11 @@ function impList() {
   if (S.sheet.level >= 5) out = out.concat(d.advanced.map(function (x, i) { return { key: 'a' + i, it: x }; }));
   return out;
 }
+/* level up happens in a dialog, opened by the Level up button that appears in the Experience card at 5 XP */
+function lvlOpen() { var d = $('#lvldlg'); if (!d || S.sheet.xp < 5) return; levelPanel(); if (!d.open) { if (d.showModal) d.showModal(); else d.setAttribute('open', ''); } }
+function lvlClose() { var d = $('#lvldlg'); if (d && d.open) { if (d.close) d.close(); else d.removeAttribute('open'); } }
+$('#lvldlg-x').addEventListener('click', lvlClose);
+$('#lvldlg').addEventListener('click', function (e) { if (e.target === this) lvlClose(); });
 function levelPanel() {
   var d = curPB(), host = $('#lvlup');
   if (!d) { host.innerHTML = '<div class="levelpick"><b>No playbook picked yet</b><p class="small" style="margin:6px 0">Improvements come from your playbook. Pick one in Build a hunter, or level up now and note the improvement yourself.</p><div class="actions"><button type="button" class="btn sm" id="lvlplain">Level up anyway</button><button type="button" class="btn ghost sm" id="lvlcancel">Not yet</button></div></div>'; return; }
@@ -3523,12 +3582,12 @@ function levelDone(note, key) {
   if (st && key) st.imp[key] = true;
   sh.level++; sh.xp = Math.max(0, sh.xp - 5);
   if (note) sh.moves = (String(sh.moves || '').replace(/\s+$/, '') + (sh.moves ? '\n' : '') + 'Level ' + sh.level + ': ' + note).trim();
-  renderSheet(); renderPbCard(); fxPlay('level'); scheduleSave();
+  lvlClose(); renderSheet(); renderPbCard(); scheduleSave(); setTimeout(function () { fxPlay('level'); }, 60);
 }
 document.addEventListener('click', function (e) {
   var t = e.target, g;
   if (!t.closest) return;
-  if (t.id === 'lvlcancel') { renderSheet(); return; }
+  if (t.id === 'lvlcancel') { lvlClose(); return; }
   if (t.id === 'lvlplain') { levelDone('', null); return; }
   if (!(g = t.closest('[data-lvl],[data-lvlstat],[data-lvladv],[data-lvlgo]'))) return;
   var sh = S.sheet;
@@ -3606,7 +3665,6 @@ function renderSheet() {
   var sel = $('#f-pb');
   if (!sel.options.length) sel.innerHTML = '<option value="">Not chosen yet</option>' + PLAYBOOKS.map(function (p) { return '<option>' + esc(p[0]) + '</option>'; }).join('');
   $$('[data-bind]').forEach(function (el) { var v = getPath(S, el.dataset.bind); if (el.value !== v && document.activeElement !== el) el.value = v == null ? '' : v; });
-  $('#lvlup').innerHTML = sh.xp >= 5 ? '<div class="levelup">' + artImg('levelup', 'lvlimg') + '<span><b>Level up ready.</b> Pick an improvement.</span><button class="btn sm" type="button" id="dolevel">Level up</button></div>' : '';
   renderPortrait(); renderPbCard(); renderHistPicks(); renderBadges(); renderPlay();
 }
 document.addEventListener('input', function (e) {
@@ -3619,7 +3677,7 @@ document.addEventListener('input', function (e) {
 });
 $('#p-hunter').addEventListener('click', function (e) {
   var t = e.target, sh = S.sheet;
-  if (t.id === 'dolevel') { levelPanel(); }
+  if (t.id === 'dolevel') { lvlOpen(); }
 });
 
 
@@ -3671,21 +3729,7 @@ function renderRollas() { renderPlay(); applyMast(); }
 function photoMsg(t) { $('#photomsg').textContent = t || ''; }
 
 /* ---------- play screen ---------- */
-var play = { wantOpen: false, wantIx: -1, hit: 0, base: 0, baseUnst: false, hitTimer: null, ignore: false, msg: '', wound: 0, want: '' };
-/* Take harm: the stepper is the hit you are taking right now. Every change lands on the track at once, armor taken off the hit as a whole.
-   A few seconds after the last tap the hit is done and the stepper goes back to 0, ready for the next one. */
-function hitSet(n) {
-  var sh = S.sheet;
-  if (!play.hit) { play.base = sh.harm; play.baseUnst = !!sh.unstable; }
-  play.hit = clamp(n, 0, 12);
-  var arm = play.ignore ? 0 : armorVal(), dmg = Math.max(0, play.hit - arm);
-  sh.harm = Math.min(8, play.base + dmg); sh.unstable = play.baseUnst || sh.harm >= 4;
-  play.wound = sh.harm - play.base;
-  clearTimeout(play.hitTimer);
-  if (play.hit) play.hitTimer = setTimeout(function () { play.hit = 0; renderPlay(); }, 4000);
-  renderSheet(); scheduleSave();
-}
-function hitEnd() { clearTimeout(play.hitTimer); play.hit = 0; }
+var play = { wantOpen: false, wantIx: -1, msg: '', wound: 0, want: '' };
 var rit = { open: false, caseId: '', eos: [false, false, false, false], heal: 'none', clear: true, done: null };   // the end-of-session panel; nothing it holds is saved
 /* what a new player says they want to do: the move that covers it, or a line of advice when no move does */
 var WANTS = [
@@ -3807,6 +3851,33 @@ function wantHTML() {
   function opts(a, b) { return all.slice(a, b).map(function (x, i) { return '<option value="' + (a + i) + '">' + esc(x[0]) + '</option>'; }).join(''); }
   return '<option value="">I want to...</option>' + opts(0, 9) + (n ? '<optgroup label="Use one of my own moves">' + opts(9, 9 + n) + '</optgroup>' : '') + '<optgroup label="Or">' + opts(9 + n, all.length) + '</optgroup>';
 }
+/* Harm as tally marks scratched on parchment, and XP as wax seals. Each is a button like the old pips (data-n, aria-pressed), so the clicks are unchanged.
+   Marks added since the last draw play their stroke or stamp; from 4 harm the ink runs to blood. */
+var markPrev = { harm: null, xp: null };
+function tallyPips(val) {
+  var h = '', was = markPrev.harm; markPrev.harm = val;
+  /* a tapered slash: thin at the start, full in the middle, a ragged tail; a few drops thrown off it */
+  var paths = ['M7 35C11 28 17 18 33 5C26 15 18 25 10 36Z', 'M6 33C12 26 18 16 34 8C25 16 18 26 9 35Z', 'M8 34C13 27 19 16 32 6C26 17 19 27 11 36Z', 'M7 32C12 26 19 15 33 8C27 16 20 26 10 34Z'];
+  var drops = ['<circle cx="29" cy="15" r="1.3"/><circle cx="33" cy="12" r=".8"/>', '<circle cx="12" cy="22" r="1.1"/><circle cx="31" cy="17" r=".9"/>', '<circle cx="27" cy="20" r="1.2"/><circle cx="14" cy="17" r=".8"/>', '<circle cx="30" cy="18" r="1"/><circle cx="10" cy="24" r="1.1"/>'];
+  for (var i = 1; i <= 8; i++) {
+    var on = i <= val, fresh = on && was != null && i > was;
+    h += '<button type="button" data-n="' + i + '" aria-pressed="' + on + '" aria-label="Harm ' + i + '"' + (fresh ? ' class="fresh"' : '') + '><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">' +
+      (on ? '<g class="sl"><path class="tl" d="' + paths[i % 4] + '"/><g class="sp">' + drops[i % 4] + '</g></g>' : '') + (on && val >= 4 ? '<path class="drip" d="M' + (12 + i % 3 * 4) + ' 30c0 3-1.6 5-1.6 6.4a1.6 1.6 0 0 0 3.2 0c0-1.4-1.6-3.4-1.6-6.4z"/>' : '') + '<text x="34" y="36">' + i + '</text></svg></button>';
+  }
+  return '<div class="pips tally' + (val >= 4 ? ' bleed' : '') + '" id="pl-harm" role="group" aria-label="Harm">' + h + '</div>';
+}
+function sealPips(val, mark) {
+  var h = '', was = markPrev.xp; markPrev.xp = val;
+  var em = mark && pgHas(SIGILS, mark) ? '<g transform="translate(12 12) scale(.67)" class="em">' + SIGILS[mark] + '</g>' : '<path class="em" d="M20 11l3 6.5 7 .8-5.2 4.8 1.5 7-6.3-3.6-6.3 3.6 1.5-7L10 18.3l7-.8z"/>';
+  for (var i = 1; i <= 5; i++) {
+    var on = i <= val, fresh = on && was != null && i > was;
+    h += '<button type="button" data-n="' + i + '" aria-pressed="' + on + '" aria-label="XP ' + i + '"' + (fresh ? ' class="fresh"' : '') + '><svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">' +
+      (on ? '<path class="wax" d="M20 2.5c3 0 4.4 2 7 2.6s5 .2 6.6 2.3 1 4.4 2.2 6.8 3 3.6 3 6.3-2.1 3.9-2.8 6.4.6 5.1-1.4 7.1-4.7 1.3-7 2.4S23.4 39 20 39s-4.3-1.9-6.8-2.8-4.9-.4-6.9-2.4-.8-4.6-1.5-7.1S1.7 23.2 1.7 20.4s2-4 3-6.3.2-4.8 1.9-6.9 4.3-1.6 6.7-2.4S17.1 2.5 20 2.5z"/>' +
+        '<circle class="ring" cx="20" cy="20.5" r="12.5"/>' + em + '<ellipse class="shine" cx="14" cy="12" rx="9" ry="6"/>'
+      : '<circle class="empty" cx="20" cy="20.5" r="15"/>') + '</svg></button>';
+  }
+  return '<div class="pips seals" id="pl-xp" role="group" aria-label="XP">' + h + '</div>';
+}
 function pipStr(id, cls, n, val, label) {
   var h = '';
   for (var i = 1; i <= n; i++) h += '<button type="button" data-n="' + i + '" aria-pressed="' + (i <= val) + '" aria-label="' + label + ' ' + i + '">' + i + '</button>';
@@ -3817,7 +3888,7 @@ var odoPrev = {};
 function odoRun() {
   var calm = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   $$('#hv-play .prow .ctl output').forEach(function (o) {
-    var b = o.previousElementSibling, k = b && (b.dataset.padj || (b.dataset.ph ? 'hit' : '')); if (!k) return;
+    var b = o.previousElementSibling, k = b && b.dataset.padj; if (!k) return;
     var now = o.textContent, was = odoPrev[k], wasH = odoPrev[k + '#']; odoPrev[k] = now; odoPrev[k + '#'] = o.innerHTML;
     if (was == null || was === now || calm) return;
     var up = parseInt(now.replace(String.fromCharCode(8722), '-'), 10) > parseInt(was.replace(String.fromCharCode(8722), '-'), 10);
@@ -3835,19 +3906,23 @@ function renderPlay() {
   var sh = S.sheet, R = S.roller, d = curPB(), a = armorVal(), w = weaponsOut();
   var av0 = sh.photo || artFor(sh.playbook), av = av0 ? '<img src="' + esc(av0) + '" alt="">' : '<button type="button" class="pport-ph" data-pgo="photo">No picture yet<br><span>Add one on the Sheet</span></button>';
   var fresh = !sh.playbook && !(sh.name && sh.name.trim());
-  var gear = w.map(function (i) { return '<li class="chip">' + esc(i.name || 'Weapon') + ' ' + (+i.val || 0) + '-harm' + (i.note ? ' <span class="muted">' + esc(String(i.note).replace(/\s*\[.*\]$/, '')) + '</span>' : '') + '</li>'; }).join('') + (a ? '<li class="chip">Armor ' + a + '</li>' : '');
   host.innerHTML =
     '<div class="pport">' + av + '<span class="pclass">' + esc(sh.playbook || 'No playbook yet') + ' &middot; Level ' + sh.level + '</span></div>' +
     (fresh ? '<p class="note pfresh" style="margin:0">No hunter yet. You can still roll the basic moves. <button type="button" class="linkbtn" data-pgo="build">Build a hunter</button></p>' : '') +
-    '<div class="pblock pstats"><div class="statrow" role="group" aria-label="Rating to roll">' + STATS.map(function (s) { return '<button type="button" class="statbtn" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '"><b>' + fmtI(sh.stats[s]) + '</b><span>' + STATNAME[s] + '</span></button>'; }).join('') + '</div></div>' +
-    (gear ? '<div class="pblock pgear"><span class="lbl">Equipped</span><ul class="chips" style="margin:0">' + gear + '</ul></div>' : '');
-  $('#pv-harm').innerHTML = '<span class="lbl">Harm</span>' + pipStr('pl-harm', 'harm', 8, sh.harm, 'Harm') + '<p class="small' + (sh.harm >= 4 ? '' : ' muted') + '" style="margin:6px 0 0">' + (sh.unstable ? '<b style="color:var(--bad)">Unstable.</b> ' : '') + esc(harmText(sh.harm)) + '</p>' +
-      '<div class="prow"><span>Take harm</span><span class="ctl"><button type="button" data-ph="-1" aria-label="Less harm"' + (play.hit ? '' : ' disabled') + '><span class="i i-minus" aria-hidden="true"></span></button><output aria-live="polite">' + play.hit + '</output><button type="button" data-ph="1" aria-label="More harm"><span class="i i-plus" aria-hidden="true"></span></button></span></div>' +
-      '<div class="prow"><span>Heal</span><span class="pbtns"><button type="button" class="btn ghost sm" id="pl-heal1" aria-label="Heal 1"' + (sh.harm < 1 ? ' disabled' : '') + '>+1</button><button type="button" class="btn ghost sm" id="pl-healall" aria-label="Heal all"' + (sh.harm < 1 ? ' disabled' : '') + '>All</button></span></div>' +
-      '<div class="prow pchecks"><label><input type="checkbox" id="pl-ign"' + (play.ignore ? ' checked' : '') + '> Ignores armor</label><span class="vdiv" aria-hidden="true"></span><label><input type="checkbox" id="pl-unst"' + (sh.unstable ? ' checked' : '') + '> Unstable</label></div>' +
+    '<div class="pblock pstats"><ul class="pstatlist" aria-label="Your ratings">' + STATS.map(function (s) { var v = sh.stats[s]; return '<li><span>' + STATNAME[s] + '</span><b class="' + (v >= 2 ? 'hi' : v < 0 ? 'lo' : '') + '">' + fmtI(v) + '</b></li>'; }).join('') + '</ul></div>';
+  /* Equipment, in the middle column: the weapons and armor you carry, switched on or off here; everything else about them is on the Sheet */
+  var kit = sh.inventory.filter(function (i) { return i.type === 'Weapon' || i.type === 'Armor'; });
+  $('#play-gear').innerHTML = '<div class="invhead" style="margin-bottom:10px"><span class="lbl" style="margin:0">Equipment</span><button type="button" class="linkbtn small" data-pgo="gear">Edit on the Sheet</button></div>' +
+    (kit.length ? '<ul class="eqlist">' + kit.map(function (i) {
+      var note = String(i.note || '').replace(/\s*\[.*\]$/, '').trim();
+      return '<li class="' + (i.eq ? '' : 'off') + '"><span class="eqtxt"><b>' + esc(i.name || i.type) + '</b><span class="small muted">' + (i.type === 'Weapon' ? (+i.val || 0) + '-harm' : 'Armor ' + (+i.val || 0)) + (note ? ' &middot; ' + esc(note) : '') + '</span></span>' +
+        '<label class="switch"><input type="checkbox" role="switch" data-peq="' + esc(i.id) + '"' + (i.eq ? ' checked' : '') + ' aria-label="' + esc(i.name || i.type) + ' equipped"></label></li>';
+    }).join('') + '</ul>' : '<p class="small muted" style="margin:0">No weapons or armor yet. Add them on the Sheet.</p>');
+  $('#pv-harm').innerHTML = '<span class="lbl">Harm</span>' + tallyPips(sh.harm) + '<p class="small' + (sh.harm >= 4 ? '' : ' muted') + '" style="margin:6px 0 0">' + (sh.unstable ? '<b style="color:var(--bad)">Unstable.</b> ' : '') + esc(harmText(sh.harm)) + '</p>' +
+      '<div class="prow pchecks"><label><input type="checkbox" id="pl-unst"' + (sh.unstable ? ' checked' : '') + '> Unstable</label></div>' +
       (play.wound > 0 && sh.luck > 0 ? '<button type="button" class="btn ghost sm" id="pl-undo">Spend Luck: cancel that wound</button>' : '');
   $('#pv-luck').innerHTML = '<span class="lbl">Luck</span>' + '<div class="pips candles' + (sh.luck < 3 ? ' low' : '') + '" id="pl-luck" role="group" aria-label="Luck">' + luckPips(sh.luck) + '</div><p class="lucknote' + (sh.luck < 3 ? ' low' : '') + '">' + luckNote(sh.luck) + '</p>' + (d ? '<p class="small muted" style="margin:6px 0 0"><b>When you spend Luck:</b> ' + esc(d.luckSpecial) + '</p>' : '');
-  $('#pv-xp').innerHTML = '<span class="lbl">Experience</span>' + pipStr('pl-xp', '', 5, Math.min(sh.xp, 5), 'XP') + '<p class="small muted" style="margin:8px 0 0">Level <b id="lvl">' + sh.level + '</b>. Mark one on any roll of 6 or less. At 5 you level up.</p>';
+  $('#pv-xp').innerHTML = '<span class="lbl">Experience</span>' + sealPips(Math.min(sh.xp, 5), pageOf(sh).mark) + '<p class="small muted" style="margin:8px 0 0">Level <b id="lvl">' + sh.level + '</b>. Mark one on any roll of 6 or less. At 5 you level up.</p>' + (sh.xp >= 5 ? '<button class="btn sm" type="button" id="dolevel" style="margin-top:12px">Level up</button>' : '');
 
   var basic = MOVES.filter(function (m) { return m.g === 'basic'; }), weird = MOVES.filter(function (m) { return m.g === 'weird'; });
   var mine = S.sheet.custom.map(function (c) { return BYID['x' + c.id]; }).filter(Boolean);
@@ -3870,6 +3945,8 @@ function renderPlay() {
   $('#play-sel').className = 'card psel';
   $('#play-sel').innerHTML = '<h3>' + esc(mv.id === 'plain' ? 'Plain roll' : mv.name) + '</h3>' + (mv.trig ? '<p class="muted"><i>' + esc(mv.trig) + '</i></p>' : '') +
     '<p class="prollline">Roll 2d6 <b>' + fmt(m) + '</b> <span class="muted">(' + esc(parts.join(', ')) + ')</span></p>' +
+    '<div class="rollwith"><span class="small muted">' + (mv.id === 'plain' ? 'Pick what to roll with' : 'Rolls with. Change it only if a move lets you swap.') + '</span><div class="rwbtns" role="group" aria-label="Rating to roll">' +
+      STATS.map(function (s) { return '<button type="button" data-pstat="' + s + '" aria-pressed="' + (R.stat === s) + '">' + STATNAME[s] + ' ' + fmtI(sh.stats[s]) + '</button>'; }).join('') + '</div></div>' +
     (mv.adv ? '<label class="small" style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="adv"' + (S.sheet.adv[R.move] ? ' checked' : '') + ' style="width:20px;height:20px;accent-color:var(--accent)"> My hunter has the Advanced version</label>' : '') +
     '<div class="pblock"><span class="lbl">This roll</span>' + stepStr('+1 forward', 'forward', fmtI(R.forward), '(clears)') + stepStr('+1 ongoing', 'ongoing', fmtI(R.ongoing)) + stepStr('Other', 'other', fmtI(R.other), '(clears)') + stepStr('Hold', 'hold', S.hold.n) + '</div>';
   odoRun();
@@ -3885,27 +3962,23 @@ function renderPlay() {
       if (k === 'hold') S.hold.n = clamp(S.hold.n + dd, 0, 9); else R[k] = clamp(R[k] + dd, -5, 5);
       renderRoller(); scheduleSave(); return;
     }
-    if ((g = t.closest('[data-ph]'))) { hitSet(play.hit + +g.dataset.ph); return; }
     if ((g = t.closest('.pips button')) && /^pl-/.test(g.parentElement.id)) {
       var n = +g.dataset.n, id = g.parentElement.id;
       if (id === 'pl-luck') setLuck(sh.luck === n ? n - 1 : n);
-      if (id === 'pl-harm') { hitEnd(); sh.harm = sh.harm === n ? n - 1 : n; if (sh.harm >= 4) sh.unstable = true; if (sh.harm === 0) sh.unstable = false; play.wound = 0; play.msg = ''; }
+      if (id === 'pl-harm') { var was = sh.harm; sh.harm = sh.harm === n ? n - 1 : n; if (sh.harm >= 4) sh.unstable = true; if (sh.harm === 0) sh.unstable = false; play.wound = sh.harm > was ? sh.harm - was : 0; play.msg = ''; }   // a rise is a wound that Spend Luck can cancel
       if (id === 'pl-xp') sh.xp = sh.xp === n ? n - 1 : n;
       renderSheet(); scheduleSave(); return;
     }
-    if (t.id === 'pl-healall') { hitEnd(); evSay('Healed all harm'); sh.harm = 0; sh.unstable = false; play.wound = 0; play.msg = ''; renderSheet(); scheduleSave(); return; }
-    if (t.id === 'pl-heal1') { hitEnd(); evSay('Healed 1'); sh.harm = Math.max(0, sh.harm - 1); if (sh.harm < 4) sh.unstable = false; play.wound = 0; play.msg = ''; renderSheet(); scheduleSave(); return; }
     if (t.id === 'pl-undo' && play.wound > 0 && sh.luck > 0) {
-      hitEnd();
       evSay('Spent Luck to cancel a wound');
       sh.harm = Math.max(0, sh.harm - play.wound); if (sh.harm < 4) sh.unstable = false; setLuck(sh.luck - 1);
       play.wound = 0;
       renderSheet(); scheduleSave(); return;
     }
-    if ((g = t.closest('[data-pgo]'))) { if (g.dataset.pgo === 'photo') { setHV('sheet'); var pb = $('#photobtn'); if (pb) pb.scrollIntoView({ block: 'center' }); } else if (g.dataset.pgo === 'build') { setHV('build'); renderBuild(); window.scrollTo(0, 0); } else { var lv = $('#lvlup'); if (lv) lv.scrollIntoView({ block: 'center' }); } scheduleSave(); return; }
+    if ((g = t.closest('[data-pgo]'))) { if (g.dataset.pgo === 'gear') { setHV('sheet'); var ia = $('#invadd-open'); if (ia) ia.scrollIntoView({ block: 'start', behavior: 'smooth' }); } else if (g.dataset.pgo === 'photo') { setHV('sheet'); var pb = $('#photobtn'); if (pb) pb.scrollIntoView({ block: 'center' }); } else if (g.dataset.pgo === 'build') { setHV('build'); renderBuild(); window.scrollTo(0, 0); } else { var lv = $('#lvlup'); if (lv) lv.scrollIntoView({ block: 'center' }); } scheduleSave(); return; }
   });
   host.addEventListener('change', function (e) {
-    if (e.target.id === 'pl-ign') { play.ignore = e.target.checked; if (play.hit) hitSet(play.hit); }
+    if (e.target.dataset && e.target.dataset.peq) { var it = S.sheet.inventory.filter(function (x) { return x.id === e.target.dataset.peq; })[0]; if (it) { it.eq = e.target.checked; renderInv(); renderPlay(); scheduleSave(); } return; }
     if (e.target.id === 'pl-unst') { S.sheet.unstable = e.target.checked; renderPlay(); scheduleSave(); }
   });
 })();
