@@ -759,7 +759,7 @@ details.case .ttl, details.beast .ttl { font-size: 21px; text-transform: none; }
 .small, .muted.small { font-size: 17px; }
 .hint, .note, .chip, .hist, .odds, .meters, .strip li, .item .eq, .tip p, .pb p, .move dl, .move .trig, table, .gear { font-size: 17px; }
 .tiny { font-size: 14px; }
-.chip { border-radius: 2px; padding: 1px 10px; }
+.chip { border-radius: 8px; padding: 1px 10px; }
 .btn { font-family: var(--display); font-size: 19px; letter-spacing: .05em; border-radius: 3px; }
 .btn.sm { font-size: 17px; }
 input[type=text], input[type=date], input[type=search], input[type=number], select, textarea { border-radius: 8px; font-size: 18px; }
@@ -1365,6 +1365,7 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
    segmented control and the candles keep their own shape. */
 .btn, .inkbtn, .step .ctl button, .prow .ctl button, .item .qty button, .wctl button,
 .clock button, button.chip, .statbtn, .pmove, .wopt, .wcard { border-radius: var(--radius-btn); }
+.chip, button.chip { border-radius: 8px; }   /* every chip on the site, buttons and labels alike */
 
 /* ---------- the hunter's page (track L): a frame, a trim color, a mark, a background and showcases, on the Party tab's card and on the page it opens ----------
    A page's look is choices from lists the journal knows, a few numbers and short text (pageClean): never CSS or markup from a player. pageLook() turns the choices into
