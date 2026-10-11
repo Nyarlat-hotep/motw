@@ -417,17 +417,24 @@ details.case .meta { color: var(--muted); font-size: 14px; margin-left: auto; }
 .chips button { font: inherit; color: inherit; cursor: pointer; }
 .chips button.chip:hover { border-color: var(--accent); }
 .inv { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
-.item { display: grid; grid-template-columns: minmax(0, 1fr) 120px 84px auto auto; gap: 8px; align-items: center; border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 10px; }
+.item { display: grid; grid-template-columns: minmax(0, 1fr) 150px 88px 128px 88px 44px; gap: 10px 12px; align-items: end; border: 1px solid var(--line); background: var(--bg); border-radius: 8px; padding: 10px; }
 .item .eq { display: flex; align-items: center; gap: 6px; font-size: 14px; white-space: nowrap; }
 .item .eq input { width: 20px; height: 20px; accent-color: var(--accent); }
 .item .note { grid-column: 1 / -1; border: 0; background: none; padding: 0; border-radius: 0; }
 .item .note input { font-size: 14px; }
 .item .val { display: grid; gap: 2px; }
 .item .val span { font-family: var(--type); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.item .qty { display: inline-flex; align-items: center; gap: 2px; }
-.item .qty button { width: 32px; height: 32px; border: 1px solid var(--line); background: var(--surface); border-radius: 6px; cursor: pointer; }
+.ifld { display: grid; gap: 4px; min-width: 0; }
+.ilbl { font-size: 13px; color: var(--muted); line-height: 1.2; }
+.ifld input[type="text"], .ifld input[type="number"], .ifld select { height: 44px; min-height: 0; }
+.ifld input[type="number"] { text-align: center; padding: 0 6px; }
+.irm .btn.ib { width: 44px; min-width: 44px; height: 44px; min-height: 0; }
+.ieq .switch { height: 44px; align-items: center; }
+.item .qty { display: inline-flex; align-items: center; justify-content: space-between; gap: 4px; height: 44px; padding: 0 4px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.item .qty button { width: 34px; height: 34px; border: 0; background: none; border-radius: 6px; cursor: pointer; color: var(--ink); }
+.item .qty button:hover { background: var(--surface2); }
 .item .qty output { min-width: 2.4ch; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
-@media (max-width: 640px) { .item { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .item .note { grid-column: 1 / -1; } }
+@media (max-width: 760px) { .item { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 44px; } .iname { grid-column: 1 / -1; } .irm { grid-column: 3; grid-row: 2; } .ieq { grid-column: 3; } .item .note { grid-column: 1 / -1; } }
 .gear { margin: 8px 0 0; font-size: 14px; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
 
@@ -4042,14 +4049,17 @@ $('#rmphoto').addEventListener('click', function () { S.sheet.photo = ''; S.shee
 
 var removed = null;
 function itemHTML(i) {
-  var gearType = i.type === 'Weapon' || i.type === 'Armor';
+  /* one inventory row: each control under its own small label, all the same height, in columns that line up from row to row */
+  var gearType = i.type === 'Weapon' || i.type === 'Armor', n = 'it' + i.id;
   var opts = ITYPES.map(function (t) { return '<option' + (t === i.type ? ' selected' : '') + '>' + t + '</option>'; }).join('');
-  var eq = gearType ? '<label class="eq"><input type="checkbox" data-i="eq"' + (i.eq ? ' checked' : '') + ' aria-label="Equipped"><span>Equipped</span></label>' : '';
-  var val = gearType ? '<label class="val"><span>' + (i.type === 'Weapon' ? 'Harm' : 'Armor') + '</span><input type="number" data-i="val" min="0" max="9" value="' + esc(i.val) + '" inputmode="numeric"></label>' : '<span></span>';
-  return '<li class="item" data-iid="' + i.id + '"><div style="display:flex;gap:10px;align-items:center;min-width:0">' + eq + '<input type="text" data-i="name" value="' + esc(i.name) + '" aria-label="Item name" style="min-width:0"></div>' +
-    '<select data-i="type" aria-label="Type">' + opts + '</select>' + val +
-    '<span class="qty"><button type="button" data-q="-1" aria-label="Fewer"><span class="i i-minus" aria-hidden="true"></span></button><output>' + i.qty + '</output><button type="button" data-q="1" aria-label="More"><span class="i i-plus" aria-hidden="true"></span></button></span>' +
-    '' + ib('trash', 'Remove ' + esc(i.name || 'item'), 'data-rm') + '' +
+  var f = function (cls, lab, ctl, forId) { return '<div class="ifld ' + cls + '">' + (forId ? '<label class="ilbl" for="' + forId + '">' : '<span class="ilbl">') + lab + (forId ? '</label>' : '</span>') + ctl + '</div>'; };
+  return '<li class="item" data-iid="' + i.id + '">' +
+    f('iname', 'Item', '<input type="text" id="' + n + 'n" data-i="name" value="' + esc(i.name) + '" autocomplete="off">', n + 'n') +
+    f('itype', 'Type', '<select id="' + n + 't" data-i="type">' + opts + '</select>', n + 't') +
+    (gearType ? f('ival', i.type === 'Weapon' ? 'Harm' : 'Armor', '<input type="number" id="' + n + 'v" data-i="val" min="0" max="9" value="' + esc(i.val) + '" inputmode="numeric">', n + 'v') : '<div class="ifld ival"></div>') +
+    f('iqty', 'Qty', '<span class="qty"><button type="button" data-q="-1" aria-label="Fewer"><span class="i i-minus" aria-hidden="true"></span></button><output aria-label="Quantity">' + i.qty + '</output><button type="button" data-q="1" aria-label="More"><span class="i i-plus" aria-hidden="true"></span></button></span>') +
+    (gearType ? f('ieq', 'Equipped', '<label class="switch"><input type="checkbox" role="switch" data-i="eq"' + (i.eq ? ' checked' : '') + ' aria-label="Equipped"></label>') : '<div class="ifld ieq"></div>') +
+    '<div class="ifld irm">' + ib('trash', 'Remove ' + esc(i.name || 'item'), 'data-rm') + '</div>' +
     '<div class="note"><input type="text" data-i="note" value="' + esc(i.note) + '" placeholder="Notes or tags, like silver, close, loud" aria-label="Notes"></div></li>';
 }
 function renderInvSum() {
