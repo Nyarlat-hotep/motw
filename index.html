@@ -226,6 +226,42 @@ details.sect > .body { padding: 0 16px 16px; }
 .hicons { display: flex; align-items: center; gap: 4px; }
 .hdiv { width: 1px; align-self: stretch; margin: 6px 8px; background: var(--line); }
 .hdiv[hidden], .hend[hidden] { display: none; }
+/* the notebook sheet: slides up from below the bottom right corner, and back down */
+.nbsheet { position: fixed; right: calc(16px + env(safe-area-inset-right, 0px)); bottom: 0; z-index: 30; width: min(500px, calc(100vw - 32px)); height: min(70vh, 640px); display: flex; flex-direction: column;
+  background: var(--surface2); color: var(--ink); border: 1px solid color-mix(in srgb, var(--line), var(--ink) 30%); border-bottom: 0; border-radius: var(--radius) var(--radius) 0 0; box-shadow: 0 -12px 40px rgba(0, 0, 0, .35), 0 -2px 8px rgba(0, 0, 0, .15);
+  transform: translateY(calc(100% + 24px)); visibility: hidden; transition: transform .34s cubic-bezier(.4, 0, .9, .6), visibility 0s .34s; }
+.nbsheet.on { transform: none; visibility: visible; transition: transform .38s cubic-bezier(.16, .9, .3, 1); }
+@media (prefers-reduced-motion: reduce) { .nbsheet, .nbsheet.on { transition: none; } }
+@media (max-width: 640px) { .nbsheet { right: 0; width: 100%; height: min(78vh, 640px); } }
+.nbhead { display: flex; align-items: center; gap: 10px; padding: 6px 6px 6px 18px; border-bottom: 1px solid color-mix(in srgb, var(--line), var(--ink) 15%); }
+.nbhead h2 { margin: 0; font-family: var(--display); font-size: 22px; line-height: 1.2; }
+.nbwho { flex: 1; min-width: 0; color: var(--muted); font-size: 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.nbx .i { width: 18px; height: 18px; }
+.nbtools { display: flex; flex-wrap: wrap; gap: 4px 0; padding: 6px 8px; border-bottom: 1px solid color-mix(in srgb, var(--line), var(--ink) 15%); }
+.nbg { display: flex; gap: 2px; padding: 0 4px; }
+.nbg + .nbg { border-left: 1px solid var(--line); }
+.nbtools button { width: 36px; height: 36px; padding: 0; display: inline-grid; place-items: center; border: 1px solid transparent; border-radius: 8px; background: none; color: var(--muted); cursor: pointer; font-family: var(--body); font-size: 19px; line-height: 1; }
+.nbtools button:hover { color: var(--ink); border-color: var(--line); }
+.nbtools button[aria-pressed="true"] { color: var(--accent); border-color: color-mix(in srgb, var(--line), var(--ink) 30%); background: var(--surface); }
+.nbtools svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.nbtools .nbh { font-family: var(--body); font-weight: 700; font-size: 15px; }
+.nblink { display: flex; gap: 6px; align-items: center; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.nblink[hidden] { display: none; }
+.nblink input { flex: 1; min-width: 0; }
+.nbed { flex: 1; overflow: auto; padding: 14px 18px 28px; outline: none; font-family: var(--body); font-size: 18px; line-height: 1.5; overflow-wrap: anywhere; }
+.nbed > :first-child { margin-top: 0; }
+.nbed p { margin: 0 0 .5em; }
+.nbed h2 { font-family: var(--display); font-size: 26px; line-height: 1.2; margin: .7em 0 .3em; }
+.nbed h3 { font-family: var(--display); font-size: 21px; line-height: 1.25; margin: .6em 0 .25em; }
+.nbed blockquote { margin: .5em 0; padding: 2px 0 2px 14px; border-left: 3px solid var(--accent); color: var(--muted); font-style: italic; }
+.nbed ul, .nbed ol { margin: .2em 0 .6em; padding-left: 1.5em; }
+.nbed a { color: var(--accent); text-decoration: underline; }
+.nbed ul.nbchk { list-style: none; padding-left: 0; }
+.nbed ul.nbchk > li { position: relative; padding-left: 32px; }
+.nbed ul.nbchk > li::before { content: ''; position: absolute; left: 2px; top: .28em; width: 18px; height: 18px; box-sizing: border-box; border: 1.5px solid var(--muted); border-radius: 5px; cursor: pointer; }
+.nbed ul.nbchk > li[data-done]::before { background: var(--accent); border-color: var(--accent); }
+.nbed ul.nbchk > li[data-done]::after { content: ''; position: absolute; left: 5px; top: calc(.28em + 3px); width: 12px; height: 12px; background: var(--accent-ink); -webkit-mask: var(--i-check) center / contain no-repeat; mask: var(--i-check) center / contain no-repeat; pointer-events: none; }
+.nbed ul.nbchk > li[data-done] { opacity: .55; }   /* faded, not struck through: the browser would carry a strike or a color on into the next line typed */
 .hicon.hend { color: var(--bad); }
 .hicon.hend:hover { color: var(--bad); border-color: var(--bad); background: var(--bad-bg); }
 .hicon { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding: 0 10px; background: none; border: 1px solid transparent; border-radius: 8px; color: var(--muted); cursor: pointer; }
@@ -1251,6 +1287,18 @@ span.mc-out { display: grid; }
 .eqlist { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .eqlist li { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 10px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
 .eqlist li.off .eqtxt { opacity: .5; }
+.eqgrp { margin: 14px 0 6px; font-family: var(--display); font-size: 17px; font-weight: 400; color: var(--muted); }
+.eqgrp:first-of-type { margin-top: 0; }
+/* my moves on Play as cards; a roll card is a button that picks the move */
+.pmcards { margin-top: 10px; }
+.mcard.pmc { cursor: pointer; }
+/* Weird moves and plain rolls, an accordion inside the Basic moves card */
+.pnest { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); }
+.pnest > .pmoves { margin-top: 10px; }
+.mcard.pmc:hover { border-color: var(--accent); }
+.mcard.pmc[aria-pressed="true"] { border: 2px solid var(--accent); background: var(--surface2); }
+.mcard.pmc[aria-pressed="true"]::before { border-color: var(--accent); opacity: .5; }
+.mcard.pmc:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .eqtxt { display: grid; gap: 2px; min-width: 0; }
 .eqlist .switch { margin: 0; align-items: center; }
 .pvit { display: grid; gap: 16px; min-width: 0; }
@@ -1676,6 +1724,13 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
     <div class="actions" style="justify-content:flex-end"><button class="btn ghost" type="button" id="invdlg-cancel">Cancel</button><button class="btn" type="submit" id="invdlg-add">Add to inventory</button></div>
   </form>
 </dialog>
+<!-- the notebook: one running note for the hunter in play, in a sheet that slides up in the bottom right corner. Not modal: the game stays usable behind it. -->
+<section class="nbsheet" id="nbsheet" role="dialog" aria-modal="false" aria-labelledby="nb-title" inert>
+  <div class="nbhead"><h2 id="nb-title">Notes</h2><span class="nbwho" id="nb-who"></span><button type="button" class="hicon nbx" id="nb-close" aria-label="Close notes"><span class="i i-x"></span></button></div>
+  <div class="nbtools" role="toolbar" aria-label="Formatting" aria-controls="nb-ed"><div class="nbg"><button type="button" data-nb="undo" aria-label="Undo" title="Undo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button><button type="button" data-nb="redo" aria-label="Redo" title="Redo"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button></div><div class="nbg"><button type="button" data-nb="bold" aria-label="Bold" title="Bold" aria-pressed="false"><b>B</b></button><button type="button" data-nb="italic" aria-label="Italic" title="Italic" aria-pressed="false"><i>I</i></button><button type="button" data-nb="underline" aria-label="Underline" title="Underline" aria-pressed="false"><u>U</u></button><button type="button" data-nb="strikeThrough" aria-label="Strikethrough" title="Strikethrough" aria-pressed="false"><s>S</s></button><button type="button" data-nb="removeFormat" aria-label="Clear formatting" title="Clear formatting"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 7V4h16v3"/><path d="M5 20h6"/><path d="M13 4 8 20"/><path d="m15 15 5 5"/><path d="m20 15-5 5"/></svg></button></div><div class="nbg"><button type="button" data-nb="h2" aria-label="Heading" title="Heading" aria-pressed="false"><span class="nbh">H1</span></button><button type="button" data-nb="h3" aria-label="Subheading" title="Subheading" aria-pressed="false"><span class="nbh">H2</span></button><button type="button" data-nb="blockquote" aria-label="Quote" title="Quote" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M17 6H3"/><path d="M21 12H8"/><path d="M21 18H8"/><path d="M3 12v6"/></svg></button></div><div class="nbg"><button type="button" data-nb="insertUnorderedList" aria-label="Bulleted list" title="Bulleted list" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 6h.01M4 12h.01M4 18h.01" stroke-width="3"/></svg></button><button type="button" data-nb="insertOrderedList" aria-label="Numbered list" title="Numbered list" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 6h11"/><path d="M10 12h11"/><path d="M10 18h11"/><path d="M4 6h1v4"/><path d="M4 10h2"/><path d="M6 18H4c0-1 2-2 2-3s-1-1.5-2-1"/></svg></button><button type="button" data-nb="check" aria-label="Checklist" title="Checklist" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m3 7 2 2 4-4"/><path d="m3 17 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/></svg></button></div><div class="nbg"><button type="button" data-nb="link" aria-label="Add link" title="Add link" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></button><button type="button" data-nb="unlink" aria-label="Remove link" title="Remove link"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="m18.84 12.25 1.72-1.71a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="m5.17 11.75-1.71 1.71a5 5 0 0 0 7.07 7.07l1.71-1.71"/><path d="M8 2v3"/><path d="M2 8h3"/><path d="M16 22v-3"/><path d="M22 16h-3"/></svg></button></div></div>
+  <div class="nblink" id="nb-linkrow" hidden><input type="url" id="nb-url" placeholder="https://" aria-label="Link address" autocomplete="off" spellcheck="false"><button type="button" class="btn sm" id="nb-linkok">Add link</button><button type="button" class="btn ghost sm" id="nb-linkno">Cancel</button></div>
+  <div class="nbed" id="nb-ed" contenteditable="true" role="textbox" aria-multiline="true" aria-labelledby="nb-title"></div>
+</section>
 <dialog class="hcdlg" id="hcdlg" aria-labelledby="hc-title">
   <h2 class="sectitle" id="hc-title">Hunter card</h2>
   <p class="small muted" style="margin:0 0 10px">A picture of your hunter to drop in the group chat. It always uses the dark look, so it reads the same wherever you paste it.</p>
@@ -1928,6 +1983,8 @@ details[open] > summary::after { transform: translateY(2px) rotate(-135deg); }
           <button type="button" id="seg-build" aria-pressed="true">Build</button>
         </div>
         <div class="hicons">
+          <button type="button" class="hicon" id="hn-notes" aria-controls="nbsheet" aria-expanded="false" aria-label="Notes" data-tip="Notes"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M9 15h6"/><path d="M12 18v-6"/></svg></button>
+          <span class="hdiv" aria-hidden="true"></span>
           <button type="button" class="hicon" id="hn-list" data-hn="list" aria-haspopup="dialog" aria-label="My hunters" data-tip="My hunters"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></button>
           <button type="button" class="hicon" data-hn="new" aria-label="New hunter" data-tip="New hunter"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6"/><path d="M22 11h-6"/></svg></button>
           <button type="button" class="hicon" id="hn-ret" data-hn="retire" aria-haspopup="dialog" aria-label="Retire or mark lost" data-tip="Retire or mark lost"><svg class="tabico" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11h-6"/></svg></button>
@@ -2249,7 +2306,7 @@ function newCase() { var c = exampleCase(); c.example = false; c.title = ''; c.h
 function defaults() {
   return { v: 1, tab: 'hunter', hv: 'build', wiz: 0, bkAt: 0, rolls: [], cases: [exampleCase()], bestiary: [exampleBeast()], share: false, settings: { fx: true, sound: false, vol: .6, dice3d: false, light: 'garage', theme: 'dark', ink: '', tname: '', tnote: true }, hold: { n: 0, move: '', asked: [] }, session: { started: 0, events: [] }, bench: [], hoseen: 0, tseen: 0, prev: '', night: { k: '', since: 0, end: 0, by: {} }, dice: { linked: true, a: die0(), b: die0(), tray: 'leather', sets: [] },
     roller: { move: 'kick', stat: 'tough', forward: 0, ongoing: 0, other: 0 },
-    sheet: { name: '', pronouns: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', tv: 0, crop: { x: 50, y: 30, z: 1 }, hid: '', page: {}, badges: {}, pins: [], tal: [], career: { sessions: 0, rolls: 0, misses: 0, harm: 0, lvls: 0 }, bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, adv: {}, moves: '', gear: '' } };   // adv: the moves marked advanced, by id
+    sheet: { name: '', pronouns: '', playbook: '', catch: '', look: '', backstory: '', photo: '', thumb: '', tv: 0, crop: { x: 50, y: 30, z: 1 }, hid: '', page: {}, badges: {}, pins: [], tal: [], career: { sessions: 0, rolls: 0, misses: 0, harm: 0, lvls: 0 }, notebook: '', bonds: [], custom: [], inventory: [], pbs: {}, stats: { charm: 0, cool: 0, sharp: 0, tough: 0, weird: 0 }, luck: 7, harm: 0, unstable: false, xp: 0, level: 0, adv: {}, moves: '', gear: '' } };   // adv: the moves marked advanced, by id
 }
 var S = defaults();
 function merge(base, saved) {
@@ -2609,6 +2666,10 @@ function renderHist() {
   renderSession(el);
 }
 $('#roll').addEventListener('click', function () { if (Date.now() - shake.ended < 400) return; doRoll(); });
+$('#hv-play').addEventListener('keydown', function (e) {
+  var c = e.target.closest && e.target.closest('.pmc[data-pmove]');
+  if (c && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); c.click(); }
+});
 $('#hv-play').addEventListener('change', function (e) { if (e.target.id !== 'adv') return; if (e.target.checked) S.sheet.adv[S.roller.move] = true; else delete S.sheet.adv[S.roller.move]; renderStage(); renderPlay(); scheduleSave(); });
 /* moves that hand you hold: how much on a 10+ and on a 7-9 */
 var HOLDS = { inv: { full: 2, part: 1 }, read: { full: 3, part: 1 } };
@@ -3936,6 +3997,24 @@ function odoRun() {
 function stepStr(label, key, val, hint) {
   return '<div class="prow"><span>' + label + (hint ? ' <span class="muted small">' + hint + '</span>' : '') + '</span><span class="ctl"><button type="button" data-padj="' + key + '" data-d="-1" aria-label="Lower ' + label + '"><span class="i i-minus" aria-hidden="true"></span></button><output>' + val + '</output><button type="button" data-padj="' + key + '" data-d="1" aria-label="Raise ' + label + '"><span class="i i-plus" aria-hidden="true"></span></button></span></div>';
 }
+/* my moves on Play, as the same cards as the Sheet's playbook card: the playbook's in its order (automatic first), then moves I made myself.
+   A roll move's card picks that move for the dice; a no-roll card is there to read. */
+function pmCards(d, mine) {
+  var auto = d ? d.moves.auto.map(function (m) { return m.id; }) : [], used = {}, out = [];
+  function rollCard(m, kick) {
+    used[m.id] = true;
+    return mcardHTML({ idx: '+' + STATNAME[m.stat], kick: kick + (S.sheet.adv[m.id] ? ', advanced' : ''), name: m.name, text: m.trig, outs: [['10+', m.full], ['7-9', m.part], ['Miss', m.miss]], cls: 'pmc',
+      attrs: 'data-pmove="' + esc(m.id) + '" role="button" tabindex="0" aria-pressed="' + (S.roller.move === m.id) + '"' });
+  }
+  pbPicked().forEach(function (pm) {
+    var kick = auto.indexOf(pm.id) >= 0 ? 'Automatic' : 'Your pick';
+    if (pm.kind === 'passive') { out.push(mcardHTML({ idx: 'No roll', kick: kick, name: pm.name, text: pm.summary, cls: 'mc-passive' })); return; }
+    var c = S.sheet.custom.filter(function (x) { return x.pbk === pm.id; })[0], m = c && BYID['x' + c.id];
+    if (m) out.push(rollCard(m, kick));
+  });
+  mine.forEach(function (m) { if (!used[m.id]) out.push(rollCard(m, 'Your own move')); });
+  return out.join('');
+}
 function pmoveBtn(m) {
   return '<button type="button" class="pmove" data-pmove="' + esc(m.id) + '" aria-pressed="' + (S.roller.move === m.id) + '" title="' + esc(m.name) + '"><span>' + esc(m.name) + '</span><small>' + STATNAME[m.stat] + ' ' + fmtI(S.sheet.stats[m.stat]) + (S.sheet.adv[m.id] ? ' &middot; advanced' : '') + '</small></button>';
 }
@@ -3948,14 +4027,19 @@ function renderPlay() {
     '<div class="pport">' + av + '<span class="pclass">' + esc(sh.playbook || 'No playbook yet') + ' &middot; Level ' + sh.level + '</span></div>' +
     (fresh ? '<p class="note pfresh" style="margin:0">No hunter yet. You can still roll the basic moves. <button type="button" class="linkbtn" data-pgo="build">Build a hunter</button></p>' : '') +
     '<div class="pblock pstats"><ul class="pstatlist" aria-label="Your ratings">' + STATS.map(function (s) { var v = sh.stats[s]; return '<li><span>' + STATNAME[s] + '</span><b class="' + (v >= 2 ? 'hi' : v < 0 ? 'lo' : '') + '">' + fmtI(v) + '</b></li>'; }).join('') + '</ul></div>';
-  /* Equipment, in the middle column: the weapons and armor you carry, switched on or off here; everything else about them is on the Sheet */
-  var kit = sh.inventory.filter(function (i) { return i.type === 'Weapon' || i.type === 'Armor'; });
+  /* Equipment, in the middle column: everything in the inventory, under a heading for each type. Weapons and armor are switched on or off here; everything else about an item is on the Sheet */
+  var EQHEAD = { Weapon: 'Weapons', Armor: 'Armor', Gadget: 'Gadgets', Consumable: 'Consumables', Other: 'Other' };
+  var eqItem = function (i) {
+    var note = String(i.note || '').replace(/\s*\[.*\]$/, '').trim(), kit = i.type === 'Weapon' || i.type === 'Armor';
+    var info = [i.type === 'Weapon' ? (+i.val || 0) + '-harm' : i.type === 'Armor' ? 'Armor ' + (+i.val || 0) : '', (+i.qty || 1) > 1 ? 'Qty ' + (+i.qty) : '', note ? esc(note) : ''].filter(Boolean).join(' &middot; ');
+    return '<li class="' + (kit && !i.eq ? 'off' : '') + '"><span class="eqtxt"><b>' + esc(i.name || i.type) + '</b>' + (info ? '<span class="small muted">' + info + '</span>' : '') + '</span>' +
+      (kit ? '<label class="switch"><input type="checkbox" role="switch" data-peq="' + esc(i.id) + '"' + (i.eq ? ' checked' : '') + ' aria-label="' + esc(i.name || i.type) + ' equipped"></label>' : '') + '</li>';
+  };
   $('#play-gear').innerHTML = '<div class="invhead" style="margin-bottom:10px"><span class="lbl" style="margin:0">Equipment</span><button type="button" class="linkbtn small" data-pgo="gear">Edit on the Sheet</button></div>' +
-    (kit.length ? '<ul class="eqlist">' + kit.map(function (i) {
-      var note = String(i.note || '').replace(/\s*\[.*\]$/, '').trim();
-      return '<li class="' + (i.eq ? '' : 'off') + '"><span class="eqtxt"><b>' + esc(i.name || i.type) + '</b><span class="small muted">' + (i.type === 'Weapon' ? (+i.val || 0) + '-harm' : 'Armor ' + (+i.val || 0)) + (note ? ' &middot; ' + esc(note) : '') + '</span></span>' +
-        '<label class="switch"><input type="checkbox" role="switch" data-peq="' + esc(i.id) + '"' + (i.eq ? ' checked' : '') + ' aria-label="' + esc(i.name || i.type) + ' equipped"></label></li>';
-    }).join('') + '</ul>' : '<p class="small muted" style="margin:0">No weapons or armor yet. Add them on the Sheet.</p>');
+    (sh.inventory.length ? ITYPES.map(function (t) {
+      var its = sh.inventory.filter(function (i) { return (ITYPES.indexOf(i.type) >= 0 ? i.type : 'Other') === t; });
+      return its.length ? '<h4 class="eqgrp">' + EQHEAD[t] + '</h4><ul class="eqlist">' + its.map(eqItem).join('') + '</ul>' : '';
+    }).join('') : '<p class="small muted" style="margin:0">Nothing in your inventory yet. Add things on the Sheet.</p>');
   $('#pv-harm').innerHTML = '<span class="lbl">Harm</span>' + tallyPips(sh.harm) + '<p class="small' + (sh.harm >= 4 ? '' : ' muted') + '" style="margin:6px 0 0">' + (sh.unstable ? '<b style="color:var(--bad)">Unstable.</b> ' : '') + esc(harmText(sh.harm)) + '</p>' +
       '<div class="prow pchecks"><label><input type="checkbox" id="pl-unst"' + (sh.unstable ? ' checked' : '') + '> Unstable</label></div>' +
       (play.wound > 0 && sh.luck > 0 ? '<button type="button" class="btn ghost sm" id="pl-undo">Spend Luck: cancel that wound</button>' : '');
@@ -3968,13 +4052,12 @@ function renderPlay() {
   var wd = $('#pl-weird'), weirdOpen = (wd && wd.open) || R.move === 'plain' || weird.some(function (m) { return m.id === R.move; });
   $('#play-moves').innerHTML =
     wantDD() +
-    '<div class="card"><span class="lbl">Basic moves</span><div class="pmoves">' + basic.map(pmoveBtn).join('') + '</div></div>' +
+    '<div class="card"><span class="lbl">Basic moves</span><div class="pmoves">' + basic.map(pmoveBtn).join('') + '</div>' +
+      '<details class="pnest"' + (weirdOpen ? ' open' : '') + ' id="pl-weird"><summary class="lbl" style="margin:0">Weird moves and plain rolls</summary><div class="pmoves">' + weird.map(pmoveBtn).join('') +
+      '<button type="button" class="pmove" data-pmove="plain" aria-pressed="' + (R.move === 'plain') + '"><span>Plain roll</span><small>' + STATNAME[R.stat] + ' ' + fmtI(sh.stats[R.stat]) + '</small></button></div></details></div>' +
     '<div class="card" style="margin-top:16px"><span class="lbl">' + (d ? esc(d.name) + ' moves' : 'Your playbook moves') + '</span>' +
-      (mine.length ? '<div class="pmoves">' + mine.map(pmoveBtn).join('') + '</div>' : '') +
-      pass.map(function (m) { return '<details class="ppass"><summary><b>' + esc(m.name) + '</b> <span class="muted small">no roll</span></summary><p>' + esc(m.summary) + '</p></details>'; }).join('') +
-      (!mine.length && !pass.length ? '<p class="small muted" style="margin:0">Moves you pick in Build a hunter show up here.</p>' : '') + '</div>' +
-    '<details class="card" style="margin-top:16px"' + (weirdOpen ? ' open' : '') + ' id="pl-weird"><summary class="lbl" style="margin:0">Weird moves and plain rolls</summary><div class="pmoves">' + weird.map(pmoveBtn).join('') +
-      '<button type="button" class="pmove" data-pmove="plain" aria-pressed="' + (R.move === 'plain') + '"><span>Plain roll</span><small>' + STATNAME[R.stat] + ' ' + fmtI(sh.stats[R.stat]) + '</small></button></div></details>';
+      (mine.length || pass.length ? '<ul class="mcards pmcards">' + pmCards(d, mine) + '</ul>' : '') +
+      (!mine.length && !pass.length ? '<p class="small muted" style="margin:0">Moves you pick in Build a hunter show up here.</p>' : '') + '</div>';
   if (rit.open) $('#play-moves').innerHTML = ritualHTML();
 
   var mv = BYID[R.move] || PLAIN, m = bonus();
@@ -4139,7 +4222,162 @@ function ritFinish() {
 var hn = { list: false, del: '' };
 function clone(o) { return JSON.parse(JSON.stringify(o)); }
 /* a bench entry made from the hunter in play: a copy, so the swap can never lose anything */
-function benchOf(ended) { return { id: uid(), sheet: clone(S.sheet), hold: clone(S.hold), parked: Date.now(), ended: ended || null }; }
+/* ---------- the notebook ----------
+   One running note for each hunter (sheet.notebook), written in a sheet that slides up in the bottom right corner from the Notes button on the Hunter tab.
+   It is formatted text, kept as HTML from a short list of tags: nbClean() is the only way in, from the editor, from a paste and from a save, and it keeps
+   no attributes but a link's address (web or mail only), the checklist's class and a ticked item's mark. Nothing else from the note can reach the page. */
+var nb = { open: false, t: 0, sheet: null, range: null };
+var NBTAG = { P: 'p', DIV: 'p', BR: 'br', B: 'b', STRONG: 'b', I: 'i', EM: 'i', U: 'u', S: 's', STRIKE: 's', DEL: 's', H1: 'h2', H2: 'h2', H3: 'h3', H4: 'h3', H5: 'h3', H6: 'h3', UL: 'ul', OL: 'ol', LI: 'li', BLOCKQUOTE: 'blockquote', A: 'a' };
+var NBDROP = { SCRIPT: 1, STYLE: 1, TEMPLATE: 1, IFRAME: 1, OBJECT: 1, EMBED: 1, SVG: 1, MATH: 1, NOSCRIPT: 1, TITLE: 1, HEAD: 1, META: 1, LINK: 1, IMG: 1, VIDEO: 1, AUDIO: 1, CANVAS: 1, INPUT: 1, BUTTON: 1, SELECT: 1, TEXTAREA: 1 };
+function nbHref(v) { v = String(v || '').trim(); return /^(https?:\/\/|mailto:)/i.test(v) && v.length <= 2000 ? v : ''; }
+function nbClean(html) {
+  var t = document.createElement('template'), out = document.createElement('div');
+  t.innerHTML = String(html || '').slice(0, 400000);
+  (function walk(src, dst) {
+    for (var c = src.firstChild; c; c = c.nextSibling) {
+      if (c.nodeType === 3) { dst.appendChild(document.createTextNode(c.nodeValue)); continue; }
+      if (c.nodeType !== 1 || NBDROP[c.nodeName.toUpperCase()]) continue;
+      var name = NBTAG[c.nodeName.toUpperCase()];
+      if (!name) { walk(c, dst); continue; }   // a tag we do not keep: keep what is inside it
+      var el = document.createElement(name);
+      if (name === 'a') { var h = nbHref(c.getAttribute('href')); if (!h) { walk(c, dst); continue; } el.setAttribute('href', h); }
+      if (name === 'ul' && c.classList.contains('nbchk')) el.className = 'nbchk';
+      if (name === 'li' && c.hasAttribute('data-done')) el.setAttribute('data-done', '');
+      if (name !== 'br') walk(c, el);
+      dst.appendChild(el);
+    }
+  })(t.content, out);
+  return /\S/.test(out.textContent) ? out.innerHTML : '';
+}
+function nbEd() { return $('#nb-ed'); }
+function nbLoad() {
+  clearTimeout(nb.t); nb.t = 0;
+  nb.sheet = S.sheet; nbEd().innerHTML = nbClean(S.sheet.notebook);
+  $('#nb-who').textContent = S.sheet.name ? 'for ' + S.sheet.name : '';
+  nbState();
+}
+/* typing is saved a moment after it stops, into the hunter it was typed for */
+function nbStore() { clearTimeout(nb.t); nb.t = 0; if (!nb.sheet) return; nb.sheet.notebook = nbClean(nbEd().innerHTML); scheduleSave(); }
+function nbLater() { clearTimeout(nb.t); nb.t = setTimeout(nbStore, 400); }
+function nbFlush() { if (nb.t) nbStore(); }
+function nbOpen() {
+  if (nb.open) return;
+  nb.open = true; nbLoad();
+  var sh = $('#nbsheet'); sh.inert = false; sh.classList.add('on'); $('#hn-notes').setAttribute('aria-expanded', 'true');
+  try { document.execCommand('styleWithCSS', false, false); document.execCommand('defaultParagraphSeparator', false, 'p'); } catch (e) {}
+  var ed = nbEd(); ed.focus({ preventScroll: true });
+  var r = document.createRange(); r.selectNodeContents(ed); r.collapse(false); var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);   // the caret at the end of the note
+}
+function nbClose() {
+  if (!nb.open) return;
+  nbStore(); nbLinkRow(false);
+  var sh = $('#nbsheet'), back = sh.contains(document.activeElement);
+  nb.open = false; sh.classList.remove('on'); sh.inert = true; $('#hn-notes').setAttribute('aria-expanded', 'false');
+  if (back) $('#hn-notes').focus();
+}
+$('#hn-notes').addEventListener('click', function () { if (nb.open) nbClose(); else nbOpen(); });
+$('#nb-close').addEventListener('click', nbClose);
+$('#nbsheet').addEventListener('keydown', function (e) {
+  if (e.key !== 'Escape') return;
+  e.preventDefault();
+  if (!$('#nb-linkrow').hidden) { nbLinkRow(false); nbEd().focus(); nbPut(); } else nbClose();
+});
+
+/* where the caret is: the block it is in (a line, a heading, a quote) and the list and link around it */
+function nbAt() {
+  var sel = window.getSelection(), ed = nbEd(), n = sel.rangeCount ? sel.getRangeAt(0).startContainer : null, o = { block: null, ul: null, ol: null, a: null, li: null };
+  if (!n || !ed.contains(n)) return null;
+  for (; n && n !== ed; n = n.parentNode) {
+    if (n.nodeType !== 1) continue;
+    var t = n.nodeName;
+    if (!o.a && t === 'A') o.a = n;
+    if (!o.li && t === 'LI') o.li = n;
+    if (!o.ul && !o.ol && t === 'UL') o.ul = n;
+    if (!o.ul && !o.ol && t === 'OL') o.ol = n;
+    if (!o.block && /^(P|H2|H3|BLOCKQUOTE|DIV)$/.test(t)) o.block = n;
+    if (t === 'BLOCKQUOTE') o.quote = n;
+  }
+  return o;
+}
+function nbState() {
+  var o = nbAt() || {}, q = function (c) { try { return document.queryCommandState(c); } catch (e) { return false; } }, on = {
+    bold: q('bold'), italic: q('italic'), underline: q('underline'), strikeThrough: q('strikeThrough'),
+    h2: !!(o.block && o.block.nodeName === 'H2'), h3: !!(o.block && o.block.nodeName === 'H3'), blockquote: !!o.quote,
+    insertUnorderedList: !!(o.ul && !o.ul.classList.contains('nbchk')), insertOrderedList: !!o.ol, check: !!(o.ul && o.ul.classList.contains('nbchk')), link: !!o.a };
+  if (!nbAt()) Object.keys(on).forEach(function (k) { on[k] = false; });
+  $$('#nbsheet [data-nb][aria-pressed]').forEach(function (b) { b.setAttribute('aria-pressed', on[b.dataset.nb] ? 'true' : 'false'); });
+}
+document.addEventListener('selectionchange', function () { if (nb.open) nbState(); });
+
+/* the toolbar keeps the selection in the note: a press on it never takes the focus */
+$('#nbsheet .nbtools').addEventListener('mousedown', function (e) { if (e.target.closest('[data-nb]')) e.preventDefault(); });
+$('#nbsheet .nbtools').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-nb]'); if (!b) return;
+  var c = b.dataset.nb, ed = nbEd(), o;
+  if (!nbAt()) { ed.focus(); }
+  o = nbAt() || {};
+  if (c === 'h2' || c === 'h3') document.execCommand('formatBlock', false, o.block && o.block.nodeName === c.toUpperCase() ? 'p' : c);
+  else if (c === 'blockquote') document.execCommand('formatBlock', false, o.quote ? 'p' : 'blockquote');
+  else if (c === 'check') nbCheck(o);
+  else if (c === 'insertUnorderedList' && o.ul && o.ul.classList.contains('nbchk')) o.ul.classList.remove('nbchk');   // a checklist becomes plain bullets
+  else if (c === 'link') { nbLinkRow(true, o.a); return; }
+  else if (c === 'unlink') { if (o.a && window.getSelection().isCollapsed) { var r = document.createRange(); r.selectNode(o.a); window.getSelection().removeAllRanges(); window.getSelection().addRange(r); } document.execCommand('unlink'); }
+  else document.execCommand(c);
+  nbLater(); nbState();
+});
+/* a checklist is a bulleted list with the nbchk class: turn plain bullets into one, start one, or turn it back into lines */
+function nbCheck(o) {
+  if (o.ul && o.ul.classList.contains('nbchk')) { document.execCommand('insertUnorderedList'); return; }
+  if (o.ul) { o.ul.classList.add('nbchk'); return; }
+  if (o.ol) document.execCommand('insertOrderedList');   // out of the numbered list first
+  document.execCommand('insertUnorderedList');
+  var n = nbAt(); if (n && n.ul) n.ul.classList.add('nbchk');
+}
+/* tick an item by its box, or with Ctrl or Cmd and Enter */
+nbEd().addEventListener('click', function (e) {
+  var li = e.target.closest && e.target.closest('ul.nbchk > li'); if (!li) return;
+  if (e.clientX - li.getBoundingClientRect().left > 28) return;
+  e.preventDefault(); li.toggleAttribute('data-done'); nbLater();
+});
+nbEd().addEventListener('keydown', function (e) {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { var o = nbAt(); if (o && o.li && o.ul && o.ul.classList.contains('nbchk')) { e.preventDefault(); o.li.toggleAttribute('data-done'); nbLater(); } return; }
+  if (e.key === 'Enter' && !e.shiftKey) setTimeout(function () { var o = nbAt(); if (o && o.li && !/\S/.test(o.li.textContent)) o.li.removeAttribute('data-done'); }, 0);   // a new item starts unticked
+});
+nbEd().addEventListener('input', nbLater);
+/* a paste keeps its formatting, through the same cleaning as everything else */
+nbEd().addEventListener('paste', function (e) {
+  var cd = e.clipboardData; if (!cd) return;
+  e.preventDefault();
+  var h = cd.getData('text/html');
+  if (h) document.execCommand('insertHTML', false, nbClean(h) || esc(cd.getData('text/plain')));
+  else document.execCommand('insertText', false, cd.getData('text/plain'));
+  nbLater();
+});
+
+/* links: a small row under the toolbar asks for the address; the selection is kept and put back */
+function nbLinkRow(show, a) {
+  var row = $('#nb-linkrow'), sel = window.getSelection();
+  if (show) {
+    nb.range = sel.rangeCount && nbEd().contains(sel.getRangeAt(0).startContainer) ? sel.getRangeAt(0).cloneRange() : null;
+    if (a && nb.range && nb.range.collapsed) { nb.range = document.createRange(); nb.range.selectNodeContents(a); }
+    row.hidden = false; $('#nb-url').value = a ? a.getAttribute('href') : ''; $('#nb-url').focus(); $('#nb-url').select();
+  } else row.hidden = true;
+}
+function nbPut() { if (!nb.range) return; var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(nb.range); }
+function nbLinkGo() {
+  var v = $('#nb-url').value.trim();
+  if (v && !/^[a-z]+:/i.test(v)) v = (/^[^\s@\/]+@[^\s@\/]+\.[^\s@\/]+$/.test(v) ? 'mailto:' : 'https://') + v;
+  var h = nbHref(v); if (!h) { $('#nb-url').focus(); return; }
+  nbLinkRow(false); nbEd().focus(); nbPut();
+  if (!nb.range || nb.range.collapsed) document.execCommand('insertHTML', false, '<a href="' + esc(h) + '">' + esc(h.replace(/^mailto:/i, '')) + '</a>&nbsp;');
+  else document.execCommand('createLink', false, h);
+  nbLater(); nbState();
+}
+$('#nb-linkok').addEventListener('click', nbLinkGo);
+$('#nb-linkno').addEventListener('click', function () { nbLinkRow(false); nbEd().focus(); nbPut(); });
+$('#nb-url').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); nbLinkGo(); } });
+window.__journal.nb = function () { return { open: nb.open, html: nbEd().innerHTML, saved: S.sheet.notebook }; };
+function benchOf(ended) { nbFlush(); return { id: uid(), sheet: clone(S.sheet), hold: clone(S.hold), parked: Date.now(), ended: ended || null }; }
 function benchFind(id) { for (var i = 0; i < S.bench.length; i++) if (S.bench[i].id === id) return i; return -1; }
 /* Anything that came from a saved file or a backup is checked and filled in with the current defaults, so an old or odd entry can still be played. */
 function benchClean() {
@@ -4163,6 +4401,7 @@ function takeHunter(h, build) {
 function hunterChanged() {
   hn.list = false; hn.del = '';
   renderBuild(); renderSheet(); renderPortrait(); renderInv(); renderBonds(); renderCustom(); renderRoller(); renderPlay(); renderHunters(); setHV(S.hv); applyMast();
+  if (nb.open) nbLoad();   // the notebook shows the new hunter's note
   scheduleSave(); window.scrollTo(0, 0);
 }
 function newHunter() { if (rolling) return; nightLeave(false); S.bench.unshift(benchOf(null)); takeHunter({ sheet: defaults().sheet, hold: defaults().hold }, true); hunterChanged(); }
@@ -5118,6 +5357,7 @@ function sheetClean(sh) {
   sh.career = { sessions: n(c.sessions, 1e5), rolls: n(c.rolls, 1e7), misses: n(c.misses, 1e7), harm: n(c.harm, 1e7), lvls: n(c.lvls, 1e5) };
   if (!HIDRX.test(sh.hid || '')) sh.hid = '';
   sh.page = pageClean(sh.page);   // how the hunter's page looks
+  sh.notebook = typeof sh.notebook === 'string' ? nbClean(sh.notebook) : '';   // the notebook, formatted text from a short list of tags
 }
 function saveClean() {
   var N = S.night && typeof S.night === 'object' ? S.night : {}, by = {}, src = N.by && typeof N.by === 'object' ? N.by : {};
@@ -5671,7 +5911,7 @@ $('#rs-confirm').addEventListener('click', function (e) {
   if (e.target.id === 'rs-go' && restoreStaged) {
     S = merge(defaults(), restoreStaged); restoreStaged = null; benchClean(); evBase();
     $('#rs-confirm').innerHTML = ''; $('#rs-text').value = '';
-    renderAll(); flushNow(); showTab('hunter'); bkMsg('Journal restored.');
+    renderAll(); if (nb.open) nbLoad(); flushNow(); showTab('hunter'); bkMsg('Journal restored.');
   }
 });
 
