@@ -6351,29 +6351,15 @@ function tone(f, to, g, len, t) {
 /* Recorded hits (snd/*.mp3, optional, see snd/README.md). Each bounce plays the tray's recording and, over it, the die's own tick.
    A set is fetched the first time it is wanted, only once sound is on, and only over http. Until it has arrived, or if it never
    does, that half of the bounce uses the made-up sound instead. */
-var SNDSETS = { dicehit_plastic: 15, dicehit_metal: 12, dicehit_wood: 12, dicehit_glass: 5, surface_felt: [1, 2, 3, 4, 5, 7], surface_wood_table: 7, surface_wood_tray: 7, surface_metal: 9, surface_soft: 5 };
+var SNDSETS = { dicehit_glass: 5, surface_soft: 5 };   // only Kenney's CC0 recordings; the rest were left out of this public copy, so those dice and trays use made-up sounds
 /* set: which recordings. rate: playback speed, lower is deeper. g: loudness. w: weight, which makes the landing louder and a touch deeper.
    ring: how much of the finish's made-up ring (SFX) to add on top; the glass recording is a tap on a pane, so a small die needs it sped up and ringing.
    under: a second recording played beneath a tray's own, here a low thud for the soft trays. */
 var DIESND = {
-  bone: { set: 'dicehit_plastic', rate: .88, g: 1 },
-  resin: { set: 'dicehit_plastic', rate: 1.04, g: .9 },
-  metal: { set: 'dicehit_metal', rate: 1, g: 1, w: 1.25 },
-  stone: { set: 'dicehit_wood', rate: .8, g: 1, w: 1.2 },
-  wood: { set: 'dicehit_wood', rate: 1, g: 1 },
-  rust: { set: 'dicehit_metal', rate: .9, g: .95, w: 1.2 },
   gem: { set: 'dicehit_glass', rate: 4, g: .8, ring: .6 },
   fuel: { set: 'dicehit_glass', rate: 3, g: .8, w: 1.15, ring: .5 }
 };
-var TRAYSND = {
-  leather: { set: 'surface_felt', rate: .82, g: .85, under: { set: 'surface_soft', rate: 2.2, g: 1 } },
-  felt: { set: 'surface_felt', rate: 1, g: 1, under: { set: 'surface_soft', rate: 2.6, g: .45 } },
-  wood: { set: 'surface_wood_tray', rate: 1, g: 1 },
-  slate: { set: 'surface_wood_table', rate: 1.22, g: .9 },
-  rust: { set: 'surface_metal', rate: .9, g: .55 },
-  dust: { set: 'surface_felt', rate: .9, g: .6, under: { set: 'surface_soft', rate: 2.4, g: .8 } },
-  concrete: { set: 'surface_wood_table', rate: 1.32, g: .9 }
-};
+var TRAYSND = {};   // no tray recordings in this copy: every tray uses its made-up sound (TRAYSFX)
 var SND = window.__snd = {}; /* set name: { ready, takes: [{ b: AudioBuffer, pk: peak }] sorted quiet to loud }. On window so tests can look in. */
 function sndLoad(set) {
   var st = SND[set], ids = SNDSETS[set], left, i;
