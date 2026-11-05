@@ -1301,6 +1301,8 @@ span.mc-out { display: grid; }
 .mcard.pmc:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .eqtxt { display: grid; gap: 2px; min-width: 0; }
 .eqlist .switch { margin: 0; align-items: center; }
+.eqacts { display: flex; align-items: center; gap: 10px; flex: none; }
+.equndo { margin: 10px 0 0; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .pvit { display: grid; gap: 16px; min-width: 0; }
 .pvit .levelup { margin-top: 0; }
 .prow.pchecks { justify-content: flex-start; gap: 12px 16px; }
@@ -4033,13 +4035,15 @@ function renderPlay() {
     var note = String(i.note || '').replace(/\s*\[.*\]$/, '').trim(), kit = i.type === 'Weapon' || i.type === 'Armor';
     var info = [i.type === 'Weapon' ? (+i.val || 0) + '-harm' : i.type === 'Armor' ? 'Armor ' + (+i.val || 0) : '', (+i.qty || 1) > 1 ? 'Qty ' + (+i.qty) : '', note ? esc(note) : ''].filter(Boolean).join(' &middot; ');
     return '<li class="' + (kit && !i.eq ? 'off' : '') + '"><span class="eqtxt"><b>' + esc(i.name || i.type) + '</b>' + (info ? '<span class="small muted">' + info + '</span>' : '') + '</span>' +
-      (kit ? '<label class="switch"><input type="checkbox" role="switch" data-peq="' + esc(i.id) + '"' + (i.eq ? ' checked' : '') + ' aria-label="' + esc(i.name || i.type) + ' equipped"></label>' : '') + '</li>';
+      '<span class="eqacts">' + (kit ? '<label class="switch"><input type="checkbox" role="switch" data-peq="' + esc(i.id) + '"' + (i.eq ? ' checked' : '') + ' aria-label="' + esc(i.name || i.type) + ' equipped"></label>' : '') +
+      ib('trash', 'Remove ' + esc(i.name || i.type), 'data-prm="' + esc(i.id) + '"') + '</span></li>';
   };
   $('#play-gear').innerHTML = '<div class="invhead" style="margin-bottom:10px"><span class="lbl" style="margin:0">Equipment</span><button type="button" class="linkbtn small" data-pgo="gear">Edit on the Sheet</button></div>' +
     (sh.inventory.length ? ITYPES.map(function (t) {
       var its = sh.inventory.filter(function (i) { return (ITYPES.indexOf(i.type) >= 0 ? i.type : 'Other') === t; });
       return its.length ? '<h4 class="eqgrp">' + EQHEAD[t] + '</h4><ul class="eqlist">' + its.map(eqItem).join('') + '</ul>' : '';
-    }).join('') : '<p class="small muted" style="margin:0">Nothing in your inventory yet. Add things on the Sheet.</p>');
+    }).join('') : '<p class="small muted" style="margin:0">Nothing in your inventory yet. Add things on the Sheet.</p>') +
+    (removed && removed.play ? '<p class="small equndo" role="status">Removed ' + esc(removed.it.name || 'item') + '. <button class="btn ghost sm" type="button" id="pl-undorm">Undo</button></p>' : '');
   $('#pv-harm').innerHTML = '<span class="lbl">Harm</span>' + tallyPips(sh.harm) + '<p class="small' + (sh.harm >= 4 ? '' : ' muted') + '" style="margin:6px 0 0">' + (sh.unstable ? '<b style="color:var(--bad)">Unstable.</b> ' : '') + esc(harmText(sh.harm)) + '</p>' +
       '<div class="prow pchecks"><label><input type="checkbox" id="pl-unst"' + (sh.unstable ? ' checked' : '') + '> Unstable</label></div>' +
       (play.wound > 0 && sh.luck > 0 ? '<button type="button" class="btn ghost sm" id="pl-undo">Spend Luck: cancel that wound</button>' : '');
@@ -4570,6 +4574,20 @@ $('#inv').addEventListener('click', function (e) {
     renderInv(); scheduleSave();
     $('#invundo').innerHTML = 'Removed ' + esc(it.name || 'item') + '. <button class="btn ghost sm" type="button" id="undorm">Undo</button>';
   }
+});
+/* removing from Play's Equipment: the same as the Sheet's remove, with its own Undo under the list */
+$('#play-gear').addEventListener('click', function (e) {
+  var b = e.target.closest('[data-prm], #pl-undorm'); if (!b) return;
+  if (b.id === 'pl-undorm') {
+    if (removed) S.sheet.inventory.splice(Math.min(removed.idx, S.sheet.inventory.length), 0, removed.it);
+    removed = null;
+  } else {
+    var it = S.sheet.inventory.filter(function (x) { return x.id === b.dataset.prm; })[0]; if (!it) return;
+    var idx = S.sheet.inventory.indexOf(it);
+    removed = { it: it, idx: idx, play: true }; S.sheet.inventory.splice(idx, 1);
+  }
+  $('#invundo').textContent = ''; renderInv(); renderPlay(); scheduleSave();
+  var u = $('#pl-undorm'); if (u) u.focus();
 });
 $('#invundo').addEventListener('click', function (e) {
   if (e.target.id !== 'undorm' || !removed) return;
